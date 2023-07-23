@@ -34,5 +34,5 @@ public class Convenience {
 
     private String name;
 
-    private String usage;
+    private String price;
 }

@@ -53,8 +53,7 @@ public class Studycafe {
     @Column(name = "accum_reserve_count")
     private Integer accumReserveCount;
 
-    @Column(name = "basic_info")
-    private String basicInfo;
+    private String introduction;
 
     @Column(name = "notification_info")
     private String notificationInfo;
