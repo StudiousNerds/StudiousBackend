@@ -3,11 +3,13 @@ package nerds.studiousTestProject.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.review.dto.FindReviewResponse;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,5 +23,22 @@ public class ReviewService {
     private List<Review> getReviewList(Long id) {
         List<Review> reviewList = reviewRepository.findAllById(id);
         return reviewList;
+    }
+
+    public List<FindReviewResponse> findAllReviews(Long id){
+        List<Review> reviewList = getReviewList(id);
+        List<FindReviewResponse> reviewResponses = new ArrayList<>();
+
+        for (Review review :reviewList) {
+            reviewResponses.add(FindReviewResponse.builder()
+                    .grade(review.getGrade().getTotal())
+                    .email(review.getReservationRecord().getMember().getNickname())
+                    .detail(review.getDetail())
+                    .date(review.getCreatedDate())
+                    .photos(subPhotoService.findReviewPhotos(review.getId()))
+                    .build());
+        }
+
+        return reviewResponses;
     }
 }
