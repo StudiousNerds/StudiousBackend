@@ -43,7 +43,7 @@ public class StudycafeService {
                 .conveniences(convenienceService.getAllCafeConveniences(id))
                 .notification(studycafe.getNotificationInfo())
                 .refundPolicy(studycafe.getRefundPolicyInfo())
-                .notice()
+                .notice(getNotice(id))
                 .rooms(roomService.getRooms(date, id))
                 .recommendationRate(reviewService.getAvgRecommendation(id))
                 .cleanliness(reviewService.getAvgCleanliness(id))
@@ -53,4 +53,26 @@ public class StudycafeService {
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
     }
+
+    public String[] getNotice(Long id){
+        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
+
+        List<String> noticeList = studycafe.getNotice();
+        Integer arrSize = noticeList.size();
+        String notices[] = noticeList.toArray(new String[arrSize]);
+
+        return notices;
+    }
+
+//    public LocalTime getOpenTime(Long studycafeId){
+//        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
+//
+//        return studycafe.getStartTime();
+//    }
+//
+//    public LocalTime getEndTime(Long studycafeId){
+//        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
+//
+//        return studycafe.getEndTime();
+//    }
 }
