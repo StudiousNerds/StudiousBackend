@@ -49,7 +49,7 @@ public class RoomService {
                             .type(room.getType())
                             .minUsingTime(room.getMinUsingTime())
                             .photos(subPhotoService.findRoomPhotos(room.getId()))
-                            .canReserveDatetime()
+                            .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
                             .conveniences(convenienceService.getAllRoomConveniences(studycafeId, room.getId()))
                             .build());
         }
@@ -71,5 +71,19 @@ public class RoomService {
         }
 
         return timeList;
+    }
+
+    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date,Long studycafeId, Long roomId){
+        Integer oneMonth = date.lengthOfMonth();
+        LocalDate firstDayOfMonth = date.withDayOfMonth(1);
+        Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
+
+        for (int i = 0; i < oneMonth; i++){
+            Integer[] canReserveTime = getCanReserveTime(firstDayOfMonth, studycafeId, roomId);
+            reservationList.put(firstDayOfMonth.toString(), canReserveTime);
+            firstDayOfMonth.plusDays(1);
+        }
+
+        return reservationList;
     }
 }
