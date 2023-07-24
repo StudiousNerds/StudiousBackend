@@ -65,4 +65,16 @@ public class ReviewService {
 
         return result = sum / count;
     }
+
+    public Integer getAvgFixturesStatus(Long id){
+        List<Review> reviewList = getReviewList(id);
+        Integer count = 0, sum = 0, result = 0;
+
+        for (Review review : reviewList){
+            sum += review.getGrade().getFixturesStatus();
+            count++;
+        }
+
+        return result = sum / count;
+    }
 }
