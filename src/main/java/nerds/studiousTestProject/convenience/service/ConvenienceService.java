@@ -25,4 +25,12 @@ public class ConvenienceService {
 
         return cafeConveniences;
     }
+
+    public String[] getAllRoomConveniences(Long studycafeId, Long roomId){
+        List<String> convenienceList = convenienceRepository.findByStudycafeIdAndRoomId(studycafeId, roomId);
+        Integer arrSize = convenienceList.size();
+        String roomConveniences[] = convenienceList.toArray(new String[arrSize]);
+
+        return roomConveniences;
+    }
 }
