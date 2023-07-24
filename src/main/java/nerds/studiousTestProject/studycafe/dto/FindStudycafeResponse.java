@@ -14,6 +14,7 @@ public class FindStudycafeResponse {
     private String[] photos;
     private Integer accumResCnt;
     private Integer duration;
+    private String nearestStation;
     private String[] hashtags;
     private String introduction;
     private String[] conveniences;
@@ -21,7 +22,7 @@ public class FindStudycafeResponse {
     private List<Integer> refundPolicy;
     private String[] notice;
     private List<FindRoomResponse> rooms;
-    private Double recommendationRate;
+    private Integer recommendationRate;
     private Integer cleanliness;
     private Integer deafening;
     private Integer fixturesStatus;

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class FindReviewResponse {
-    private Integer grade;
+    private Double grade;
     private String email;
     private String detail;
     private LocalDate date;
