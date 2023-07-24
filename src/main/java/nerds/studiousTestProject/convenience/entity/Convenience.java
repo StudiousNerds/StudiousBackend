@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.convenience.entity;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
