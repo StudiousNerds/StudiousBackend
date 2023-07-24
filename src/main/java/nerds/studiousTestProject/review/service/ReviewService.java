@@ -53,4 +53,16 @@ public class ReviewService {
 
         return result = sum / count;
     }
+
+    public Integer getAvgDeafening(Long id){
+        List<Review> reviewList = getReviewList(id);
+        Integer count = 0, sum = 0, result = 0;
+
+        for (Review review : reviewList){
+            sum += review.getGrade().getDeafening();
+            count++;
+        }
+
+        return result = sum / count;
+    }
 }
