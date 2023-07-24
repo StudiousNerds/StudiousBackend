@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.photo.entity;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
