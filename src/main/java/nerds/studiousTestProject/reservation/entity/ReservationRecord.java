@@ -14,10 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.user.entity.member.Member;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Builder
@@ -46,13 +46,18 @@ public class ReservationRecord {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "reservation_time")
-    private LocalDateTime reservationTime;
+    private LocalDate date;
+
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
 
     private Integer headcount;
 
     @Column(name = "reservation_status")
-    private String reservationStatus;
+    private ReservationStatus reservationStatus;
 
     private String request;
 
