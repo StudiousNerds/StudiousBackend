@@ -8,4 +8,5 @@ import java.util.List;
 public interface SubPhotoRepository extends JpaRepository<SubPhoto, Long> {
     List<SubPhoto> findAllByReviewId(Long reviewId);
     List<SubPhoto> findAllByStudycafeId(Long studycafeId);
+    List<SubPhoto> findAllByRoomId(Long roomId);
 }
