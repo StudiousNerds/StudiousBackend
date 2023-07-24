@@ -56,4 +56,20 @@ public class RoomService {
 
         return rooms;
     }
+
+    public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
+        Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
+        Integer timeList[] = new Integer[24];
+
+        List<Boolean> values = reservationTimes.values().stream().toList();
+        List<Integer> timeZone = reservationTimes.keySet().stream().toList();
+
+        for (int i = 0; i < values.size(); i++) {
+            if(values.get(i) == true){
+                timeList[i] = timeZone.get(i);
+            }
+        }
+
+        return timeList;
+    }
 }
