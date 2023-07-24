@@ -30,7 +30,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-ldap")
 	implementation("com.unboundid:unboundid-ldapsdk")
 	 */
-
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// JWT 의존성
