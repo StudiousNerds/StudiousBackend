@@ -5,7 +5,8 @@ import nerds.studiousTestProject.user.entity.token.RefreshToken;
 import nerds.studiousTestProject.user.exception.message.ExceptionMessage;
 import nerds.studiousTestProject.user.exception.model.TokenNotFoundException;
 import nerds.studiousTestProject.user.repository.token.RefreshTokenRepository;
-import nerds.studiousTestProject.user.util.JwtTokenConst;
+import nerds.studiousTestProject.user.util.DateConverter;
+import nerds.studiousTestProject.user.util.JwtTokenUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,22 +14,22 @@ import org.springframework.stereotype.Service;
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public RefreshToken save(Long memberId, String refreshToken) {
+    public RefreshToken save(String username, String refreshToken) {
         return refreshTokenRepository.save(
                 RefreshToken.from(
-                        memberId,
+                        username,
                         refreshToken,
-                        JwtTokenConst.REFRESH_TOKEN_EXPIRE_TIME
+                        DateConverter.toLocalDateTime(JwtTokenUtil.REFRESH_TOKEN_EXPIRE_TIME)
                 )
         );
     }
 
-    public RefreshToken findByMemberId(Long memberId) {
-        return refreshTokenRepository.findById(memberId)
+    public RefreshToken findByUsername(String username) {
+        return refreshTokenRepository.findById(username)
                 .orElseThrow(() -> new TokenNotFoundException(ExceptionMessage.TOKEN_NOT_FOUND));
     }
 
-    public void deleteByMemberId(Long memberId) {
-        refreshTokenRepository.deleteById(memberId);
+    public void deleteByUsername(String username) {
+        refreshTokenRepository.deleteById(username);
     }
 }
