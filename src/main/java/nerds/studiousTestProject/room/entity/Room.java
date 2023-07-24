@@ -33,6 +33,8 @@ public class Room {
     @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member member;
 
+    private String name;
+
     @Column(name = "stand_count")
     private Integer standCount; // 기존 인원수
 
