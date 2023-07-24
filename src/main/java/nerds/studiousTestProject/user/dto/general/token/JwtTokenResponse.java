@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.user.util.JwtTokenConst;
+import nerds.studiousTestProject.user.util.JwtTokenUtil;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +16,7 @@ public class JwtTokenResponse {
 
     public static JwtTokenResponse from(String accessToken) {
         return JwtTokenResponse.builder()
-                .grantType(JwtTokenConst.TOKEN_PREFIX)
+                .grantType(JwtTokenUtil.TOKEN_PREFIX)
                 .accessToken(accessToken)
                 .build();
     }
