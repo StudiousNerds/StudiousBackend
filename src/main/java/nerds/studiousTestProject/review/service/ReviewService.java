@@ -41,4 +41,16 @@ public class ReviewService {
 
         return reviewResponses;
     }
+
+    public Integer getAvgCleanliness(Long id){
+        List<Review> reviewList = getReviewList(id);
+        Integer count = 0, sum = 0, result = 0;
+
+        for (Review review : reviewList){
+            sum += review.getGrade().getCleanliness();
+            count++;
+        }
+
+        return result = sum / count;
+    }
 }
