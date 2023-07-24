@@ -27,4 +27,16 @@ public class SubPhotoService {
 
         return reviewPhotos;
     }
+
+    public String[] findCafePhotos(Long id){
+        List<SubPhoto> photoList = subPhotoRepository.findAllByStudycafeId(id);
+        Integer arrSize = photoList.size();
+        String cafePhotos[] = new String[arrSize];
+
+        for (int i = 0; i < arrSize; i++){
+            cafePhotos[i] = photoList.get(i).getUrl();
+        }
+
+        return cafePhotos;
+    }
 }
