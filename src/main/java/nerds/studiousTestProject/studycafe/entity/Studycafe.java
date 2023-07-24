@@ -60,6 +60,10 @@ public class Studycafe {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
+    private List<String> notice = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     @Column(name = "refund_policy_info")
     private List<Integer> refundPolicyInfo = new ArrayList<>();
 }
