@@ -77,4 +77,16 @@ public class ReviewService {
 
         return result = sum / count;
     }
+
+    public Integer getAvgRecommendation(Long id){
+        List<Review> reviewList = getReviewList(id);
+        Integer recommend = 0, count = 0, result = 0;
+
+        for (Review review : reviewList){
+            recommend += review.getGrade().getFixturesStatus();
+            count++;
+        }
+
+        return result = recommend / count * 100;
+    }
 }
