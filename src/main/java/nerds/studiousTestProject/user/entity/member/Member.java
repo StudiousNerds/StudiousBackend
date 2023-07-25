@@ -57,6 +57,11 @@ public class Member implements UserDetails {
     @Column(name = "phone_number")
     private String phoneNumber;
     private Date createdDate;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<String> bookmark = new ArrayList<>();
+
     private boolean usable;
 
     @Nullable
