@@ -11,6 +11,8 @@ import nerds.studiousTestProject.room.service.RoomService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -20,9 +22,10 @@ public class ReservationRecordService {
     private final RoomService roomService;
 
     @Transactional
-    public void saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId){
+    public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId){
         ReservationInfo reservation = paymentRequest.getReservation();
         ReserveUser user = paymentRequest.getUser();
+        String orderId = String.valueOf(UUID.randomUUID());
         reservationRecordRepository.saveReservationRecord(
                 ReservationRecord.builder()
                         .reservationStatus(ReservationStatus.INPROGRESS)
@@ -35,7 +38,13 @@ public class ReservationRecordService {
                         .phoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(roomService.findById(roomId))
+                        .orderId(orderId)
                         .build()
         );
+        return orderId;
+    }
+
+    public ReservationRecord findByOrderId(String orderId) {
+        return reservationRecordRepository.findByOrderId(orderId);
     }
 }
