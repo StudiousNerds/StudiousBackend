@@ -10,6 +10,7 @@ public class MainPageResponse {
     private String cafeName;
     private String photo;
     private Integer accumRevCnt;
+    private String nearestStation;
     private Integer distance;
     private Double grade;
     private String[] hashtags;

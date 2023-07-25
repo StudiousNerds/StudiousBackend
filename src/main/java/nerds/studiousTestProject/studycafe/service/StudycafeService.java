@@ -79,6 +79,7 @@ public class StudycafeService {
                     .photo(cafePhotos[0])
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
+                    .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGarde())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
