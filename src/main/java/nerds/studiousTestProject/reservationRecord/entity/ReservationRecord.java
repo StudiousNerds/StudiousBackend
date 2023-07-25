@@ -3,6 +3,7 @@ package nerds.studiousTestProject.reservationRecord.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.user.entity.member.Member;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter
 public class ReservationRecord {
 
     @Id
@@ -39,4 +41,5 @@ public class ReservationRecord {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
+    private String orderId;
 }
