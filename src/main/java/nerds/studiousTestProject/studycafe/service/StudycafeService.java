@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
@@ -92,6 +93,10 @@ public class StudycafeService {
             recommendStudycafeList.add(foundStudycafe);
         }
         return recommendStudycafeList;
+    }
+
+    public Studycafe getStudyCafe(Long studycafeId){
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
     }
 
 //    public List<MainPageResponse> getRecommendStudycafe(){
