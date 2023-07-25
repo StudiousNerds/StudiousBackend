@@ -10,4 +10,5 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long> {
     Optional<Studycafe> findById(Long id);
     List<Studycafe> findTop10ByOrderByTotalGardeDesc();
     List<Studycafe> findTop10ByOrderByCreatedDateDesc();
+    Optional<Studycafe> findByName(String cafeName);
 }

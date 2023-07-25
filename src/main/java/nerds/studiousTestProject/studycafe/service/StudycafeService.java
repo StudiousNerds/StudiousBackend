@@ -92,6 +92,10 @@ public class StudycafeService {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
     }
 
+    public Studycafe getStudyCafeByName(String cafeName){
+        return studycafeRepository.findByName(cafeName).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
+    }
+
 //    public List<MainPageResponse> getRecommendStudycafe(){
 //        Map<Studycafe, Double> averageList = getStudycafeAvgGrade();
 //        Map<Studycafe, Double> topTenList = getTopTenStudycafeList(averageList);
