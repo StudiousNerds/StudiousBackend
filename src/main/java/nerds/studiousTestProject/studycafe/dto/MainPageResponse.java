@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MainPageResponse {
+    private Long cafeId;
     private String cafeName;
     private String photo;
     private Integer accumRevCnt;

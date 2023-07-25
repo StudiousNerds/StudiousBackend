@@ -36,6 +36,7 @@ public class StudycafeService {
         Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
 
         return FindStudycafeResponse.builder()
+                .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
                 .photos(subPhotoService.findCafePhotos(id))
                 .accumResCnt(studycafe.getAccumReserveCount())
@@ -59,30 +60,21 @@ public class StudycafeService {
 
     public List<MainPageResponse> getRecommendStduycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGardeDesc();
-        List<MainPageResponse> recommendStudycafeList = new ArrayList<>();
-
-        for (Studycafe studycafe : topTenCafeList) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
-            MainPageResponse foundStudycafe = MainPageResponse.builder()
-                    .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
-                    .accumRevCnt(studycafe.getAccumReserveCount())
-                    .distance(studycafe.getDuration())
-                    .grade(studycafe.getTotalGarde())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
-                    .build();
-            recommendStudycafeList.add(foundStudycafe);
-        }
-        return recommendStudycafeList;
+        return getMainPageCafes(topTenCafeList);
     }
 
     public List<MainPageResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
-        List<MainPageResponse> recommendStudycafeList = new ArrayList<>();
+        return getMainPageCafes(topTenCafeList);
+    }
+
+    private List<MainPageResponse> getMainPageCafes(List<Studycafe> topTenCafeList) {
+        List<MainPageResponse> mainPageStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
             String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             MainPageResponse foundStudycafe = MainPageResponse.builder()
+                    .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
                     .photo(cafePhotos[0])
                     .accumRevCnt(studycafe.getAccumReserveCount())
@@ -90,9 +82,9 @@ public class StudycafeService {
                     .grade(studycafe.getTotalGarde())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
-            recommendStudycafeList.add(foundStudycafe);
+            mainPageStudycafeList.add(foundStudycafe);
         }
-        return recommendStudycafeList;
+        return mainPageStudycafeList;
     }
 
     public Studycafe getStudyCafe(Long studycafeId){

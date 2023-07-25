@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder
 public class FindStudycafeResponse {
+    private Long cafeId;
     private String cafeName;
     private String[] photos;
     private Integer accumResCnt;
