@@ -142,8 +142,6 @@ public class MemberService {
 
     /**
      * 이메일과 전화번호를 통해 알맞는 회원의 비밀번호를 임시 비밀번호로 수정 및 임시 비밀번호를 반환하는 메소드
-     * @param email 이메일
-     * @param phoneNumber 전화번호
      * @return 발급된 임시 비밀번호
      */
     @Transactional
@@ -276,7 +274,7 @@ public class MemberService {
         return passwordEncoder.encode(password);
     }
 
-    private Member getMemberFromAccessToken(String accessToken) {
+    public Member getMemberFromAccessToken(String accessToken) {
         String resolvedAccessToken = jwtTokenProvider.resolveToken(accessToken);
         Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
 
