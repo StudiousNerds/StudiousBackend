@@ -8,7 +8,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @Getter
-public class ConfirmSuccessResponseFromToss {
+public class PaymentResponseFromToss {
     private String version;
     private String paymentKey;
     private String type;
