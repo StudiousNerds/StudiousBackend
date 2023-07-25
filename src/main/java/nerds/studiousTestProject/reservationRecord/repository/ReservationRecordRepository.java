@@ -15,4 +15,10 @@ public class ReservationRecordRepository {
         em.persist(reservationRecord);
         return reservationRecord;
     }
+
+    public ReservationRecord findByOrderId(String orderId){
+        return em.createQuery("select r from ReservationRecord r where r.orderId =: orderId", ReservationRecord.class)
+                .setParameter(orderId, orderId)
+                .getSingleResult();
+    }
 }
