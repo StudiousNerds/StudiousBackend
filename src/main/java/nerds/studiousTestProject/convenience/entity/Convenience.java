@@ -2,8 +2,11 @@ package nerds.studiousTestProject.convenience.entity;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,7 +24,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 @Entity
 public class Convenience {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -32,7 +35,8 @@ public class Convenience {
     @JoinColumn(name = "studycafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Studycafe studycafe;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private ConvenienceName name;
 
     private String price;
 }
