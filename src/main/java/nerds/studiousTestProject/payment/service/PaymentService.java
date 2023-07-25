@@ -1,10 +1,11 @@
 package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmResponseFromToss;
-import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmRequest;
+import nerds.studiousTestProject.payment.dto.confirm.*;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
+import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
+import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,12 @@ import static nerds.studiousTestProject.payment.PaymentConstant.*;
 public class PaymentService {
 
     private final WebClient webClient;
-    public PaymentResponse createPaymentResponse(PaymentRequest paymentRequest) {
+    private final ReservationRecordService reservationRecordService;
+
+    public PaymentResponse createPaymentResponse(PaymentRequest paymentRequest, String orderId) {
         return PaymentResponse.builder()
                 .amount(paymentRequest.getReservation().getPrice())
-                .orderId(String.valueOf(UUID.randomUUID()))
+                .orderId(orderId)
                 .orderName(paymentRequest.getUser().getName())
                 .successUrl("http://localhost:8080/studious/payments/success")
                 .failUrl("http://localhost:8080/studious/payments/fail")
@@ -34,14 +37,14 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentConfirmResponseFromToss confirmPay(String orderId, String paymentKey, int amount) throws IOException, InterruptedException {
+    public PaymentConfirmResponse confirmPayToToss(String orderId, String paymentKey, int amount) {
         PaymentConfirmRequest request = PaymentConfirmRequest.builder()
                 .amount(amount)
                 .orderId(orderId)
                 .paymentKey(paymentKey)
                 .build();
         String encodedAuth = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-        return webClient.method(HttpMethod.POST)
+        PaymentConfirmResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + encodedAuth)
@@ -49,6 +52,28 @@ public class PaymentService {
                 .retrieve()
                 .bodyToMono(PaymentConfirmResponseFromToss.class)
                 .block();
+        return createPaymentConfirmResponse(responseFromToss);
+    }
+
+    public PaymentConfirmResponse createPaymentConfirmResponse(PaymentConfirmResponseFromToss responseFromToss){
+        ReservationRecord reservationRecord = reservationRecordService.findByOrderId(responseFromToss.getOrderId());
+        ReserveUserInfo reserveUserInfo = ReserveUserInfo.builder()
+                .name(reservationRecord.getName())
+                .phoneNumber(reservationRecord.getPhoneNumber())
+                .request(reservationRecord.getRequest())
+                .build();
+        ReservationInfo reservationInfo = ReservationInfo.builder()
+                .reserveDate(reservationRecord.getDate())
+                .roomName(reservationRecord.getRoom().getName())
+                .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
+                .startTime(reservationRecord.getStartTime())
+                .endTime(reservationRecord.getEndTime())
+                .usingTime(reservationRecord.getDuration())
+                .build();
+        return PaymentConfirmResponse.builder()
+                .reservationInfo(reservationInfo)
+                .reserveUserInfo(reserveUserInfo)
+                .build();
     }
 
 }
