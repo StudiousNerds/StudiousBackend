@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.user.entity.member.Member;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,10 @@ public class Studycafe {
     private Integer accumReserveCount;
 
     private String introduction;
+
+    private LocalDateTime createdDate;
+
+    private Double totalGarde;
 
     @Column(name = "notification_info")
     private String notificationInfo;
