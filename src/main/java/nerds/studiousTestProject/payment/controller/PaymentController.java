@@ -1,7 +1,8 @@
 package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmResponse;
+import nerds.studiousTestProject.payment.dto.confirm.ConfirmFailResponse;
+import nerds.studiousTestProject.payment.dto.confirm.ConfirmSuccessResponse;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
@@ -23,10 +24,18 @@ public class PaymentController {
     }
 
     @GetMapping("/success")
-    public PaymentConfirmResponse payConfirmSuccess(@RequestParam String orderId,
+    public ConfirmSuccessResponse payConfirmSuccess(@RequestParam String orderId,
                                                     @RequestParam int amount,
                                                     @RequestParam String paymentKey) {
         return paymentService.confirmPayToToss(orderId, paymentKey, amount);
+    }
+
+    @GetMapping("/fail")
+    public ConfirmFailResponse payConfirmFail(@RequestParam String code,
+                                              @RequestParam String message,
+                                              @RequestParam String orderId) {
+
+        return paymentService.confirmFail(message, orderId);
     }
 
 }
