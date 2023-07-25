@@ -45,10 +45,15 @@ public class ReservationRecord {
     private String orderId;
 
     @OneToOne
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     public void completePay(Payment payment){
         this.reservationStatus = ReservationStatus.SUCCESS;
         this.payment = payment;
+    }
+
+    public void canceled(){
+        this.reservationStatus = ReservationStatus.CANCEL;
     }
 }
