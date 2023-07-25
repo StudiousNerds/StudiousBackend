@@ -47,4 +47,8 @@ public class ReservationRecordService {
     public ReservationRecord findByOrderId(String orderId) {
         return reservationRecordRepository.findByOrderId(orderId);
     }
+
+    public void deleteByOrderId(String orderId){
+        reservationRecordRepository.deleteByOrderId(orderId);
+    }
 }
