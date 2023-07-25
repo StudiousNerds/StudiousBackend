@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto;
+package nerds.studiousTestProject.payment.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

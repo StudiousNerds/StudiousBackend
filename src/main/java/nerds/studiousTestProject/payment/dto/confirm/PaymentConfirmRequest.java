@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto;
+package nerds.studiousTestProject.payment.dto.confirm;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

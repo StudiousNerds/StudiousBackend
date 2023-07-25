@@ -1,7 +1,6 @@
-package nerds.studiousTestProject.payment.dto;
+package nerds.studiousTestProject.payment.dto.request;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
