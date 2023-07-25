@@ -1,6 +1,8 @@
 package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.payment.dto.cancel.CancelRequest;
+import nerds.studiousTestProject.payment.dto.cancel.CancelResponse;
 import nerds.studiousTestProject.payment.dto.confirm.*;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import static nerds.studiousTestProject.payment.PaymentConstant.*;
 
@@ -41,19 +45,19 @@ public class PaymentService {
                 .orderId(orderId)
                 .paymentKey(paymentKey)
                 .build();
-        String encodedAuth = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-        ConfirmSuccessResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
+        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + encodedAuth)
+                .header("Authorization", "Basic " + secreteKey)
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(ConfirmSuccessResponseFromToss.class)
+                .bodyToMono(PaymentResponseFromToss.class)
                 .block();
         return createPaymentConfirmResponse(responseFromToss);
     }
 
-    public ConfirmSuccessResponse createPaymentConfirmResponse(ConfirmSuccessResponseFromToss responseFromToss){
+    public ConfirmSuccessResponse createPaymentConfirmResponse(PaymentResponseFromToss responseFromToss){
         ReservationRecord reservationRecord = reservationRecordService.findByOrderId(responseFromToss.getOrderId());
         ReserveUserInfo reserveUserInfo = ReserveUserInfo.builder()
                 .name(reservationRecord.getName())
@@ -83,6 +87,29 @@ public class PaymentService {
                 .message(message)
                 .statusCode(400)
                 .build();
+    }
+
+    public List<CancelResponse> requestCancelToToss(CancelRequest cancelRequest){
+        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+
+        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
+                .uri(CONFIRM_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Basic " + secreteKey)
+                .bodyValue(cancelRequest)
+                .retrieve()
+                .bodyToMono(PaymentResponseFromToss.class)
+                .block();
+        List<CancelResponse> cancelResponses = new ArrayList<>();
+        List<Cancels> cancels = responseFromToss.getCancels();
+        for (Cancels cancel : cancels) {
+            CancelResponse cancelResponse = CancelResponse.builder()
+                    .canceledAt(cancel.getCanceledAt())
+                    .cancelAmount(cancel.getCancelAmount())
+                    .build();
+            cancelResponses.add(cancelResponse);
+        }
+        return cancelResponses;
     }
 
 }
