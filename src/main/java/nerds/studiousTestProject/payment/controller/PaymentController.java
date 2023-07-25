@@ -1,8 +1,9 @@
 package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.PaymentResponse;
+import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmResponse;
+import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,15 @@ public class PaymentController {
 
     @PostMapping("/studycafes/{cafeId}/rooms/{roomId}")
     public PaymentResponse payRequest(@PathVariable Long roomId, @RequestBody PaymentRequest paymentRequest) {
-        reservationRecordService.saveReservationRecordBeforePayment(paymentRequest, roomId);
-        return paymentService.createPaymentResponse(paymentRequest);
+        String orderId = reservationRecordService.saveReservationRecordBeforePayment(paymentRequest, roomId);
+        return paymentService.createPaymentResponse(paymentRequest, orderId);
+    }
+
+    @GetMapping("/success")
+    public PaymentConfirmResponse payConfirmSuccess(@RequestParam String orderId,
+                                                    @RequestParam int amount,
+                                                    @RequestParam String paymentKey) {
+        return paymentService.confirmPayToToss(orderId, paymentKey, amount);
     }
 
 }
