@@ -3,6 +3,7 @@ package nerds.studiousTestProject.room.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
@@ -10,6 +11,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter
 public class Room {
     @Id
     @GeneratedValue
