@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class FindRecommendStudycafeResponse {
+public class MainPageResponse {
     private String cafeName;
     private String photo;
     private Integer accumRevCnt;
