@@ -18,14 +18,18 @@ public class ReservationRecordRepository {
 
     public ReservationRecord findByOrderId(String orderId){
         return em.createQuery("select r from ReservationRecord r where r.orderId =: orderId", ReservationRecord.class)
-                .setParameter(orderId, orderId)
+                .setParameter("orderId", orderId)
                 .getSingleResult();
     }
 
     public void deleteByOrderId(String orderId) {
         em.createQuery("delete from ReservationRecord r where r.orderId =: orderId")
-                .setParameter(orderId, orderId)
+                .setParameter("orderId", orderId)
                 .executeUpdate();
         em.clear();
+    }
+
+    public ReservationRecord findById(Long reservationRecordId){
+        return em.find(ReservationRecord.class, reservationRecordId);
     }
 }
