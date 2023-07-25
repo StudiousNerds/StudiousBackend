@@ -49,6 +49,15 @@ public class BookmarkService {
         return bookmarkCafeList;
     }
 
+    @Transactional
+    public ResponseEntity<?> deleteBookmark(String accessToken, Long studycafeId){
+        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
+        member.deleteBookmark(studyCafe.getName());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
+    }
+
     private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<String> bookmarkList) {
         for (String s : bookmarkList) {
             Studycafe studycafe = studycafeService.getStudyCafeByName(s);
