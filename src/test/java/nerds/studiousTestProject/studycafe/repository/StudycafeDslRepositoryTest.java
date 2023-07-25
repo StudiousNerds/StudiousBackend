@@ -134,6 +134,22 @@ class StudycafeDslRepositoryTest {
         assertEquals(responses.size(), 3);  // 예약 내역이 있는 한 곳만 제외
     }
 
+    @Test
+    @DisplayName("키워드 검색")
+    public void 키워드_검색() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .keyword("테스트")
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request);
+
+        // then
+        assertEquals(responses.size(), 4);
+    }
+
     private Studycafe studycafe1() {
         return Studycafe.builder()
                 .name("테스트1 스터디카페")
