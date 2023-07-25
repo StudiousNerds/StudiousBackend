@@ -51,4 +51,8 @@ public class ReservationRecordService {
     public void deleteByOrderId(String orderId){
         reservationRecordRepository.deleteByOrderId(orderId);
     }
+
+    public void cancel(Long reservationRecordId){
+        reservationRecordRepository.findById(reservationRecordId).canceled();
+    }
 }
