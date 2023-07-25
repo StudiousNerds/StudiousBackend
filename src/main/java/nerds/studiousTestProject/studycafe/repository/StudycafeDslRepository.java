@@ -8,6 +8,9 @@ import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Time;
@@ -61,7 +64,8 @@ public class StudycafeDslRepository {
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
-                        keywordContains(searchRequest.getKeyword())
+                        keywordContains(searchRequest.getKeyword()),
+                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade())
                 )
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
@@ -163,5 +167,20 @@ public class StudycafeDslRepository {
 
     private BooleanExpression keywordContains(String keyword) {
         return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.contains(keyword)) : null;
+    }
+
+    private BooleanExpression minGradeGoe(Integer minGrade) {
+        return minGrade != null ? studycafe.totalGrade.goe(minGrade) : null;
+    }
+
+    private BooleanExpression maxGradeLoe(Integer maxGrade) {
+        return maxGrade != null ? studycafe.totalGrade.loe(maxGrade) : null;
+    }
+
+    private BooleanExpression gradeBetween(Integer minGrade, Integer maxGrade) {
+        BooleanExpression minGradeGoe = minGradeGoe(minGrade);
+        BooleanExpression maxGradeLoe = maxGradeLoe(maxGrade);
+
+        return minGradeGoe != null ? minGradeGoe.and(maxGradeLoe) : maxGradeLoe;
     }
 }
