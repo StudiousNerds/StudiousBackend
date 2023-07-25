@@ -17,6 +17,7 @@ import java.util.List;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
+import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,7 +41,8 @@ public class StudycafeDslRepository {
                 .where(
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
-                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime())
+                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        keywordContains(searchRequest.getKeyword())
                 )
                 .groupBy(studycafe.id)
                 .fetch();
@@ -123,4 +125,7 @@ public class StudycafeDslRepository {
         return reservationRecord.endTime.goe(endTime);
     }
 
+    private BooleanExpression keywordContains(String keyword) {
+        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.contains(keyword)) : null;
+    }
 }
