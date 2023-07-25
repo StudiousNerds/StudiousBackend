@@ -61,25 +61,43 @@ public class StudycafeService {
     }
 
     public List<FindRecommendStudycafeResponse> getRecommendStudycafe(){
+        Map<Studycafe, Double> averageList = getStudycafeAvgGrade();
+        Map<Studycafe, Double> topTenList = getTopTenStudycafeList(averageList);
+        List<Studycafe> topTenCafeList = getTopTenStudycafesName(topTenList);
+        List<FindRecommendStudycafeResponse> recommendStudycafeList = getRecommendStudycafes(topTenList, topTenCafeList);
+        return recommendStudycafeList;
+    }
+
+
+    private Map<Studycafe, Double> getStudycafeAvgGrade() {
         List<Studycafe> studycafeList = studycafeRepository.findAll();
         Map<Studycafe, Double> averageList = new HashMap<>();
         for (Studycafe studyCafe : studycafeList) {
             Double avgGrade = reviewService.getAvgGrade(studyCafe.getId());
             averageList.put(studyCafe, avgGrade);
         }
+        return averageList;
+    }
 
+    private Map<Studycafe, Double> getTopTenStudycafeList(Map<Studycafe, Double> averageList) {
         Map<Studycafe, Double> topTenList = new HashMap<>();
         List<Studycafe> keySetList = new ArrayList<>(averageList.keySet());
         Collections.sort(keySetList, (o1, o2) -> averageList.get(o2).compareTo(averageList.get(o1)));
         for (Studycafe key : keySetList) {
             topTenList.put(key, averageList.get(key));
         }
+        return topTenList;
+    }
 
+    private List<Studycafe> getTopTenStudycafesName(Map<Studycafe, Double> topTenList) {
         List<Studycafe> topTenCafeList = new ArrayList<>();
         for (Studycafe studycafe : topTenList.keySet()) {
             topTenCafeList.add(studycafe);
         }
+        return topTenCafeList;
+    }
 
+    private List<FindRecommendStudycafeResponse> getRecommendStudycafes(Map<Studycafe, Double> topTenList, List<Studycafe> topTenCafeList) {
         List<FindRecommendStudycafeResponse> recommendStudycafeList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Studycafe studycafe = topTenCafeList.get(i);
@@ -89,7 +107,7 @@ public class StudycafeService {
                     .photo(cafePhotos[0])
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
-                    .grade(reviewService.getAvgGrade(studycafe.getId()))
+                    .grade(topTenList.get(studycafe))
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
             recommendStudycafeList.add(foundStudycafe);
