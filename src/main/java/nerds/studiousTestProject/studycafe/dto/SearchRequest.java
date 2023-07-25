@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @Data
 public class SearchRequest {
-    private Integer page;
     private String keyword;
     private Date date;
     private Time startTime;
