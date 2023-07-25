@@ -74,6 +74,10 @@ public class Member implements UserDetails {
         this.password = encodedPassword;
     }
 
+    public void registerBookmark(String studycafeName){
+        bookmark.add(studycafeName);
+    }
+
     public void withdraw() {
         this.usable = false;
         this.resignedDate = new Date();
