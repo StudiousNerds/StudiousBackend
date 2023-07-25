@@ -1,7 +1,10 @@
 package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.*;
+import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmResponseFromToss;
+import nerds.studiousTestProject.payment.dto.confirm.PaymentConfirmRequest;
+import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -31,7 +34,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment confirmPay(String orderId, String paymentKey, int amount) throws IOException, InterruptedException {
+    public PaymentConfirmResponseFromToss confirmPay(String orderId, String paymentKey, int amount) throws IOException, InterruptedException {
         PaymentConfirmRequest request = PaymentConfirmRequest.builder()
                 .amount(amount)
                 .orderId(orderId)
@@ -44,7 +47,7 @@ public class PaymentService {
                 .header("Authorization", "Basic " + encodedAuth)
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(Payment.class)
+                .bodyToMono(PaymentConfirmResponseFromToss.class)
                 .block();
     }
 
