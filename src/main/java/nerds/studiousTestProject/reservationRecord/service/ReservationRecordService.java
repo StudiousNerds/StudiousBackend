@@ -1,9 +1,9 @@
 package nerds.studiousTestProject.reservationRecord.service;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.ReservationInfo;
-import nerds.studiousTestProject.payment.dto.ReserveUser;
+import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.ReservationInfo;
+import nerds.studiousTestProject.payment.dto.request.ReserveUser;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationStatus;
 import nerds.studiousTestProject.reservationRecord.repository.ReservationRecordRepository;
