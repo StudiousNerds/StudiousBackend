@@ -8,6 +8,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
+import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
+import static nerds.studiousTestProject.studycafe.entity.hashtag.QHashtagRecord.hashtagRecord;
 import static org.springframework.util.StringUtils.hasText;
 
 @Repository
@@ -38,7 +40,8 @@ public class StudycafeDslRepository {
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
-                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade())
+                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
+                        hashtagContains(searchRequest.getHashtags())
                 )
                 .groupBy(studycafe.id);
 
@@ -65,7 +68,8 @@ public class StudycafeDslRepository {
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
-                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade())
+                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
+                        hashtagContains(searchRequest.getHashtags())
                 )
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
@@ -85,6 +89,11 @@ public class StudycafeDslRepository {
             }
         }
 
+        if (searchRequest.getHashtags() != null) {
+            query = query
+                    .leftJoin(studycafe.hashtagRecords, hashtagRecord);
+        }
+
         return query;
     }
 
@@ -96,6 +105,11 @@ public class StudycafeDslRepository {
                 query = query
                         .leftJoin(room.reservationRecords, reservationRecord);
             }
+        }
+
+        if (searchRequest.getHashtags() != null) {
+            query = query
+                    .leftJoin(studycafe.hashtagRecords, hashtagRecord);
         }
 
         return query;
@@ -182,5 +196,9 @@ public class StudycafeDslRepository {
         BooleanExpression maxGradeLoe = maxGradeLoe(maxGrade);
 
         return minGradeGoe != null ? minGradeGoe.and(maxGradeLoe) : maxGradeLoe;
+    }
+
+    private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
+        return hashtags != null && !hashtags.isEmpty() ? hashtagRecord.name.in(hashtags) : null;
     }
 }
