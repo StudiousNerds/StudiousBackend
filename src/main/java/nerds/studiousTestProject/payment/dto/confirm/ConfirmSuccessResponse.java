@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentConfirmResponse {
+public class ConfirmSuccessResponse {
 
     ReserveUserInfo reserveUserInfo;
     ReservationInfo reservationInfo;

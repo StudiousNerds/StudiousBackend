@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.util.Base64;
-import java.util.UUID;
 
 import static nerds.studiousTestProject.payment.PaymentConstant.*;
 
@@ -37,25 +35,25 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentConfirmResponse confirmPayToToss(String orderId, String paymentKey, int amount) {
-        PaymentConfirmRequest request = PaymentConfirmRequest.builder()
+    public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, int amount) {
+        ConfirmSuccessRequest request = ConfirmSuccessRequest.builder()
                 .amount(amount)
                 .orderId(orderId)
                 .paymentKey(paymentKey)
                 .build();
         String encodedAuth = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-        PaymentConfirmResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
+        ConfirmSuccessResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + encodedAuth)
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(PaymentConfirmResponseFromToss.class)
+                .bodyToMono(ConfirmSuccessResponseFromToss.class)
                 .block();
         return createPaymentConfirmResponse(responseFromToss);
     }
 
-    public PaymentConfirmResponse createPaymentConfirmResponse(PaymentConfirmResponseFromToss responseFromToss){
+    public ConfirmSuccessResponse createPaymentConfirmResponse(ConfirmSuccessResponseFromToss responseFromToss){
         ReservationRecord reservationRecord = reservationRecordService.findByOrderId(responseFromToss.getOrderId());
         ReserveUserInfo reserveUserInfo = ReserveUserInfo.builder()
                 .name(reservationRecord.getName())
@@ -70,7 +68,7 @@ public class PaymentService {
                 .endTime(reservationRecord.getEndTime())
                 .usingTime(reservationRecord.getDuration())
                 .build();
-        return PaymentConfirmResponse.builder()
+        return ConfirmSuccessResponse.builder()
                 .reservationInfo(reservationInfo)
                 .reserveUserInfo(reserveUserInfo)
                 .build();
