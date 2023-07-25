@@ -24,7 +24,26 @@ import static org.springframework.util.StringUtils.hasText;
 public class StudycafeDslRepository {
     private final JPAQueryFactory queryFactory;
 
-    public List<SearchResponse> searchAll(SearchRequest searchRequest) {
+    public Page<SearchResponse> searchAll(SearchRequest searchRequest, Pageable pageable) {
+        JPAQuery<Long> countQuery = queryFactory
+                .select(studycafe.count())
+                .from(studycafe);
+
+        JPAQuery<Long> count = getJoinedCountQuery(countQuery, searchRequest)
+                .where(
+                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        headCountBetween(searchRequest.getHeadCount()),
+                        keywordContains(searchRequest.getKeyword()),
+                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade())
+                )
+                .groupBy(studycafe.id);
+
+        // 조회 결과가 없으면 빈 Page 리턴
+        if (count.fetchOne() == null) {
+            return Page.empty();
+        }
+
         JPAQuery<SearchResponse> contentQuery = queryFactory
                 .select(
                         new QSearchResponse(
@@ -37,7 +56,7 @@ public class StudycafeDslRepository {
                 )
                 .from(studycafe);
 
-        return getJoinedContentQuery(contentQuery, searchRequest)
+        List<SearchResponse> content = getJoinedContentQuery(contentQuery, searchRequest)
                 .where(
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
@@ -45,10 +64,27 @@ public class StudycafeDslRepository {
                         keywordContains(searchRequest.getKeyword())
                 )
                 .groupBy(studycafe.id)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
     public JPAQuery<SearchResponse> getJoinedContentQuery(JPAQuery<SearchResponse> query, SearchRequest searchRequest) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null) {
+            query = query.leftJoin(studycafe.rooms, room);
+
+            if (searchRequest.getDate() != null) {
+                query = query
+                        .leftJoin(room.reservationRecords, reservationRecord);
+            }
+        }
+
+        return query;
+    }
+
+    public JPAQuery<Long> getJoinedCountQuery(JPAQuery<Long> query, SearchRequest searchRequest) {
         if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
