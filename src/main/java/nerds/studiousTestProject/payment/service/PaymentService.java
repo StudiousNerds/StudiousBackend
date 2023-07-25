@@ -2,21 +2,13 @@ package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.payment.dto.*;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -40,7 +32,7 @@ public class PaymentService {
 
     @Transactional
     public Payment confirmPay(String orderId, String paymentKey, int amount) throws IOException, InterruptedException {
-        ConfirmRequest request = ConfirmRequest.builder()
+        PaymentConfirmRequest request = PaymentConfirmRequest.builder()
                 .amount(amount)
                 .orderId(orderId)
                 .paymentKey(paymentKey)
