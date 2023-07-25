@@ -21,4 +21,11 @@ public class ReservationRecordRepository {
                 .setParameter(orderId, orderId)
                 .getSingleResult();
     }
+
+    public void deleteByOrderId(String orderId) {
+        em.createQuery("delete from ReservationRecord r where r.orderId =: orderId")
+                .setParameter(orderId, orderId)
+                .executeUpdate();
+        em.clear();
+    }
 }
