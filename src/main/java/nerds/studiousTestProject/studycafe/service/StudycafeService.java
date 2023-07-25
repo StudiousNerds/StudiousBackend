@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.service;
 
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
@@ -7,6 +8,7 @@ import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.service.RoomService;
+import nerds.studiousTestProject.studycafe.dto.FindRecommendStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -15,7 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -52,6 +58,43 @@ public class StudycafeService {
                 .total(reviewService.getAvgGrade(id))
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
+    }
+
+    public List<FindRecommendStudycafeResponse> getRecommendStudycafe(){
+        List<Studycafe> studycafeList = studycafeRepository.findAll();
+        Map<Studycafe, Double> averageList = new HashMap<>();
+        for (Studycafe studyCafe : studycafeList) {
+            Double avgGrade = reviewService.getAvgGrade(studyCafe.getId());
+            averageList.put(studyCafe, avgGrade);
+        }
+
+        Map<Studycafe, Double> topTenList = new HashMap<>();
+        List<Studycafe> keySetList = new ArrayList<>(averageList.keySet());
+        Collections.sort(keySetList, (o1, o2) -> averageList.get(o2).compareTo(averageList.get(o1)));
+        for (Studycafe key : keySetList) {
+            topTenList.put(key, averageList.get(key));
+        }
+
+        List<Studycafe> topTenCafeList = new ArrayList<>();
+        for (Studycafe studycafe : topTenList.keySet()) {
+            topTenCafeList.add(studycafe);
+        }
+
+        List<FindRecommendStudycafeResponse> recommendStudycafeList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Studycafe studycafe = topTenCafeList.get(i);
+            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
+            FindRecommendStudycafeResponse foundStudycafe = FindRecommendStudycafeResponse.builder()
+                    .cafeName(studycafe.getName())
+                    .photo(cafePhotos[0])
+                    .accumRevCnt(studycafe.getAccumReserveCount())
+                    .distance(studycafe.getDuration())
+                    .grade(reviewService.getAvgGrade(studycafe.getId()))
+                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .build();
+            recommendStudycafeList.add(foundStudycafe);
+        }
+        return recommendStudycafeList;
     }
 
     public String[] getNotice(Long id){
