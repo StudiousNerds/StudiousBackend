@@ -78,6 +78,10 @@ public class Member implements UserDetails {
         bookmark.add(studycafeName);
     }
 
+    public void deleteBookmark(String studycafeName){
+        bookmark.remove(studycafeName);
+    }
+
     public void withdraw() {
         this.usable = false;
         this.resignedDate = new Date();
