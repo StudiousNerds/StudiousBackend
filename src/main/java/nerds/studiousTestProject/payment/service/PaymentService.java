@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.payment.dto.confirm.*;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
 import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
 import org.springframework.http.HttpMethod;
@@ -50,6 +51,13 @@ public class PaymentService {
                 .retrieve()
                 .bodyToMono(ConfirmSuccessResponseFromToss.class)
                 .block();
+        Payment payment = Payment.builder()
+                .completeTime(responseFromToss.getRequestedAt())
+                .type(responseFromToss.getType())
+                .orderId(responseFromToss.getOrderId())
+                .paymentKey(responseFromToss.getPaymentKey())
+                .build();
+        reservationRecordService.findByOrderId(orderId).completePay(payment);//결제 완료로 상태 변경
         return createPaymentConfirmResponse(responseFromToss);
     }
 
