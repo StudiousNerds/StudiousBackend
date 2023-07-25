@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.user.entity.member.Member;
 
@@ -42,4 +43,12 @@ public class ReservationRecord {
     @JoinColumn(name = "room_id")
     private Room room;
     private String orderId;
+
+    @OneToOne
+    private Payment payment;
+
+    public void completePay(Payment payment){
+        this.reservationStatus = ReservationStatus.SUCCESS;
+        this.payment = payment;
+    }
 }
