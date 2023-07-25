@@ -74,4 +74,15 @@ public class PaymentService {
                 .build();
     }
 
+    /*
+     실패시 저장되었던 예약내역 삭제, 실패 정보 반환
+     */
+    public ConfirmFailResponse confirmFail(String message, String orderId){
+        reservationRecordService.deleteByOrderId(orderId);
+        return ConfirmFailResponse.builder()
+                .message(message)
+                .statusCode(400)
+                .build();
+    }
+
 }
