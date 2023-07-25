@@ -51,7 +51,7 @@ public class StudycafeService {
                 .cleanliness(reviewService.getAvgCleanliness(id))
                 .deafening(reviewService.getAvgDeafening(id))
                 .fixturesStatus(reviewService.getAvgFixturesStatus(id))
-                .total(reviewService.getAvgGrade(id))
+                .total(studycafe.getTotalGarde())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
     }
