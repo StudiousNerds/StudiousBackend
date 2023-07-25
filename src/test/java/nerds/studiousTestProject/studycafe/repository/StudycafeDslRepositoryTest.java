@@ -7,10 +7,12 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -92,7 +94,7 @@ class StudycafeDslRepositoryTest {
                 .build();
 
         // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request);
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
 
         // then
         assertEquals(responses.size(), 2);
@@ -108,7 +110,7 @@ class StudycafeDslRepositoryTest {
                 .build();
 
         // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request);
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
 
         // then
         System.out.println(responses);
@@ -127,7 +129,7 @@ class StudycafeDslRepositoryTest {
                 .build();
 
         // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request);
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
 
         // then
         System.out.println(responses);
@@ -144,10 +146,27 @@ class StudycafeDslRepositoryTest {
                 .build();
 
         // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request);
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
 
         // then
         assertEquals(responses.size(), 4);
+    }
+
+    @Test
+    @DisplayName("평점 범위 필터링")
+    public void 평점_범위_필터링() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .minGrade(2)
+                .maxGrade(4)
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        assertEquals(responses.size(), 2);
     }
 
     private Studycafe studycafe1() {
@@ -157,7 +176,7 @@ class StudycafeDslRepositoryTest {
                 .accumReserveCount(100)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
-                .totalGrade(3.1)
+                .totalGrade(1.2)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -173,7 +192,7 @@ class StudycafeDslRepositoryTest {
                 .accumReserveCount(100)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
-                .totalGrade(5.0)
+                .totalGrade(2.4)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -189,7 +208,7 @@ class StudycafeDslRepositoryTest {
                 .accumReserveCount(100)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
-                .totalGrade(5.0)
+                .totalGrade(3.6)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -205,7 +224,7 @@ class StudycafeDslRepositoryTest {
                 .accumReserveCount(100)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
-                .totalGrade(5.0)
+                .totalGrade(4.8)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -258,5 +277,9 @@ class StudycafeDslRepositoryTest {
                 .headCount(5)
                 .status(ReservationStatus.CONFIRMED)
                 .build();
+    }
+
+    private Pageable pageable() {
+        return PageRequestConverter.of(0);
     }
 }
