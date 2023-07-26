@@ -29,4 +29,19 @@ public class StudycafeRepositoryTest {
         // then
         Assertions.assertThat(findByIdStudycafe.getId()).isEqualTo(1L);
     }
+
+    @Test
+    @DisplayName("스터디카페의 이름이 주어졌을 때 해당 스터디카페를 잘 찾아오는지 확인")
+    void findByName(){
+        // given
+        Studycafe studycafe = Studycafe.builder()
+                .id(1L)
+                .name("스프링카페")
+                .build();
+        Studycafe savedStudycafe = studycafeRepository.save(studycafe);
+        // when
+        Studycafe findByNameStudycafe = studycafeRepository.findByName(savedStudycafe.getName()).orElseThrow(() -> new EntityNotFoundException("No Such Studycafe"));
+        // then
+        Assertions.assertThat(findByNameStudycafe.getName()).isEqualTo("스프링카페");
+    }
 }
