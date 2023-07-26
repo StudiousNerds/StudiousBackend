@@ -1,5 +1,7 @@
 package nerds.studiousTestProject.studycafe.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,6 +12,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.SortType;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +20,13 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
+import static nerds.studiousTestProject.studycafe.dto.SortType.*;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 import static nerds.studiousTestProject.studycafe.entity.hashtag.QHashtagRecord.hashtagRecord;
 import static org.springframework.util.StringUtils.hasText;
@@ -76,6 +81,7 @@ public class StudycafeDslRepository {
                         convenienceContains(searchRequest.getConveniences())
                 )
                 .groupBy(studycafe.id)
+                .orderBy(createOrderSpecifier(searchRequest.getSortType()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -235,4 +241,17 @@ public class StudycafeDslRepository {
 
         return cConvenienceList.name.in(conveniences).and(rConvenienceList.name.in(conveniences));
     }
+
+    private OrderSpecifier[] createOrderSpecifier(SortType sortType) {
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+        switch (sortType != null ? sortType : SortType.GRADE_DESC) {
+            case RESERVATION_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.accumReserveCount));
+            case RESERVATION_ASC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.accumReserveCount));
+        }
+
+        orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
+        return orderSpecifiers.toArray(OrderSpecifier[]::new);
+    }
+
 }
