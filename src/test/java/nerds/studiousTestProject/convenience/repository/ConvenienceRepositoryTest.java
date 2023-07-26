@@ -70,4 +70,14 @@ class ConvenienceRepositoryTest {
         // then
         Assertions.assertThat(convenienceList).contains("담요", "음료");
     }
+
+    @Test
+    void findByStudycafeIdAndRoomId() {
+        // given
+
+        // when
+        List<String> convenienceList = convenienceRepository.findByStudycafeIdAndRoomId(studycafe.getId(), room.getId());
+        // then
+        Assertions.assertThat(convenienceList).contains("담요", "주차");
+    }
 }
