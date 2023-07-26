@@ -272,6 +272,44 @@ class StudycafeDslRepositoryTest {
         Assertions.assertThat(responses.get(3).getAccumRevCnt()).isEqualTo(40);
     }
 
+    @Test
+    @DisplayName("평점 높은 순 정렬")
+    public void 평점_높은_순_정렬() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .sortType(SortType.GRADE_DESC)
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        Assertions.assertThat(responses.get(0).getGrade()).isEqualTo(4.8);
+        Assertions.assertThat(responses.get(1).getGrade()).isEqualTo(3.6);
+        Assertions.assertThat(responses.get(2).getGrade()).isEqualTo(2.4);
+        Assertions.assertThat(responses.get(3).getGrade()).isEqualTo(1.2);
+    }
+
+    @Test
+    @DisplayName("평점 낮은 순 정렬")
+    public void 평점_낮은_순_정렬() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .sortType(SortType.GRADE_ASC)
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        Assertions.assertThat(responses.get(0).getGrade()).isEqualTo(1.2);
+        Assertions.assertThat(responses.get(1).getGrade()).isEqualTo(2.4);
+        Assertions.assertThat(responses.get(2).getGrade()).isEqualTo(3.6);
+        Assertions.assertThat(responses.get(3).getGrade()).isEqualTo(4.8);
+    }
+
     private Studycafe studycafe1(List<HashtagRecord> hashtagRecords, List<ConvenienceList> convenienceLists) {
         return Studycafe.builder()
                 .name("테스트1 스터디카페")
