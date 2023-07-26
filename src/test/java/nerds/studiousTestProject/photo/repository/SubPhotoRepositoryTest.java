@@ -3,6 +3,7 @@ package nerds.studiousTestProject.photo.repository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -48,5 +49,17 @@ class SubPhotoRepositoryTest {
         List<SubPhoto> studycafePhotoList = subPhotoRepository.findAllByStudycafeId(1L);
         // then
         Assertions.assertThat(studycafePhotoList).contains(subPhoto, subPhoto1);
+    }
+
+    @Test
+    void findAllByRoomId() {
+        // given
+        Room room = roomRepository.save(Room.builder().id(2L).build());
+        SubPhoto subPhoto = subPhotoRepository.save(SubPhoto.builder().room(room).url("www.spring.com").build());
+        SubPhoto subPhoto1 = subPhotoRepository.save(SubPhoto.builder().room(room).url("www.sub.com").build());
+        // when
+        List<SubPhoto> studycafeRoomList = subPhotoRepository.findAllByRoomId(room.getId());
+        // then
+        Assertions.assertThat(studycafeRoomList).contains(subPhoto, subPhoto1);
     }
 }
