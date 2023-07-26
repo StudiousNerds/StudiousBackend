@@ -248,6 +248,8 @@ public class StudycafeDslRepository {
         switch (sortType != null ? sortType : SortType.GRADE_DESC) {
             case RESERVATION_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.accumReserveCount));
             case RESERVATION_ASC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.accumReserveCount));
+            case GRADE_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.totalGrade));
+            case GRADE_ASC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.totalGrade));
         }
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
