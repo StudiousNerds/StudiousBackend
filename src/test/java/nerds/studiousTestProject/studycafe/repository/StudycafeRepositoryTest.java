@@ -25,16 +25,16 @@ public class StudycafeRepositoryTest {
     @BeforeEach
     public void setUp(){
         this.cafe1 = studycafeRepository.save(Studycafe.builder().id(1L).name("스프링카페").totalGrade(4.3).createdDate(LocalDateTime.now()).build());
-        this.cafe2 = studycafeRepository.save(Studycafe.builder().id(2L).name("스프카페").totalGrade(3.5).createdDate(LocalDateTime.now().plusDays(1)).build());
-        this.cafe3 = studycafeRepository.save(Studycafe.builder().id(3L).name("스링카페").totalGrade(4.0).createdDate(LocalDateTime.now().plusDays(10)).build());
-        this.cafe4 = studycafeRepository.save(Studycafe.builder().id(4L).name("스프후카페").totalGrade(3.7).createdDate(LocalDateTime.now().plusDays(5)).build());
-        this.cafe5 = studycafeRepository.save( Studycafe.builder().id(5L).name("프링카페").totalGrade(4.5).createdDate(LocalDateTime.now().plusDays(2)).build());
-        this.cafe6 = studycafeRepository.save(Studycafe.builder().id(6L).name("링카페").totalGrade(5.0).createdDate(LocalDateTime.now().plusDays(4)).build());
-        this.cafe7 = studycafeRepository.save(Studycafe.builder().id(7L).name("프카페").totalGrade(1.5).createdDate(LocalDateTime.now().plusDays(10)).build());
-        this.cafe8 = studycafeRepository.save(Studycafe.builder().id(8L).name("스투카페").totalGrade(1.3).createdDate(LocalDateTime.now().plusMonths(1)).build());
-        this.cafe9 = studycafeRepository.save(Studycafe.builder().id(9L).name("프파카페").totalGrade(0.5).createdDate(LocalDateTime.now().plusDays(15)).build());
-        this.cafe10 = studycafeRepository.save(Studycafe.builder().id(10L).name("링파카페").totalGrade(2.5).createdDate(LocalDateTime.now().plusDays(12)).build());
-        this.cafe11 = studycafeRepository.save(Studycafe.builder().id(11L).name("토비카페").totalGrade(2.0).createdDate(LocalDateTime.now().plusMonths(6)).build());
+        this.cafe2 = studycafeRepository.save(Studycafe.builder().id(2L).name("스프카페").totalGrade(3.5).createdDate(LocalDateTime.now().minusDays(1)).build());
+        this.cafe3 = studycafeRepository.save(Studycafe.builder().id(3L).name("스링카페").totalGrade(4.0).createdDate(LocalDateTime.now().minusDays(10)).build());
+        this.cafe4 = studycafeRepository.save(Studycafe.builder().id(4L).name("스프후카페").totalGrade(3.7).createdDate(LocalDateTime.now().minusDays(5)).build());
+        this.cafe5 = studycafeRepository.save( Studycafe.builder().id(5L).name("프링카페").totalGrade(4.5).createdDate(LocalDateTime.now().minusDays(2)).build());
+        this.cafe6 = studycafeRepository.save(Studycafe.builder().id(6L).name("링카페").totalGrade(5.0).createdDate(LocalDateTime.now().minusDays(4)).build());
+        this.cafe7 = studycafeRepository.save(Studycafe.builder().id(7L).name("프카페").totalGrade(1.5).createdDate(LocalDateTime.now().minusDays(11)).build());
+        this.cafe8 = studycafeRepository.save(Studycafe.builder().id(8L).name("스투카페").totalGrade(1.3).createdDate(LocalDateTime.now().minusMonths(1)).build());
+        this.cafe9 = studycafeRepository.save(Studycafe.builder().id(9L).name("프파카페").totalGrade(0.5).createdDate(LocalDateTime.now().minusDays(15)).build());
+        this.cafe10 = studycafeRepository.save(Studycafe.builder().id(10L).name("링파카페").totalGrade(2.5).createdDate(LocalDateTime.now().minusDays(12)).build());
+        this.cafe11 = studycafeRepository.save(Studycafe.builder().id(11L).name("토비카페").totalGrade(2.0).createdDate(LocalDateTime.now().minusMonths(6)).build());
     }
 
     @Test
@@ -76,5 +76,16 @@ public class StudycafeRepositoryTest {
         List<Studycafe> top10ByOrderByTotalGrade = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
         // then
         Assertions.assertThat(top10ByOrderByTotalGrade).containsExactly(cafe6, cafe5, cafe1, cafe3, cafe4, cafe2, cafe10, cafe11, cafe7, cafe8);
+    }
+
+    @Test
+    @DisplayName("최근 등록 순으로 10개를 제대로 가져오는지 확인")
+    void findTop10ByOrderByCreatedDateDesc(){
+        // given
+
+        // when
+        List<Studycafe> top10ByOrderByCreatedDate = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
+        //then
+        Assertions.assertThat(top10ByOrderByCreatedDate).containsExactly(cafe1, cafe2, cafe5, cafe6, cafe4, cafe3, cafe7, cafe10, cafe9, cafe8);
     }
 }
