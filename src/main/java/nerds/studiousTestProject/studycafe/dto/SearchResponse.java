@@ -7,15 +7,17 @@ import lombok.Data;
 @Builder
 @Data
 public class SearchResponse {
-    private String cafeName;
+    private Long id;
+    private String name;
     private String photo;
     private Integer accumRevCnt;
     private Integer duration;
     private Double grade;
 
     @QueryProjection
-    public SearchResponse(String cafeName, String photo, Integer accumRevCnt, Integer duration, Double grade) {
-        this.cafeName = cafeName;
+    public SearchResponse(Long id, String name, String photo, Integer accumRevCnt, Integer duration, Double grade) {
+        this.id = id;
+        this.name = name;
         this.photo = photo;
         this.accumRevCnt = accumRevCnt;
         this.duration = duration;
