@@ -53,13 +53,13 @@ public class StudycafeService {
                 .cleanliness(reviewService.getAvgCleanliness(id))
                 .deafening(reviewService.getAvgDeafening(id))
                 .fixturesStatus(reviewService.getAvgFixturesStatus(id))
-                .total(studycafe.getTotalGarde())
+                .total(studycafe.getTotalGrade())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
     }
 
     public List<MainPageResponse> getRecommendStduycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGardeDesc();
+        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
         return getMainPageCafes(topTenCafeList);
     }
 
@@ -80,7 +80,7 @@ public class StudycafeService {
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
-                    .grade(studycafe.getTotalGarde())
+                    .grade(studycafe.getTotalGrade())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
             mainPageStudycafeList.add(foundStudycafe);

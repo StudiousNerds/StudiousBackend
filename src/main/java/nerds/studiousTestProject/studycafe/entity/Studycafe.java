@@ -59,7 +59,7 @@ public class Studycafe {
 
     private LocalDateTime createdDate;
 
-    private Double totalGarde;
+    private Double totalGrade;
 
     @Column(name = "notification_info")
     private String notificationInfo;
