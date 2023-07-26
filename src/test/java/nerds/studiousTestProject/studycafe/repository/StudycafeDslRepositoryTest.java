@@ -8,10 +8,12 @@ import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.SortType;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagRecord;
 import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -232,11 +234,49 @@ class StudycafeDslRepositoryTest {
         assertEquals(responses.size(), 1);
     }
 
+    @Test
+    @DisplayName("예약 많은 순 정렬")
+    public void 예약_많은_순_정렬() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .sortType(SortType.RESERVATION_DESC)
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        Assertions.assertThat(responses.get(0).getAccumRevCnt()).isEqualTo(40);
+        Assertions.assertThat(responses.get(1).getAccumRevCnt()).isEqualTo(30);
+        Assertions.assertThat(responses.get(2).getAccumRevCnt()).isEqualTo(20);
+        Assertions.assertThat(responses.get(3).getAccumRevCnt()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("예약 적은 순 정렬")
+    public void 예약_적은_순_정렬() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .sortType(SortType.RESERVATION_ASC)
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        Assertions.assertThat(responses.get(0).getAccumRevCnt()).isEqualTo(10);
+        Assertions.assertThat(responses.get(1).getAccumRevCnt()).isEqualTo(20);
+        Assertions.assertThat(responses.get(2).getAccumRevCnt()).isEqualTo(30);
+        Assertions.assertThat(responses.get(3).getAccumRevCnt()).isEqualTo(40);
+    }
+
     private Studycafe studycafe1(List<HashtagRecord> hashtagRecords, List<ConvenienceList> convenienceLists) {
         return Studycafe.builder()
                 .name("테스트1 스터디카페")
                 .address("경기도 남양주시 진접읍")
-                .accumReserveCount(100)
+                .accumReserveCount(40)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(1.2)
@@ -254,7 +294,7 @@ class StudycafeDslRepositoryTest {
         return Studycafe.builder()
                 .name("테스트2 스터디카페")
                 .address("경기도 남양주시 진접읍")
-                .accumReserveCount(100)
+                .accumReserveCount(30)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(2.4)
@@ -271,7 +311,7 @@ class StudycafeDslRepositoryTest {
         return Studycafe.builder()
                 .name("테스트3 스터디카페")
                 .address("경기도 남양주시 진접읍")
-                .accumReserveCount(100)
+                .accumReserveCount(20)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(3.6)
@@ -288,7 +328,7 @@ class StudycafeDslRepositoryTest {
         return Studycafe.builder()
                 .name("테스트4 스터디카페")
                 .address("경기도 남양주시 진접읍")
-                .accumReserveCount(100)
+                .accumReserveCount(10)
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(4.8)
