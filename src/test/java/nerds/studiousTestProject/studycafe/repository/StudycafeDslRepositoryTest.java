@@ -1,6 +1,8 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import jakarta.persistence.EntityManager;
+import nerds.studiousTestProject.convenience.ConvenienceList;
+import nerds.studiousTestProject.convenience.ConvenienceName;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
@@ -38,10 +40,15 @@ class StudycafeDslRepositoryTest {
         HashtagRecord hashtag2 = hashtag2();
         List<HashtagRecord> hashtagRecords1 = List.of(hashtag1, hashtag2);
 
-        Studycafe studycafe1 = studycafe1(hashtagRecords1);    // 예약 내역 O
-        Room room1 = room1(studycafe1);
-        Room room2 = room1(studycafe1);
-        Room room3 = room1(studycafe1);
+        ConvenienceList hdmi = hdmi();
+        ConvenienceList park = park();
+        List<ConvenienceList> roomConvenienceLists1 = List.of(hdmi);
+        List<ConvenienceList> cafeConvenienceLists1 = List.of(park);
+
+        Studycafe studycafe1 = studycafe1(hashtagRecords1, cafeConvenienceLists1);    // 예약 내역 O
+        Room room1 = room1(studycafe1, roomConvenienceLists1);
+        Room room2 = room1(studycafe1, roomConvenienceLists1);
+        Room room3 = room1(studycafe1, roomConvenienceLists1);
         ReservationRecord reservationRecord1 = reservationRecord1(room1);
         ReservationRecord reservationRecord2 = reservationRecord1(room2);
         ReservationRecord reservationRecord3 = reservationRecord1(room3);
@@ -58,10 +65,15 @@ class StudycafeDslRepositoryTest {
         ReservationRecord reservationRecord5 = reservationRecord2(room5);
         ReservationRecord reservationRecord6 = reservationRecord2(room6);
 
-        Studycafe studycafe3 = studycafe3();    // 예약 내역 X
-        Room room7 = room1(studycafe3);
-        Room room8 = room1(studycafe3);
-        Room room9 = room1(studycafe3);
+        ConvenienceList beam = beam();
+        ConvenienceList elevator = elevator();
+        List<ConvenienceList> roomConvenienceLists2 = List.of(beam);
+        List<ConvenienceList> cafeConvenienceLists2 = List.of(elevator);
+
+        Studycafe studycafe3 = studycafe3(cafeConvenienceLists2);    // 예약 내역 X
+        Room room7 = room1(studycafe3, roomConvenienceLists2);
+        Room room8 = room1(studycafe3, roomConvenienceLists2);
+        Room room9 = room1(studycafe3, roomConvenienceLists2);
 
         Studycafe studycafe4 = studycafe4();    // 예약 내역 X
         Room room10 = room2(studycafe4);
@@ -94,6 +106,10 @@ class StudycafeDslRepositoryTest {
         em.persist(hashtag2);
         em.persist(hashtag3);
         em.persist(hashtag4);
+        em.persist(hdmi);
+        em.persist(park);
+        em.persist(beam);
+        em.persist(elevator);
 
         em.flush();
         em.clear();
@@ -200,7 +216,23 @@ class StudycafeDslRepositoryTest {
         assertEquals(responses.size(), 1);
     }
 
-    private Studycafe studycafe1(List<HashtagRecord> hashtagRecords) {
+    @Test
+    @DisplayName("편의시설 필터링")
+    public void 편의시설_필터링() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .conveniences(convenienceNames())
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        assertEquals(responses.size(), 1);
+    }
+
+    private Studycafe studycafe1(List<HashtagRecord> hashtagRecords, List<ConvenienceList> convenienceLists) {
         return Studycafe.builder()
                 .name("테스트1 스터디카페")
                 .address("경기도 남양주시 진접읍")
@@ -209,6 +241,7 @@ class StudycafeDslRepositoryTest {
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(1.2)
                 .hashtagRecords(hashtagRecords)
+                .convenienceLists(convenienceLists)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -234,7 +267,7 @@ class StudycafeDslRepositoryTest {
                 .build();
     }
 
-    private Studycafe studycafe3() {
+    private Studycafe studycafe3(List<ConvenienceList> convenienceLists) {
         return Studycafe.builder()
                 .name("테스트3 스터디카페")
                 .address("경기도 남양주시 진접읍")
@@ -242,6 +275,7 @@ class StudycafeDslRepositoryTest {
                 .startTime(Time.valueOf("09:00:00"))
                 .endTime(Time.valueOf("21:00:00"))
                 .totalGrade(3.6)
+                .convenienceLists(convenienceLists)
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
@@ -266,9 +300,10 @@ class StudycafeDslRepositoryTest {
                 .build();
     }
 
-    private Room room1(Studycafe studycafe) {
+    private Room room1(Studycafe studycafe, List<ConvenienceList> convenienceLists) {
         return Room.builder()
                 .studycafe(studycafe)
+                .convenienceLists(convenienceLists)
                 .headCount(4)
                 .minHeadCount(2)
                 .maxHeadCount(4)
@@ -347,6 +382,43 @@ class StudycafeDslRepositoryTest {
                 .count(10)
                 .build();
     }
+
+    private List<ConvenienceName> convenienceNames() {
+        List<ConvenienceName> convenienceNames = new ArrayList<>();
+        convenienceNames.add(ConvenienceName.HDMI);
+        convenienceNames.add(ConvenienceName.PARKING);
+
+        return convenienceNames;
+    }
+
+    private ConvenienceList hdmi() {
+        return ConvenienceList.builder()
+                .name(ConvenienceName.HDMI)
+                .price(0)
+                .build();
+    }
+
+    private ConvenienceList park() {
+        return ConvenienceList.builder()
+                .name(ConvenienceName.PARKING)
+                .price(0)
+                .build();
+    }
+
+    private ConvenienceList beam() {
+        return ConvenienceList.builder()
+                .name(ConvenienceName.BEAM)
+                .price(0)
+                .build();
+    }
+
+    private ConvenienceList elevator() {
+        return ConvenienceList.builder()
+                .name(ConvenienceName.ELEVATOR)
+                .price(0)
+                .build();
+    }
+
 
     private Pageable pageable() {
         return PageRequestConverter.of(0);
