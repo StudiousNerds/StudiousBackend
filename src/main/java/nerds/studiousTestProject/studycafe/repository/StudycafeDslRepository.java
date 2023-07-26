@@ -4,6 +4,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.convenience.ConvenienceName;
+import nerds.studiousTestProject.convenience.QConvenienceList;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
@@ -41,7 +43,8 @@ public class StudycafeDslRepository {
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
                         gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
-                        hashtagContains(searchRequest.getHashtags())
+                        hashtagContains(searchRequest.getHashtags()),
+                        convenienceContains(searchRequest.getConveniences())
                 )
                 .groupBy(studycafe.id);
 
@@ -69,7 +72,8 @@ public class StudycafeDslRepository {
                         openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
                         gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
-                        hashtagContains(searchRequest.getHashtags())
+                        hashtagContains(searchRequest.getHashtags()),
+                        convenienceContains(searchRequest.getConveniences())
                 )
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
@@ -80,12 +84,21 @@ public class StudycafeDslRepository {
     }
 
     public JPAQuery<SearchResponse> getJoinedContentQuery(JPAQuery<SearchResponse> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null) {
                 query = query
                         .leftJoin(room.reservationRecords, reservationRecord);
+            }
+
+            if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
+                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
+                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
+
+                query = query
+                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
+                        .leftJoin(room.convenienceLists, rConvenienceList);
             }
         }
 
@@ -98,12 +111,21 @@ public class StudycafeDslRepository {
     }
 
     public JPAQuery<Long> getJoinedCountQuery(JPAQuery<Long> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null) {
                 query = query
                         .leftJoin(room.reservationRecords, reservationRecord);
+            }
+
+            if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
+                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
+                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
+
+                query = query
+                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
+                        .leftJoin(room.convenienceLists, rConvenienceList);
             }
         }
 
@@ -200,5 +222,17 @@ public class StudycafeDslRepository {
 
     private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
         return hashtags != null && !hashtags.isEmpty() ? hashtagRecord.name.in(hashtags) : null;
+    }
+
+    private BooleanExpression convenienceContains(List<ConvenienceName> conveniences) {
+        if (conveniences == null || conveniences.isEmpty()) {
+            return null;
+        }
+
+        // Room과 Studycafe의 Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
+        QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
+        QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
+
+        return cConvenienceList.name.in(conveniences).and(rConvenienceList.name.in(conveniences));
     }
 }
