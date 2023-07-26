@@ -57,6 +57,11 @@ public class Member implements UserDetails {
     @Column(name = "phone_number")
     private String phoneNumber;
     private Date createdDate;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<String> bookmark = new ArrayList<>();
+
     private boolean usable;
 
     @Nullable
@@ -67,6 +72,10 @@ public class Member implements UserDetails {
     }
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void registerBookmark(String studycafeName){
+        bookmark.add(studycafeName);
     }
 
     public void withdraw() {
