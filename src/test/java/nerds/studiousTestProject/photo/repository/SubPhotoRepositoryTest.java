@@ -4,6 +4,7 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.room.repository.RoomRepository;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,5 +36,17 @@ class SubPhotoRepositoryTest {
         List<SubPhoto> reviewPhotoList = subPhotoRepository.findAllByReviewId(review.getId());
         // then
         Assertions.assertThat(reviewPhotoList).contains(subPhoto, subPhoto1);
+    }
+
+    @Test
+    void findAllByStudycafeId() {
+        // given
+        Studycafe studycafe = studycafeRepository.save(Studycafe.builder().id(1L).build());
+        SubPhoto subPhoto = subPhotoRepository.save(SubPhoto.builder().studycafe(studycafe).url("www.spring.com").build());
+        SubPhoto subPhoto1 = subPhotoRepository.save(SubPhoto.builder().studycafe(studycafe).url("www.sub.com").build());
+        // when
+        List<SubPhoto> studycafePhotoList = subPhotoRepository.findAllByStudycafeId(1L);
+        // then
+        Assertions.assertThat(studycafePhotoList).contains(subPhoto, subPhoto1);
     }
 }
