@@ -38,6 +38,8 @@ public class Studycafe {
 
     private String name;
 
+    private String photo;
+
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -57,8 +59,10 @@ public class Studycafe {
 
     private String introduction;
 
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
+    @Column(name = "total_grade")
     private Double totalGrade;
 
     @Column(name = "notification_info")
