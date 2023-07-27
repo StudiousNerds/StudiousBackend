@@ -10,10 +10,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query(value = "select r " +
             "from Review as r " +
-            "where r.reservationRecord = " +
-            "(select res from ReservationRecord as res where res.room = " +
-            "(select ro from Room ro where ro.studycafe = " +
-            "(select s from Studycafe as s where s.id = :cafeId))) " +
+            "where r.reservationRecord.id = :reservationId " +
             "order by r.createdDate desc")
-    List<Review> findAllById(@Param("cafeId") Long cafeId);
+    List<Review> findAllById(@Param("reservationId") Long reservationId);
 }
