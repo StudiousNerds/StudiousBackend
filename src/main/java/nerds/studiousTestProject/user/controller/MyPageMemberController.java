@@ -3,6 +3,7 @@ package nerds.studiousTestProject.user.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.user.dto.bookmark.BookmarkReuqest;
+import nerds.studiousTestProject.user.dto.bookmark.FindBookmarkResponse;
 import nerds.studiousTestProject.user.dto.general.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.user.dto.general.patch.PatchPasswordRequest;
 import nerds.studiousTestProject.user.dto.general.withdraw.WithdrawRequest;
@@ -10,6 +11,7 @@ import nerds.studiousTestProject.user.service.bookmark.BookmarkService;
 import nerds.studiousTestProject.user.service.member.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -44,5 +48,10 @@ public class MyPageMemberController {
     @PostMapping("/bookmarks/{pageNumber}")
     public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest, @PathVariable("pageNumber") Integer pageNumber){
         return bookmarkService.registerBookmark(accessToken, bookmarkReuqest);
+    }
+
+    @GetMapping("/bookmarks/{pageNumber}")
+    public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable("pageNumber") Integer pageNumber){
+        return bookmarkService.findBookmark(accessToken, pageNumber);
     }
 }
