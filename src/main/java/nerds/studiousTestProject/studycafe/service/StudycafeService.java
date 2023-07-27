@@ -61,17 +61,13 @@ public class StudycafeService {
                 .build();
     }
 
-    public MainPageResponse getMainPage(){
-        List<RecommendCafeResponse> recommendStduycafes = getRecommendStduycafes();
-        List<EventCafeResponse> eventStudycafes = getEventStudycafes();
-        return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
-    public MainPageResponse getMainPage(){
-        List<RecommendCafeResponse> recommendStduycafes = getRecommendStduycafes();
+    public MainPageResponse getMainPage() {
+        List<RecommendCafeResponse> recommendStduycafes = getRecommendStudycafes();
         List<EventCafeResponse> eventStudycafes = getEventStudycafes();
         return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
     }
 
-    public List<RecommendCafeResponse> getRecommendStduycafes(){
+    public List<RecommendCafeResponse> getRecommendStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
         List<RecommendCafeResponse> recommedStudycafeList = new ArrayList<>();
 
@@ -91,26 +87,6 @@ public class StudycafeService {
         }
         return recommedStudycafeList;
     }
-
-    public List<RecommendCafeResponse> getRecommendStduycafes(){
-        List<Studycafe> recommend = studycafeRepository.findTop2ByOrderByTotalGradeDesc();
-        List<RecommendCafeResponse> recommendCafeList = new ArrayList<>();
-
-        for (Studycafe studycafe : recommend) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
-            RecommendCafeResponse foundStudycafe = RecommendCafeResponse.builder()
-                    .cafeId(studycafe.getId())
-                    .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
-                    .accumRevCnt(studycafe.getAccumReserveCount())
-                    .distance(studycafe.getDuration())
-                    .nearestStation(studycafe.getNearestStation())
-                    .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
-                    .build();
-            recommendCafeList.add(foundStudycafe);
-        }
-        return recommendCafeList;
 
     public List<EventCafeResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
