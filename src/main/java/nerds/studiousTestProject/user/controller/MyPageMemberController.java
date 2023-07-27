@@ -11,6 +11,7 @@ import nerds.studiousTestProject.user.service.bookmark.BookmarkService;
 import nerds.studiousTestProject.user.service.member.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,5 +54,10 @@ public class MyPageMemberController {
     @GetMapping("/bookmarks/{pageNumber}")
     public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable("pageNumber") Integer pageNumber){
         return bookmarkService.findBookmark(accessToken, pageNumber);
+    }
+
+    @DeleteMapping("/bookmarks/{pageNumber}")
+    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest, @PathVariable("pageNumber") Integer pageNumber){
+        return bookmarkService.deleteBookmark(accessToken, bookmarkReuqest);
     }
 }
