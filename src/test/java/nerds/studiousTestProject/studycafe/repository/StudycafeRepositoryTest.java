@@ -2,7 +2,6 @@ package nerds.studiousTestProject.studycafe.repository;
 
 import jakarta.persistence.EntityNotFoundException;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import org.aspectj.lang.annotation.Before;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
