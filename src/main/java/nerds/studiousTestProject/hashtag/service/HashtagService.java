@@ -24,7 +24,10 @@ public class HashtagService {
 
         List<Hashtag> hashtagList = hashtagRecord.getHashtags();
         Integer arrSize = hashtagList.size();
-        String hashtags[] = hashtagList.toArray(new String[arrSize]);
+        String hashtags[] = new String[arrSize];
+        for (int i = 0; i < arrSize; i++) {
+            hashtags[i] = hashtagList.get(i).toString();
+        }
 
         return hashtags;
     }
