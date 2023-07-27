@@ -13,7 +13,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     @Query(value = "select r.startTime, r.endTime " +
             "from ReservationRecord r " +
             "where r.date = :date and r.room.id = :roomId " +
-            "and r.reservationStatus = 'RESERVED'")
+            "and r.reservationStatus = 0")
     List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
     @Query("select r from ReservationRecord r where r.room.id = :roomId")
