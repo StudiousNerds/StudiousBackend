@@ -7,6 +7,7 @@ import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
+import nerds.studiousTestProject.user.dto.bookmark.BookmarkReuqest;
 import nerds.studiousTestProject.user.dto.bookmark.FindBookmarkResponse;
 import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.user.repository.member.MemberRepository;
@@ -31,7 +32,9 @@ public class BookmarkService {
     private final HashtagService hashtagService;
 
     @Transactional
-    public ResponseEntity<?> registerBookmark(String accessToken, Long studycafeId){
+    public ResponseEntity<?> registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+        Long studycafeId = bookmarkReuqest.getStudycafeId();
+
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
         member.registerBookmark(studyCafe.getName());
@@ -50,7 +53,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteBookmark(String accessToken, Long studycafeId){
+    public ResponseEntity<?> deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+        Long studycafeId = bookmarkReuqest.getStudycafeId();
+
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
         member.deleteBookmark(studyCafe.getName());
