@@ -15,7 +15,6 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import org.eclipse.jdt.internal.compiler.batch.Main;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +65,10 @@ public class StudycafeService {
         List<RecommendCafeResponse> recommendStduycafes = getRecommendStduycafes();
         List<EventCafeResponse> eventStudycafes = getEventStudycafes();
         return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
+    public MainPageResponse getMainPage(){
+        List<RecommendCafeResponse> recommendStduycafes = getRecommendStduycafes();
+        List<EventCafeResponse> eventStudycafes = getEventStudycafes();
+        return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
     }
 
     public List<RecommendCafeResponse> getRecommendStduycafes(){
@@ -88,6 +91,26 @@ public class StudycafeService {
         }
         return recommedStudycafeList;
     }
+
+    public List<RecommendCafeResponse> getRecommendStduycafes(){
+        List<Studycafe> recommend = studycafeRepository.findTop2ByOrderByTotalGradeDesc();
+        List<RecommendCafeResponse> recommendCafeList = new ArrayList<>();
+
+        for (Studycafe studycafe : recommend) {
+            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
+            RecommendCafeResponse foundStudycafe = RecommendCafeResponse.builder()
+                    .cafeId(studycafe.getId())
+                    .cafeName(studycafe.getName())
+                    .photo(cafePhotos[0])
+                    .accumRevCnt(studycafe.getAccumReserveCount())
+                    .distance(studycafe.getDuration())
+                    .nearestStation(studycafe.getNearestStation())
+                    .grade(studycafe.getTotalGrade())
+                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .build();
+            recommendCafeList.add(foundStudycafe);
+        }
+        return recommendCafeList;
 
     public List<EventCafeResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
