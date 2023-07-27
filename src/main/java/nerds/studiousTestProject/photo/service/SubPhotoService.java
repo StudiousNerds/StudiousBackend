@@ -1,9 +1,13 @@
 package nerds.studiousTestProject.photo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
+import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubPhotoService {
     private final SubPhotoRepository subPhotoRepository;
+    private final StudycafeRepository studycafeRepository;
 
     public String[] findReviewPhotos(Long id){
         List<SubPhoto> photoList = subPhotoRepository.findAllByReviewId(id);
@@ -30,10 +35,12 @@ public class SubPhotoService {
 
     public String[] findCafePhotos(Long id){
         List<SubPhoto> photoList = subPhotoRepository.findAllByStudycafeId(id);
+        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No such Cafe"));
         Integer arrSize = photoList.size();
         String cafePhotos[] = new String[arrSize];
+        cafePhotos[0] = studycafe.getPhoto();
 
-        for (int i = 0; i < arrSize; i++){
+        for (int i = 1; i < arrSize; i++){
             cafePhotos[i] = photoList.get(i).getUrl();
         }
 
