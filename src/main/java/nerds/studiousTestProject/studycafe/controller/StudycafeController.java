@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,5 +24,8 @@ public class StudycafeController {
         return studycafeService.findByDate(cafeId, findStudycafeRequest);
     }
 
-
+    @GetMapping("/main")
+    public MainPageResponse mainpage(){
+        return studycafeService.getMainPage();
+    }
 }
