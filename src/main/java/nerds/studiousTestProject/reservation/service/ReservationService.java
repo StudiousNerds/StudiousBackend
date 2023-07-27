@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
-import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,14 +25,9 @@ public class ReservationService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
     private final StudycafeRepository studycafeRepository;
-    //private final RoomService roomService;
-//private final StudycafeService studycafeService;
-
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
     public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId){
-        /* LocalTime openTime = studycafeService.getOpenTime(studycafeId);
-        LocalTime endTime = studycafeService.getEndTime(studycafeId); */
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No such Studycafe"));
         LocalTime openTime = studycafe.getStartTime();
         LocalTime endTime = studycafe.getEndTime();
