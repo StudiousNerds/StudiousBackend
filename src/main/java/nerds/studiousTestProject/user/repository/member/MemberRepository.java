@@ -16,6 +16,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByProviderIdAndType(Long providerId, MemberType type);
     boolean existsByEmailAndType(String email, MemberType type);
     boolean existsByPhoneNumber(String phoneNumber);
-    @Query(value = "select m from Member m where m.id = :id and m.bookmark is not empty", nativeQuery = true)
-    Optional<Member> findById(Long id);
 }
