@@ -33,9 +33,9 @@ public class ReservationService {
         LocalTime endTime = studycafe.getEndTime();
 
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("No such Studyroom"));
-        Integer minUsingTime = room.getMinUsingTime();
+        Integer minUsingTime = room.getMinUsingTime() / 60;
 
-        for(int i = openTime.getHour(); i < endTime.getHour(); i+=minUsingTime){
+        for(int i = openTime.getHour(); i <= endTime.getHour(); i+= minUsingTime){
             reservationTimes.put(i, true);
         }
 
