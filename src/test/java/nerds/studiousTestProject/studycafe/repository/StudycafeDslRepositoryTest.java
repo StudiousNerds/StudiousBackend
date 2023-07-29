@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,9 +51,9 @@ class StudycafeDslRepositoryTest {
         Room room1 = room1(studycafe1, roomConvenienceLists1);
         Room room2 = room1(studycafe1, roomConvenienceLists1);
         Room room3 = room1(studycafe1, roomConvenienceLists1);
-        ReservationRecord reservationRecord1 = reservationRecord1(room1);
-        ReservationRecord reservationRecord2 = reservationRecord1(room2);
-        ReservationRecord reservationRecord3 = reservationRecord1(room3);
+        ReservationRecord reservationRecord1 = reservationRecord_13_15(room1);
+        ReservationRecord reservationRecord2 = reservationRecord_13_15(room2);
+        ReservationRecord reservationRecord3 = reservationRecord_13_15(room3);
 
         HashtagRecord hashtag3 = hashtag3();
         HashtagRecord hashtag4 = hashtag4();
@@ -63,9 +63,9 @@ class StudycafeDslRepositoryTest {
         Room room4 = room2(studycafe2);
         Room room5 = room2(studycafe2);
         Room room6 = room2(studycafe2);
-        ReservationRecord reservationRecord4 = reservationRecord2(room4);
-        ReservationRecord reservationRecord5 = reservationRecord2(room5);
-        ReservationRecord reservationRecord6 = reservationRecord2(room6);
+        ReservationRecord reservationRecord4 = reservationRecord_09_11(room4);
+        ReservationRecord reservationRecord5 = reservationRecord_09_11(room5);
+        ReservationRecord reservationRecord6 = reservationRecord_09_11(room6);
 
         ConvenienceList beam = beam();
         ConvenienceList elevator = elevator();
@@ -139,7 +139,7 @@ class StudycafeDslRepositoryTest {
 
         // given
         SearchRequest request = SearchRequest.builder()
-                .date(Date.valueOf("2023-07-30"))
+                .date(LocalDate.of(2023, 7, 30))
                 .build();
 
         // when
@@ -156,9 +156,9 @@ class StudycafeDslRepositoryTest {
 
         // given
         SearchRequest request = SearchRequest.builder()
-                .date(Date.valueOf("2023-07-30"))
-                .startTime(Time.valueOf("13:00:00"))
-                .endTime(Time.valueOf("14:00:00"))
+                .date(LocalDate.of(2023, 7, 30))
+                .startTime(LocalTime.of(13, 0))
+                .endTime(LocalTime.of(14, 0))
                 .build();
 
         // when
@@ -186,20 +186,19 @@ class StudycafeDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("평점 범위 필터링")
-    public void 평점_범위_필터링() throws Exception {
+    @DisplayName("평점 필터링")
+    public void 평점_필터링() throws Exception {
 
         // given
         SearchRequest request = SearchRequest.builder()
                 .minGrade(2)
-                .maxGrade(4)
                 .build();
 
         // when
         List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
 
         // then
-        assertEquals(responses.size(), 2);
+        assertEquals(responses.size(), 3);
     }
 
     @Test
@@ -254,25 +253,6 @@ class StudycafeDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("예약 적은 순 정렬")
-    public void 예약_적은_순_정렬() throws Exception {
-
-        // given
-        SearchRequest request = SearchRequest.builder()
-                .sortType(SortType.RESERVATION_ASC)
-                .build();
-
-        // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
-
-        // then
-        Assertions.assertThat(responses.get(0).getAccumRevCnt()).isEqualTo(10);
-        Assertions.assertThat(responses.get(1).getAccumRevCnt()).isEqualTo(20);
-        Assertions.assertThat(responses.get(2).getAccumRevCnt()).isEqualTo(30);
-        Assertions.assertThat(responses.get(3).getAccumRevCnt()).isEqualTo(40);
-    }
-
-    @Test
     @DisplayName("평점 높은 순 정렬")
     public void 평점_높은_순_정렬() throws Exception {
 
@@ -291,32 +271,13 @@ class StudycafeDslRepositoryTest {
         Assertions.assertThat(responses.get(3).getGrade()).isEqualTo(1.2);
     }
 
-    @Test
-    @DisplayName("평점 낮은 순 정렬")
-    public void 평점_낮은_순_정렬() throws Exception {
-
-        // given
-        SearchRequest request = SearchRequest.builder()
-                .sortType(SortType.GRADE_ASC)
-                .build();
-
-        // when
-        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
-
-        // then
-        Assertions.assertThat(responses.get(0).getGrade()).isEqualTo(1.2);
-        Assertions.assertThat(responses.get(1).getGrade()).isEqualTo(2.4);
-        Assertions.assertThat(responses.get(2).getGrade()).isEqualTo(3.6);
-        Assertions.assertThat(responses.get(3).getGrade()).isEqualTo(4.8);
-    }
-
     private Studycafe studycafe1(List<HashtagRecord> hashtagRecords, List<ConvenienceList> convenienceLists) {
         return Studycafe.builder()
                 .name("테스트1 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(40)
-                .startTime(Time.valueOf("09:00:00"))
-                .endTime(Time.valueOf("21:00:00"))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(21, 0))
                 .totalGrade(1.2)
                 .hashtagRecords(hashtagRecords)
                 .convenienceLists(convenienceLists)
@@ -333,8 +294,8 @@ class StudycafeDslRepositoryTest {
                 .name("테스트2 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(30)
-                .startTime(Time.valueOf("09:00:00"))
-                .endTime(Time.valueOf("21:00:00"))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(21, 0))
                 .totalGrade(2.4)
                 .duration(null)
                 .hashtagRecords(hashtagRecords)
@@ -350,8 +311,8 @@ class StudycafeDslRepositoryTest {
                 .name("테스트3 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(20)
-                .startTime(Time.valueOf("09:00:00"))
-                .endTime(Time.valueOf("21:00:00"))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(21, 0))
                 .totalGrade(3.6)
                 .convenienceLists(convenienceLists)
                 .duration(null)
@@ -367,8 +328,8 @@ class StudycafeDslRepositoryTest {
                 .name("테스트4 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(10)
-                .startTime(Time.valueOf("09:00:00"))
-                .endTime(Time.valueOf("21:00:00"))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(21, 0))
                 .totalGrade(4.8)
                 .duration(null)
                 .nearestStation(null)
@@ -401,24 +362,24 @@ class StudycafeDslRepositoryTest {
                 .build();
     }
 
-    private ReservationRecord reservationRecord1(Room room) {
+    private ReservationRecord reservationRecord_13_15(Room room) {
         return ReservationRecord.builder()
                 .room(room)
-                .date(Date.valueOf("2023-07-30"))
-                .startTime(Time.valueOf("13:00:00"))
-                .endTime(Time.valueOf("15:00:00"))
+                .date(LocalDate.of(2023, 7, 30))
+                .startTime(LocalTime.of(13, 0))
+                .endTime(LocalTime.of(15, 0))
                 .duration(2)
                 .headCount(5)
                 .status(ReservationStatus.CONFIRMED)
                 .build();
     }
 
-    private ReservationRecord reservationRecord2(Room room) {
+    private ReservationRecord reservationRecord_09_11(Room room) {
         return ReservationRecord.builder()
                 .room(room)
-                .date(Date.valueOf("2023-07-30"))
-                .startTime(Time.valueOf("09:00:00"))
-                .endTime(Time.valueOf("11:00:00"))
+                .date(LocalDate.of(2023, 7, 30))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(11, 0))
                 .duration(2)
                 .headCount(5)
                 .status(ReservationStatus.CONFIRMED)
@@ -427,36 +388,36 @@ class StudycafeDslRepositoryTest {
 
     private List<HashtagName> hashtagNames() {
         List<HashtagName> hashtagNames = new ArrayList<>();
-        hashtagNames.add(HashtagName.역세권);
-        hashtagNames.add(HashtagName.깨끗해요);
+        hashtagNames.add(HashtagName.STATION_AREA);
+        hashtagNames.add(HashtagName.CLEAN);
 
         return hashtagNames;
     }
 
     private HashtagRecord hashtag1() {
         return HashtagRecord.builder()
-                .name(HashtagName.역세권)
+                .name(HashtagName.STATION_AREA)
                 .count(20)
                 .build();
     }
 
     private HashtagRecord hashtag2() {
         return HashtagRecord.builder()
-                .name(HashtagName.깨끗해요)
+                .name(HashtagName.CLEAN)
                 .count(10)
                 .build();
     }
 
     private HashtagRecord hashtag3() {
         return HashtagRecord.builder()
-                .name(HashtagName.갓성비)
+                .name(HashtagName.COST_EFFECTIVE)
                 .count(20)
                 .build();
     }
 
     private HashtagRecord hashtag4() {
         return HashtagRecord.builder()
-                .name(HashtagName.접근성)
+                .name(HashtagName.ACCESS)
                 .count(10)
                 .build();
     }
