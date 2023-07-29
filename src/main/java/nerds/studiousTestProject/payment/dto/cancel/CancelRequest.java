@@ -14,10 +14,8 @@ import nerds.studiousTestProject.payment.dto.RequestToToss;
 @NoArgsConstructor
 public class CancelRequest extends RequestToToss {
 
-    @NotNull(message = "취소 사유가 없습니다.")
     private String cancelReason;
 
-    @Nullable
-    private Integer canselAmount;
+    private Integer cancelAmount;
 
 }

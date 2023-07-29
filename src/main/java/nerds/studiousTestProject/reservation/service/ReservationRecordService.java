@@ -1,22 +1,22 @@
-package nerds.studiousTestProject.reservationRecord.service;
+package nerds.studiousTestProject.reservation.service;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.exception.ReservationRecordNotFoundException;
-import nerds.studiousTestProject.exception.ReservationRecordNotFoundException;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.ReservationInfo;
 import nerds.studiousTestProject.payment.dto.request.ReserveUser;
-import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
-import nerds.studiousTestProject.reservationRecord.entity.ReservationStatus;
-import nerds.studiousTestProject.reservationRecord.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationStatus;
+import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.user.service.member.MemberService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.UUID;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 
 @RequiredArgsConstructor
 @Service
@@ -59,7 +59,7 @@ public class ReservationRecordService {
 
     public ReservationRecord findByOrderId(String orderId) {
         return reservationRecordRepository.findByOrderId(orderId)
-                .orElseThrow(ReservationRecordNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     @Transactional
@@ -73,7 +73,7 @@ public class ReservationRecordService {
     }
 
     public ReservationRecord findById(Long id) {
-        return reservationRecordRepository.findById(id).orElseThrow(ReservationRecordNotFoundException::new);
+        return reservationRecordRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
 }

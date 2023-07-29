@@ -28,6 +28,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 import java.util.Optional;
 
+import static nerds.studiousTestProject.user.exception.message.ExceptionMessage.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -84,7 +86,7 @@ public class OAuth2Service {
         // providerId == null 인 경우 (사용자 정보를 가져오지 못한 경우) 예외 발생
         Long providerId = oAuth2UserInfo.getProviderId();
         if (providerId == null) {
-            throw new OAuth2Exception(ExceptionMessage.NOT_AUTHORIZE_ACCESS);
+            throw new OAuth2Exception(NOT_AUTHORIZE_ACCESS);
         }
 
         return oAuth2UserInfo;
