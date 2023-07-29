@@ -2,6 +2,7 @@ package nerds.studiousTestProject.payment.dto.request;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -11,10 +12,10 @@ import lombok.*;
 @AllArgsConstructor
 public class ReserveUser {
 
-    @NotBlank
+    @NotNull(message = "예약자명은 필수 입니다.")
     private String name;
 
-    @Size(min = 11, max = 11)
+    @NotNull(message = "예약자 전화번호는 필수 입니다.")
     private String phoneNumber;
 
     @Nullable
