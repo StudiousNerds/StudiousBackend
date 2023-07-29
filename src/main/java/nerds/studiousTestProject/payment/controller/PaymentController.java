@@ -1,12 +1,12 @@
 package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.payment.dto.confirm.ConfirmFailResponse;
-import nerds.studiousTestProject.payment.dto.confirm.ConfirmSuccessResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
-import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
