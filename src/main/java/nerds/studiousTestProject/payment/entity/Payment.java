@@ -19,15 +19,15 @@ public class Payment {
     private Long id;
     private String orderId;
     private String paymentKey;
-    private String type;
+    private String method;
     private String completeTime;
 
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String type, String completeTime) {
+    public Payment(Long id, String orderId, String paymentKey, String method, String completeTime) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
-        this.type = type;
+        this.method = method;
         this.completeTime = completeTime;
     }
 }
