@@ -172,8 +172,8 @@ public class StudycafeDslRepository {
 
     private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
         BooleanExpression dateEq = dateEq(date);
-        BooleanExpression startTimeGoe = startTimeGoe(startTime);
-        BooleanExpression endTimeLoe = endTimeLoe(endTime);
+        BooleanExpression startTimeLoe = startTimeLoe(startTime);
+        BooleanExpression endTimeGoe = endTimeGoe(endTime);
 
         // 날짜가 선택 안 된 경우는 가능 시간 조회 불가능
         // 예약이 없는 경우를 대비하여 reservationRecord.isNull() 조건 추가
@@ -181,8 +181,8 @@ public class StudycafeDslRepository {
                 .or(
                         (reservationRecord.status.eq(ReservationStatus.CONFIRMED).and(
                                 reservationRecord.date.eq(date)
-                                .and(startTimeGoe)
-                                .and(endTimeLoe)
+                                .and(startTimeLoe)
+                                .and(endTimeGoe)
                         )).not()
                 ) : null;
     }
@@ -191,39 +191,28 @@ public class StudycafeDslRepository {
         return date != null ? reservationRecord.date.eq(date) : null;
     }
 
-    private BooleanExpression startTimeGoe(LocalTime startTime) {
+    private BooleanExpression startTimeLoe(LocalTime startTime) {
         if (startTime == null) {
             startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
         }
 
-        return reservationRecord.startTime.goe(startTime);
+        return reservationRecord.startTime.loe(startTime);
     }
 
-    private BooleanExpression endTimeLoe(LocalTime endTime) {
+    private BooleanExpression endTimeGoe(LocalTime endTime) {
         if (endTime == null) {
             endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
         }
 
-        return reservationRecord.endTime.loe(endTime);
+        return reservationRecord.endTime.goe(endTime);
     }
 
     private BooleanExpression keywordContains(String keyword) {
         return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.contains(keyword)) : null;
     }
 
-    private BooleanExpression minGradeGoe(Integer minGrade) {
+    private BooleanExpression totalGradeGoe(Integer minGrade) {
         return minGrade != null ? studycafe.totalGrade.goe(minGrade) : null;
-    }
-
-    private BooleanExpression maxGradeLoe(Integer maxGrade) {
-        return maxGrade != null ? studycafe.totalGrade.loe(maxGrade) : null;
-    }
-
-    private BooleanExpression gradeBetween(Integer minGrade, Integer maxGrade) {
-        BooleanExpression minGradeGoe = minGradeGoe(minGrade);
-        BooleanExpression maxGradeLoe = maxGradeLoe(maxGrade);
-
-        return minGradeGoe != null ? minGradeGoe.and(maxGradeLoe) : maxGradeLoe;
     }
 
     private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
@@ -247,9 +236,8 @@ public class StudycafeDslRepository {
 
         switch (sortType != null ? sortType : SortType.GRADE_DESC) {
             case RESERVATION_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.accumReserveCount));
-            case RESERVATION_ASC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.accumReserveCount));
             case GRADE_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.totalGrade));
-            case GRADE_ASC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.totalGrade));
+            case CREATED_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
         }
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
