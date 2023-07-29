@@ -35,7 +35,7 @@ public class ReservationRecord {
     private String request;
     private boolean completePayment; //편의시설 사용여부
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

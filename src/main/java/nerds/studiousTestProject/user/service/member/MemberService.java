@@ -276,7 +276,7 @@ public class MemberService {
         return passwordEncoder.encode(password);
     }
 
-    private Member getMemberFromAccessToken(String accessToken) {
+    public Member getMemberFromAccessToken(String accessToken) {
         String resolvedAccessToken = jwtTokenProvider.resolveToken(accessToken);
         Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
 

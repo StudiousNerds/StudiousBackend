@@ -20,6 +20,7 @@ public class ReservationRecordService {
 
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomService roomService;
+    private final MemberService memberService;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId){
@@ -39,6 +40,7 @@ public class ReservationRecordService {
                         .request(user.getRequest())
                         .room(roomService.findById(roomId))
                         .orderId(orderId)
+                        .member(memberService.getMemberFromAccessToken(accessToken))
                         .build()
         );
         return orderId;
