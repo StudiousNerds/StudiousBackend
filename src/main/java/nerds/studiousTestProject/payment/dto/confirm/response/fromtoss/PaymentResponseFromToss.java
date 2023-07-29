@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.confirm.request;
+package nerds.studiousTestProject.payment.dto.confirm.response.fromtoss;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
