@@ -1,8 +1,8 @@
 package nerds.studiousTestProject.studycafe.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
@@ -18,10 +18,10 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -36,7 +36,7 @@ public class StudycafeService {
     private final ConvenienceService convenienceService;
 
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
+        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
@@ -110,15 +110,15 @@ public class StudycafeService {
     }
 
     public Studycafe getStudyCafe(Long studycafeId){
-        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     public Studycafe getStudyCafeByName(String cafeName){
-        return studycafeRepository.findByName(cafeName).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
+        return studycafeRepository.findByName(cafeName).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     public String[] getNotice(Long id){
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new RuntimeException("No Such Studycafe"));
+        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         List<String> noticeList = studycafe.getNotice();
         Integer arrSize = noticeList.size();

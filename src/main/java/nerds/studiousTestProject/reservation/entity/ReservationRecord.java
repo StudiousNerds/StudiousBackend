@@ -10,13 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.user.entity.member.Member;
+import nerds.studiousTestProject.member.entity.member.Member;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

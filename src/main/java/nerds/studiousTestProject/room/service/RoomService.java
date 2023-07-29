@@ -3,6 +3,7 @@ package nerds.studiousTestProject.room.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.service.ReservationService;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @Slf4j
 @Service
@@ -56,7 +59,7 @@ public class RoomService {
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No Such Cafe"));
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         int start = studycafe.getStartTime().getHour();
         int end = studycafe.getEndTime().getHour();
         int size = end - start;
