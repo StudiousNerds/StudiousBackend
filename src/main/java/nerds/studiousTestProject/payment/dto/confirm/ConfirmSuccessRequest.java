@@ -6,12 +6,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.exception.InvalidRequestToTossException;
+import nerds.studiousTestProject.payment.dto.RequestToToss;
 
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfirmSuccessRequest {
+public class ConfirmSuccessRequest extends RequestToToss {
 
     @NotNull(message = "orderId가 없습니다.")
     private String orderId;
