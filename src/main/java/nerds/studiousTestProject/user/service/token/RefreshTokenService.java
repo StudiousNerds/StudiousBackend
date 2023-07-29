@@ -1,9 +1,9 @@
 package nerds.studiousTestProject.user.service.token;
 
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.user.entity.token.RefreshToken;
-import nerds.studiousTestProject.user.exception.message.ExceptionMessage;
-import nerds.studiousTestProject.user.exception.model.TokenNotFoundException;
 import nerds.studiousTestProject.user.repository.token.RefreshTokenRepository;
 import nerds.studiousTestProject.user.util.JwtTokenConst;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class RefreshTokenService {
 
     public RefreshToken findByMemberId(Long memberId) {
         return refreshTokenRepository.findById(memberId)
-                .orElseThrow(() -> new TokenNotFoundException(ExceptionMessage.TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOKEN));
     }
 
     public void deleteByMemberId(Long memberId) {

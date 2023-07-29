@@ -2,11 +2,13 @@ package nerds.studiousTestProject.user.service.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.user.dto.general.find.FindEmailRequest;
 import nerds.studiousTestProject.user.dto.general.find.FindEmailResponse;
 import nerds.studiousTestProject.user.dto.general.find.FindPasswordRequest;
-import nerds.studiousTestProject.user.dto.general.logout.LogoutResponse;
 import nerds.studiousTestProject.user.dto.general.find.FindPasswordResponse;
+import nerds.studiousTestProject.user.dto.general.logout.LogoutResponse;
 import nerds.studiousTestProject.user.dto.general.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.user.dto.general.patch.PatchPasswordRequest;
 import nerds.studiousTestProject.user.dto.general.signup.SignUpRequest;
@@ -16,8 +18,6 @@ import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.user.entity.member.MemberType;
 import nerds.studiousTestProject.user.entity.token.LogoutAccessToken;
 import nerds.studiousTestProject.user.entity.token.RefreshToken;
-import nerds.studiousTestProject.user.exception.message.ExceptionMessage;
-import nerds.studiousTestProject.user.exception.model.UserAuthException;
 import nerds.studiousTestProject.user.repository.member.MemberRepository;
 import nerds.studiousTestProject.user.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.user.service.token.RefreshTokenService;
@@ -89,16 +89,16 @@ public class MemberService {
     public JwtTokenResponse issueToken(String email, String password) {
         List<Member> members = memberRepository.findByEmail(email);
         if (members.isEmpty()) {
-            throw new UserAuthException(ExceptionMessage.MISMATCH_EMAIL);
+            throw new NotFoundException(ErrorCode.MISMATCH_EMAIL);
         }
 
-        Member member = members.stream().filter(m -> passwordEncoder.matches(password, m.getPassword())).findAny().orElseThrow(() -> new UserAuthException(ExceptionMessage.MISMATCH_PASSWORD));
+        Member member = members.stream().filter(m -> passwordEncoder.matches(password, m.getPassword())).findAny().orElseThrow(() -> new NotFoundException(ErrorCode.MISMATCH_PASSWORD));
         if (!member.getType().equals(MemberType.DEFAULT)) {
-            throw new UserAuthException(ExceptionMessage.NOT_DEFAULT_TYPE_USER);
+            throw new NotFoundException(ErrorCode.NOT_DEFAULT_TYPE_USER);
         }
 
         if (!member.isUsable()) {
-            throw new UserAuthException(ExceptionMessage.EXPIRE_USER);
+            throw new NotFoundException(ErrorCode.EXPIRE_USER);
         }
 
         return jwtTokenProvider.generateToken(member);
@@ -129,10 +129,10 @@ public class MemberService {
         String phoneNumber = findEmailRequest.getPhoneNumber();
 
         Member member = memberRepository.findByPhoneNumber(phoneNumber).
-                orElseThrow(() -> new UserAuthException(ExceptionMessage.USER_NOT_FOUND));
+                orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         if (!member.getType().equals(MemberType.DEFAULT)) {
-            throw new UserAuthException(ExceptionMessage.NOT_DEFAULT_TYPE_USER);
+            throw new NotFoundException(ErrorCode.NOT_DEFAULT_TYPE_USER);
         }
 
         return FindEmailResponse.builder()
@@ -142,8 +142,7 @@ public class MemberService {
 
     /**
      * 이메일과 전화번호를 통해 알맞는 회원의 비밀번호를 임시 비밀번호로 수정 및 임시 비밀번호를 반환하는 메소드
-     * @param email 이메일
-     * @param phoneNumber 전화번호
+     * @param findPasswordRequest 이메일, 비밀번호
      * @return 발급된 임시 비밀번호
      */
     @Transactional
@@ -153,13 +152,13 @@ public class MemberService {
 
         List<Member> members = memberRepository.findByEmail(email);
         if (members.isEmpty()) {
-            throw new UserAuthException(ExceptionMessage.MISMATCH_EMAIL);
+            throw new NotFoundException(ErrorCode.MISMATCH_EMAIL);
         }
 
         Member member = members.stream().filter(m -> m.getPhoneNumber().equals(phoneNumber)).findAny()
-                .orElseThrow(() -> new UserAuthException(ExceptionMessage.MISMATCH_PHONE_NUMBER));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MISMATCH_PHONE_NUMBER));
         if (!member.getType().equals(MemberType.DEFAULT)) {
-            throw new UserAuthException(ExceptionMessage.NOT_DEFAULT_TYPE_USER);
+            throw new NotFoundException(ErrorCode.NOT_DEFAULT_TYPE_USER);
         }
 
         String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
@@ -178,7 +177,7 @@ public class MemberService {
 
         Member member = getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
-            throw new UserAuthException(ExceptionMessage.MISMATCH_PASSWORD);
+            throw new NotFoundException(ErrorCode.MISMATCH_PASSWORD);
         }
 
         // 회원 비밀번호 수정
@@ -198,7 +197,7 @@ public class MemberService {
 
         Member member = getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new UserAuthException(ExceptionMessage.MISMATCH_PASSWORD);
+            throw new NotFoundException(ErrorCode.MISMATCH_PASSWORD);
         }
 
         member.withdraw();
@@ -218,13 +217,13 @@ public class MemberService {
         Member member = getMemberFromAccessToken(accessToken);
         RefreshToken redisRefreshToken = refreshTokenService.findByMemberId(member.getId());
         if (redisRefreshToken == null) {
-            throw new UserAuthException(ExceptionMessage.TOKEN_VALID_TIME_EXPIRED);
+            throw new NotFoundException(ErrorCode.EXPIRED_TOKEN_VALID_TIME);
         }
 
         if (!refreshToken.equals(redisRefreshToken.getToken())) {
             log.info("refreshToken = {}", refreshToken);
             log.info("redisRefreshToken = {}", redisRefreshToken.getToken());
-            throw new UserAuthException(ExceptionMessage.MISMATCH_TOKEN);
+            throw new NotFoundException(ErrorCode.MISMATCH_TOKEN);
         }
 
 //        Authorization 사용하여 패스워드 가져올 때 PROTECTED 되있으므로 DB에서 사용자 내역을 가져온다.
@@ -243,25 +242,25 @@ public class MemberService {
     private void validate(SignUpRequest signUpRequest, MemberType type) {
         Long providerId = signUpRequest.getProviderId();
         if (providerId == null && !type.equals(MemberType.DEFAULT)) {
-            throw new UserAuthException(ExceptionMessage.NOT_EXIST_PROVIDER_ID);
+            throw new NotFoundException(ErrorCode.NOT_EXIST_PROVIDER_ID);
         }
 
         if ((providerId != null && memberRepository.existsByProviderIdAndType(providerId, type))) {
-            throw new UserAuthException(ExceptionMessage.ALREADY_EXIST_USER);
+            throw new NotFoundException(ErrorCode.ALREADY_EXIST_USER);
         }
 
         if (signUpRequest.getPassword() == null && type.equals(MemberType.DEFAULT)) {
-            throw new UserAuthException(ExceptionMessage.NOT_EXIST_PASSWORD);
+            throw new NotFoundException(ErrorCode.NOT_EXIST_PASSWORD);
         }
 
         String email = signUpRequest.getEmail();
         if (memberRepository.existsByEmailAndType(email, type)) {
-            throw new UserAuthException(ExceptionMessage.ALREADY_EXIST_USER);
+            throw new NotFoundException(ErrorCode.ALREADY_EXIST_USER);
         }
 
         String phoneNumber = signUpRequest.getPhoneNumber();
         if (memberRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new UserAuthException(ExceptionMessage.PHONE_NUMBER_ALREADY_EXIST);
+            throw new NotFoundException(ErrorCode.ALREADY_EXIST_PHONE_NUMBER);
         }
     }
 
@@ -281,17 +280,17 @@ public class MemberService {
         Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
 
         Member member =  memberRepository.findById(memberId).
-                orElseThrow(() -> new UserAuthException(ExceptionMessage.MISMATCH_USERNAME_TOKEN));
+                orElseThrow(() -> new NotFoundException(ErrorCode.MISMATCH_USERNAME_TOKEN));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
             log.info("auth = {}", authentication);
-            throw new UserAuthException(ExceptionMessage.NOT_AUTHORIZE_ACCESS);
+            throw new NotFoundException(ErrorCode.NOT_AUTHORIZE_ACCESS);
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         if (!userDetails.getUsername().equals(member.getUsername())) {
-            throw new UserAuthException(ExceptionMessage.NOT_AUTHORIZE_ACCESS);
+            throw new NotFoundException(ErrorCode.NOT_AUTHORIZE_ACCESS);
         }
 
         return member;

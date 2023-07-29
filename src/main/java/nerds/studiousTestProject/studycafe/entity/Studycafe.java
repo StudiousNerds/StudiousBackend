@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,11 +25,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-@AllArgsConstructor
-@Builder
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Studycafe {
 
     @Id
@@ -65,4 +64,26 @@ public class Studycafe {
     @OneToMany
     @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<ConvenienceList> convenienceLists;
+
+    @Builder
+    public Studycafe(Long id, String name, String tel, String address, String photo, @Nullable Integer duration, @Nullable String nearestStation, LocalTime startTime, LocalTime endTime, Integer accumReserveCount, Double totalGrade, String introduction, LocalDateTime createdAt, @Nullable String notificationInfo, String notice, List<Room> rooms, List<HashtagRecord> hashtagRecords, List<ConvenienceList> convenienceLists) {
+        this.id = id;
+        this.name = name;
+        this.tel = tel;
+        this.address = address;
+        this.photo = photo;
+        this.duration = duration;
+        this.nearestStation = nearestStation;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.accumReserveCount = accumReserveCount;
+        this.totalGrade = totalGrade;
+        this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.notificationInfo = notificationInfo;
+        this.notice = notice;
+        this.rooms = rooms;
+        this.hashtagRecords = hashtagRecords;
+        this.convenienceLists = convenienceLists;
+    }
 }

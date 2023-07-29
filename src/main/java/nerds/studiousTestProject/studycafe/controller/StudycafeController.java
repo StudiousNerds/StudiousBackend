@@ -36,7 +36,7 @@ public class StudycafeController {
     public List<SearchResponse> search(
                                         @RequestParam Integer page,
                                         @RequestParam(required = false) SortType sortType,       // 정렬 기준
-                                        @RequestParam(required = false) @Length(min = 2) String keyword,
+                                        @RequestParam @Length(min = 2) String keyword,
                                         @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent LocalDate date,
                                         @RequestParam(required = false) LocalTime startTime,
                                         @RequestParam(required = false) LocalTime endTime,

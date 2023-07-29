@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .requestMatchers("/studious/members/signup", "/studious/members/login",  "/studious/oauth/authenticate/**").permitAll()    // 일반, 소셜 회원가입 및 로그인
                 .requestMatchers("/studious/members/logout", "/studious/members/reissue").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")  // 로그아웃, 토큰 재발급
                 .requestMatchers("/studious/mypage/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN") // 닉네임, 비밀번호 수정 및 회원 탈퇴
-                .requestMatchers(HttpMethod.GET, "/studious/members/email").permitAll()      // 이메일 찾기
+                .requestMatchers("studious/search/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
                 .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
                 .requestMatchers("/studious/members/test").hasRole("USER")      // 테스트 용
                 .anyRequest().authenticated()

@@ -2,6 +2,8 @@ package nerds.studiousTestProject.user.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.user.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.user.dto.oauth.signup.OAuth2AuthenticateResponse;
 import nerds.studiousTestProject.user.dto.oauth.token.OAuth2TokenRequest;
@@ -10,8 +12,6 @@ import nerds.studiousTestProject.user.dto.oauth.userinfo.OAuth2UserInfo;
 import nerds.studiousTestProject.user.dto.oauth.userinfo.OAuth2UserInfoFactory;
 import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.user.entity.member.MemberType;
-import nerds.studiousTestProject.user.exception.message.ExceptionMessage;
-import nerds.studiousTestProject.user.exception.model.OAuth2Exception;
 import nerds.studiousTestProject.user.service.member.MemberService;
 import nerds.studiousTestProject.user.util.JwtTokenProvider;
 import nerds.studiousTestProject.user.util.MultiValueMapConverter;
@@ -84,7 +84,7 @@ public class OAuth2Service {
         // providerId == null 인 경우 (사용자 정보를 가져오지 못한 경우) 예외 발생
         Long providerId = oAuth2UserInfo.getProviderId();
         if (providerId == null) {
-            throw new OAuth2Exception(ExceptionMessage.NOT_AUTHORIZE_ACCESS);
+            throw new BadRequestException(ErrorCode.NOT_AUTHORIZE_ACCESS);
         }
 
         return oAuth2UserInfo;
