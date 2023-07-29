@@ -5,20 +5,19 @@ import lombok.Data;
 import nerds.studiousTestProject.convenience.ConvenienceName;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
 
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Builder
 @Data
 public class SearchRequest {
     private String keyword;
-    private Date date;
-    private Time startTime;
-    private Time endTime;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private Integer headCount;
     private Integer minGrade;
-    private Integer maxGrade;
     private Boolean eventInProgress;
     private List<HashtagName> hashtags;
     private List<ConvenienceName> conveniences;

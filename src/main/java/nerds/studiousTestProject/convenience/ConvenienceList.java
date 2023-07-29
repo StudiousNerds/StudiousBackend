@@ -24,14 +24,4 @@ public class ConvenienceList {
     @Enumerated(EnumType.STRING)
     private ConvenienceName name;
     private Integer price;
-
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Studycafe studycafe;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Room room;
-    */
 }

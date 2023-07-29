@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -37,12 +37,11 @@ public class StudycafeController {
                                         @RequestParam Integer page,
                                         @RequestParam(required = false) SortType sortType,       // 정렬 기준
                                         @RequestParam(required = false) @Length(min = 2) String keyword,
-                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent Date date,
-                                        @RequestParam(required = false) Time startTime,
-                                        @RequestParam(required = false) Time endTime,
+                                        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent LocalDate date,
+                                        @RequestParam(required = false) LocalTime startTime,
+                                        @RequestParam(required = false) LocalTime endTime,
                                         @RequestParam(required = false) @Positive Integer headCount,
                                         @RequestParam(required = false) @Range(min = 0, max = 5) Integer minGrade,          // 최소 평점
-                                        @RequestParam(required = false) @Range(min = 0, max = 5) Integer maxGrade,          // 최대 평점
                                         @RequestParam(required = false) Boolean eventInProgress,   // 이벤트 여부
                                         @RequestParam(required = false) List<HashtagName> hashtags,     // 해시태그
                                         @RequestParam(required = false) List<ConvenienceName> conveniences // 편의 시설
@@ -55,7 +54,6 @@ public class StudycafeController {
                 .endTime(endTime)
                 .headCount(headCount)
                 .minGrade(minGrade)
-                .maxGrade(maxGrade)
                 .eventInProgress(eventInProgress)
                 .hashtags(hashtags)
                 .conveniences(conveniences)

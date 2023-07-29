@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.user.entity.member.Member;
 
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @AllArgsConstructor
 @Builder
@@ -41,9 +41,9 @@ public class ReservationRecord {
 
     private String name;
     private String phoneNumber;
-    private Date date;
-    private Time startTime;
-    private Time endTime;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private Integer duration;
     private Integer headCount;
 

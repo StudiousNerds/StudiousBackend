@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
@@ -10,7 +9,6 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class StudyCafeService {
 
         // 시작 시간이 끝 시간보다 이후인 경우
         if (searchRequest.getStartTime() != null && searchRequest.getEndTime() != null &&
-        !searchRequest.getStartTime().before(searchRequest.getEndTime())) {
+        !searchRequest.getStartTime().isBefore(searchRequest.getEndTime())) {
             throw new SearchException(SearchExceptionMessage.START_TIME_AFTER_THAN_END_TIME);
         }
 

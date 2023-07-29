@@ -19,6 +19,9 @@ import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagRecord;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -41,14 +44,12 @@ public class Studycafe {
     private Integer duration;   // 역까지 걸리는 시간 (분)
     @Nullable
     private String nearestStation;  // 가장 가까운 역 이름
-//    private String latitude;
-//    private String longitude;
-    private Time startTime;
-    private Time endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private Integer accumReserveCount;
     private Double totalGrade;
     private String introduction;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Nullable
     private String notificationInfo;

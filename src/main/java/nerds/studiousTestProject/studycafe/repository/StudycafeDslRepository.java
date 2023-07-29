@@ -19,9 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
@@ -46,7 +46,7 @@ public class StudycafeDslRepository {
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
-                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
+                        totalGradeGoe(searchRequest.getMinGrade()),
                         hashtagContains(searchRequest.getHashtags()),
                         convenienceContains(searchRequest.getConveniences())
                 )
@@ -76,7 +76,7 @@ public class StudycafeDslRepository {
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
-                        gradeBetween(searchRequest.getMinGrade(), searchRequest.getMaxGrade()),
+                        totalGradeGoe(searchRequest.getMinGrade()),
                         hashtagContains(searchRequest.getHashtags()),
                         convenienceContains(searchRequest.getConveniences())
                 )
@@ -156,21 +156,21 @@ public class StudycafeDslRepository {
         return headCount != null ? room.maxHeadCount.goe(headCount) : null;
     }
 
-    private BooleanExpression openTime(Time startTime, Time endTime) {
+    private BooleanExpression openTime(LocalTime startTime, LocalTime endTime) {
         BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
         BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
         return startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe;
     }
 
-    private BooleanExpression cafeStartTimeLoe(Time startTime) {
+    private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
         return startTime != null ? studycafe.startTime.loe(startTime) : null;
     }
 
-    private BooleanExpression cafeEndTimeGoe(Time endTime) {
+    private BooleanExpression cafeEndTimeGoe(LocalTime endTime) {
         return endTime != null ? studycafe.endTime.goe(endTime) : null;
     }
 
-    private BooleanExpression dateAndTimeNotReserved(Date date, Time startTime, Time endTime) {
+    private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
         BooleanExpression dateEq = dateEq(date);
         BooleanExpression startTimeGoe = startTimeGoe(startTime);
         BooleanExpression endTimeLoe = endTimeLoe(endTime);
@@ -179,28 +179,29 @@ public class StudycafeDslRepository {
         // 예약이 없는 경우를 대비하여 reservationRecord.isNull() 조건 추가
         return dateEq != null ? reservationRecord.isNull()
                 .or(
-                        (reservationRecord.status.eq(ReservationStatus.CONFIRMED).and(reservationRecord.date.eq(date)
+                        (reservationRecord.status.eq(ReservationStatus.CONFIRMED).and(
+                                reservationRecord.date.eq(date)
                                 .and(startTimeGoe)
                                 .and(endTimeLoe)
                         )).not()
                 ) : null;
     }
 
-    private BooleanExpression dateEq(Date date) {
+    private BooleanExpression dateEq(LocalDate date) {
         return date != null ? reservationRecord.date.eq(date) : null;
     }
 
-    private BooleanExpression startTimeGoe(Time startTime) {
+    private BooleanExpression startTimeGoe(LocalTime startTime) {
         if (startTime == null) {
-            startTime = Time.valueOf("00:00:00");   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
+            startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
         }
 
         return reservationRecord.startTime.goe(startTime);
     }
 
-    private BooleanExpression endTimeLoe(Time endTime) {
+    private BooleanExpression endTimeLoe(LocalTime endTime) {
         if (endTime == null) {
-            endTime = Time.valueOf("23:59:59");     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
+            endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
         }
 
         return reservationRecord.endTime.loe(endTime);
@@ -254,5 +255,4 @@ public class StudycafeDslRepository {
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
-
 }
