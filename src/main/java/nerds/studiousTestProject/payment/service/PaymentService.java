@@ -18,12 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
-import static nerds.studiousTestProject.payment.PaymentConstant.*;
 
 @RequiredArgsConstructor
 @Service
@@ -35,6 +32,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
+    private static final String SECRET_KEY = "test_sk_BE92LAa5PVb07oOEEzp87YmpXyJj";
 
     public PaymentResponse createPaymentResponse(PaymentRequest paymentRequest, String orderId) {
         return PaymentResponse.builder()
