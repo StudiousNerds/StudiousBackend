@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.payment.dto.confirm.request.ConfirmSuccessRequest;
-import nerds.studiousTestProject.payment.dto.confirm.request.PaymentResponseFromToss;
+import nerds.studiousTestProject.payment.dto.confirm.response.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.dto.RequestToToss;
 import nerds.studiousTestProject.payment.dto.cancel.CancelRequest;
 import nerds.studiousTestProject.payment.dto.cancel.CancelResponse;

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.dto.confirm.request.Cancels;
+import nerds.studiousTestProject.payment.dto.confirm.response.fromtoss.Cancels;
 
 @Data
 @AllArgsConstructor
