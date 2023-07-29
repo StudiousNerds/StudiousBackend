@@ -120,4 +120,12 @@ public class PaymentService {
         return cancelResponses;
     }
 
+    private void deletePaymentByCancel(PaymentResponseFromToss responseFromToss) {
+        Payment payment = paymentRepository.findByPaymentKeyAndOrderId(
+                        responseFromToss.getPaymentKey(),
+                        responseFromToss.getOrderId())
+                .orElseThrow(PaymentNotFoundException::new);
+        paymentRepository.delete(payment);
+    }
+
 }
