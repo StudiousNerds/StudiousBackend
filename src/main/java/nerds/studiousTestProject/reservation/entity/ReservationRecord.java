@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ReservationRecord {
     @Id
@@ -64,4 +63,21 @@ public class ReservationRecord {
 
     @Column(name = "complete_payment")
     private Boolean completePayment;
+
+    @Builder
+    public ReservationRecord(Long id, Member member, Room room, Payment payment, String name, String phoneNumber, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headcount, ReservationStatus reservationStatus, String request, Boolean completePayment) {
+        this.id = id;
+        this.member = member;
+        this.room = room;
+        this.payment = payment;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.headcount = headcount;
+        this.reservationStatus = reservationStatus;
+        this.request = request;
+        this.completePayment = completePayment;
+    }
 }

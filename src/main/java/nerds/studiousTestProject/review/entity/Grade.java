@@ -6,15 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Grade {
     @Id
@@ -35,4 +34,15 @@ public class Grade {
     private Boolean isRecommended;
 
     private Double total;
+
+    @Builder
+    public Grade(Long id, Review review, Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total) {
+        this.id = id;
+        this.review = review;
+        this.cleanliness = cleanliness;
+        this.deafening = deafening;
+        this.fixturesStatus = fixturesStatus;
+        this.isRecommended = isRecommended;
+        this.total = total;
+    }
 }

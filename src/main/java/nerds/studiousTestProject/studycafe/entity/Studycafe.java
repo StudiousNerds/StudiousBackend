@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Studycafe {
     @Id
@@ -76,4 +75,24 @@ public class Studycafe {
     @Builder.Default
     @Column(name = "refund_policy_info")
     private List<Integer> refundPolicyInfo = new ArrayList<>();
+
+    @Builder
+    public Studycafe(Long id, Member member, String name, String photo, String phoneNumber, LocalTime startTime, LocalTime endTime, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade, String notificationInfo, List<String> notice, List<Integer> refundPolicyInfo) {
+        this.id = id;
+        this.member = member;
+        this.name = name;
+        this.photo = photo;
+        this.phoneNumber = phoneNumber;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.duration = duration;
+        this.nearestStation = nearestStation;
+        this.accumReserveCount = accumReserveCount;
+        this.introduction = introduction;
+        this.createdDate = createdDate;
+        this.totalGrade = totalGrade;
+        this.notificationInfo = notificationInfo;
+        this.notice = notice;
+        this.refundPolicyInfo = refundPolicyInfo;
+    }
 }

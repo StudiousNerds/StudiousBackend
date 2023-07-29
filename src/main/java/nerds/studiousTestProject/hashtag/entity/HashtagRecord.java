@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class HashtagRecord {
     @Id
@@ -38,4 +37,12 @@ public class HashtagRecord {
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<Hashtag> hashtags = new ArrayList<>();
+
+    @Builder
+    public HashtagRecord(Long id, Studycafe studycafe, Integer count, List<Hashtag> hashtags) {
+        this.id = id;
+        this.studycafe = studycafe;
+        this.count = count;
+        this.hashtags = hashtags;
+    }
 }

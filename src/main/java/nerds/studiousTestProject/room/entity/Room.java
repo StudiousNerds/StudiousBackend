@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,9 +18,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.user.entity.member.Member;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Room {
     @Id
@@ -51,4 +50,18 @@ public class Room {
 
     @Column(name = "min_using_time")
     private Integer minUsingTime; // 최소 이용 시간
+
+    @Builder
+    public Room(Long id, Studycafe studycafe, Member member, String name, Integer standCount, Integer minCount, Integer maxCount, Integer price, String type, Integer minUsingTime) {
+        this.id = id;
+        this.studycafe = studycafe;
+        this.member = member;
+        this.name = name;
+        this.standCount = standCount;
+        this.minCount = minCount;
+        this.maxCount = maxCount;
+        this.price = price;
+        this.type = type;
+        this.minUsingTime = minUsingTime;
+    }
 }

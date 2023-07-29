@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,9 +20,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import java.time.LocalDate;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Review {
     @Id
@@ -42,4 +41,14 @@ public class Review {
     private String detail;
 
     private String comment;
+
+    @Builder
+    public Review(Long id, ReservationRecord reservationRecord, Grade grade, LocalDate createdDate, String detail, String comment) {
+        this.id = id;
+        this.reservationRecord = reservationRecord;
+        this.grade = grade;
+        this.createdDate = createdDate;
+        this.detail = detail;
+        this.comment = comment;
+    }
 }

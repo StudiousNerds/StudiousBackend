@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,9 +18,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class SubPhoto {
     @Id
@@ -39,4 +38,13 @@ public class SubPhoto {
     private Review review;
 
     private String url;
+
+    @Builder
+    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String url) {
+        this.id = id;
+        this.room = room;
+        this.studycafe = studycafe;
+        this.review = review;
+        this.url = url;
+    }
 }
