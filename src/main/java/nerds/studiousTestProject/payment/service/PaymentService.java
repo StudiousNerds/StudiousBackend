@@ -1,12 +1,16 @@
 package nerds.studiousTestProject.payment.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.exception.PaymentNotFoundException;
+import nerds.studiousTestProject.payment.dto.RequestToToss;
 import nerds.studiousTestProject.payment.dto.cancel.CancelRequest;
 import nerds.studiousTestProject.payment.dto.cancel.CancelResponse;
 import nerds.studiousTestProject.payment.dto.confirm.*;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
 import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
 import org.springframework.http.HttpMethod;
@@ -28,6 +32,9 @@ public class PaymentService {
 
     private final WebClient webClient;
     private final ReservationRecordService reservationRecordService;
+    private final PaymentRepository paymentRepository;
+    private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
+    private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
 
     public PaymentResponse createPaymentResponse(PaymentRequest paymentRequest, String orderId) {
         return PaymentResponse.builder()
@@ -40,21 +47,9 @@ public class PaymentService {
     }
 
     @Transactional
-    public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, int amount) {
-        ConfirmSuccessRequest request = ConfirmSuccessRequest.builder()
-                .amount(amount)
-                .orderId(orderId)
-                .paymentKey(paymentKey)
-                .build();
-        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
-                .uri(CONFIRM_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + secreteKey)
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(PaymentResponseFromToss.class)
-                .block();
+    public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, Integer amount) {
+        ConfirmSuccessRequest request = ConfirmSuccessRequest.of(orderId,amount,paymentKey);
+        PaymentResponseFromToss responseFromToss = requestToToss(request, CONFIRM_URI);
         Payment payment = Payment.builder()
                 .completeTime(responseFromToss.getRequestedAt())
                 .type(responseFromToss.getType())
@@ -65,30 +60,32 @@ public class PaymentService {
         return createPaymentConfirmResponse(responseFromToss);
     }
 
+    @NonNull
+    private PaymentResponseFromToss requestToToss(RequestToToss request, String requestURI) {
+        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
+                .uri(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Basic " + secreteKey)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(PaymentResponseFromToss.class)
+                .block();
+        return responseFromToss;
+    }
+
     public ConfirmSuccessResponse createPaymentConfirmResponse(PaymentResponseFromToss responseFromToss){
         ReservationRecord reservationRecord = reservationRecordService.findByOrderId(responseFromToss.getOrderId());
-        ReserveUserInfo reserveUserInfo = ReserveUserInfo.builder()
-                .name(reservationRecord.getName())
-                .phoneNumber(reservationRecord.getPhoneNumber())
-                .request(reservationRecord.getRequest())
-                .build();
-        ReservationInfo reservationInfo = ReservationInfo.builder()
-                .reserveDate(reservationRecord.getDate())
-                .roomName(reservationRecord.getRoom().getName())
-                .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
-                .startTime(reservationRecord.getStartTime())
-                .endTime(reservationRecord.getEndTime())
-                .usingTime(reservationRecord.getDuration())
-                .build();
         return ConfirmSuccessResponse.builder()
-                .reservationInfo(reservationInfo)
-                .reserveUserInfo(reserveUserInfo)
+                .reservationInfo(ReservationInfo.of(reservationRecord))
+                .reserveUserInfo(ReserveUserInfo.of(reservationRecord))
                 .build();
     }
 
     /*
      실패시 저장되었던 예약내역 삭제, 실패 정보 반환
      */
+    @Transactional
     public ConfirmFailResponse confirmFail(String message, String orderId){
         reservationRecordService.deleteByOrderId(orderId);
         return ConfirmFailResponse.builder()
@@ -97,26 +94,18 @@ public class PaymentService {
                 .build();
     }
 
-    public List<CancelResponse> requestCancelToToss(CancelRequest cancelRequest){
-        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-
-        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
-                .uri(CONFIRM_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + secreteKey)
-                .bodyValue(cancelRequest)
-                .retrieve()
-                .bodyToMono(PaymentResponseFromToss.class)
-                .block();
+    public List<CancelResponse> cancel(CancelRequest cancelRequest, Long reservationId){
+        ReservationRecord reservationRecord = reservationRecordService.findById(reservationId);
+        List<CancelResponse> cancelResponses = requestCancelToToss(cancelRequest, reservationRecord.getPayment().getPaymentKey());
+        reservationRecordService.cancel(reservationId); //결제 취소 상태로 변경
+        return cancelResponses;
+    }
+    @Transactional
+    public List<CancelResponse> requestCancelToToss(CancelRequest cancelRequest, String paymentKey){
+        PaymentResponseFromToss responseFromToss = requestToToss(cancelRequest, String.format(CANCEL_URI, paymentKey));
         List<CancelResponse> cancelResponses = new ArrayList<>();
-        List<Cancels> cancels = responseFromToss.getCancels();
-        for (Cancels cancel : cancels) {
-            CancelResponse cancelResponse = CancelResponse.builder()
-                    .canceledAt(cancel.getCanceledAt())
-                    .cancelAmount(cancel.getCancelAmount())
-                    .build();
-            cancelResponses.add(cancelResponse);
-        }
+        responseFromToss.getCancels().stream().forEach(cancel -> cancelResponses.add(CancelResponse.of(cancel)));
+        deletePaymentByCancel(responseFromToss);
         return cancelResponses;
     }
 
