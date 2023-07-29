@@ -15,12 +15,10 @@ import java.util.List;
 public class ReservationRecordController {
 
     private final PaymentService paymentService;
-    private final ReservationRecordService reservationRecordService;
 
     @GetMapping("{reservationRecordId}/cancel")
     public List<CancelResponse> cancelReservation(@PathVariable Long reservationRecordId,
                                                   @RequestBody CancelRequest cancelRequest){
-        reservationRecordService.cancel(reservationRecordId);
-        return paymentService.requestCancelToToss(cancelRequest);
+        return paymentService.cancel(cancelRequest, reservationRecordId);
     }
 }
