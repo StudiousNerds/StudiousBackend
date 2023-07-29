@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.confirm;
+package nerds.studiousTestProject.payment.dto.confirm.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 
-public class GiftCertificate {
-    private String approveNo;
+public class Transfer {
+    private String bankCode;
     private String settlementStatus;
 }

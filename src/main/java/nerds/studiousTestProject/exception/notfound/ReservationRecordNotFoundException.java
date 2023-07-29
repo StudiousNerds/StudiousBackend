@@ -1,4 +1,6 @@
-package nerds.studiousTestProject.exception;
+package nerds.studiousTestProject.exception.notfound;
+
+import nerds.studiousTestProject.exception.ErrorCode;
 
 public class ReservationRecordNotFoundException extends NotFoundException{
     public ReservationRecordNotFoundException() {

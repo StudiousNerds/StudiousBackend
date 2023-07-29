@@ -1,9 +1,13 @@
-package nerds.studiousTestProject.payment.dto.confirm;
+package nerds.studiousTestProject.payment.dto.confirm.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 public class Cancels {
     private int cancelAmount;

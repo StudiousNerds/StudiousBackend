@@ -1,5 +1,7 @@
-package nerds.studiousTestProject.exception;
+package nerds.studiousTestProject.exception.notfound;
 
+
+import nerds.studiousTestProject.exception.ErrorCode;
 
 public class RoomNotFoundException extends NotFoundException {
     public RoomNotFoundException() {

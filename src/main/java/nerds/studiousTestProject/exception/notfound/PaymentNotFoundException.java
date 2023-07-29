@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.exception;
+package nerds.studiousTestProject.exception.notfound;
 
 import static nerds.studiousTestProject.exception.ErrorCode.PAYMENT_NOT_FOUNT;
 

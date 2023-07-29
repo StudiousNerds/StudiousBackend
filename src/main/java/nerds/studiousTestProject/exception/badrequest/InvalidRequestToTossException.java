@@ -1,4 +1,6 @@
-package nerds.studiousTestProject.exception;
+package nerds.studiousTestProject.exception.badrequest;
+
+import nerds.studiousTestProject.exception.ErrorCode;
 
 public class InvalidRequestToTossException extends InvalidRequestForm {
 

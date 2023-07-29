@@ -1,11 +1,11 @@
-package nerds.studiousTestProject.payment.dto.confirm;
+package nerds.studiousTestProject.payment.dto.confirm.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.exception.InvalidRequestToTossException;
+import nerds.studiousTestProject.exception.badrequest.InvalidRequestToTossException;
 import nerds.studiousTestProject.payment.dto.RequestToToss;
 
 @Builder

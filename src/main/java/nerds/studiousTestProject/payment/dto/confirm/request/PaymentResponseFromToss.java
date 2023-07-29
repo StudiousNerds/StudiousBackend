@@ -1,12 +1,16 @@
-package nerds.studiousTestProject.payment.dto.confirm;
+package nerds.studiousTestProject.payment.dto.confirm.request;
 
 import jakarta.annotation.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Getter
 public class PaymentResponseFromToss {
     private String version;
