@@ -23,9 +23,7 @@ public class ReservationRecordService {
     private final MemberService memberService;
 
     @Transactional
-    public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId){
-        ReservationInfo reservation = paymentRequest.getReservation();
-        ReserveUser user = paymentRequest.getUser();
+    public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
         reservationRecordRepository.saveReservationRecord(
                 ReservationRecord.builder()
