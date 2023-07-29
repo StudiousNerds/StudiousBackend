@@ -1,13 +1,18 @@
 package nerds.studiousTestProject.reservationRecord.service;
 
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.exception.ReservationRecordNotFoundException;
+import nerds.studiousTestProject.exception.ReservationRecordNotFoundException;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.ReservationInfo;
 import nerds.studiousTestProject.payment.dto.request.ReserveUser;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationStatus;
 import nerds.studiousTestProject.reservationRecord.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
+import nerds.studiousTestProject.user.entity.member.Member;
+import nerds.studiousTestProject.user.service.member.MemberService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,15 @@ public class ReservationRecordService {
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
+        saveReservationRecord(memberService.getMemberFromAccessToken(accessToken),
+                roomService.findRoomById(roomId),
+                paymentRequest.getReservation(),
+                paymentRequest.getUser(),
+                orderId);
+        return orderId;
+    }
+
+    private void saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
         reservationRecordRepository.saveReservationRecord(
                 ReservationRecord.builder()
                         .reservationStatus(ReservationStatus.INPROGRESS)
@@ -36,12 +50,11 @@ public class ReservationRecordService {
                         .name(user.getName())
                         .phoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
-                        .room(roomService.findById(roomId))
+                        .room(room)
                         .orderId(orderId)
-                        .member(memberService.getMemberFromAccessToken(accessToken))
+                        .member(member)
                         .build()
         );
-        return orderId;
     }
 
     public ReservationRecord findByOrderId(String orderId) {
