@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Getter
 public class Room {
@@ -25,7 +23,19 @@ public class Room {
 
     private int minUsingTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
+
+    @Builder
+    public Room(Long id, String name, int minHeadCount, int maxHeadCount, int price, String type, int minUsingTime, Studycafe studycafe) {
+        this.id = id;
+        this.name = name;
+        this.minHeadCount = minHeadCount;
+        this.maxHeadCount = maxHeadCount;
+        this.price = price;
+        this.type = type;
+        this.minUsingTime = minUsingTime;
+        this.studycafe = studycafe;
+    }
 }
