@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 public class ReservationRecordRepository {
@@ -16,20 +17,19 @@ public class ReservationRecordRepository {
         return reservationRecord;
     }
 
-    public ReservationRecord findByOrderId(String orderId){
-        return em.createQuery("select r from ReservationRecord r where r.orderId =: orderId", ReservationRecord.class)
+    public Optional<ReservationRecord> findByOrderId(String orderId){
+        ReservationRecord reservationRecord = em.createQuery("select r from ReservationRecord r where r.orderId =: orderId", ReservationRecord.class)
                 .setParameter("orderId", orderId)
                 .getSingleResult();
+        return Optional.ofNullable(reservationRecord);
     }
 
-    public void deleteByOrderId(String orderId) {
-        em.createQuery("delete from ReservationRecord r where r.orderId =: orderId")
-                .setParameter("orderId", orderId)
-                .executeUpdate();
-        em.clear();
+    public Optional<ReservationRecord> findById(Long reservationRecordId){
+        ReservationRecord reservationRecord = em.find(ReservationRecord.class, reservationRecordId);
+        return Optional.ofNullable(reservationRecord);
     }
 
-    public ReservationRecord findById(Long reservationRecordId){
-        return em.find(ReservationRecord.class, reservationRecordId);
+    public void remove(ReservationRecord reservationRecord) {
+        em.remove(reservationRecord);
     }
 }
