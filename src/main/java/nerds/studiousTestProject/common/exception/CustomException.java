@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.exception;
+package nerds.studiousTestProject.common.exception;
 
 import lombok.Getter;
 
@@ -7,8 +7,8 @@ public class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public CustomException(final ErrorCode errorCode, final String message) {
-        super(message);
+    public CustomException(final ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 }

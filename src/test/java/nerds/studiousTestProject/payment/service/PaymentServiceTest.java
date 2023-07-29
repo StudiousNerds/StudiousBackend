@@ -74,7 +74,7 @@ class PaymentServiceTest {
     @Test
     void 토스에게_보내는_요청엔_null값이_없어야_한다(){
         assertThatThrownBy(()->paymentService.confirmPayToToss(null, null, null))
-                .isExactlyInstanceOf(InvalidRequestToTossException.class);
+                .isExactlyInstanceOf(BadRequestException.class);
     }
 
 
