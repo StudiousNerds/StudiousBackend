@@ -16,6 +16,7 @@ public enum ConvenienceName {
     PEN,
     BOARD,
     BEAM,
+    NO_FOOD,
     POINTER,
     POWER_SOCKET,
     NOTEBOOK,
