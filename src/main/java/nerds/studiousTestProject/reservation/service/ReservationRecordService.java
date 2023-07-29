@@ -39,7 +39,7 @@ public class ReservationRecordService {
     }
 
     private void saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
-        reservationRecordRepository.saveReservationRecord(
+        reservationRecordRepository.save(
                 ReservationRecord.builder()
                         .reservationStatus(ReservationStatus.INPROGRESS)
                         .date(reservation.getReserveDate())
@@ -64,7 +64,7 @@ public class ReservationRecordService {
 
     @Transactional
     public void deleteByOrderId(String orderId){
-        reservationRecordRepository.remove(findByOrderId(orderId));
+        reservationRecordRepository.delete(findByOrderId(orderId));
     }
 
     @Transactional
@@ -72,8 +72,9 @@ public class ReservationRecordService {
         findById(reservationRecordId).canceled();
     }
 
-    public ReservationRecord findById(Long id) {
-        return reservationRecordRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    public ReservationRecord findById(Long reservationRecordId) {
+        return reservationRecordRepository.findById(reservationRecordId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
 }
