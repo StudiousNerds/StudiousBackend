@@ -45,14 +45,22 @@ public class ReservationRecordService {
     }
 
     public ReservationRecord findByOrderId(String orderId) {
-        return reservationRecordRepository.findByOrderId(orderId);
+        return reservationRecordRepository.findByOrderId(orderId)
+                .orElseThrow(ReservationRecordNotFoundException::new);
     }
 
+    @Transactional
     public void deleteByOrderId(String orderId){
-        reservationRecordRepository.deleteByOrderId(orderId);
+        reservationRecordRepository.remove(findByOrderId(orderId));
     }
 
+    @Transactional
     public void cancel(Long reservationRecordId){
-        reservationRecordRepository.findById(reservationRecordId).canceled();
+        findById(reservationRecordId).canceled();
     }
+
+    public ReservationRecord findById(Long id) {
+        return reservationRecordRepository.findById(id).orElseThrow(ReservationRecordNotFoundException::new);
+    }
+
 }
