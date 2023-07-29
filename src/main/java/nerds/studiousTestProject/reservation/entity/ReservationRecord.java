@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservationRecord.entity;
+package nerds.studiousTestProject.reservation.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

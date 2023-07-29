@@ -1,10 +1,9 @@
-package nerds.studiousTestProject.reservationRecord.controller;
+package nerds.studiousTestProject.reservation.controller;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.payment.dto.cancel.CancelRequest;
 import nerds.studiousTestProject.payment.dto.cancel.CancelResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
-import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

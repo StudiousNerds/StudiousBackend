@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

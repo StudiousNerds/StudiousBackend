@@ -2,17 +2,23 @@ package nerds.studiousTestProject.payment.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.exception.PaymentNotFoundException;
+import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.payment.dto.confirm.request.ConfirmSuccessRequest;
+import nerds.studiousTestProject.payment.dto.confirm.request.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.dto.RequestToToss;
 import nerds.studiousTestProject.payment.dto.cancel.CancelRequest;
 import nerds.studiousTestProject.payment.dto.cancel.CancelResponse;
-import nerds.studiousTestProject.payment.dto.confirm.*;
+import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.ReservationInfo;
+import nerds.studiousTestProject.payment.dto.confirm.response.ReserveUserInfo;
 import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
-import nerds.studiousTestProject.reservationRecord.entity.ReservationRecord;
-import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAYMENT;
+
 
 @RequiredArgsConstructor
 @Service
@@ -48,12 +57,12 @@ public class PaymentService {
     public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, Integer amount) {
         ConfirmSuccessRequest request = ConfirmSuccessRequest.of(orderId,amount,paymentKey);
         PaymentResponseFromToss responseFromToss = requestToToss(request, CONFIRM_URI);
-        Payment payment = Payment.builder()
+        Payment payment = paymentRepository.save(Payment.builder()
                 .completeTime(responseFromToss.getRequestedAt())
-                .type(responseFromToss.getType())
+                .method(responseFromToss.getMethod())
                 .orderId(responseFromToss.getOrderId())
                 .paymentKey(responseFromToss.getPaymentKey())
-                .build();
+                .build());
         reservationRecordService.findByOrderId(orderId).completePay(payment);//결제 완료로 상태 변경
         return createPaymentConfirmResponse(responseFromToss);
     }
@@ -64,7 +73,7 @@ public class PaymentService {
         PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
                 .uri(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + secreteKey)
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + secreteKey)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(PaymentResponseFromToss.class)
@@ -111,7 +120,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findByPaymentKeyAndOrderId(
                         responseFromToss.getPaymentKey(),
                         responseFromToss.getOrderId())
-                .orElseThrow(PaymentNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
         paymentRepository.delete(payment);
     }
 
