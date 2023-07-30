@@ -12,10 +12,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.member.entity.member.Member;
 
@@ -61,4 +63,20 @@ public class ReservationRecord {
     private Boolean completePayment;
 
     private String request;
+
+    private String orderId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+    public void completePay(Payment payment) {
+        this.status = ReservationStatus.CONFIRMED;
+        this.payment = payment;
+    }
+
+    public void canceled() {
+        this.status = ReservationStatus.CANCELED;
+    }
+
 }
