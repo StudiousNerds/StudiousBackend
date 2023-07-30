@@ -19,6 +19,7 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
+import nerds.studiousTestProject.member.util.JwtTokenConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

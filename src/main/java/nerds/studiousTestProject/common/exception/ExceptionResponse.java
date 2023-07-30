@@ -1,12 +1,15 @@
 package nerds.studiousTestProject.common.exception;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Builder
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExceptionResponse {
     private String message;
     private String code;

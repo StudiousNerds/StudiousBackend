@@ -1,92 +1,56 @@
-# Studious-Backend
+# ScascannerFinal
+> 스터디룸 조회 및 예약 기능 사이트 개발 프로젝트 (2022.03.20 ~)
+>
+> __우리가 불편했던 것을 우리의 힘으로 개선해야 한다!__
 
+### 목차
+1. [설명](#설명)
+2. [기술 스택](#기술-스택)
+3. [구현 기능](#구현-기능)
 
+### 규칙
+1. 2주에 1번씩 대면 회의
+2. 1주일에 한 번씩 `Pull Request` 올리기
+3. 커밋은 기능 단위 기준으로 하고 메시지는 반드시 노션에 있는 커밋 메시지 컨벤션을 준수하여 작성할 것!
 
-## Getting started
+## 설명
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### 제안 배경
+- 스터디 카페와 개인석/자유석 요금은 검색이 용이하나, 스터디 룸의 존재 여부와 요금 및 시설은 파악하기에 어려움이 많다. 그리고 이를 알기 위해선 보편적으로 오픈채팅을 이용한 상담만이 유일한 수단인 곳이 많고, 결제 또한 직접 방문하여 키오스크에서 결제하거나 계좌 번호를 받아 입금하는 형태인 곳이 많다. 또한 스터디룸에 대한 실제 후기가 많지 않아 사진과 실제 스터디룸이 다르거나, 안내되어 있는 정보와 다른 경우가 있다.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### 주요 내용
+- 사용자가 설정해 놓은 날짜/시간/인원 을 통해 알맞는 스터디룸을 검색하고 해당 스터디룸을 선택하면 상세 정보 (HDMI, 에어컨 여부 등 편의 시설)를 조회할 수 있고 실시간 예약 현황을 조회하고 가능한 시간대에 예약을 하고 스터디룸 연장 시 사이트를 이용해 간편하게 연장을 할 수 있다.
 
-## Add your files
+## 🧑‍💻 Team members
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Backend
+| [김민우](https://github.com/kmw2378) | [길가은](https://github.com/rlfrkdms1) |                                            [최보현](https://github.com/Brilly-Bohyun)                                            |
+| :--------------------------------: | :----------------------------------: |:-----------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://user-images.githubusercontent.com/83744709/212283218-78f4db00-6530-411e-becc-d93161f81035.png" width="200"> | <img src="https://user-images.githubusercontent.com/83744709/212281564-acac7f5c-ce83-45e2-8b3c-1579f5f6898a.png" width="200"> | <img src="https://user-images.githubusercontent.com/83744709/212281310-471a7dd8-11a9-4d01-83aa-8a6338b24bc3.png" width="200"> |
+| 팀장 | 팀원 |                                                              팀원                                                               |
 
-```
-cd existing_repo
-git remote add origin https://lab.hanium.or.kr/23_HF141/studious-backend.git
-git branch -M main
-git push -uf origin main
-```
+### Frontend
+|                                              [김한주](https://github.com/hanjuuuuuu)                                              | [이민희](https://github.com/leeminhee119) |
+|:------------------------------------------------------------------------------------------------------------------------------:| :---: |
+| <img src="https://user-images.githubusercontent.com/107420002/226254682-c0aa9b25-2d0e-4969-a7b7-4c3c84e251b6.png" width="200"> | <img src="https://user-images.githubusercontent.com/107420002/226254622-c09f022a-b2d7-4260-9fb3-250098735cde.png" width="200"> | <img src="https://user-images.githubusercontent.com/83744709/212281310-471a7dd8-11a9-4d01-83aa-8a6338b24bc3.png" width="200"> |
+|                                                               팀원                                                               | 팀원 |
 
-## Integrate with your tools
+## 기술 스택
+|                                                 Spring                                                 |                                                              JPA                                                               | JavaScript | TypeScript |  React   |
+|:------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------:| :------: | :------: | :------: |
+| <img src="https://cdn.freebiesupply.com/logos/large/2x/spring-3-logo-png-transparent.png" width="100"> | <img src="https://user-images.githubusercontent.com/107420002/226260149-7a74fd61-4da7-42f1-9e3e-cb1a95cd2fc4.png" width="100"> | ![image](https://user-images.githubusercontent.com/107420002/226259666-d69e1b6a-bdd9-4bf9-9308-0783b91d4bf8.png) | ![image](https://user-images.githubusercontent.com/107420002/226259679-041ff46f-c1cf-4e86-b3b9-104fcdf50449.png) | ![image](https://user-images.githubusercontent.com/107420002/226259751-e9bf147c-35ad-491a-8998-0d09da13f6ba.png) |
 
-- [ ] [Set up project integrations](https://lab.hanium.or.kr/23_HF141/studious-backend/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## 구현 기능
+### 조회 기능
+- 예약할 스터디룸, 예약할 날짜, 시간, 인원수에 따라 실시간으로 예약 가능한 시간대를 조회할 수 있다.
+- HDMI, TV, 화이트 보드 등 각 스터디룸 마다 상세정보를 확인할 수 있다.
+- 날짜, 편의시설, 인원수 등의 기준으로 필터링을 해 원하는 조건의 스터디룸을 검색할 수 있다.
+### 예약 기능
+- 조회를 통해 예약할 스터디룸과 시간, 날짜를 정했다면, 이를 바탕으로 예약과 결제를 상담 없이 바로 할 수 있다.
+- 실시간 예약 변경/취소/연장이 가능하다.
+### 결제 기능
+- 예약된 건에 대해 토스 페이먼츠를 이용해 카드/가상계좌/계좌이체/상품권/휴대폰 등의 다양한 결제 수단을 통해 결제를 할 수 있다.
+- 예약한 스터디룸의 환불 정책에 의거하여 환불을 진행할 수 있다.
+### 추가 예정 기능
+- 실제 사용자들의 리뷰 작성 기능
+- 스터디 커뮤니티 기능
