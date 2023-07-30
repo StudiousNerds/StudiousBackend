@@ -1,13 +1,17 @@
 package nerds.studiousTestProject.room.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.service.ReservationService;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @Slf4j
 @Service
@@ -26,6 +32,7 @@ public class RoomService {
     private final SubPhotoService subPhotoService;
     private final ConvenienceService convenienceService;
     private final ReservationService reservationService;
+    private final StudycafeRepository studycafeRepository;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId){
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
@@ -52,7 +59,11 @@ public class RoomService {
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
-        Integer timeList[] = new Integer[24];
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        int start = studycafe.getStartTime().getHour();
+        int end = studycafe.getEndTime().getHour();
+        int size = end - start;
+        Integer timeList[] = new Integer[size+1];
 
         List<Boolean> values = reservationTimes.values().stream().toList();
         List<Integer> timeZone = reservationTimes.keySet().stream().toList();
@@ -71,10 +82,11 @@ public class RoomService {
         LocalDate firstDayOfMonth = date.withDayOfMonth(1);
         Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
 
-        for (int i = 0; i < oneMonth; i++){
-            Integer[] canReserveTime = getCanReserveTime(firstDayOfMonth, studycafeId, roomId);
-            reservationList.put(firstDayOfMonth.toString(), canReserveTime);
-            firstDayOfMonth.plusDays(1);
+        for (int i = 0; i <= oneMonth; i++){
+            log.info("반복문 확인", i);
+            Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
+            reservationList.put(date.toString(), canReserveTime);
+            date.plusDays(i);
         }
 
         return reservationList;

@@ -3,13 +3,12 @@ package nerds.studiousTestProject.reservation.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
-import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -27,22 +29,17 @@ public class ReservationService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
     private final StudycafeRepository studycafeRepository;
-    //private final RoomService roomService;
-//private final StudycafeService studycafeService;
-
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
     public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId){
-        /* LocalTime openTime = studycafeService.getOpenTime(studycafeId);
-        LocalTime endTime = studycafeService.getEndTime(studycafeId); */
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new EntityNotFoundException("No such Studycafe"));
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         LocalTime openTime = studycafe.getStartTime();
         LocalTime endTime = studycafe.getEndTime();
 
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("No such Studyroom"));
-        Integer minUsingTime = room.getMinUsingTime();
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
+        Integer minUsingTime = room.getMinUsingTime() / 60;
 
-        for(int i = openTime.getHour(); i < endTime.getHour(); i+=minUsingTime){
+        for(int i = openTime.getHour(); i <= endTime.getHour(); i+= minUsingTime){
             reservationTimes.put(i, true);
         }
 

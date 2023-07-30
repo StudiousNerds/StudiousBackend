@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.service.member;
+package nerds.studiousTestProject.user.service.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -275,7 +275,7 @@ public class MemberService {
         return passwordEncoder.encode(password);
     }
 
-    private Member getMemberFromAccessToken(String accessToken) {
+    public Member getMemberFromAccessToken(String accessToken) {
         String resolvedAccessToken = jwtTokenProvider.resolveToken(accessToken);
         Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
 

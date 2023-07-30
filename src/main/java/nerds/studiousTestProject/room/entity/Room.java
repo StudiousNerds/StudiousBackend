@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.room.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,26 +17,33 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.convenience.ConvenienceList;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.member.entity.member.Member;
 
 import java.util.List;
 
-@AllArgsConstructor
-@Builder
-@Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Room {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Member member;
+
+    private String name;
+
     private Integer standardHeadCount; // 기존 인원수
     private Integer minHeadCount;
     private Integer maxHeadCount;
+
     private Integer price;
     private Integer minUsingTime;
 

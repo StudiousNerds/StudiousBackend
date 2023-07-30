@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +19,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Convenience {
     @Id
@@ -39,4 +38,13 @@ public class Convenience {
     private ConvenienceName name;
 
     private String price;
+
+    @Builder
+    public Convenience(Long id, Room room, Studycafe studycafe, ConvenienceName name, String price) {
+        this.id = id;
+        this.room = room;
+        this.studycafe = studycafe;
+        this.name = name;
+        this.price = price;
+    }
 }

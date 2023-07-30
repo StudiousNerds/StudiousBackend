@@ -16,18 +16,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.user.entity.member.Member;
+import nerds.studiousTestProject.member.entity.member.Member;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@AllArgsConstructor
-@Builder
-@Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class ReservationRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +42,13 @@ public class ReservationRecord {
 
     private String name;
     private String phoneNumber;
+
     private LocalDate date;
+
+    @Column(name = "start_time")
     private LocalTime startTime;
+
+    @Column(name = "end_time")
     private LocalTime endTime;
     private Integer duration;
     private Integer headCount;

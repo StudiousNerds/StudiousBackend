@@ -3,13 +3,11 @@ package nerds.studiousTestProject.studycafe.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class MainPageResponse {
-    private String cafeName;
-    private String photo;
-    private Integer accumRevCnt;
-    private Integer distance;
-    private Double grade;
-    private String[] hashtags;
+    private List<RecommendCafeResponse>  recommend;
+    private List<EventCafeResponse>  event;
 }
