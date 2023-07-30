@@ -1,15 +1,23 @@
 package nerds.studiousTestProject.reservation.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import io.lettuce.core.dynamic.annotation.Param;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long> {
+    @Query(value = "select r.startTime, r.endTime " +
+            "from ReservationRecord r " +
+            "where r.date = :date and r.room.id = :roomId " +
+            "and r.status = 'CONFIRMED'")
+    List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
-    public Optional<ReservationRecord> findByOrderId(String orderId);
+    @Query("select r from ReservationRecord r where r.room.id = :roomId")
+    List<ReservationRecord> findAllByRoomId(@Param("roomId")Long roomId);
+    Optional<ReservationRecord> findByOrderId(String orderId);
 
 }

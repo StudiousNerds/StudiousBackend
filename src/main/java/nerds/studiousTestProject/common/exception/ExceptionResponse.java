@@ -1,28 +1,37 @@
 package nerds.studiousTestProject.common.exception;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExceptionResponse {
-
     private String message;
-    private String errorCode;
+    private String code;
+
+    public static ExceptionResponse from(ErrorCode errorCode) {
+        return ExceptionResponse.builder()
+                .message(errorCode.getMessage())
+                .code(errorCode.name())
+                .build();
+    }
 
     public static ExceptionResponse from(String message, String code) {
         return ExceptionResponse.builder()
                 .message(message)
-                .errorCode(code)
+                .code(code)
                 .build();
     }
 
     public static ExceptionResponse from(CustomException e) {
         return ExceptionResponse.builder()
                 .message(e.getMessage())
-                .errorCode(e.getErrorCode().name())
+                .code(e.getErrorCode().name())
                 .build();
     }
 }

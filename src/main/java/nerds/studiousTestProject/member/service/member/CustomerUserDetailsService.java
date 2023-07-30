@@ -1,8 +1,8 @@
 package nerds.studiousTestProject.member.service.member;
 
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.exception.message.ExceptionMessage;
 import nerds.studiousTestProject.member.repository.member.MemberRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +26,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, NumberFormatException {
         return memberRepository.findById(Long.valueOf(username))
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(ExceptionMessage.USER_NOT_FOUND.message()));
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     private UserDetails createUserDetails(Member member) {

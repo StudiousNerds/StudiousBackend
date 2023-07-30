@@ -2,6 +2,8 @@ package nerds.studiousTestProject.member.service.oauth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
 import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenRequest;
@@ -10,7 +12,6 @@ import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfo;
 import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfoFactory;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.exception.model.OAuth2Exception;
 import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import nerds.studiousTestProject.member.util.MultiValueMapConverter;
@@ -26,8 +27,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 import java.util.Optional;
-
-import static nerds.studiousTestProject.member.exception.message.ExceptionMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +84,7 @@ public class OAuth2Service {
         // providerId == null 인 경우 (사용자 정보를 가져오지 못한 경우) 예외 발생
         Long providerId = oAuth2UserInfo.getProviderId();
         if (providerId == null) {
-            throw new OAuth2Exception(NOT_AUTHORIZE_ACCESS);
+            throw new BadRequestException(ErrorCode.NOT_AUTHORIZE_ACCESS);
         }
 
         return oAuth2UserInfo;

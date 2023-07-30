@@ -12,13 +12,14 @@ import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
-import nerds.studiousTestProject.member.exception.message.ExceptionMessage;
-import nerds.studiousTestProject.member.exception.model.UserAuthException;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
+import nerds.studiousTestProject.member.util.JwtTokenConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,7 +79,7 @@ public class JwtTokenProvider {
         try {
              userDetails = userDetailsService.loadUserByUsername(username);
         } catch (Exception e) {
-            throw new UserAuthException(ExceptionMessage.INVALID_TOKEN);
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
@@ -125,7 +126,7 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String token) {
         if (checkLogout(token)) {
-            log.info("msg = {}", ExceptionMessage.LOGOUT_USER.message());
+            log.info("msg = {}", ErrorCode.ALREADY_LOGOUT_USER.getMessage());
             return false;
         }
 
@@ -133,13 +134,13 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("msg = {}", ExceptionMessage.INVALID_TOKEN.message());
+            log.info("msg = {}", ErrorCode.INVALID_TOKEN.getMessage());
         } catch (ExpiredJwtException e) {
-            log.info("msg = {}", ExceptionMessage.TOKEN_VALID_TIME_EXPIRED.message());
+            log.info("msg = {}", ErrorCode.EXPIRED_TOKEN_VALID_TIME.getMessage());
         } catch (UnsupportedJwtException e) {
-            log.info("msg = {}", ExceptionMessage.NOT_SUPPORTED_JWT.message());
+            log.info("msg = {}", ErrorCode.NOT_SUPPORTED_JWT.getMessage());
         } catch (IllegalArgumentException e) {
-            log.info("msg = {}", ExceptionMessage.TOKEN_NOT_FOUND.message());
+            log.info("msg = {}", ErrorCode.NOT_FOUND_TOKEN.getMessage());
         }
 
         return false;

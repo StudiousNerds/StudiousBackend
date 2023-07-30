@@ -1,41 +1,63 @@
 package nerds.studiousTestProject.room.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.convenience.ConvenienceList;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.member.entity.member.Member;
 
-@NoArgsConstructor
-@Entity
+import java.util.List;
+
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Room {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Member member;
+
     private String name;
-    private int minHeadCount;
-    private int maxHeadCount;
 
-    private int price;
-    private String type;
+    private Integer standardHeadCount; // 기존 인원수
+    private Integer minHeadCount;
+    private Integer maxHeadCount;
 
-    private int minUsingTime;
+    private Integer price;
+    private Integer minUsingTime;
+
+    @Enumerated(value = EnumType.STRING)
+    private PriceType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
+    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Studycafe studycafe;
 
-    @Builder
-    public Room(Long id, String name, int minHeadCount, int maxHeadCount, int price, String type, int minUsingTime, Studycafe studycafe) {
-        this.id = id;
-        this.name = name;
-        this.minHeadCount = minHeadCount;
-        this.maxHeadCount = maxHeadCount;
-        this.price = price;
-        this.type = type;
-        this.minUsingTime = minUsingTime;
-        this.studycafe = studycafe;
-    }
+    @OneToMany(mappedBy = "room")
+    private List<ReservationRecord> reservationRecords;
+
+    // 일대다 단방향 연관관계
+    @OneToMany
+    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private List<ConvenienceList> convenienceLists;
 }
