@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.user.util;
+package nerds.studiousTestProject.member.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

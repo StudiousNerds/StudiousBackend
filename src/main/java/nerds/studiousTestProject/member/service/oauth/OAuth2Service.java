@@ -12,6 +12,8 @@ import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfo;
 import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfoFactory;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
+import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import nerds.studiousTestProject.member.util.MultiValueMapConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +34,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class OAuth2Service {
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
-    private final nerds.studiousTestProject.user.service.member.MemberService memberService;
-    private final nerds.studiousTestProject.user.util.JwtTokenProvider jwtTokenProvider;
+    private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final WebClient webClient;
 
     /**

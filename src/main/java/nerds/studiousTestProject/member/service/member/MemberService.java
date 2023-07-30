@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.user.service.member;
+package nerds.studiousTestProject.member.service.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

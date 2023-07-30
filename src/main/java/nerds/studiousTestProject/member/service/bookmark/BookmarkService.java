@@ -78,7 +78,7 @@ public class BookmarkService {
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
-                    .grade(studycafe.getTotalGrade())
+                    .grade(studycafe.getTotalGarde())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
             bookmarkCafeList.add(bookmarkCafe);
