@@ -8,12 +8,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.convenience.ConvenienceName;
 import nerds.studiousTestProject.convenience.QConvenienceList;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SortType;
-import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -24,10 +24,10 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
-import static nerds.studiousTestProject.studycafe.entity.hashtag.QHashtagRecord.hashtagRecord;
 import static org.springframework.util.StringUtils.hasText;
 
 @Repository

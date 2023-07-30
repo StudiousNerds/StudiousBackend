@@ -3,6 +3,8 @@ package nerds.studiousTestProject.studycafe.repository;
 import jakarta.persistence.EntityManager;
 import nerds.studiousTestProject.convenience.ConvenienceList;
 import nerds.studiousTestProject.convenience.ConvenienceName;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
@@ -10,8 +12,6 @@ import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SortType;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
-import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagRecord;
 import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -285,7 +286,7 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice("유의 사항")
+                .notice(Collections.singletonList("유의 사항"))
                 .build();
     }
 
@@ -302,7 +303,7 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice("유의 사항")
+                .notice(Collections.singletonList("유의 사항"))
                 .build();
     }
 
@@ -319,7 +320,7 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice("유의 사항")
+                .notice(Collections.singletonList("유의 사항"))
                 .build();
     }
 
@@ -335,7 +336,7 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice("유의 사항")
+                .notice(Collections.singletonList("유의 사항"))
                 .build();
     }
 
@@ -343,7 +344,7 @@ class StudycafeDslRepositoryTest {
         return Room.builder()
                 .studycafe(studycafe)
                 .convenienceLists(convenienceLists)
-                .headCount(4)
+                .standardHeadCount(4)
                 .minHeadCount(2)
                 .maxHeadCount(4)
                 .minUsingTime(1)
@@ -354,7 +355,7 @@ class StudycafeDslRepositoryTest {
     private Room room2(Studycafe studycafe) {
         return Room.builder()
                 .studycafe(studycafe)
-                .headCount(10)
+                .standardHeadCount(10)
                 .minHeadCount(8)
                 .maxHeadCount(10)
                 .minUsingTime(1)

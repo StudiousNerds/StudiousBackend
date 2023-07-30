@@ -41,7 +41,7 @@ public class ReservationRecordService {
     private void saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
         reservationRecordRepository.save(
                 ReservationRecord.builder()
-                        .reservationStatus(ReservationStatus.INPROGRESS)
+                        .status(ReservationStatus.INPROGRESS)
                         .date(reservation.getReserveDate())
                         .duration(reservation.getDuration())
                         .startTime(reservation.getStartTime())

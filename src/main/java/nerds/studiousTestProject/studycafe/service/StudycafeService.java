@@ -87,7 +87,7 @@ public class StudycafeService {
                 .cleanliness(reviewService.getAvgCleanliness(id))
                 .deafening(reviewService.getAvgDeafening(id))
                 .fixturesStatus(reviewService.getAvgFixturesStatus(id))
-                .total(studycafe.getTotalGarde())
+                .total(studycafe.getTotalGrade())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
     }
@@ -111,7 +111,7 @@ public class StudycafeService {
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
-                    .grade(studycafe.getTotalGarde())
+                    .grade(studycafe.getTotalGrade())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
             recommedStudycafeList.add(foundStudycafe);
@@ -120,7 +120,7 @@ public class StudycafeService {
     }
 
     public List<EventCafeResponse> getEventStudycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
+        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedAtDesc();
         List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
@@ -132,7 +132,7 @@ public class StudycafeService {
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
-                    .grade(studycafe.getTotalGarde())
+                    .grade(studycafe.getTotalGrade())
                     .hashtags(hashtagService.findHashtags(studycafe.getId()))
                     .build();
             eventStudycafeList.add(foundStudycafe);
