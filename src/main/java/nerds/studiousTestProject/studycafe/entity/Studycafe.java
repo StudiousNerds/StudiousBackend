@@ -24,6 +24,7 @@ import nerds.studiousTestProject.convenience.ConvenienceList;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagRecord;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,9 @@ public class Studycafe {
     private Double totalGrade;
     private String introduction;
     private LocalDateTime createdAt;
+    private Double totalGarde;
 
+    @Column(name = "notification_info")
     @Nullable
     private String notificationInfo;
 
@@ -79,5 +82,4 @@ public class Studycafe {
     @Builder.Default
     @Column(name = "refund_policy_info")
     private List<Integer> refundPolicyInfo = new ArrayList<>();
-
 }
