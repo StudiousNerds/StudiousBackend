@@ -1,10 +1,10 @@
 package nerds.studiousTestProject.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nerds.studiousTestProject.exception.InvalidRequestToTossException;
+import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.payment.PaymentFixture;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
-import nerds.studiousTestProject.reservationRecord.service.ReservationRecordService;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
