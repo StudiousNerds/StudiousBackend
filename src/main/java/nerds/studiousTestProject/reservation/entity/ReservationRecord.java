@@ -76,7 +76,7 @@ public class ReservationRecord {
     }
 
     public void canceled() {
-        this.status = ReservationStatus.CANCEL;
+        this.status = ReservationStatus.CANCELED;
     }
 
 }
