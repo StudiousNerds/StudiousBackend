@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.convenience;
+package nerds.studiousTestProject.convenience.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

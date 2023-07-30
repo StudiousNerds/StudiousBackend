@@ -69,6 +69,7 @@ public class StudycafeService {
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
         Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
+        /*
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
@@ -90,6 +91,9 @@ public class StudycafeService {
                 .total(studycafe.getTotalGrade())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
+
+         */
+        return null;
     }
 
     public MainPageResponse getMainPage() {

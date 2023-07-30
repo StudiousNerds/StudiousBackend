@@ -1,8 +1,8 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import jakarta.persistence.EntityManager;
-import nerds.studiousTestProject.convenience.ConvenienceList;
-import nerds.studiousTestProject.convenience.ConvenienceName;
+import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
