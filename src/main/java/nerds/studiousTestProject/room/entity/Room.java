@@ -16,9 +16,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.convenience.ConvenienceList;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer headCount;
+    private Integer standardHeadCount; // 기존 인원수
     private Integer minHeadCount;
     private Integer maxHeadCount;
     private Integer price;
