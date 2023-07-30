@@ -3,8 +3,12 @@ package nerds.studiousTestProject.reservation.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -19,48 +23,38 @@ import nerds.studiousTestProject.user.entity.member.Member;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
+@Getter
+@NoArgsConstructor
 public class ReservationRecord {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Room room;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Payment payment;
-
-    private String name; // 예약자 이름
-
-    @Column(name = "phone_number")
+    private String name;
     private String phoneNumber;
-
     private LocalDate date;
-
-    @Column(name = "start_time")
     private LocalTime startTime;
-
-    @Column(name = "end_time")
     private LocalTime endTime;
+    private Integer duration;
+    private Integer headCount;
 
-    private Integer headcount;
+    @Enumerated(value = EnumType.STRING)
+    private ReservationStatus status;
 
-    @Column(name = "reservation_status")
-    private ReservationStatus reservationStatus;
-
-    private String request;
-
+    // 편의시설 사용 여부
     @Column(name = "complete_payment")
     private Boolean completePayment;
+
+    private String request;
 }
