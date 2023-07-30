@@ -2,8 +2,8 @@ package nerds.studiousTestProject.studycafe.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.convenience.ConvenienceName;
-import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

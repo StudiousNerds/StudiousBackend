@@ -79,11 +79,11 @@
 //
 //    @Test
 //    @DisplayName("최근 등록 순으로 10개를 제대로 가져오는지 확인")
-//    void findTop10ByOrderByCreatedDateDesc(){
+//    void findTop10ByOrderByCreatedAtDesc(){
 //        // given
 //
 //        // when
-//        List<Studycafe> top10ByOrderByCreatedDate = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
+//        List<Studycafe> top10ByOrderByCreatedDate = studycafeRepository.findTop10ByOrderByCreatedAtDesc();
 //        //then
 //        Assertions.assertThat(top10ByOrderByCreatedDate).containsExactly(cafe1, cafe2, cafe5, cafe6, cafe4, cafe3, cafe7, cafe10, cafe9, cafe8);
 //    }

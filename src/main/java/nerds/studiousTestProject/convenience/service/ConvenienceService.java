@@ -18,6 +18,7 @@ import java.util.List;
 public class ConvenienceService {
     private final ConvenienceRepository convenienceRepository;
 
+    /*
     public String[] getAllCafeConveniences(Long studycafeId){
         List<String> convenienceList = convenienceRepository.findByStudycafeId(studycafeId);
         Integer arrSize = convenienceList.size();
@@ -33,4 +34,6 @@ public class ConvenienceService {
 
         return roomConveniences;
     }
+
+     */
 }

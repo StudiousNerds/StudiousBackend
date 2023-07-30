@@ -35,6 +35,7 @@ public class RoomService {
     private final StudycafeRepository studycafeRepository;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId){
+        /*
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
         List<FindRoomResponse> rooms = new ArrayList<>();
 
@@ -51,9 +52,14 @@ public class RoomService {
                     .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
                     .conveniences(convenienceService.getAllRoomConveniences(studycafeId, room.getId()))
                     .build());
+
+
+
         }
 
         return rooms;
+         */
+        return null;
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
