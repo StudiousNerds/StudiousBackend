@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.room.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @Slf4j
@@ -89,5 +89,10 @@ public class RoomService {
         }
 
         return reservationList;
+    }
+
+    public Room findRoomById(Long roomId){
+        return roomRepository.findById(roomId)
+                .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
     }
 }

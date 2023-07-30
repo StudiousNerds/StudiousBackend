@@ -1,6 +1,11 @@
 package nerds.studiousTestProject.common.exception;
 
 public enum ErrorCode {
+
+    NOT_FOUND_ROOM("스터디룸을 찾을 수 없습니다."),
+    NOT_FOUND_RESERVATION_RECORD("예약내역을 찾을 수 없습니다."),
+    NOT_FOUND_PAYMENT("결제 내역을 찾을 수 없습니다."),
+    INVALID_REQUEST_BODY_TYPE_TO_TOSS("토스에게 요청하는 값은 null 값이 있어선 안됩니다."),
     MISMATCH_EMAIL("이메일이 일치하지 않습니다."),
     MISMATCH_PASSWORD("비밀번호가 일치하지 않습니다."),
     MISMATCH_PHONE_NUMBER("전화번호가 일치하지 않습니다."),
@@ -25,11 +30,7 @@ public enum ErrorCode {
     WEB_CLIENT_ERROR("웹 API 호출 예외 발생. 자세한 건 서버 로그를 참고하세요."),
     NOT_FOUND_DATE("날짜 선택을 해주세요."),
     INVALID_REQUEST_BODY_TYPE("유효하지 않은 요청입니다."),
-
     NOT_FOUND_STUDYCAFE("스터디카페를 찾을 수 없습니다."),
-
-    NOT_FOUND_ROOM("스터디룸을 찾을 수 없습니다."),
-
     NOT_FOUND_HASHTAG("해시태그를 찾을 수 없습니다."),
 
     NOT_FOUND_MEMBER("멤버를 찾을 수 없습니다."),
