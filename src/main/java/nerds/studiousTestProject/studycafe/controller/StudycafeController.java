@@ -9,7 +9,7 @@ import nerds.studiousTestProject.studycafe.dto.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.SortType;
 import nerds.studiousTestProject.studycafe.entity.hashtag.HashtagName;
-import nerds.studiousTestProject.studycafe.service.StudyCafeService;
+import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
@@ -30,7 +30,7 @@ import java.util.List;
 @Validated
 @Slf4j
 public class StudycafeController {
-    private final StudyCafeService studyCafeService;
+    private final StudycafeService studyCafeService;
 
     @GetMapping("/search")
     public List<SearchResponse> search(

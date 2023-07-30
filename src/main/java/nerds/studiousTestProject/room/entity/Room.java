@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.user.entity.member.Member;
 import nerds.studiousTestProject.convenience.ConvenienceList;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
