@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.entity.hashtag;
+package nerds.studiousTestProject.convenience.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,19 +16,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class HashtagRecord {
-
+public class ConvenienceList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer count;
 
     @Enumerated(EnumType.STRING)
-    private HashtagName name;
-
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Studycafe studycafe;
-    */
+    private ConvenienceName name;
+    private Integer price;
 }

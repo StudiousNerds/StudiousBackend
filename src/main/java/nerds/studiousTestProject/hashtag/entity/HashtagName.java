@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.entity.hashtag;
+package nerds.studiousTestProject.hashtag.entity;
 
 public enum HashtagName {
     KIND,
