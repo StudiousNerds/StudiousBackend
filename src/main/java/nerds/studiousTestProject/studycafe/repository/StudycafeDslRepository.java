@@ -10,10 +10,10 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.entity.QConvenienceList;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
-import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
-import nerds.studiousTestProject.studycafe.dto.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.SearchResponse;
-import nerds.studiousTestProject.studycafe.dto.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.QSearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.SortType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -42,7 +42,7 @@ public class StudycafeDslRepository {
 
         JPAQuery<Long> count = getJoinedCountQuery(countQuery, searchRequest)
                 .where(
-                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
@@ -72,9 +72,9 @@ public class StudycafeDslRepository {
 
         List<SearchResponse> content = getJoinedContentQuery(contentQuery, searchRequest)
                 .where(
+                        inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
-                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
                         totalGradeGoe(searchRequest.getMinGrade()),
                         hashtagContains(searchRequest.getHashtags()),
@@ -156,13 +156,21 @@ public class StudycafeDslRepository {
         return headCount != null ? room.maxHeadCount.goe(headCount) : null;
     }
 
-    private BooleanExpression openTime(LocalTime startTime, LocalTime endTime) {
-        BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
+    private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        int value;
+        try {
+            value = date.getDayOfWeek().getValue();
+        } catch (Exception e) {
+            value = 8;
+        }
+
+//        BooleanExpression startTimeLoe = cafeStartTimeLoe(studycafe.operationInfos.get(value - 1).startTime);
+        BooleanExpression startTimeLoe = cafeStartTimeLoe(date, startTime);
         BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
         return startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe;
     }
 
-    private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
+    private BooleanExpression cafeStartTimeLoe(LocalDate date, LocalTime startTime) {
         return startTime != null ? studycafe.startTime.loe(startTime) : null;
     }
 
