@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto;
+package nerds.studiousTestProject.studycafe.dto.search;
 
 import lombok.Builder;
 import lombok.Data;

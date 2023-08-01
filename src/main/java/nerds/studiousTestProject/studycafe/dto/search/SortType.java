@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto;
+package nerds.studiousTestProject.studycafe.dto.search;
 
 public enum SortType {
     GRADE_DESC,
