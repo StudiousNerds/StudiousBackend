@@ -1,12 +1,13 @@
 package nerds.studiousTestProject.studycafe.entity;
 
+import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,16 +44,20 @@ public class Studycafe {
 
     private String name;
     private String address;
-    private String photo;
+    private String photo;   // 추후 Photo 엔티티를 만들어 수정 예정
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<OperationInfo> operationInfos = new ArrayList<>();
+
     @Column(name = "start_time")
-    private LocalTime startTime;
+    private LocalTime startTime;    // 추후 삭제 예정
 
     @Column(name = "end_time")
-    private LocalTime endTime;
+    private LocalTime endTime;      // 추후 삭제 예정
 
     private Integer duration;
 
@@ -70,14 +75,14 @@ public class Studycafe {
     @Nullable
     private String notificationInfo;
 
-    @OneToMany(mappedBy = "studycafe") // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL) // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<Room> rooms;
 
     @OneToMany
     @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<HashtagRecord> hashtagRecords;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<ConvenienceList> convenienceLists;
 
