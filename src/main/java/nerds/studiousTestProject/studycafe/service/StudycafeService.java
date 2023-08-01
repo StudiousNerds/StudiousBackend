@@ -5,29 +5,42 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.convenience.entity.ConvenienceList;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.review.service.ReviewService;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.studycafe.dto.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
-import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.register.RegisterRequest;
+import nerds.studiousTestProject.studycafe.dto.register.RegisterResponse;
+import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.valid.AccountInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.valid.BusinessInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.valid.ValidResponse;
+import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
+import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.*;
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT;
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @Slf4j
 @Service
@@ -41,6 +54,7 @@ public class StudycafeService {
     private final HashtagService hashtagService;
     private final ConvenienceService convenienceService;
     private final StudycafeDslRepository studycafeDslRepository;
+    private final CafeRegistrationValidator cafeRegistrationValidator;
 
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
@@ -160,5 +174,95 @@ public class StudycafeService {
         String notices[] = noticeList.toArray(new String[arrSize]);
 
         return notices;
+    }
+
+    public ValidResponse validateAccountInfo(AccountInfoRequest accountInfoRequest) {
+        return cafeRegistrationValidator.getAccountInfoValidResponse(accountInfoRequest);
+    }
+
+    public ValidResponse validateBusinessInfo(BusinessInfoRequest businessInfoRequest) {
+        return cafeRegistrationValidator.getBusinessInfoValidResponse(businessInfoRequest);
+    }
+
+    @Transactional
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        List<RegisterRequest.RoomInfo> roomInfos = registerRequest.getRoomInfos();
+        for (RegisterRequest.RoomInfo roomInfo : roomInfos) {
+            Integer standardHeadCount = roomInfo.getStandardHeadCount();
+            Integer minHeadCount = roomInfo.getMinHeadCount();
+            Integer maxHeadCount = roomInfo.getMaxHeadCount();
+
+            // 최대 인원 수가 최대 인원 수 보다 작은 경우
+            if (maxHeadCount < minHeadCount) {
+                throw new BadRequestException(INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT);
+            }
+
+            // 기준 인원 수가 최소 인원 수 보다 작은 경우
+            if (standardHeadCount < minHeadCount) {
+                throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT);
+            }
+
+            // 기준 인원 수가 최대 인원 수보다 큰 경우
+            if (standardHeadCount > maxHeadCount) {
+                throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT);
+            }
+        }
+
+        studycafeRepository.save(
+                Studycafe.builder()
+                        .name(registerRequest.getCafeInfo().getName())
+                        .address(registerRequest.getCafeInfo().getAddressInfo().getBasic())
+                        .photo(null)
+                        .phoneNumber(null)
+                        .operationInfos(
+                                registerRequest.getCafeInfo().getOperationInfos().stream().map(oi -> OperationInfo.builder()
+                                                .week(oi.getWeek())
+                                                .startTime(oi.getStartTime())
+                                                .endTime(oi.getEndTime())
+                                                .allDay(oi.getAllDay())
+                                                .closed(oi.getClosed())
+                                                .build()
+                                ).toList()
+                        )
+                        .rooms(
+                                roomInfos.stream().map(ri -> Room.builder()
+                                        .name(ri.getName())
+                                        .standardHeadCount(ri.getStandardHeadCount())
+                                        .minHeadCount(ri.getMinHeadCount())
+                                        .maxHeadCount(ri.getMaxHeadCount())
+                                        .minUsingTime(ri.getMinUsingTime())
+                                        .price(ri.getPrice())
+                                        .type(ri.getType())
+                                        .convenienceLists(
+                                                ri.getConveniences().stream().map(c -> ConvenienceList.builder()
+                                                        .name(c)
+                                                        .price(0)
+                                                        .build()
+                                                ).toList()
+                                        ).build()
+                                ).toList()
+                        )
+                        .convenienceLists(registerRequest.getCafeInfo().getConveniences().stream().map(
+                                c -> ConvenienceList.builder()
+                                        .name(c)
+                                        .price(0)
+                                        .build()
+                                ).toList()
+                        )
+                        .hashtagRecords(new ArrayList<>())
+                        .totalGrade(0.0)
+                        .createdAt(LocalDateTime.now())
+                        .accumReserveCount(0)
+                        .duration(null)
+                        .nearestStation(null)
+                        .notice(registerRequest.getCafeInfo().getNotices())
+                        .introduction(registerRequest.getCafeInfo().getIntroduction())
+                        .refundPolicyInfo(registerRequest.getCafeInfo().getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
+                        .build()
+        );
+
+        return RegisterResponse.builder()
+                .cafeName(registerRequest.getCafeInfo().getName())
+                .build();
     }
 }
