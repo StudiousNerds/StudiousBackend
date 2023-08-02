@@ -9,6 +9,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
+import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.service.member.MemberService;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 
 @RequiredArgsConstructor
 @Service
@@ -24,14 +26,14 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RES
 public class ReservationRecordService {
 
     private final ReservationRecordRepository reservationRecordRepository;
-    private final RoomService roomService;
+    private final RoomRepository roomRepository;
     private final MemberService memberService;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
         saveReservationRecord(memberService.getMemberFromAccessToken(accessToken),
-                roomService.findRoomById(roomId),
+                findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
                 orderId);
@@ -41,7 +43,7 @@ public class ReservationRecordService {
     private void saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
         reservationRecordRepository.save(
                 ReservationRecord.builder()
-                        .reservationStatus(ReservationStatus.INPROGRESS)
+                        .status(ReservationStatus.INPROGRESS)
                         .date(reservation.getReserveDate())
                         .duration(reservation.getDuration())
                         .startTime(reservation.getStartTime())
@@ -75,6 +77,11 @@ public class ReservationRecordService {
     public ReservationRecord findById(Long reservationRecordId) {
         return reservationRecordRepository.findById(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
+    public Room findRoomById(Long roomId){
+        return roomRepository.findById(roomId)
+                .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
     }
 
 }

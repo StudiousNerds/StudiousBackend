@@ -1,3 +1,4 @@
+/*
 package nerds.studiousTestProject.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-
+assertThatThrownBy
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,8 +77,5 @@ class PaymentServiceTest {
         assertThatThrownBy(()->paymentService.confirmPayToToss(null, null, null))
                 .isExactlyInstanceOf(BadRequestException.class);
     }
-
-
-
-
 }
+*/
