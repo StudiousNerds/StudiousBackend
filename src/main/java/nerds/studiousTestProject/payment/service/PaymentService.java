@@ -20,6 +20,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,10 @@ public class PaymentService {
     private final WebClient webClient;
     private final ReservationRecordService reservationRecordService;
     private final PaymentRepository paymentRepository;
+
+    private static final String SECRET_KEY_PREFIX = "Basic ";
+    private static final String REQUEST_SUCCESS_URI = "http://localhost:8080/studious/payments/success";
+    private static final String REQUEST_FAIL_URI = "http://localhost:8080/studious/payments/success";
     private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
     private static final String SECRET_KEY = "test_sk_BE92LAa5PVb07oOEEzp87YmpXyJj";
@@ -48,8 +53,8 @@ public class PaymentService {
                 .amount(paymentRequest.getReservation().getPrice())
                 .orderId(orderId)
                 .orderName(paymentRequest.getUser().getName())
-                .successUrl("http://localhost:8080/studious/payments/success")
-                .failUrl("http://localhost:8080/studious/payments/fail")
+                .successUrl(REQUEST_SUCCESS_URI)
+                .failUrl(REQUEST_FAIL_URI)
                 .build();
     }
 
@@ -69,11 +74,11 @@ public class PaymentService {
 
     @NonNull
     private PaymentResponseFromToss requestToToss(RequestToToss request, String requestURI) {
-        String secreteKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+        String secretKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
         PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
                 .uri(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Basic " + secreteKey)
+                .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(PaymentResponseFromToss.class)
@@ -97,7 +102,7 @@ public class PaymentService {
         reservationRecordService.deleteByOrderId(orderId);
         return ConfirmFailResponse.builder()
                 .message(message)
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
