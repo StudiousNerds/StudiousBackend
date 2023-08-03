@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.search;
+package nerds.studiousTestProject.studycafe.dto.search.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;

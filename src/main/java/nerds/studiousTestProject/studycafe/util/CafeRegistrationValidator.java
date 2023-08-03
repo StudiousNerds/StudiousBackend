@@ -1,16 +1,19 @@
 package nerds.studiousTestProject.studycafe.util;
 
+import io.netty.handler.codec.http.HttpScheme;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.studycafe.dto.valid.AccountInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.BusinessInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.ValidResponse;
+import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -30,14 +33,51 @@ public class CafeRegistrationValidator {
      * @return
      */
     public ValidResponse getAccountInfoValidResponse(AccountInfoRequest accountInfoRequest) {
+        MultiValueMap<String, String> params = MultiValueMapConverter.convert(
+                OpenBankTokenRequest.builder()
+                        .client_id("7338b43b-eb71-40e9-9414-749b772e4907")
+                        .client_secret("3cfae1dc-b541-45a9-8528-a5707aaf36c4")
+                        .scope("oob")
+                        .grant_type("client_credentials")
+                        .build()
+        );
+
+        accountInfoRequest.setAccount_holder_info_type("");
+        OpenBankTokenResponse openBankTokenResponse = webClient.post()
+                .uri(
+                        UriComponentsBuilder.newInstance()
+                                .scheme(HttpScheme.HTTPS.toString())
+                                .host("testapi.openbanking.or.kr")
+                                .path("/oauth/2.0/token")
+                                .encode()
+                                .build()
+                                .toUri()
+                )
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .body(BodyInserters.fromFormData(params))
+                .retrieve()
+                .bodyToMono(OpenBankTokenResponse.class)
+                .block();
+
+        log.info("openBankTokenResponse = {}", openBankTokenResponse);
+
         accountInfoRequest.setTran_dtime(
                 getNowTimeString()
         );
         AccountInfoResponse accountInfoResponse = webClient.post()
-                .uri("https://openapi.openbanking.or.kr/v2.0/inquiry/real_name")
+                .uri(
+                        UriComponentsBuilder.newInstance()
+                                .scheme(HttpScheme.HTTPS.toString())
+                                .host("testapi.openbanking.or.kr")
+                                .path("/v2.0/inquiry/real_name")
+                                .queryParam("bank_tran_id", "M202301745U123456789")
+                                .encode()
+                                .build()
+                                .toUri()
+                )
                 .headers(
                         httpHeaders -> {
-                            httpHeaders.setBasicAuth("3cfae1dc-b541-45a9-8528-a5707aaf36c4");
+                            httpHeaders.setBearerAuth(openBankTokenResponse.getAccess_token());
                             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                         }
                 )
@@ -45,6 +85,8 @@ public class CafeRegistrationValidator {
                 .retrieve()
                 .bodyToMono(AccountInfoResponse.class)
                 .block();
+
+        log.info("response = {}", accountInfoResponse);
 
         return ValidResponse.builder()
                 .available(true)
@@ -85,6 +127,31 @@ public class CafeRegistrationValidator {
         return ValidResponse.builder()
                 .available(businessInfoResponse.getMatch_cnt() != null)
                 .build();
+    }
+
+    @Data
+    static class OpenBankTokenRequest {
+        private String client_id;
+        private String client_secret;
+        private String scope;
+        private String grant_type;
+
+        @Builder
+        public OpenBankTokenRequest(String client_id, String client_secret, String scope, String grant_type) {
+            this.client_id = client_id;
+            this.client_secret = client_secret;
+            this.scope = scope;
+            this.grant_type = grant_type;
+        }
+    }
+
+    @Data
+    static class OpenBankTokenResponse {
+        private String access_token;
+        private String token_type;
+        private String expires_in;
+        private String oop;
+        private String client_use_code;
     }
 
     @Data

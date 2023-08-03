@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.valid;
+package nerds.studiousTestProject.studycafe.dto.valid.request;
 
 import lombok.Data;
 

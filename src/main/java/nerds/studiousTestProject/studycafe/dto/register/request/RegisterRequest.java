@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.register;
+package nerds.studiousTestProject.studycafe.dto.register.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +30,30 @@ public class RegisterRequest {
     @NotNull(message = "스터디룸 정보는 필수입니다.")
     @Valid
     private List<RoomInfo> roomInfos;
+
+    @Data
+    static class BusinessInfo {
+        @Size(min = 10, max = 10, message = "사업자 등록번호는 하이픈(-)을 포함하지 않는 10자리 숫자입니다.")
+        private String number; // 사업자 등록 번호
+
+        @Size(min = 2, max = 4, message = "대표자 성명이 잘못되었습니다.")
+        private String name;    // 대표자 성명
+
+        @NotNull(message = "계좌 정보는 필수입니다.")
+        @Valid
+        private AccountInfo accountInfo;    // 계좌 정보
+
+        @NotBlank(message = "사업자 등록증은 필수입니다.")
+        private String registration;    // 사업자 등록증
+
+        @Data
+        static class AccountInfo {
+            @NotBlank(message = "은행명은 필수입니다.")
+            private String name;        // 은행명 (추후, 열거체로 리펙토링)
+            @Size(min = 10, max = 14, message = "계좌 번호가 잘못되었습니다.")   // 계좌 번호 길이는 10 ~ 14자
+            private String number;      // 계좌 번호
+        }
+    }
 
     @Data
     public static class CafeInfo {
