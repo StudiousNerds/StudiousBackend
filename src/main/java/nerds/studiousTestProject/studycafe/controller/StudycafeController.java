@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class StudycafeController {
     }
 
     @PostMapping("/studycafes/registrations")
-    public RegisterResponse registerStudycafe(@RequestBody RegisterRequest registerRequest) {
+    public RegisterResponse registerStudycafe(@RequestBody @Valid RegisterRequest registerRequest) {
         log.info("request = {}", registerRequest);
         return studycafeService.register(registerRequest);
     }
