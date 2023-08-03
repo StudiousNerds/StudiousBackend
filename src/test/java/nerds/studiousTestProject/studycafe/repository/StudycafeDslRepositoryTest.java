@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotNull;
 import nerds.studiousTestProject.convenience.entity.ConvenienceList;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
@@ -11,7 +12,9 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.search.SortType;
+import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -277,8 +280,7 @@ class StudycafeDslRepositoryTest {
                 .name("테스트1 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(40)
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(21, 0))
+                .operationInfos(operationInfos())
                 .totalGrade(1.2)
                 .hashtagRecords(hashtagRecords)
                 .convenienceLists(convenienceLists)
@@ -295,8 +297,7 @@ class StudycafeDslRepositoryTest {
                 .name("테스트2 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(30)
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(21, 0))
+                .operationInfos(operationInfos())
                 .totalGrade(2.4)
                 .duration(null)
                 .hashtagRecords(hashtagRecords)
@@ -312,8 +313,7 @@ class StudycafeDslRepositoryTest {
                 .name("테스트3 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(20)
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(21, 0))
+                .operationInfos(operationInfos())
                 .totalGrade(3.6)
                 .convenienceLists(convenienceLists)
                 .duration(null)
@@ -329,8 +329,7 @@ class StudycafeDslRepositoryTest {
                 .name("테스트4 스터디카페")
                 .address("경기도 남양주시 진접읍")
                 .accumReserveCount(10)
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(21, 0))
+                .operationInfos(operationInfos())
                 .totalGrade(4.8)
                 .duration(null)
                 .nearestStation(null)
@@ -338,6 +337,67 @@ class StudycafeDslRepositoryTest {
                 .notificationInfo("공지 사항")
                 .notice(Collections.singletonList("유의 사항"))
                 .build();
+    }
+
+    private List<OperationInfo> operationInfos() {
+        return List.of(
+                OperationInfo.builder()
+                        .week(Week.MONDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.TUESDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.WEDNESDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.THURSDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.FRIDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.SATURDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.SUNDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build(),
+                OperationInfo.builder()
+                        .week(Week.HOLIDAY)
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(21, 0))
+                        .allDay(false)
+                        .closed(false)
+                        .build()
+        );
     }
 
     private Room room1(Studycafe studycafe, List<ConvenienceList> convenienceLists) {
