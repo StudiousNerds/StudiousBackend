@@ -33,14 +33,21 @@ public class NearestStationInfoCalculator {
      * @param request 스터디 카페 생성 DTO
      * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null 반환)
      */
-    public PlaceResponse getPlaceResponse(CreateRequest request) {
-        Place place = getPlace(request);
-        log.info("place = {}", place);
+    public PlaceResponse getPlaceResponse(String latitude, String longitude) {
+        Place place;
+        PlaceResponse.PlaceResponseBuilder builder = PlaceResponse.builder();
+        try {
+            place = getPlace(latitude, longitude);
+        } catch (Exception e) {
+            // 주변 역이 없는 경우 필드에 null값을 담아 리턴
+            return builder.build();
+        }
 
+        log.info("place = {}", place);
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 TMapDistanceCalcRequest.builder()
-                        .startX(request.getLongitude())
-                        .startY(request.getLatitude())
+                        .startX(longitude)
+                        .startY(latitude)
                         .endX(place.x)
                         .endY(place.y)
                         .startName("cafe")
@@ -68,7 +75,8 @@ public class NearestStationInfoCalculator {
                 .block();
 
         List<Map<String, Object>> features = (List<Map<String, Object>>) map.get("features");
-        return PlaceResponse.builder()
+
+        return builder
                 .duration(calcDuration(features))
                 .nearestStation(place.name)
                 .build();
@@ -80,12 +88,12 @@ public class NearestStationInfoCalculator {
      * @param request 스터디 카페 생성 DTO
      * @return 지하철 역 위도, 경도 좌표
      */
-    private Place getPlace(CreateRequest request) {
+    private Place getPlace(String latitude, String longitude) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 KakaoMapDistanceSearchRequest.builder()
                         .category_group_code("SW8")
-                        .x(request.getLongitude())
-                        .y(request.getLatitude())
+                        .x(longitude)
+                        .y(latitude)
                         .radius(10000)
                         .page(1)
                         .size(1)
@@ -113,6 +121,7 @@ public class NearestStationInfoCalculator {
         // 아래 변수들이 null인 경우는 주변 역이 없다는 것을 의미
         List<Object> documents = (List<Object>) map.get("documents");
         Map<String, Object> document = (Map<String, Object>) documents.get(0);
+
         return Place.builder()
                 .x((String) document.get("x"))
                 .y((String) document.get("y"))
