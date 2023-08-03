@@ -14,6 +14,7 @@ import nerds.studiousTestProject.studycafe.dto.search.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.search.SortType;
+import nerds.studiousTestProject.studycafe.entity.Week;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -27,6 +28,7 @@ import java.util.List;
 import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
+import static nerds.studiousTestProject.studycafe.entity.QOperationInfo.operationInfo;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -40,7 +42,8 @@ public class StudycafeDslRepository {
                 .select(studycafe.count())
                 .from(studycafe);
 
-        JPAQuery<Long> count = getJoinedCountQuery(countQuery, searchRequest)
+        // 페이징 처리를 위해선 개수를 직접 쿼리를 날려 확인해야 한다! (QueryDSL의 count는 믿을게 못됨)
+        JPAQuery<Long> count = getJoinedQuery(countQuery, searchRequest)
                 .where(
                         inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
@@ -52,7 +55,7 @@ public class StudycafeDslRepository {
                 )
                 .groupBy(studycafe.id);
 
-        // 조회 결과가 없으면 빈 Page 리턴
+        // 조회 결과가 없으면(조회 결과 개수가 0인 경우) 굳이 쿼리를 날리지 않고 빈 Page 리턴
         if (count.fetchOne() == null) {
             return Page.empty();
         }
@@ -70,7 +73,7 @@ public class StudycafeDslRepository {
                 )
                 .from(studycafe);
 
-        List<SearchResponse> content = getJoinedContentQuery(contentQuery, searchRequest)
+        List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
@@ -89,39 +92,13 @@ public class StudycafeDslRepository {
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
-    public JPAQuery<SearchResponse> getJoinedContentQuery(JPAQuery<SearchResponse> query, SearchRequest searchRequest) {
+    public <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
         if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null) {
                 query = query
-                        .leftJoin(room.reservationRecords, reservationRecord);
-            }
-
-            if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
-                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
-                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
-
-                query = query
-                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
-                        .leftJoin(room.convenienceLists, rConvenienceList);
-            }
-        }
-
-        if (searchRequest.getHashtags() != null) {
-            query = query
-                    .leftJoin(studycafe.hashtagRecords, hashtagRecord);
-        }
-
-        return query;
-    }
-
-    public JPAQuery<Long> getJoinedCountQuery(JPAQuery<Long> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
-            query = query.leftJoin(studycafe.rooms, room);
-
-            if (searchRequest.getDate() != null) {
-                query = query
+                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.closed.isFalse())
                         .leftJoin(room.reservationRecords, reservationRecord);
             }
 
@@ -167,8 +144,7 @@ public class StudycafeDslRepository {
             return null;
         }
 
-        int value = date.getDayOfWeek().getValue();
-        return studycafe.operationInfos.get(value - 1).startTime.loe(startTime);
+        return operationInfo.week.eq(Week.of(date)).and(operationInfo.startTime.loe(startTime));
     }
 
     private BooleanExpression cafeEndTimeGoe(LocalDate date, LocalTime endTime) {
@@ -176,8 +152,7 @@ public class StudycafeDslRepository {
             return null;
         }
 
-        int value = date.getDayOfWeek().getValue();
-        return studycafe.operationInfos.get(value - 1).endTime.goe(endTime);
+        return operationInfo.week.eq(Week.of(date)).and(operationInfo.endTime.goe(endTime));
     }
 
     private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
