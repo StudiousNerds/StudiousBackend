@@ -17,6 +17,7 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.register.PlaceResponse;
 import nerds.studiousTestProject.studycafe.dto.register.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
@@ -29,6 +30,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
+import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,7 @@ public class StudycafeService {
     private final ConvenienceService convenienceService;
     private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
+    private final NearestStationInfoCalculator nearestStationInfoCalculator;
 
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
@@ -208,14 +211,20 @@ public class StudycafeService {
             }
         }
 
+        RegisterRequest.CafeInfo cafeInfo = registerRequest.getCafeInfo();
+        String latitude = cafeInfo.getAddressInfo().getLatitude();
+        String longitude = cafeInfo.getAddressInfo().getLongitude();
+
+        PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
+
         studycafeRepository.save(
                 Studycafe.builder()
-                        .name(registerRequest.getCafeInfo().getName())
-                        .address(registerRequest.getCafeInfo().getAddressInfo().getBasic())
+                        .name(cafeInfo.getName())
+                        .address(cafeInfo.getAddressInfo().getBasic())
                         .photo(null)
                         .phoneNumber(null)
                         .operationInfos(
-                                registerRequest.getCafeInfo().getOperationInfos().stream().map(oi -> OperationInfo.builder()
+                                cafeInfo.getOperationInfos().stream().map(oi -> OperationInfo.builder()
                                                 .week(oi.getWeek())
                                                 .startTime(oi.getStartTime())
                                                 .endTime(oi.getEndTime())
@@ -242,7 +251,7 @@ public class StudycafeService {
                                         ).build()
                                 ).toList()
                         )
-                        .convenienceLists(registerRequest.getCafeInfo().getConveniences().stream().map(
+                        .convenienceLists(cafeInfo.getConveniences().stream().map(
                                 c -> ConvenienceList.builder()
                                         .name(c)
                                         .price(0)
@@ -253,16 +262,16 @@ public class StudycafeService {
                         .totalGrade(0.0)
                         .createdAt(LocalDateTime.now())
                         .accumReserveCount(0)
-                        .duration(null)
-                        .nearestStation(null)
-                        .notice(registerRequest.getCafeInfo().getNotices())
-                        .introduction(registerRequest.getCafeInfo().getIntroduction())
-                        .refundPolicyInfo(registerRequest.getCafeInfo().getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
+                        .duration(placeResponse.getDuration())
+                        .nearestStation(placeResponse.getNearestStation())
+                        .notice(cafeInfo.getNotices())
+                        .introduction(cafeInfo.getIntroduction())
+                        .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
                         .build()
         );
 
         return RegisterResponse.builder()
-                .cafeName(registerRequest.getCafeInfo().getName())
+                .cafeName(cafeInfo.getName())
                 .build();
     }
 }
