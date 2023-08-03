@@ -1,7 +1,6 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.NotNull;
 import nerds.studiousTestProject.convenience.entity.ConvenienceList;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
@@ -9,9 +8,9 @@ import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.dto.search.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.search.SearchResponse;
-import nerds.studiousTestProject.studycafe.dto.search.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
