@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.studycafe.dto.register.CreateRequest;
 import nerds.studiousTestProject.studycafe.dto.register.PlaceResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -30,8 +29,9 @@ public class NearestStationInfoCalculator {
     /**
      * 스터디카페의 가장 가까운 역까지 도보 거리를 계산하여 반환하는 메소드 (TMAP API 사용)
      * 참고 : https://tmapapi.sktelecom.com/main.html#webservice/docs/tmapRoutePedestrianDoc
-     * @param request 스터디 카페 생성 DTO
-     * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null 반환)
+     * @param latitude 위도
+     * @param longitude 경도
+     * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null을 담은 객체 반환)
      */
     public PlaceResponse getPlaceResponse(String latitude, String longitude) {
         Place place;
@@ -85,7 +85,8 @@ public class NearestStationInfoCalculator {
     /**
      * 스터디카페와 가장 가까운 지하철역 위도, 경도 쌍을 반환하는 메소드
      * 참고 : https://developers.kakao.com/docs/latest/ko/local/dev-guide#search-by-keyword
-     * @param request 스터디 카페 생성 DTO
+     * @param latitude 위도
+     * @param longitude 경도
      * @return 지하철 역 위도, 경도 좌표
      */
     private Place getPlace(String latitude, String longitude) {
