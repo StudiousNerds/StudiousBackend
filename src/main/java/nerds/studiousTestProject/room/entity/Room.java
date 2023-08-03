@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.room.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -57,7 +58,7 @@ public class Room {
     private List<ReservationRecord> reservationRecords;
 
     // 일대다 단방향 연관관계
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<ConvenienceList> convenienceLists;
 }
