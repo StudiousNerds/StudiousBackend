@@ -157,25 +157,27 @@ public class StudycafeDslRepository {
     }
 
     private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        int value;
-        try {
-            value = date.getDayOfWeek().getValue();
-        } catch (Exception e) {
-            value = 8;
-        }
-
-//        BooleanExpression startTimeLoe = cafeStartTimeLoe(studycafe.operationInfos.get(value - 1).startTime);
         BooleanExpression startTimeLoe = cafeStartTimeLoe(date, startTime);
-        BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
+        BooleanExpression endTimeGoe = cafeEndTimeGoe(date, endTime);
         return startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe;
     }
 
     private BooleanExpression cafeStartTimeLoe(LocalDate date, LocalTime startTime) {
-        return startTime != null ? studycafe.startTime.loe(startTime) : null;
+        if (startTime == null) {
+            return null;
+        }
+
+        int value = date.getDayOfWeek().getValue();
+        return studycafe.operationInfos.get(value - 1).startTime.loe(startTime);
     }
 
-    private BooleanExpression cafeEndTimeGoe(LocalTime endTime) {
-        return endTime != null ? studycafe.endTime.goe(endTime) : null;
+    private BooleanExpression cafeEndTimeGoe(LocalDate date, LocalTime endTime) {
+        if (endTime == null) {
+            return null;
+        }
+
+        int value = date.getDayOfWeek().getValue();
+        return studycafe.operationInfos.get(value - 1).endTime.goe(endTime);
     }
 
     private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
