@@ -18,7 +18,11 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
+import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
+import nerds.studiousTestProject.studycafe.dto.register.request.RoomInfo;
 import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -194,7 +198,7 @@ public class StudycafeService {
         validateRoomInfo(registerRequest);
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
-        RegisterRequest.CafeInfo cafeInfo = registerRequest.getCafeInfo();
+        CafeInfo cafeInfo = registerRequest.getCafeInfo();
         String latitude = cafeInfo.getAddressInfo().getLatitude();
         String longitude = cafeInfo.getAddressInfo().getLongitude();
         PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
@@ -212,26 +216,26 @@ public class StudycafeService {
                 .nearestStation(placeResponse.getNearestStation())
                 .notice(cafeInfo.getNotices())
                 .introduction(cafeInfo.getIntroduction())
-                .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
+                .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RefundPolicyRequest::getRate).toList())
                 .build();
 
         // 운영 시간 정보 등록
-        List<RegisterRequest.CafeInfo.OperationInfo> operationInfos = cafeInfo.getOperationInfos();
-        for (RegisterRequest.CafeInfo.OperationInfo operationInfoDto : operationInfos) {
+        List<OperationInfoRequest> operationInfoRequests = cafeInfo.getOperationInfos();
+        for (OperationInfoRequest operationInfoRequest : operationInfoRequests) {
             studycafe.addOperationInfo(
                     OperationInfo.builder()
-                            .week(operationInfoDto.getWeek())
-                            .startTime(operationInfoDto.getStartTime())
-                            .endTime(operationInfoDto.getEndTime())
-                            .allDay(operationInfoDto.getAllDay())
-                            .closed(operationInfoDto.getClosed())
+                            .week(operationInfoRequest.getWeek())
+                            .startTime(operationInfoRequest.getStartTime())
+                            .endTime(operationInfoRequest.getEndTime())
+                            .allDay(operationInfoRequest.getAllDay())
+                            .closed(operationInfoRequest.getClosed())
                             .build()
             );
         }
 
         // 룸 정보 등록
-        List<RegisterRequest.RoomInfo> roomInfos = registerRequest.getRoomInfos();
-        for (RegisterRequest.RoomInfo roomInfo : roomInfos) {
+        List<RoomInfo> roomInfos = registerRequest.getRoomInfos();
+        for (RoomInfo roomInfo : roomInfos) {
             Room room = Room.builder()
                     .name(roomInfo.getName())
                     .studycafe(studycafe)   // 이부분 좀 애매
@@ -275,8 +279,8 @@ public class StudycafeService {
     }
 
     private void validateRoomInfo(RegisterRequest registerRequest) {
-        List<RegisterRequest.RoomInfo> roomInfos = registerRequest.getRoomInfos();
-        for (RegisterRequest.RoomInfo roomInfo : roomInfos) {
+        List<RoomInfo> roomInfos = registerRequest.getRoomInfos();
+        for (RoomInfo roomInfo : roomInfos) {
             Integer standardHeadCount = roomInfo.getStandardHeadCount();
             Integer minHeadCount = roomInfo.getMinHeadCount();
             Integer maxHeadCount = roomInfo.getMaxHeadCount();
