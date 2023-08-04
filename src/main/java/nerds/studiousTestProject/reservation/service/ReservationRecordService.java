@@ -2,24 +2,22 @@ package nerds.studiousTestProject.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.request.ReservationInfo;
 import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
-import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
 import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
-import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;

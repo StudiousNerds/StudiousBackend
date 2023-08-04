@@ -41,4 +41,8 @@ public class RefundPolicy {
         this.type = type;
         this.studycafe = studycafe;
     }
+
+    public void setStudycafe(Studycafe studycafe) {
+        this.studycafe = studycafe;
+    }
 }
