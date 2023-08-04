@@ -21,7 +21,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Convenience {
+public class Conveniences {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,6 +37,11 @@ public class Convenience {
     @Enumerated(EnumType.STRING)
     private ConvenienceName name;
     private Integer price;
+    private Boolean isFree;
+
+    public boolean isFree(){
+        return this.isFree;
+    }
 
     public void setStudycafe(Studycafe studycafe) {
         this.studycafe = studycafe;

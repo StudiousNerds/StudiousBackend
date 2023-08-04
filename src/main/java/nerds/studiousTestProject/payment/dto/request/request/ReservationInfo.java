@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.request;
+package nerds.studiousTestProject.payment.dto.request.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,10 +7,10 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Data
+@NoArgsConstructor
 public class ReservationInfo {
 
     @NotNull(message = "예약날짜는 필수입니다.")
