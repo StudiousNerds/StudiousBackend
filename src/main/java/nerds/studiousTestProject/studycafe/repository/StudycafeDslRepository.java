@@ -7,13 +7,13 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
-import nerds.studiousTestProject.convenience.entity.QConvenienceList;
+import nerds.studiousTestProject.convenience.entity.QConvenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
-import nerds.studiousTestProject.studycafe.dto.search.QSearchResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.response.QSearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,7 +75,6 @@ public class StudycafeDslRepository {
 
         List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
-                        inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
@@ -98,17 +97,17 @@ public class StudycafeDslRepository {
 
             if (searchRequest.getDate() != null) {
                 query = query
-                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.closed.isFalse())
+                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.closed.isFalse()).on(operationInfo.week.eq(Week.of(searchRequest.getDate())))
                         .leftJoin(room.reservationRecords, reservationRecord);
             }
 
             if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
-                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
-                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
+                QConvenience cConveniences = new QConvenience("cConvenienceList");
+                QConvenience rConveniences = new QConvenience("rConvenienceList");
 
                 query = query
-                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
-                        .leftJoin(room.convenienceLists, rConvenienceList);
+                        .leftJoin(studycafe.conveniences, cConveniences)
+                        .leftJoin(room.conveniences, rConveniences);
             }
         }
 
@@ -136,7 +135,7 @@ public class StudycafeDslRepository {
     private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
         BooleanExpression startTimeLoe = cafeStartTimeLoe(date, startTime);
         BooleanExpression endTimeGoe = cafeEndTimeGoe(date, endTime);
-        return startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe;
+        return operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe);
     }
 
     private BooleanExpression cafeStartTimeLoe(LocalDate date, LocalTime startTime) {
@@ -144,7 +143,7 @@ public class StudycafeDslRepository {
             return null;
         }
 
-        return operationInfo.week.eq(Week.of(date)).and(operationInfo.startTime.loe(startTime));
+        return operationInfo.startTime.loe(startTime);
     }
 
     private BooleanExpression cafeEndTimeGoe(LocalDate date, LocalTime endTime) {
@@ -152,7 +151,7 @@ public class StudycafeDslRepository {
             return null;
         }
 
-        return operationInfo.week.eq(Week.of(date)).and(operationInfo.endTime.goe(endTime));
+        return operationInfo.endTime.goe(endTime);
     }
 
     private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
@@ -181,7 +180,7 @@ public class StudycafeDslRepository {
             startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
         }
 
-        return reservationRecord.startTime.loe(startTime);
+        return reservationRecord.startTime.goe(startTime);
     }
 
     private BooleanExpression endTimeGoe(LocalTime endTime) {
@@ -189,7 +188,7 @@ public class StudycafeDslRepository {
             endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
         }
 
-        return reservationRecord.endTime.goe(endTime);
+        return reservationRecord.endTime.loe(endTime);
     }
 
     private BooleanExpression keywordContains(String keyword) {
@@ -210,10 +209,10 @@ public class StudycafeDslRepository {
         }
 
         // Room과 Studycafe의 Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
-        QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
-        QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
+        QConvenience cConveniences = new QConvenience("cConvenienceList");
+        QConvenience rConveniences = new QConvenience("rConvenienceList");
 
-        return cConvenienceList.name.in(conveniences).and(rConvenienceList.name.in(conveniences));
+        return cConveniences.name.in(conveniences).and(rConveniences.name.in(conveniences));
     }
 
     private OrderSpecifier[] createOrderSpecifier(SortType sortType) {
