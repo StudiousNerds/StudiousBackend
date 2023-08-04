@@ -43,7 +43,7 @@ public class ReserveResponse {
                 .username(member.getName())
                 .userPhoneNumber(member.getPhoneNumber())
                 .refundPolicy(
-                        studycafe.getRefundPolicyList().stream()
+                        studycafe.getRefundPolicies().stream()
                         .map(RefundPolicyInResponse::from)
                         .collect(Collectors.toList()))
                 .build();
