@@ -10,7 +10,7 @@ public class RefundPolicyInResponse {
     private String day;
     private Integer rate;
 
-    public static RefundPolicyInResponse of(RefundPolicy refundPolicy) {
+    public static RefundPolicyInResponse from(RefundPolicy refundPolicy) {
         return RefundPolicyInResponse.builder()
                 .day(refundPolicy.getRefundDay().getMessage())
                 .rate(refundPolicy.getRate())
