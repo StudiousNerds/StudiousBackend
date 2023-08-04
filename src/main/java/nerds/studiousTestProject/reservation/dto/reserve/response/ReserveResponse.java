@@ -2,7 +2,7 @@ package nerds.studiousTestProject.reservation.dto.reserve.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -25,10 +25,10 @@ public class ReserveResponse {
     private List<RefundPolicyInResponse> refundPolicy;
 
     public static ReserveResponse of(Member member, Room room, Studycafe studycafe) {
-        List<ConvenienceList> convenienceLists = studycafe.getConvenienceLists();
+        List<Convenience> convenienceLists = studycafe.getConveniences();
         List<String> convenienceList = new ArrayList<>();
         List<PaidConvenience> paidConvenienceList = new ArrayList<>();
-        for (ConvenienceList convenience : convenienceLists) {
+        for (Convenience convenience : convenienceLists) {
             convenienceList.add(convenience.getName().name());
             if (!convenience.isFree()) {
                 paidConvenienceList.add(PaidConvenience.from(convenience));

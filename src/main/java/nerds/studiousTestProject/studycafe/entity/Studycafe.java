@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.room.entity.Room;
 
 import java.time.LocalDateTime;

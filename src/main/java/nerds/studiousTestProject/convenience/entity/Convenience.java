@@ -21,7 +21,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Conveniences {
+public class Convenience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
