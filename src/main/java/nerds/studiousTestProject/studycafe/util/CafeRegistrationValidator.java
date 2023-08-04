@@ -11,6 +11,10 @@ import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.util.odcloud.response.BusinessInfoResponse;
+import nerds.studiousTestProject.studycafe.util.openbank.request.OpenBankTokenRequest;
+import nerds.studiousTestProject.studycafe.util.openbank.response.AccountInfoResponse;
+import nerds.studiousTestProject.studycafe.util.openbank.response.OpenBankTokenResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CafeRegistrationValidator {
+    private static final String OPEN_BANK_CLIENT_ID = "7338b43b-eb71-40e9-9414-749b772e4907";
+    private static final String OPEN_BANK_CLIENT_SECRET = "3cfae1dc-b541-45a9-8528-a5707aaf36c4";
+    private static final String OPEN_BANK_SCOPE = "oob";
+    private static final String OPEN_BANK_GRANT_TYPE = "client_credentials";
+    private static final String OPEN_BANK_HOST = "testapi.openbanking.or.kr";
+    private static final String OPEN_BANK_TOKEN_PATH = "/oauth/2.0/token";
+    private static final String OPEN_BANK_ACCOUNT_INQUIRE_PATH = "/v2.0/inquiry/real_name";
+    private static final String OPEN_BANK_TRAN_ID_PREFIX = "bank_tran_id";
+    private static final String OPEN_BANK_TRAN_ID = "M202301745" + "U" + "123456789";
+    private static final String OD_CLOUD_HOST = "api.odcloud.kr";
+    private static final String OD_CLOUD_BUSINESS_STATUS_PATH = "/api/nts-businessman/v1/status";
+    private static final String OD_CLOUD_SERVICE_KEY_PREFIX = "serviceKey";
+    private static final String OD_CLOUD_SERVICE_KEY = "FgCjyyTMbN42kaatvYSk8LsS1%2Bu6BY%2BW%2BrZWqjr7TkgZD%2BNt7HGM5WqjLkG60PdNroVSEQTK9JcwunkeQ%2F%2F3kQ%3D%3D";
+
     private final WebClient webClient;
 
     /**
@@ -36,10 +54,10 @@ public class CafeRegistrationValidator {
     public ValidResponse getAccountInfoValidResponse(AccountInfoRequest accountInfoRequest) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 OpenBankTokenRequest.builder()
-                        .client_id("7338b43b-eb71-40e9-9414-749b772e4907")
-                        .client_secret("3cfae1dc-b541-45a9-8528-a5707aaf36c4")
-                        .scope("oob")
-                        .grant_type("client_credentials")
+                        .client_id(OPEN_BANK_CLIENT_ID)
+                        .client_secret(OPEN_BANK_CLIENT_SECRET)
+                        .scope(OPEN_BANK_SCOPE)
+                        .grant_type(OPEN_BANK_GRANT_TYPE)
                         .build()
         );
 
@@ -48,8 +66,8 @@ public class CafeRegistrationValidator {
                 .uri(
                         UriComponentsBuilder.newInstance()
                                 .scheme(HttpScheme.HTTPS.toString())
-                                .host("testapi.openbanking.or.kr")
-                                .path("/oauth/2.0/token")
+                                .host(OPEN_BANK_HOST)
+                                .path(OPEN_BANK_TOKEN_PATH)
                                 .encode()
                                 .build()
                                 .toUri()
@@ -69,9 +87,9 @@ public class CafeRegistrationValidator {
                 .uri(
                         UriComponentsBuilder.newInstance()
                                 .scheme(HttpScheme.HTTPS.toString())
-                                .host("testapi.openbanking.or.kr")
-                                .path("/v2.0/inquiry/real_name")
-                                .queryParam("bank_tran_id", "M202301745U123456789")
+                                .host(OPEN_BANK_HOST)
+                                .path(OPEN_BANK_ACCOUNT_INQUIRE_PATH)
+                                .queryParam(OPEN_BANK_TRAN_ID_PREFIX, OPEN_BANK_TRAN_ID)
                                 .encode()
                                 .build()
                                 .toUri()
@@ -112,9 +130,11 @@ public class CafeRegistrationValidator {
         BusinessInfoResponse businessInfoResponse = webClient
                 .post()
                 .uri(
-                        UriComponentsBuilder.fromUriString("https://api.odcloud.kr")
-                                .path("/api/nts-businessman/v1/status")
-                                .queryParam("serviceKey", "FgCjyyTMbN42kaatvYSk8LsS1%2Bu6BY%2BW%2BrZWqjr7TkgZD%2BNt7HGM5WqjLkG60PdNroVSEQTK9JcwunkeQ%2F%2F3kQ%3D%3D")
+                        UriComponentsBuilder.newInstance()
+                                .scheme(HttpScheme.HTTPS.toString())
+                                .host(OD_CLOUD_HOST)
+                                .path(OD_CLOUD_BUSINESS_STATUS_PATH)
+                                .queryParam(OD_CLOUD_SERVICE_KEY_PREFIX, OD_CLOUD_SERVICE_KEY)
                                 .build()
                                 .toUriString()
                 )
@@ -128,74 +148,5 @@ public class CafeRegistrationValidator {
         return ValidResponse.builder()
                 .available(businessInfoResponse.getMatch_cnt() != null)
                 .build();
-    }
-
-    @Data
-    static class OpenBankTokenRequest {
-        private String client_id;
-        private String client_secret;
-        private String scope;
-        private String grant_type;
-
-        @Builder
-        public OpenBankTokenRequest(String client_id, String client_secret, String scope, String grant_type) {
-            this.client_id = client_id;
-            this.client_secret = client_secret;
-            this.scope = scope;
-            this.grant_type = grant_type;
-        }
-    }
-
-    @Data
-    static class OpenBankTokenResponse {
-        private String access_token;
-        private String token_type;
-        private String expires_in;
-        private String oop;
-        private String client_use_code;
-    }
-
-    @Data
-    static class AccountInfoResponse {
-        private String api_tran_id;
-        private String api_tran_dtm;
-        private String rsp_code;
-        private String rsp_message;
-        private String bank_tran_id;
-        private String bank_tran_date;
-        private String bank_code_tran;
-        private String bank_rsp_code;
-        private String bank_rsp_message;
-        private String bank_code_std;
-        private String bank_code_sub;
-        private String bank_name;
-        private String account_num;
-        private String account_holder_info_type;
-        private String account_holder_info;
-        private String account_holder_name;
-        private String account_type;
-    }
-
-    @Data
-    static class BusinessInfoResponse {
-        private String status_code;     // 상태 코드
-        private Integer match_cnt;      // 조회 결과 개수
-        private Integer request_cnt;    // 조회 요청 개수
-        private List<Data> data;        // 결과
-
-        @Getter
-        @Setter
-        static class Data {
-            private String b_no;
-            private String b_stt;
-            private String b_stt_cd;
-            private String tax_type;
-            private String tax_type_cd;
-            private String end_at;
-            private String utcc_yn;
-            private String tax_type_change_at;
-            private String rbf_tax_type;
-            private String rbf_tax_type_cd;
-        }
     }
 }

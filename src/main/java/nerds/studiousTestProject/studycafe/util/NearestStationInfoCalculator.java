@@ -1,13 +1,13 @@
 package nerds.studiousTestProject.studycafe.util;
 
-import lombok.Builder;
-import lombok.Getter;
+import io.netty.handler.codec.http.HttpScheme;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
+import nerds.studiousTestProject.studycafe.util.kakao.request.KakaoDistanceSearchRequest;
+import nerds.studiousTestProject.studycafe.util.kakao.response.KakaoDistanceSearchResponse;
+import nerds.studiousTestProject.studycafe.util.tmap.request.TMapDistanceCalcRequest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,6 +25,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class NearestStationInfoCalculator {
+    private static final String TMAP_APP_KEY_PREFIX = "appKey";
+    private static final String TMAP_APP_KEY = "121xik5nus14FswbOy5EF1DRDhQ3n2m68AoYAslX";
+    private static final String TMAP_API_HOST = "apis.openapi.sk.com";
+    private static final String TMAP_ROUTES_PATH = "/tmap/routes/pedestrian";
+    private static final String KAKAO_API_HOST = "dapi.kakao.com";
+    private static final String KAKAO_API_PATH = "/v2/local/search/category.{FORMAT}";
+    private static final String KAKAO_CLIENT_KEY = "KakaoAK " + "840802008a58093510f5294d2e7c67c9";
+
     private final WebClient webClient;
 
     /**
@@ -35,22 +43,22 @@ public class NearestStationInfoCalculator {
      * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null을 담은 객체 반환)
      */
     public PlaceResponse getPlaceResponse(String latitude, String longitude) {
-        Place place;
+        KakaoDistanceSearchResponse response;
         PlaceResponse.PlaceResponseBuilder builder = PlaceResponse.builder();
         try {
-            place = getPlace(latitude, longitude);
+            response = getKakaoDistanceSearchResponse(latitude, longitude);
         } catch (Exception e) {
             // 주변 역이 없는 경우 필드에 null값을 담아 리턴
             return builder.build();
         }
 
-        log.info("place = {}", place);
+        log.info("response = {}", response);
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 TMapDistanceCalcRequest.builder()
                         .startX(longitude)
                         .startY(latitude)
-                        .endX(place.x)
-                        .endY(place.y)
+                        .endX(response.getX())
+                        .endY(response.getY())
                         .startName("cafe")
                         .endName("station")
                         .build()
@@ -60,16 +68,16 @@ public class NearestStationInfoCalculator {
                 .post()
                 .uri(
                         UriComponentsBuilder.newInstance()
-                                .scheme("https")
-                                .host("apis.openapi.sk.com")
-                                .path("/tmap/routes/pedestrian")
+                                .scheme(HttpScheme.HTTPS.toString())
+                                .host(TMAP_API_HOST)
+                                .path(TMAP_ROUTES_PATH)
                                 .query("version={VERSION}")
                                 .encode()
                                 .buildAndExpand("1")
                                 .toUri()
                 )
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .header("appKey", "121xik5nus14FswbOy5EF1DRDhQ3n2m68AoYAslX")
+                .header(TMAP_APP_KEY_PREFIX, TMAP_APP_KEY)
                 .body(BodyInserters.fromFormData(params))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
@@ -79,7 +87,7 @@ public class NearestStationInfoCalculator {
 
         return builder
                 .duration(calcDuration(features))
-                .nearestStation(place.name)
+                .nearestStation(response.getName())
                 .build();
     }
 
@@ -90,9 +98,9 @@ public class NearestStationInfoCalculator {
      * @param longitude 경도
      * @return 지하철 역 위도, 경도 좌표
      */
-    private Place getPlace(String latitude, String longitude) {
+    private KakaoDistanceSearchResponse getKakaoDistanceSearchResponse(String latitude, String longitude) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
-                KakaoMapDistanceSearchRequest.builder()
+                KakaoDistanceSearchRequest.builder()
                         .category_group_code("SW8")
                         .x(longitude)
                         .y(latitude)
@@ -107,15 +115,15 @@ public class NearestStationInfoCalculator {
                 .get()
                 .uri(
                         UriComponentsBuilder.newInstance()
-                                .scheme("https")
-                                .host("dapi.kakao.com")
-                                .path("/v2/local/search/category.{FORMAT}")
+                                .scheme(HttpScheme.HTTPS.toString())
+                                .host(KAKAO_API_HOST)
+                                .path(KAKAO_API_PATH)
                                 .queryParams(params)
                                 .encode()
                                 .buildAndExpand("json")
                                 .toUri()
                 )
-                .header(HttpHeaders.AUTHORIZATION, "KakaoAK 840802008a58093510f5294d2e7c67c9")
+                .header(HttpHeaders.AUTHORIZATION, KAKAO_CLIENT_KEY)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
@@ -124,7 +132,7 @@ public class NearestStationInfoCalculator {
         List<Object> documents = (List<Object>) map.get("documents");
         Map<String, Object> document = (Map<String, Object>) documents.get(0);
 
-        return Place.builder()
+        return KakaoDistanceSearchResponse.builder()
                 .x((String) document.get("x"))
                 .y((String) document.get("y"))
                 .name((String) document.get("place_name"))
@@ -140,40 +148,5 @@ public class NearestStationInfoCalculator {
         }
 
         return duration != 0 ? duration / 60 : null;    // 분 단위로 바꾸기
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    static class KakaoMapDistanceSearchRequest {
-        String category_group_code;
-        String x;
-        String y;
-        Integer radius;
-        Integer page;
-        Integer size;
-        String sort;
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @Builder
-    static class Place {
-        String x;
-        String y;
-        String name;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    static class TMapDistanceCalcRequest {
-        String startX;
-        String startY;
-        String endX;
-        String endY;
-        String startName;
-        String endName;
     }
 }
