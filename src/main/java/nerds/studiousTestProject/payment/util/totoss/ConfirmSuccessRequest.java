@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.confirm.request;
+package nerds.studiousTestProject.payment.util.totoss;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.payment.dto.RequestToToss;
 
 @Builder
 @Getter

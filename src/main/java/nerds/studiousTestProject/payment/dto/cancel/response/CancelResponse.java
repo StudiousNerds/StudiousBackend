@@ -1,15 +1,15 @@
-package nerds.studiousTestProject.payment.dto.cancel;
+package nerds.studiousTestProject.payment.dto.cancel.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.dto.confirm.response.fromtoss.Cancels;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancels;
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@Data
+@NoArgsConstructor
 public class CancelResponse {
 
     private int cancelAmount;

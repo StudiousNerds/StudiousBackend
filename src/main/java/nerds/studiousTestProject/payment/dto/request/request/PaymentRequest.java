@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.request;
+package nerds.studiousTestProject.payment.dto.request.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,4 +9,5 @@ public class PaymentRequest {
 
     private ReserveUser user;
     private ReservationInfo reservation;
+
 }
