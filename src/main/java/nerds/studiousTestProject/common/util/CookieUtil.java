@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.util;
+package nerds.studiousTestProject.common.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

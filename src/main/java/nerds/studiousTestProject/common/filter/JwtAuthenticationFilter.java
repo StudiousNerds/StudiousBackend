@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.jwt.filter;
+package nerds.studiousTestProject.common.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

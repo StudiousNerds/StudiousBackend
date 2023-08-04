@@ -1,7 +1,7 @@
-package nerds.studiousTestProject.member.config;
+package nerds.studiousTestProject.common.config;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.member.jwt.filter.JwtAuthenticationFilter;
+import nerds.studiousTestProject.common.filter.JwtAuthenticationFilter;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

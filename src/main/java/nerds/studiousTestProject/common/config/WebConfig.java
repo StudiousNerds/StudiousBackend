@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.config;
+package nerds.studiousTestProject.common.config;
 
 /*
 @Configuration

@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.util;
+package nerds.studiousTestProject.common.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

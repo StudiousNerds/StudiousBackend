@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.util;
+package nerds.studiousTestProject.common.util;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
