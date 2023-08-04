@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.ElementCollection;
@@ -17,7 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -71,16 +72,14 @@ public class Studycafe {
     @Nullable
     private String notificationInfo;
 
-    @OneToMany(mappedBy = "studycafe") // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
-    private List<Room> rooms;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<Room> rooms = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<HashtagRecord> hashtagRecords;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<HashtagRecord> hashtagRecords = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<ConvenienceList> convenienceLists;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<Convenience> conveniences = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default

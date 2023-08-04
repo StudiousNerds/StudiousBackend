@@ -1,26 +1,27 @@
-package nerds.studiousTestProject.hashtag.entity;
+package nerds.studiousTestProject.convenience.entity;
 
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Entity
-public class HashtagRecord {
+@Getter
+@NoArgsConstructor
+public class Convenience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,25 +30,24 @@ public class HashtagRecord {
     @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
-    private Integer count;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     @Enumerated(EnumType.STRING)
-    private HashtagName name;
+    private ConvenienceName name;
+    private Integer price;
+    private Boolean isFree;
 
-    /**
-     * 연관관계 편의 메소드
-     * 스터디카페(1)를 저장할 때 HashtagRecord(N)의 연관관계가 만들어지도록 하기 위한 메소드
-     * @param studycafe
-     */
+    public boolean isFree(){
+        return this.isFree;
+    }
+
     public void setStudycafe(Studycafe studycafe) {
         this.studycafe = studycafe;
     }
 
-    @Builder
-    public HashtagRecord(Long id, Studycafe studycafe, Integer count, HashtagName name) {
-        this.id = id;
-        this.studycafe = studycafe;
-        this.count = count;
-        this.name = name;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }
