@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.ConvenienceList;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.room.entity.Room;
 
 import java.time.LocalDateTime;
@@ -85,8 +86,6 @@ public class Studycafe {
     @Builder.Default
     private List<String> notice = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    @Column(name = "refund_policy_info")
-    private List<Integer> refundPolicyInfo = new ArrayList<>();
+    @OneToMany(mappedBy = "studycafe")
+    private List<RefundPolicy> refundPolicyList = new ArrayList<>();
 }

@@ -2,21 +2,29 @@ package nerds.studiousTestProject.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.request.ReservationInfo;
-import nerds.studiousTestProject.payment.dto.request.ReserveUser;
+import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.request.ReservationInfo;
+import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
+import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.room.service.RoomService;
+import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
 @Service
@@ -24,14 +32,16 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RES
 public class ReservationRecordService {
 
     private final ReservationRecordRepository reservationRecordRepository;
-    private final RoomService roomService;
+    private final RoomRepository roomRepository;
     private final MemberService memberService;
+    private final StudycafeRepository studycafeRepository;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
-        saveReservationRecord(memberService.getMemberFromAccessToken(accessToken),
-                roomService.findRoomById(roomId),
+        saveReservationRecord(
+                memberService.getMemberFromAccessToken(accessToken),
+                findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
                 orderId);
@@ -75,6 +85,23 @@ public class ReservationRecordService {
     public ReservationRecord findById(Long reservationRecordId) {
         return reservationRecordRepository.findById(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
+    public Room findRoomById(Long roomId){
+        return roomRepository.findById(roomId)
+                .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
+    }
+
+    public Studycafe findStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    }
+
+    public ReserveResponse reserve(Long cafeId, Long roomId, String accessToken) {
+        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Room room = findRoomById(roomId);
+        Studycafe studycafe = findStudycafeById(cafeId);
+        return ReserveResponse.of(member, room, studycafe);
     }
 
 }

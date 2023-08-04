@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.request;
+package nerds.studiousTestProject.payment.dto.request.response;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -8,9 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
 @AllArgsConstructor
+@Builder
+@Data
 @NoArgsConstructor
 public class PaymentResponse {
 

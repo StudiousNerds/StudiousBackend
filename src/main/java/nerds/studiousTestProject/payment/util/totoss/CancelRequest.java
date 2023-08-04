@@ -1,10 +1,9 @@
-package nerds.studiousTestProject.payment.dto.cancel;
+package nerds.studiousTestProject.payment.util.totoss;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.dto.RequestToToss;
 
 @Getter
 @Builder
