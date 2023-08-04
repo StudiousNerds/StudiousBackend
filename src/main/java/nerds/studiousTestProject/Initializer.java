@@ -51,7 +51,7 @@
 //
 //    @PostConstruct
 //    public void init(){
-//        List<String> notice = getNotice();
+//        List<String> notice = getNotices();
 //        List<Integer> refundPolicy = getRefundPolicy();
 //        List<String> role = getRole();
 //        List<Hashtag> hashtags = getHashtags();
@@ -132,7 +132,7 @@
 //        return refundPolicy;
 //    }
 //
-//    private List<String> getNotice() {
+//    private List<String> getNotices() {
 //        List<String> notice = new ArrayList<>();
 //        notice.add("이벤트 합니다.");
 //        notice.add("친구추천");
