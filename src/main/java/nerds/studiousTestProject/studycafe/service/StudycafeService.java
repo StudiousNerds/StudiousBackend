@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
@@ -17,8 +18,8 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
+import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
@@ -189,6 +190,91 @@ public class StudycafeService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
+        // 룸 정보 추가 검증
+        validateRoomInfo(registerRequest);
+
+        // 위도, 경도 정보를 통해 역 정보를 가져온다.
+        RegisterRequest.CafeInfo cafeInfo = registerRequest.getCafeInfo();
+        String latitude = cafeInfo.getAddressInfo().getLatitude();
+        String longitude = cafeInfo.getAddressInfo().getLongitude();
+        PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
+
+        // 생성자에서는 필요한 부분만 초기화
+        Studycafe studycafe = Studycafe.builder()
+                .name(cafeInfo.getName())
+                .address(cafeInfo.getAddressInfo().getBasic())
+                .photo(null)
+                .phoneNumber(null)
+                .totalGrade(0.0)
+                .createdAt(LocalDateTime.now())
+                .accumReserveCount(0)
+                .duration(placeResponse.getDuration())
+                .nearestStation(placeResponse.getNearestStation())
+                .notice(cafeInfo.getNotices())
+                .introduction(cafeInfo.getIntroduction())
+                .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
+                .build();
+
+        // 운영 시간 정보 등록
+        List<RegisterRequest.CafeInfo.OperationInfo> operationInfos = cafeInfo.getOperationInfos();
+        for (RegisterRequest.CafeInfo.OperationInfo operationInfoDto : operationInfos) {
+            studycafe.addOperationInfo(
+                    OperationInfo.builder()
+                            .week(operationInfoDto.getWeek())
+                            .startTime(operationInfoDto.getStartTime())
+                            .endTime(operationInfoDto.getEndTime())
+                            .allDay(operationInfoDto.getAllDay())
+                            .closed(operationInfoDto.getClosed())
+                            .build()
+            );
+        }
+
+        // 룸 정보 등록
+        List<RegisterRequest.RoomInfo> roomInfos = registerRequest.getRoomInfos();
+        for (RegisterRequest.RoomInfo roomInfo : roomInfos) {
+            Room room = Room.builder()
+                    .name(roomInfo.getName())
+                    .studycafe(studycafe)   // 이부분 좀 애매
+                    .standardHeadCount(roomInfo.getStandardHeadCount())
+                    .minHeadCount(roomInfo.getMinHeadCount())
+                    .maxHeadCount(roomInfo.getMaxHeadCount())
+                    .minUsingTime(roomInfo.getMinUsingTime())
+                    .price(roomInfo.getPrice())
+                    .type(roomInfo.getType())
+                    .build();
+
+            // 룸 편의시설 정보 등록
+            List<ConvenienceName> roomConveniences = roomInfo.getConveniences();
+            for (ConvenienceName name : roomConveniences) {
+                room.addConvenience(
+                        Convenience.builder()
+                                .name(name)
+                                .price(0)
+                                .build()
+                );
+            }
+        }
+
+        // 카페 편의시설 정보 등록
+        List<ConvenienceName> cafeConveniences = cafeInfo.getConveniences();
+        for (ConvenienceName name : cafeConveniences) {
+            studycafe.addConvenience(
+                    Convenience.builder()
+                            .name(name)
+                            .studycafe(studycafe)
+                            .price(0)
+                            .build()
+            );
+        }
+
+        studycafeRepository.save(studycafe);    // 스터디카페 저장
+
+        return RegisterResponse.builder()
+                .cafeName(cafeInfo.getName())
+                .build();
+    }
+
+    private void validateRoomInfo(RegisterRequest registerRequest) {
         List<RegisterRequest.RoomInfo> roomInfos = registerRequest.getRoomInfos();
         for (RegisterRequest.RoomInfo roomInfo : roomInfos) {
             Integer standardHeadCount = roomInfo.getStandardHeadCount();
@@ -210,68 +296,5 @@ public class StudycafeService {
                 throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT);
             }
         }
-
-        RegisterRequest.CafeInfo cafeInfo = registerRequest.getCafeInfo();
-        String latitude = cafeInfo.getAddressInfo().getLatitude();
-        String longitude = cafeInfo.getAddressInfo().getLongitude();
-
-        PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
-
-        studycafeRepository.save(
-                Studycafe.builder()
-                        .name(cafeInfo.getName())
-                        .address(cafeInfo.getAddressInfo().getBasic())
-                        .photo(null)
-                        .phoneNumber(null)
-                        .operationInfos(
-                                cafeInfo.getOperationInfos().stream().map(oi -> OperationInfo.builder()
-                                                .week(oi.getWeek())
-                                                .startTime(oi.getStartTime())
-                                                .endTime(oi.getEndTime())
-                                                .allDay(oi.getAllDay())
-                                                .closed(oi.getClosed())
-                                                .build()
-                                ).toList()
-                        )
-                        .rooms(
-                                roomInfos.stream().map(ri -> Room.builder()
-                                        .name(ri.getName())
-                                        .standardHeadCount(ri.getStandardHeadCount())
-                                        .minHeadCount(ri.getMinHeadCount())
-                                        .maxHeadCount(ri.getMaxHeadCount())
-                                        .minUsingTime(ri.getMinUsingTime())
-                                        .price(ri.getPrice())
-                                        .type(ri.getType())
-                                        .convenienceLists(
-                                                ri.getConveniences().stream().map(c -> ConvenienceList.builder()
-                                                        .name(c)
-                                                        .price(0)
-                                                        .build()
-                                                ).toList()
-                                        ).build()
-                                ).toList()
-                        )
-                        .convenienceLists(cafeInfo.getConveniences().stream().map(
-                                c -> ConvenienceList.builder()
-                                        .name(c)
-                                        .price(0)
-                                        .build()
-                                ).toList()
-                        )
-                        .hashtagRecords(new ArrayList<>())
-                        .totalGrade(0.0)
-                        .createdAt(LocalDateTime.now())
-                        .accumReserveCount(0)
-                        .duration(placeResponse.getDuration())
-                        .nearestStation(placeResponse.getNearestStation())
-                        .notice(cafeInfo.getNotices())
-                        .introduction(cafeInfo.getIntroduction())
-                        .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RegisterRequest.CafeInfo.RefundPolicy::getRate).toList())
-                        .build()
-        );
-
-        return RegisterResponse.builder()
-                .cafeName(cafeInfo.getName())
-                .build();
     }
 }
