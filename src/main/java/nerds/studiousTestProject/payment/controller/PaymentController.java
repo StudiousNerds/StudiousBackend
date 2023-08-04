@@ -3,8 +3,8 @@ package nerds.studiousTestProject.payment.controller;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
-import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
+import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.response.PaymentResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.http.HttpHeaders;
@@ -37,7 +37,6 @@ public class PaymentController {
     public ConfirmFailResponse payConfirmFail(@RequestParam String code,
                                               @RequestParam String message,
                                               @RequestParam String orderId) {
-
         return paymentService.confirmFail(message, orderId);
     }
 
