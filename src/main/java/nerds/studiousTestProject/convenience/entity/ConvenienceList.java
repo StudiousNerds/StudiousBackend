@@ -24,4 +24,9 @@ public class ConvenienceList {
     @Enumerated(EnumType.STRING)
     private ConvenienceName name;
     private Integer price;
+    private Boolean isFree;
+
+    public boolean isFree(){
+        return this.isFree;
+    }
 }
