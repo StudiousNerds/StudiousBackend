@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.room.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,22 +13,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.member.entity.member.Member;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,14 +49,35 @@ public class Room {
     private PriceType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
     @OneToMany(mappedBy = "room")
-    private List<ReservationRecord> reservationRecords;
+    private List<ReservationRecord> reservationRecords = new ArrayList<>();
 
-    // 일대다 단방향 연관관계
-    @OneToMany
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<ConvenienceList> convenienceLists;
+    // 다대일 양방향 연관관계
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Convenience> conveniences = new ArrayList<>();
+
+    public void addConvenience(Convenience convenience) {
+        conveniences.add(convenience);
+        convenience.setRoom(this);
+    }
+
+    @Builder
+    public Room(Long id, Studycafe studycafe, String name, Integer standardHeadCount, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, PriceType type) {
+        this.id = id;
+        this.studycafe = studycafe;
+        this.name = name;
+        this.standardHeadCount = standardHeadCount;
+        this.minHeadCount = minHeadCount;
+        this.maxHeadCount = maxHeadCount;
+        this.price = price;
+        this.minUsingTime = minUsingTime;
+        this.type = type;
+    }
+
+    public void setStudycafe(Studycafe studycafe) {
+        this.studycafe = studycafe;
+    }
 }

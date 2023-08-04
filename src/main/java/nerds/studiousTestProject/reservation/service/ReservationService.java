@@ -32,6 +32,7 @@ public class ReservationService {
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
     public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId){
+        /*
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         LocalTime openTime = studycafe.getStartTime();
         LocalTime endTime = studycafe.getEndTime();
@@ -50,5 +51,8 @@ public class ReservationService {
             }
         }
         return reservationTimes;
+
+         */
+        return null;
     }
 }

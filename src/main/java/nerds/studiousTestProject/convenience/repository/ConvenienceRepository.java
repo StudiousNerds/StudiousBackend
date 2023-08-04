@@ -1,13 +1,9 @@
 package nerds.studiousTestProject.convenience.repository;
 
-import io.lettuce.core.dynamic.annotation.Param;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
-public interface ConvenienceRepository extends JpaRepository<ConvenienceList, Long> {
+public interface ConvenienceRepository extends JpaRepository<Convenience, Long> {
     /*
     @Query(value = "select c.name " +
             "from conveienceList c " +

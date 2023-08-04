@@ -7,13 +7,14 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
-import nerds.studiousTestProject.convenience.entity.QConvenienceList;
+import nerds.studiousTestProject.convenience.entity.QConvenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
-import nerds.studiousTestProject.studycafe.dto.QSearchResponse;
-import nerds.studiousTestProject.studycafe.dto.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.SearchResponse;
-import nerds.studiousTestProject.studycafe.dto.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.response.QSearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.entity.Week;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -27,6 +28,7 @@ import java.util.List;
 import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
+import static nerds.studiousTestProject.studycafe.entity.QOperationInfo.operationInfo;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -40,9 +42,10 @@ public class StudycafeDslRepository {
                 .select(studycafe.count())
                 .from(studycafe);
 
-        JPAQuery<Long> count = getJoinedCountQuery(countQuery, searchRequest)
+        // 페이징 처리를 위해선 개수를 직접 쿼리를 날려 확인해야 한다! (QueryDSL의 count는 믿을게 못됨)
+        JPAQuery<Long> count = getJoinedQuery(countQuery, searchRequest)
                 .where(
-                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
@@ -52,7 +55,7 @@ public class StudycafeDslRepository {
                 )
                 .groupBy(studycafe.id);
 
-        // 조회 결과가 없으면 빈 Page 리턴
+        // 조회 결과가 없으면(조회 결과 개수가 0인 경우) 굳이 쿼리를 날리지 않고 빈 Page 리턴
         if (count.fetchOne() == null) {
             return Page.empty();
         }
@@ -70,11 +73,10 @@ public class StudycafeDslRepository {
                 )
                 .from(studycafe);
 
-        List<SearchResponse> content = getJoinedContentQuery(contentQuery, searchRequest)
+        List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         headCountBetween(searchRequest.getHeadCount()),
                         dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
-                        openTime(searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
                         totalGradeGoe(searchRequest.getMinGrade()),
                         hashtagContains(searchRequest.getHashtags()),
@@ -89,49 +91,23 @@ public class StudycafeDslRepository {
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
-    public JPAQuery<SearchResponse> getJoinedContentQuery(JPAQuery<SearchResponse> query, SearchRequest searchRequest) {
+    public <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
         if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null) {
                 query = query
+                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.closed.isFalse()).on(operationInfo.week.eq(Week.of(searchRequest.getDate())))
                         .leftJoin(room.reservationRecords, reservationRecord);
             }
 
             if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
-                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
-                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
+                QConvenience cConveniences = new QConvenience("cConvenienceList");
+                QConvenience rConveniences = new QConvenience("rConvenienceList");
 
                 query = query
-                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
-                        .leftJoin(room.convenienceLists, rConvenienceList);
-            }
-        }
-
-        if (searchRequest.getHashtags() != null) {
-            query = query
-                    .leftJoin(studycafe.hashtagRecords, hashtagRecord);
-        }
-
-        return query;
-    }
-
-    public JPAQuery<Long> getJoinedCountQuery(JPAQuery<Long> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
-            query = query.leftJoin(studycafe.rooms, room);
-
-            if (searchRequest.getDate() != null) {
-                query = query
-                        .leftJoin(room.reservationRecords, reservationRecord);
-            }
-
-            if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
-                QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
-                QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
-
-                query = query
-                        .leftJoin(studycafe.convenienceLists, cConvenienceList)
-                        .leftJoin(room.convenienceLists, rConvenienceList);
+                        .leftJoin(studycafe.conveniences, cConveniences)
+                        .leftJoin(room.conveniences, rConveniences);
             }
         }
 
@@ -156,18 +132,26 @@ public class StudycafeDslRepository {
         return headCount != null ? room.maxHeadCount.goe(headCount) : null;
     }
 
-    private BooleanExpression openTime(LocalTime startTime, LocalTime endTime) {
-        BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
-        BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
-        return startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe;
+    private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        BooleanExpression startTimeLoe = cafeStartTimeLoe(date, startTime);
+        BooleanExpression endTimeGoe = cafeEndTimeGoe(date, endTime);
+        return operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe);
     }
 
-    private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
-        return startTime != null ? studycafe.startTime.loe(startTime) : null;
+    private BooleanExpression cafeStartTimeLoe(LocalDate date, LocalTime startTime) {
+        if (startTime == null) {
+            return null;
+        }
+
+        return operationInfo.startTime.loe(startTime);
     }
 
-    private BooleanExpression cafeEndTimeGoe(LocalTime endTime) {
-        return endTime != null ? studycafe.endTime.goe(endTime) : null;
+    private BooleanExpression cafeEndTimeGoe(LocalDate date, LocalTime endTime) {
+        if (endTime == null) {
+            return null;
+        }
+
+        return operationInfo.endTime.goe(endTime);
     }
 
     private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
@@ -196,7 +180,7 @@ public class StudycafeDslRepository {
             startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
         }
 
-        return reservationRecord.startTime.loe(startTime);
+        return reservationRecord.startTime.goe(startTime);
     }
 
     private BooleanExpression endTimeGoe(LocalTime endTime) {
@@ -204,7 +188,7 @@ public class StudycafeDslRepository {
             endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
         }
 
-        return reservationRecord.endTime.goe(endTime);
+        return reservationRecord.endTime.loe(endTime);
     }
 
     private BooleanExpression keywordContains(String keyword) {
@@ -225,10 +209,10 @@ public class StudycafeDslRepository {
         }
 
         // Room과 Studycafe의 Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
-        QConvenienceList cConvenienceList = new QConvenienceList("cConvenienceList");
-        QConvenienceList rConvenienceList = new QConvenienceList("rConvenienceList");
+        QConvenience cConveniences = new QConvenience("cConvenienceList");
+        QConvenience rConveniences = new QConvenience("rConvenienceList");
 
-        return cConvenienceList.name.in(conveniences).and(rConvenienceList.name.in(conveniences));
+        return cConveniences.name.in(conveniences).and(rConveniences.name.in(conveniences));
     }
 
     private OrderSpecifier[] createOrderSpecifier(SortType sortType) {

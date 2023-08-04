@@ -45,7 +45,7 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<ExceptionResponse> webClientExceptionHandler(WebClientResponseException e) {
         String code = ErrorCode.WEB_CLIENT_ERROR.name();
         String message = ErrorCode.WEB_CLIENT_ERROR.getMessage();
-        log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, e.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExceptionResponse.from(message, code));
