@@ -2,23 +2,31 @@ package nerds.studiousTestProject.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.request.ReservationInfo;
-import nerds.studiousTestProject.payment.dto.request.ReserveUser;
+import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.request.ReservationInfo;
+import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
+import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
-import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
 @Service
@@ -28,11 +36,13 @@ public class ReservationRecordService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
     private final MemberService memberService;
+    private final StudycafeRepository studycafeRepository;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
-        saveReservationRecord(memberService.getMemberFromAccessToken(accessToken),
+        saveReservationRecord(
+                memberService.getMemberFromAccessToken(accessToken),
                 findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
@@ -84,4 +94,39 @@ public class ReservationRecordService {
                 .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
     }
 
+    public Studycafe findStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    }
+
+    public ReserveResponse reserve(Long cafeId, Long roomId, String accessToken) {
+        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Room room = findRoomById(roomId);
+        Studycafe studycafe = findStudycafeById(cafeId);
+        List<ConvenienceList> convenienceLists = room.getConvenienceLists();
+        List<String> convenienceList = new ArrayList<>();
+        List<PaidConvenience> paidConvenienceList = new ArrayList<>();
+        for (ConvenienceList convenience : convenienceLists) {
+            convenienceList.add(convenience.getName().name());
+            if(!convenience.isFree()) {
+                paidConvenienceList.add(PaidConvenience.builder()
+                        .convenienceName(convenience.getName().name())
+                        .price(convenience.getPrice())
+                        .build()
+                );
+            }
+        }
+        List<RefundPolicyInResponse> refundPolicyInResponses = new ArrayList<>();
+        studycafe.getRefundPolicyList().stream().forEach(refundPolicy -> refundPolicyInResponses.add(RefundPolicyInResponse.of(refundPolicy)));
+        return ReserveResponse.builder()
+                .conveniences(convenienceList)
+                .paidConveniences(paidConvenienceList)
+                .cafeName(studycafe.getName())
+                .roomName(room.getName())
+                .studycafePhoto(studycafe.getPhoto())
+                .username(member.getName())
+                .userPhoneNumber(member.getPhoneNumber())
+                .refundPolicy(refundPolicyInResponses)
+                .build();
+    }
 }
