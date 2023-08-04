@@ -63,6 +63,7 @@ public class RoomService {
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
+        /*
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         int start = studycafe.getStartTime().getHour();
@@ -80,6 +81,9 @@ public class RoomService {
         }
 
         return timeList;
+
+         */
+        return null;
     }
 
     public Map<String, Integer[]> getCanReserveDatetime(LocalDate date,Long studycafeId, Long roomId){

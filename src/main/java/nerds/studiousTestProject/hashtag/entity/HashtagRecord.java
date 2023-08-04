@@ -4,6 +4,7 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,14 +25,23 @@ public class HashtagRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "studycafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
     private Integer count;
 
     @Enumerated(EnumType.STRING)
     private HashtagName name;
+
+    /**
+     * 연관관계 편의 메소드
+     * 스터디카페(1)를 저장할 때 HashtagRecord(N)의 연관관계가 만들어지도록 하기 위한 메소드
+     * @param studycafe
+     */
+    public void setStudycafe(Studycafe studycafe) {
+        this.studycafe = studycafe;
+    }
 
     @Builder
     public HashtagRecord(Long id, Studycafe studycafe, Integer count, HashtagName name) {

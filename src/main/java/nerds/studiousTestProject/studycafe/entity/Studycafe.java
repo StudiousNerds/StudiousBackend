@@ -14,25 +14,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.convenience.entity.ConvenienceList;
+import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.room.entity.Room;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Studycafe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,15 +46,8 @@ public class Studycafe {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<OperationInfo> operationInfos = new ArrayList<>();
-
-    @Column(name = "start_time")
-    private LocalTime startTime;    // 추후 삭제 예정
-
-    @Column(name = "end_time")
-    private LocalTime endTime;      // 추후 삭제 예정
 
     private Integer duration;
 
@@ -75,23 +65,60 @@ public class Studycafe {
     @Nullable
     private String notificationInfo;
 
-    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL) // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
-    private List<Room> rooms;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<Room> rooms = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<HashtagRecord> hashtagRecords;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<HashtagRecord> hashtagRecords = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<ConvenienceList> convenienceLists;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<Convenience> conveniences = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
     private List<String> notice = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
     @Column(name = "refund_policy_info")
     private List<Integer> refundPolicyInfo = new ArrayList<>();
+
+    public void addOperationInfo(OperationInfo operationInfo) {
+        operationInfos.add(operationInfo);
+        operationInfo.setStudycafe(this);
+    }
+
+    public void addRoom(Room room) {
+        rooms.add(room);
+        room.setStudycafe(this);
+    }
+
+    public void addConvenience(Convenience convenience) {
+        conveniences.add(convenience);
+        convenience.setStudycafe(this);
+    }
+
+    public void addHashtagRecords(HashtagRecord hashtagRecord) {
+        hashtagRecords.add(hashtagRecord);
+        hashtagRecord.setStudycafe(this);
+    }
+
+    // 리스트 필드의 경우 생성자 파라미터에 추가하지 않는다. (NPE 발생 가능성)
+    // 이들은 추후, addXXX 메소드를 통해서 값을 추가한다.
+    @Builder
+    public Studycafe(Long id, Member member, String name, String address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade, @Nullable String notificationInfo, List<String> notice, List<Integer> refundPolicyInfo) {
+        this.id = id;
+        this.member = member;
+        this.name = name;
+        this.address = address;
+        this.photo = photo;
+        this.phoneNumber = phoneNumber;
+        this.duration = duration;
+        this.nearestStation = nearestStation;
+        this.accumReserveCount = accumReserveCount;
+        this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.totalGrade = totalGrade;
+        this.notificationInfo = notificationInfo;
+        this.notice = notice;
+        this.refundPolicyInfo = refundPolicyInfo;
+    }
 }

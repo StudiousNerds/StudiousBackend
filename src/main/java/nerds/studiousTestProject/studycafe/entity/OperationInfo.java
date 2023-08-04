@@ -1,21 +1,31 @@
 package nerds.studiousTestProject.studycafe.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-@Embeddable // 임베디드 활용
+@Entity
 @Getter
-@NoArgsConstructor  // 기본 생성자는 임베디드를 쓰기 위해선 필수
+@NoArgsConstructor
 public class OperationInfo {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @Enumerated(EnumType.STRING)
     private Week week;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Studycafe studycafe;
 
     private LocalTime startTime;
     private LocalTime endTime;
@@ -29,5 +39,9 @@ public class OperationInfo {
         this.endTime = endTime;
         this.allDay = allDay;
         this.closed = closed;
+    }
+
+    public void setStudycafe(Studycafe studycafe) {
+        this.studycafe = studycafe;
     }
 }
