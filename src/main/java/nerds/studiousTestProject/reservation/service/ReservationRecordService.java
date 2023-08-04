@@ -20,8 +20,6 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
@@ -103,30 +101,7 @@ public class ReservationRecordService {
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
-        List<ConvenienceList> convenienceLists = room.getConvenienceLists();
-        List<String> convenienceList = new ArrayList<>();
-        List<PaidConvenience> paidConvenienceList = new ArrayList<>();
-        for (ConvenienceList convenience : convenienceLists) {
-            convenienceList.add(convenience.getName().name());
-            if(!convenience.isFree()) {
-                paidConvenienceList.add(PaidConvenience.builder()
-                        .convenienceName(convenience.getName().name())
-                        .price(convenience.getPrice())
-                        .build()
-                );
-            }
-        }
-        List<RefundPolicyInResponse> refundPolicyInResponses = new ArrayList<>();
-        studycafe.getRefundPolicyList().stream().forEach(refundPolicy -> refundPolicyInResponses.add(RefundPolicyInResponse.of(refundPolicy)));
-        return ReserveResponse.builder()
-                .conveniences(convenienceList)
-                .paidConveniences(paidConvenienceList)
-                .cafeName(studycafe.getName())
-                .roomName(room.getName())
-                .studycafePhoto(studycafe.getPhoto())
-                .username(member.getName())
-                .userPhoneNumber(member.getPhoneNumber())
-                .refundPolicy(refundPolicyInResponses)
-                .build();
+        return ReserveResponse.of(member, room, studycafe);
     }
+
 }
