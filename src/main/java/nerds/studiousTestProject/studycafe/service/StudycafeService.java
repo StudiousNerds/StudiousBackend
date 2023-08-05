@@ -10,6 +10,8 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
@@ -30,6 +32,7 @@ import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
@@ -104,7 +107,7 @@ public class StudycafeService {
                 .conveniences(convenienceService.getAllCafeConveniences(id))
                 .notification(studycafe.getNotificationInfo())
                 .refundPolicy(studycafe.getRefundPolicyInfo())
-                .notice(getNotice(id))
+                .notice(getNotices(id))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), id))
                 .recommendationRate(reviewService.getAvgRecommendation(id))
                 .cleanliness(reviewService.getAvgCleanliness(id))
@@ -177,7 +180,7 @@ public class StudycafeService {
     public String[] getNotice(Long id){
         Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        List<String> noticeList = studycafe.getNotice();
+        List<String> noticeList = studycafe.getNotices().stream().map(Notice::getDetail).toList();
         Integer arrSize = noticeList.size();
         String notices[] = noticeList.toArray(new String[arrSize]);
 
@@ -214,10 +217,32 @@ public class StudycafeService {
                 .accumReserveCount(0)
                 .duration(placeResponse.getDuration())
                 .nearestStation(placeResponse.getNearestStation())
-                .notice(cafeInfo.getNotices())
                 .introduction(cafeInfo.getIntroduction())
-                .refundPolicyInfo(cafeInfo.getRefundPolicies().stream().map(RefundPolicyRequest::getRate).toList())
                 .build();
+
+        // 유의 사항 등록
+        List<String> details = cafeInfo.getNotices();
+        for (String detail : details) {
+            studycafe.addNotice(
+                    Notice.builder()
+                            .detail(detail)
+                            .studycafe(studycafe)
+                            .build()
+            );
+        }
+
+        // 환불 정책 등록
+        List<RefundPolicyRequest> refundPolicies = cafeInfo.getRefundPolicies();
+        for (RefundPolicyRequest refundPolicyRequest : refundPolicies) {
+            studycafe.addRefundPolicy(
+                    RefundPolicy.builder()
+                            .studycafe(studycafe)
+                            .refundDay(RefundDay.of(refundPolicyRequest.getDay()))
+                            .rate(refundPolicyRequest.getRate())
+                            .type("??")
+                            .build()
+            );
+        }
 
         // 운영 시간 정보 등록
         List<OperationInfoRequest> operationInfoRequests = cafeInfo.getOperationInfos();

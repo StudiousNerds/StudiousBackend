@@ -11,6 +11,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
@@ -25,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,6 +57,8 @@ class StudycafeDslRepositoryTest {
         studycafe1.addRoom(room1);
         studycafe1.addRoom(room2);
         studycafe1.addRoom(room3);
+        Notice notice1 = notices();
+        studycafe1.addNotice(notice1);
 
         ReservationRecord reservationRecord1 = reservationRecord_13_15(room1);
         ReservationRecord reservationRecord2 = reservationRecord_13_15(room2);
@@ -73,6 +75,8 @@ class StudycafeDslRepositoryTest {
         studycafe2.addRoom(room4);
         studycafe2.addRoom(room5);
         studycafe2.addRoom(room6);
+        Notice notice2 = notices();
+        studycafe2.addNotice(notice2);
 
         ReservationRecord reservationRecord4 = reservationRecord_09_11(room4);
         ReservationRecord reservationRecord5 = reservationRecord_09_11(room5);
@@ -90,6 +94,8 @@ class StudycafeDslRepositoryTest {
         studycafe3.addRoom(room7);
         studycafe3.addRoom(room8);
         studycafe3.addRoom(room9);
+        Notice notice3 = notices();
+        studycafe3.addNotice(notice3);
 
         Studycafe studycafe4 = studycafe4();    // 예약 내역 X
         Room room10 = room2();
@@ -98,6 +104,8 @@ class StudycafeDslRepositoryTest {
         studycafe4.addRoom(room10);
         studycafe4.addRoom(room11);
         studycafe4.addRoom(room12);
+        Notice notice4 = notices();
+        studycafe4.addNotice(notice4);
 
         em.persist(studycafe1);
         em.persist(studycafe2);
@@ -129,6 +137,10 @@ class StudycafeDslRepositoryTest {
         em.persist(park);
         em.persist(beam);
         em.persist(elevator);
+        em.persist(notice1);
+        em.persist(notice2);
+        em.persist(notice3);
+        em.persist(notice4);
 
         em.flush();
         em.clear();
@@ -298,7 +310,6 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice(Collections.singletonList("유의 사항"))
                 .build();
 
         List<OperationInfo> operationInfos = operationInfos();
@@ -307,7 +318,7 @@ class StudycafeDslRepositoryTest {
         }
 
         for (HashtagRecord hashtagRecord : hashtagRecords) {
-            studycafe.addHashtagRecords(hashtagRecord);
+            studycafe.addHashtagRecord(hashtagRecord);
         }
 
         for (Convenience convenience : conveniences) {
@@ -327,7 +338,6 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice(Collections.singletonList("유의 사항"))
                 .build();
 
         List<OperationInfo> operationInfos = operationInfos();
@@ -336,7 +346,7 @@ class StudycafeDslRepositoryTest {
         }
 
         for (HashtagRecord hashtagRecord : hashtagRecords) {
-            studycafe.addHashtagRecords(hashtagRecord);
+            studycafe.addHashtagRecord(hashtagRecord);
         }
 
         return studycafe;
@@ -352,7 +362,6 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice(Collections.singletonList("유의 사항"))
                 .build();
 
         for (Convenience convenience : conveniences) {
@@ -372,7 +381,6 @@ class StudycafeDslRepositoryTest {
                 .nearestStation(null)
                 .introduction("소개글")
                 .notificationInfo("공지 사항")
-                .notice(Collections.singletonList("유의 사항"))
                 .build();
 
         List<OperationInfo> operationInfos = operationInfos();
@@ -491,6 +499,12 @@ class StudycafeDslRepositoryTest {
                 .duration(2)
                 .headCount(5)
                 .status(ReservationStatus.CONFIRMED)
+                .build();
+    }
+
+    private Notice notices() {
+        return Notice.builder()
+                .detail("유의 사항")
                 .build();
     }
 
