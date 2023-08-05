@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class ConvenienceService {
     private final ConvenienceRepository convenienceRepository;
 

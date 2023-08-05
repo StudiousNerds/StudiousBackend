@@ -28,14 +28,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
     private final SubPhotoService subPhotoService;
-    private final ConvenienceService convenienceService;
     private final ReservationService reservationService;
     private final StudycafeRepository studycafeRepository;
     private final OperationInfoRepository operationInfoRepository;
