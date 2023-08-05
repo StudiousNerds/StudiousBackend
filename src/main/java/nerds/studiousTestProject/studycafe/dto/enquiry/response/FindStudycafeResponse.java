@@ -1,15 +1,15 @@
-package nerds.studiousTestProject.studycafe.dto;
+package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
-import nerds.studiousTestProject.review.dto.FindReviewResponse;
+import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 
 import java.util.List;
 
-@Data
 @Builder
+@Data
 public class FindStudycafeResponse {
     private Long cafeId;
     private String cafeName;
