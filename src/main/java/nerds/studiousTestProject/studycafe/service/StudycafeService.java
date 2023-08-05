@@ -8,10 +8,13 @@ import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
+import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
@@ -46,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT;
@@ -61,8 +65,6 @@ public class StudycafeService {
     private final ReviewService reviewService;
     private final RoomService roomService;
     private final SubPhotoService subPhotoService;
-    private final HashtagService hashtagService;
-    private final ConvenienceService convenienceService;
     private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
@@ -94,7 +96,6 @@ public class StudycafeService {
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
         Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        /*
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
@@ -102,12 +103,12 @@ public class StudycafeService {
                 .accumResCnt(studycafe.getAccumReserveCount())
                 .duration(studycafe.getDuration())
                 .nearestStation(studycafe.getNearestStation())
-                .hashtags(hashtagService.findHashtags(id))
+                .hashtags(getHashtags(id))
                 .introduction(studycafe.getIntroduction())
-                .conveniences(convenienceService.getAllCafeConveniences(id))
+                .conveniences(getConveniences(id))
                 .notification(studycafe.getNotificationInfo())
-                .refundPolicy(studycafe.getRefundPolicyInfo())
-                .notice(getNotices(id))
+                .refundPolicy(getRefundPolicy(id))
+                .notice(getNotice(id))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), id))
                 .recommendationRate(reviewService.getAvgRecommendation(id))
                 .cleanliness(reviewService.getAvgCleanliness(id))
@@ -116,9 +117,6 @@ public class StudycafeService {
                 .total(studycafe.getTotalGrade())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
-
-         */
-        return null;
     }
 
     public MainPageResponse getMainPage() {
@@ -141,7 +139,7 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .hashtags(getHashtags(studycafe.getId()))
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -162,22 +160,22 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .hashtags(getHashtags(studycafe.getId()))
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
         return eventStudycafeList;
     }
 
-    public Studycafe getStudyCafe(Long studycafeId){
+    public Studycafe getStudyCafe(Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public Studycafe getStudyCafeByName(String cafeName){
+    public Studycafe getStudyCafeByName(String cafeName) {
         return studycafeRepository.findByName(cafeName).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public String[] getNotice(Long id){
+    public String[] getNotice(Long id) {
         Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         List<String> noticeList = studycafe.getNotices().stream().map(Notice::getDetail).toList();
@@ -185,6 +183,34 @@ public class StudycafeService {
         String notices[] = noticeList.toArray(new String[arrSize]);
 
         return notices;
+    }
+
+    public String[] getConveniences(Long studycafeId) {
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        List<ConvenienceName> convenienceList = studycafe.getConveniences().stream().map(Convenience::getName).toList();
+        Integer arrSize = convenienceList.size();
+        String conveniences[] = convenienceList.toArray(new String[arrSize]);
+
+        return conveniences;
+    }
+
+    public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        return studycafe.getRefundPolicies().stream()
+                .map(RefundPolicyInResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    public String[] getHashtags(Long studycafeId) {
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        List<HashtagName> hashtagList = studycafe.getHashtagRecords().stream().map(HashtagRecord::getName).toList();
+        Integer arrSize = hashtagList.size();
+        String hashtags[] = hashtagList.toArray(new String[arrSize]);
+
+        return hashtags;
     }
 
     public ValidResponse validateAccountInfo(AccountInfoRequest accountInfoRequest) {
