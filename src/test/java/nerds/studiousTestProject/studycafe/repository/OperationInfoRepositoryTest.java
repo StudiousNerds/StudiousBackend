@@ -30,4 +30,15 @@ class OperationInfoRepositoryTest {
         // then
         Assertions.assertThat(startTime.getHour()).isEqualTo(8);
     }
+
+    @Test
+    void findEndTime() {
+        // given
+        OperationInfo operation = OperationInfo.builder().endTime(LocalTime.of(21,0,0)).week(Week.SATURDAY).build();
+        operationInfoRepository.save(operation);
+        // when
+        LocalTime endTime = operationInfoRepository.findEndTime(Week.of(LocalDate.now()));
+        // then
+        Assertions.assertThat(endTime.getHour()).isEqualTo(21);
+    }
 }
