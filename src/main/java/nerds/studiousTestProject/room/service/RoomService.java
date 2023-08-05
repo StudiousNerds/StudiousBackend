@@ -3,13 +3,18 @@ package nerds.studiousTestProject.room.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationService;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.entity.Week;
+import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +38,10 @@ public class RoomService {
     private final ConvenienceService convenienceService;
     private final ReservationService reservationService;
     private final StudycafeRepository studycafeRepository;
+    private final OperationInfoRepository operationInfoRepository;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId){
-        /*
+
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
         List<FindRoomResponse> rooms = new ArrayList<>();
 
@@ -46,28 +52,25 @@ public class RoomService {
                     .standCount(room.getStandardHeadCount())
                     .minCount(room.getMinHeadCount())
                     .maxCount(room.getMaxHeadCount())
-                    .price(room.getPrice()) // 타입 추가해야함
+                    .price(room.getPrice())
+                    .type(room.getType().toString())
                     .minUsingTime(room.getMinUsingTime())
                     .photos(subPhotoService.findRoomPhotos(room.getId()))
                     .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
-                    .conveniences(convenienceService.getAllRoomConveniences(studycafeId, room.getId()))
+                    .conveniences(getConveniences(room.getId()))
+                    .paidConveniences(getPaidConveniences(room.getId()))
                     .build());
-
-
-
         }
 
         return rooms;
-         */
-        return null;
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
-        /*
+
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        int start = studycafe.getStartTime().getHour();
-        int end = studycafe.getEndTime().getHour();
+        int start = operationInfoRepository.findStartTime(Week.of(date)).getHour();
+        int end = operationInfoRepository.findEndTime(Week.of(date)).getHour();
         int size = end - start;
         Integer timeList[] = new Integer[size+1];
 
@@ -81,9 +84,6 @@ public class RoomService {
         }
 
         return timeList;
-
-         */
-        return null;
     }
 
     public Map<String, Integer[]> getCanReserveDatetime(LocalDate date,Long studycafeId, Long roomId){
@@ -99,6 +99,30 @@ public class RoomService {
         }
 
         return reservationList;
+    }
+
+    public String[] getConveniences(Long roomId) {
+        Room room = findRoomById(roomId);
+
+        List<ConvenienceName> convenienceList = room.getConveniences().stream().map(Convenience::getName).toList();
+        Integer arrSize = convenienceList.size();
+        String conveniences[] = convenienceList.toArray(new String[arrSize]);
+
+        return conveniences;
+    }
+
+    public List<PaidConvenience> getPaidConveniences(Long roomId) {
+        Room room = findRoomById(roomId);
+        List<PaidConvenience> paidConvenienceList = new ArrayList<>();
+
+        List<Convenience> conveniences = room.getConveniences();
+        for (Convenience convenience : conveniences) {
+            if(!convenience.isFree()) {
+                paidConvenienceList.add(PaidConvenience.from(convenience));
+            }
+        }
+
+        return paidConvenienceList;
     }
 
     public Room findRoomById(Long roomId){
