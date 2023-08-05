@@ -7,10 +7,8 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
-import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
-import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -18,11 +16,11 @@ import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyIn
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
-import nerds.studiousTestProject.studycafe.dto.EventCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
-import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
-import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
@@ -56,10 +54,10 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWE
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class StudycafeService {
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
