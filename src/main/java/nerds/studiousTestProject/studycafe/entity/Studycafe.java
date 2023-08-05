@@ -108,6 +108,10 @@ public class Studycafe {
         refundPolicy.setStudycafe(this);
     }
 
+    public void addTotalGrade(Double totalGrade) {
+        this.totalGrade = totalGrade;
+    }
+
     @Builder
     public Studycafe(Long id, Member member, String name, String address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade, @Nullable String notificationInfo) {
         this.id = id;
