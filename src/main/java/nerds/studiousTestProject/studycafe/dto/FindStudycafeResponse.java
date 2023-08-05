@@ -2,6 +2,7 @@ package nerds.studiousTestProject.studycafe.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import nerds.studiousTestProject.reservation.dto.reserve.response.RefundPolicyInResponse;
 import nerds.studiousTestProject.review.dto.FindReviewResponse;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 
@@ -20,7 +21,7 @@ public class FindStudycafeResponse {
     private String introduction;
     private String[] conveniences;
     private String notification;
-    private List<Integer> refundPolicy;
+    private List<RefundPolicyInResponse> refundPolicy;
     private String[] notice;
     private List<FindRoomResponse> rooms;
     private Integer recommendationRate;
