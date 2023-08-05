@@ -79,7 +79,7 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgDeafening(Long id){
+    public Integer getAvgDeafening(Long id) {
         List<Review> reviewList = getReviewList(id);
         Integer count = 0, sum = 0;
 
@@ -91,7 +91,7 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgFixturesStatus(Long id){
+    public Integer getAvgFixturesStatus(Long id) {
         List<Review> reviewList = getReviewList(id);
         Integer count = 0, sum = 0;
 
@@ -103,7 +103,7 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgRecommendation(Long id){
+    public Integer getAvgRecommendation(Long id) {
         List<Review> reviewList = getReviewList(id);
         Integer recommend = 0, count = 0;
 
@@ -117,7 +117,7 @@ public class ReviewService {
         return recommend / count * 100;
     }
 
-    public Double getAvgGrade(Long id){
+    public Double getAvgGrade(Long id) {
         List<Review> reviewList = getReviewList(id);
         Integer count = 0;
         Double sum = 0.0;
