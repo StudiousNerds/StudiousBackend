@@ -12,9 +12,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +43,10 @@ public class Grade {
         this.deafening = deafening;
         this.fixturesStatus = fixturesStatus;
         this.isRecommended = isRecommended;
+        this.total = total;
+    }
+
+    public void addTotal(Double total) {
         this.total = total;
     }
 }
