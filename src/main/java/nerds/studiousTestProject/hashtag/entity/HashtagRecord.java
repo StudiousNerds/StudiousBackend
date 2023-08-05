@@ -50,4 +50,8 @@ public class HashtagRecord {
         this.count = count;
         this.name = name;
     }
+
+    public void addCount(Integer count) {
+        this.count += count;
+    }
 }
