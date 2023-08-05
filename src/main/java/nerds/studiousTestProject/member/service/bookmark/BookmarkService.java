@@ -3,7 +3,6 @@ package nerds.studiousTestProject.member.service.bookmark;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.member.dto.bookmark.BookmarkReuqest;
@@ -31,7 +30,6 @@ public class BookmarkService {
     private final MemberRepository memberRepository;
     private final StudycafeService studycafeService;
     private final SubPhotoService subPhotoService;
-    private final HashtagService hashtagService;
 
     @Transactional
     public ResponseEntity<?> registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
@@ -79,7 +77,7 @@ public class BookmarkService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .hashtags(studycafeService.getHashtags(studycafe.getId()))
                     .build();
             bookmarkCafeList.add(bookmarkCafe);
         }
