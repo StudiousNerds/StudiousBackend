@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.hashtag.repository.HashtagRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -39,6 +40,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SubPhotoService subPhotoService;
     private final StudycafeRepository studycafeRepository;
+    private final HashtagRepository hashtagRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordRepository reservationRecordRepository;
 
@@ -109,26 +111,36 @@ public class ReviewService {
         studycafe.addTotalGrade(avgGrade);
 
         /**
-         * 해시태그를 기존의 해시태그에 있는 개수를 1개씩 뺀다음에, 다시 받아온 해시태그의 개수를 증가시키고 없었던 경우에는 새롭게 추가
+         * 기존의 해시태그와 수정된 해시태그를 비교합니다.
+         * 1. 수정된 해시태그가 기존의 해시태그를 포함하고 있지 않다면(즉, 삭제된 해시태그), 해당 해시태그의 count값을 낮춥니다.
+         * 2. 기존의 해시태그가 수정된 해시태그를 포함하고 있지 않다면(즉, 새롭게 추가된 해시태그)
+         * 2-1) 이전에 나온적은 있는 해시태그라면, count값을 증가시킵니다.
+         * 2-1) 그 중에서도 이전에 나오지 못한 해시태그라면, 새롭게 추가해줍니다.
          */
         List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
-        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
-        for (HashtagRecord hashtag : hashtagRecords) {
-            hashtag.subtractCount(1);
-        }
+        List<String> exHashtags = Arrays.stream(modifyReviewRequest.getExHashtags()).toList();
+        List<String> afterHashtags = Arrays.stream(modifyReviewRequest.getAfterHashtags()).toList();
 
-        // 이 부분 depth가 맘에 좀 걸려서 혹시 좋은 방법 있으시면 조언 부탁드립니다..ㅜㅜㅜㅜ
-        for (String userHashtag : hashtags) {
-            for(HashtagRecord hashtagRecord : hashtagRecords) {
-                if (hashtagRecord.getName().toString() == userHashtag) {
-                    hashtagRecord.addCount(1);
+        // 위의 과정을 담아냈는데 좀 depth가 깊은 것 같아서 다들 혹시 좋은 방법이 있다면 추천 부탁드립니다ㅠㅠ
+        for (int i = 0; i < afterHashtags.size(); i++) {
+            if(!afterHashtags.contains(exHashtags.get(i))) {
+                HashtagRecord record = hashtagRepository
+                        .findByStudycafeIdAndName(studycafe.getId(), HashtagName.valueOf(exHashtags.get(i)));
+                record.subtractCount(1);
+            }
+            if(!exHashtags.contains(afterHashtags.get(i))) {
+                if(hashtagRecords.contains(afterHashtags.get(i))) {
+                    HashtagRecord savedRecord = hashtagRepository
+                            .findByStudycafeIdAndName(studycafe.getId(), HashtagName.valueOf(afterHashtags.get(i)));
+                    savedRecord.addCount(1);
                 } else {
                     HashtagRecord hashtag = HashtagRecord.builder()
-                            .name(HashtagName.valueOf(userHashtag))
+                            .name(HashtagName.valueOf(afterHashtags.get(i)))
                             .build();
-                    hashtagRecord.addCount(1);
-                    studycafe.addHashtagRecord(hashtagRecord);
+                    hashtag.addCount(1);
+                    studycafe.addHashtagRecord(hashtag);
                 }
+
             }
         }
 
