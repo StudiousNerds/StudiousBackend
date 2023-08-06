@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
 
 import java.time.LocalDate;
 
@@ -50,5 +51,9 @@ public class Review {
         this.createdDate = createdDate;
         this.detail = detail;
         this.comment = comment;
+    }
+
+    public void updateDetail(String detail) {
+        this.detail = detail;
     }
 }
