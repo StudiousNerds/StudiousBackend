@@ -17,7 +17,9 @@ public class ModifyReviewRequest {
     @NotBlank(message = "추천 여부는 필수입니다.")
     private Boolean isRecommend;
     @NotBlank(message = "해시태그는 필수입니다.")
-    private String[] hashtags;
+    private String[] exHashtags;
+    @NotBlank(message = "해시태그는 필수입니다.")
+    private String[] afterHashtags;
     private String[] photos;
     @NotBlank(message = "리뷰는 필수입니다.")
     private String detail;
