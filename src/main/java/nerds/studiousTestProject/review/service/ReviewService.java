@@ -2,7 +2,6 @@ package nerds.studiousTestProject.review.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
@@ -114,8 +113,8 @@ public class ReviewService {
          */
         List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
         List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
-        for (HashtagRecord hastag : hashtagRecords) {
-            hastag.subtractCount(1);
+        for (HashtagRecord hashtag : hashtagRecords) {
+            hashtag.subtractCount(1);
         }
 
         // 이 부분 depth가 맘에 좀 걸려서 혹시 좋은 방법 있으시면 조언 부탁드립니다..ㅜㅜㅜㅜ
