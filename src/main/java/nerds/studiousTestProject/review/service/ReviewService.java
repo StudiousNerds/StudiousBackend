@@ -10,8 +10,10 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.review.dto.request.DeleteReviewRequest;
 import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
+import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
@@ -107,6 +109,7 @@ public class ReviewService {
                 modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
+        // 리뷰가 수정되면서 grade가 바뀌면서 총점이 변경되는 경우가 있을 수 있으니, 스터디카페의 totalGrade 값 업데이트
         Double avgGrade = getAvgGrade(studycafe.getId());
         studycafe.addTotalGrade(avgGrade);
 
@@ -157,6 +160,27 @@ public class ReviewService {
         review.updateDetail(modifyReviewRequest.getDetail());
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
+    }
+
+    public DeleteReviewResponse deleteReview(Long reviewId, DeleteReviewRequest deleteReviewRequest) {
+        Studycafe studycafe = studycafeRepository.findById(deleteReviewRequest.getStudycafeId())
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        reviewRepository.deleteById(reviewId);
+        subPhotoService.removePhoto(reviewId);
+
+        List<String> userHashtags = Arrays.stream(deleteReviewRequest.getHashtags()).toList();
+        for (int i = 0; i < userHashtags.size(); i++) {
+            HashtagRecord hashtagRecord = hashtagRepository.findByStudycafeIdAndName(deleteReviewRequest.getStudycafeId(),
+                    HashtagName.valueOf(userHashtags.get(i)));
+            hashtagRecord.subtractCount(1);
+        }
+
+        // 리뷰가 삭제되면서 등급도 사라졌기 때문에 새롭게 스터디카페의 totalGrade값을 업데이트 해줌
+        Double avgGrade = getAvgGrade(studycafe.getId());
+        studycafe.addTotalGrade(avgGrade);
+
+        return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
 
