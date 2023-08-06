@@ -10,8 +10,10 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
+import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
@@ -27,6 +29,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -58,7 +62,7 @@ public class ReviewService {
                 .fixturesStatus(registerReviewRequest.getFixtureStatus())
                 .isRecommended(registerReviewRequest.getIsRecommend())
                 .build();
-        grade.addTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+        grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
                 .grade(grade)
@@ -75,7 +79,7 @@ public class ReviewService {
 
         List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
         Studycafe studycafe = studycafeRepository.findById(registerReviewRequest.getCafeId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STUDYCAFE));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         for (String hashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
                     .name(HashtagName.valueOf(hashtag))
@@ -89,6 +93,61 @@ public class ReviewService {
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
+
+    public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
+        Studycafe studycafe = studycafeRepository.findById(modifyReviewRequest.getCafeId())
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Grade grade = review.getGrade();
+
+        grade.updateGrade(modifyReviewRequest.getCleanliness(),
+                modifyReviewRequest.getDeafening(),
+                modifyReviewRequest.getFixtureStatus(),
+                modifyReviewRequest.getIsRecommend(),
+                getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+
+        Double avgGrade = getAvgGrade(studycafe.getId());
+        studycafe.addTotalGrade(avgGrade);
+
+        /**
+         * 해시태그를 기존의 해시태그에 있는 개수를 1개씩 뺀다음에, 다시 받아온 해시태그의 개수를 증가시키고 없었던 경우에는 새롭게 추가
+         */
+        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
+        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
+        for (HashtagRecord hastag : hashtagRecords) {
+            hastag.subtractCount(1);
+        }
+
+        // 이 부분 depth가 맘에 좀 걸려서 혹시 좋은 방법 있으시면 조언 부탁드립니다..ㅜㅜㅜㅜ
+        for (String userHashtag : hashtags) {
+            for(HashtagRecord hashtagRecord : hashtagRecords) {
+                if (hashtagRecord.getName().toString() == userHashtag) {
+                    hashtagRecord.addCount(1);
+                } else {
+                    HashtagRecord hashtag = HashtagRecord.builder()
+                            .name(HashtagName.valueOf(userHashtag))
+                            .build();
+                    hashtagRecord.addCount(1);
+                    studycafe.addHashtagRecord(hashtagRecord);
+                }
+            }
+        }
+
+        /**
+         * 사진은 같은 것들이 있으면 있는 것들을 삭제하고, 다시 받아온 url로 저장을 한다.
+         */
+        subPhotoService.removePhoto(reviewId);
+        List<String> photos = Arrays.stream(modifyReviewRequest.getPhotos()).toList();
+        for (String photo : photos) {
+            SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
+            subPhotoService.savePhoto(subPhoto);
+        }
+
+        review.updateDetail(modifyReviewRequest.getDetail());
+
+        return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
+    }
+
 
     public List<FindReviewResponse> findAllReviews(Long id) {
         List<Review> reviewList = getReviewList(id);
