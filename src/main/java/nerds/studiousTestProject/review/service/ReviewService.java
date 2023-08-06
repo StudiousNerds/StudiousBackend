@@ -38,6 +38,7 @@ public class ReviewService {
     private final StudycafeRepository studycafeRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordRepository reservationRecordRepository;
+    public final Double GRADE_COUNT = 3.0;
 
     private List<Review> getReviewList(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
@@ -74,8 +75,7 @@ public class ReviewService {
         }
 
         List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
-        Studycafe studycafe = studycafeRepository.findById(registerReviewRequest.getCafeId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
         for (String hashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
                     .name(HashtagName.valueOf(hashtag))
@@ -89,6 +89,7 @@ public class ReviewService {
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
+
 
     public List<FindReviewResponse> findAllReviews(Long id) {
         List<Review> reviewList = getReviewList(id);
@@ -170,7 +171,7 @@ public class ReviewService {
     }
 
     public Double getTotal(Integer cleanliness, Integer deafening, Integer fixtureStatus) {
-        return (cleanliness + deafening + fixtureStatus) / 3.0;
+        return (cleanliness + deafening + fixtureStatus) / GRADE_COUNT;
     }
 
     public Double getAvgGrade(Long id) {
@@ -183,5 +184,10 @@ public class ReviewService {
             count++;
         }
         return  sum/ count;
+    }
+
+    private Studycafe findByStudycafeId(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STUDYCAFE));
     }
 }
