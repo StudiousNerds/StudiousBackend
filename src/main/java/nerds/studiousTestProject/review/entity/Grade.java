@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.review.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "grade")
+    @OneToOne(mappedBy = "grade", cascade = CascadeType.ALL)
     private Review review;
 
     private Integer cleanliness;
