@@ -1,12 +1,12 @@
-package nerds.studiousTestProject.review.dto;
+package nerds.studiousTestProject.review.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
-@Data
 @Builder
+@Data
 public class FindReviewResponse {
     private Double grade;
     private String email;

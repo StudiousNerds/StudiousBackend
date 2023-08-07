@@ -16,10 +16,10 @@ import java.util.List;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class SubPhotoService {
     private final SubPhotoRepository subPhotoRepository;
     private final StudycafeRepository studycafeRepository;
@@ -60,5 +60,9 @@ public class SubPhotoService {
         }
 
         return roomPhotos;
+    }
+
+    public void savePhoto(SubPhoto photo) {
+        subPhotoRepository.save(photo);
     }
 }
