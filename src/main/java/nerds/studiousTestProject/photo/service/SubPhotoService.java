@@ -65,4 +65,8 @@ public class SubPhotoService {
     public void savePhoto(SubPhoto photo) {
         subPhotoRepository.save(photo);
     }
+
+    public void removeAllPhotos(Long reviewId) {
+        subPhotoRepository.deleteAllByReviewId(reviewId);
+    }
 }
