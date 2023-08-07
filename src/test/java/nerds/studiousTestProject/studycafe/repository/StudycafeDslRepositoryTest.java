@@ -581,6 +581,6 @@ class StudycafeDslRepositoryTest {
 
 
     private Pageable pageable() {
-        return PageRequestConverter.of(0);
+        return PageRequestConverter.of(0, 8);
     }
 }
