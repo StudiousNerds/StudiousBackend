@@ -61,8 +61,11 @@ class StudycafeDslRepositoryTest {
         studycafe1.addNotice(notice1);
 
         ReservationRecord reservationRecord1 = reservationRecord_13_15(room1);
+        room1.addReservationRecord(reservationRecord1);
         ReservationRecord reservationRecord2 = reservationRecord_13_15(room2);
+        room2.addReservationRecord(reservationRecord2);
         ReservationRecord reservationRecord3 = reservationRecord_13_15(room3);
+        room3.addReservationRecord(reservationRecord3);
 
         HashtagRecord hashtag3 = hashtag3();
         HashtagRecord hashtag4 = hashtag4();
@@ -79,8 +82,11 @@ class StudycafeDslRepositoryTest {
         studycafe2.addNotice(notice2);
 
         ReservationRecord reservationRecord4 = reservationRecord_09_11(room4);
+        room4.addReservationRecord(reservationRecord4);
         ReservationRecord reservationRecord5 = reservationRecord_09_11(room5);
+        room5.addReservationRecord(reservationRecord5);
         ReservationRecord reservationRecord6 = reservationRecord_09_11(room6);
+        room6.addReservationRecord(reservationRecord6);
 
         Convenience beam = beam();
         Convenience elevator = elevator();
@@ -111,37 +117,6 @@ class StudycafeDslRepositoryTest {
         em.persist(studycafe2);
         em.persist(studycafe3);
         em.persist(studycafe4);
-        em.persist(room1);
-        em.persist(room2);
-        em.persist(room3);
-        em.persist(room4);
-        em.persist(room5);
-        em.persist(room6);
-        em.persist(room7);
-        em.persist(room8);
-        em.persist(room9);
-        em.persist(room10);
-        em.persist(room11);
-        em.persist(room12);
-        em.persist(reservationRecord1);
-        em.persist(reservationRecord2);
-        em.persist(reservationRecord3);
-        em.persist(reservationRecord4);
-        em.persist(reservationRecord5);
-        em.persist(reservationRecord6);
-        em.persist(hashtag1);
-        em.persist(hashtag2);
-        em.persist(hashtag3);
-        em.persist(hashtag4);
-        em.persist(hdmi);
-        em.persist(park);
-        em.persist(beam);
-        em.persist(elevator);
-        em.persist(notice1);
-        em.persist(notice2);
-        em.persist(notice3);
-        em.persist(notice4);
-
         em.flush();
         em.clear();
     }
@@ -196,6 +171,25 @@ class StudycafeDslRepositoryTest {
         // then
         System.out.println(responses);
         assertEquals(responses.size(), 3);  // 예약 내역이 있는 한 곳만 제외
+    }
+
+    @Test
+    @DisplayName("운영하지 않는 날짜 및 시간에 검색")
+    public void 운영X_날짜_및_시간_검색() throws Exception {
+
+        // given
+        SearchRequest request = SearchRequest.builder()
+                .date(LocalDate.of(2023, 7, 29))
+                .startTime(LocalTime.of(13, 0))
+                .endTime(LocalTime.of(14, 0))
+                .build();
+
+        // when
+        List<SearchResponse> responses = studycafeDslRepository.searchAll(request, pageable()).getContent();
+
+        // then
+        System.out.println(responses);
+        assertEquals(responses.size(), 0);  // 예약 내역이 있는 한 곳만 제외
     }
 
     @Test
@@ -364,6 +358,11 @@ class StudycafeDslRepositoryTest {
                 .notificationInfo("공지 사항")
                 .build();
 
+        List<OperationInfo> operationInfos = operationInfos();
+        for (OperationInfo operationInfo : operationInfos) {
+            studycafe.addOperationInfo(operationInfo);
+        }
+
         for (Convenience convenience : conveniences) {
             studycafe.addConvenience(convenience);
         }
@@ -433,7 +432,7 @@ class StudycafeDslRepositoryTest {
                         .startTime(LocalTime.of(9, 0))
                         .endTime(LocalTime.of(21, 0))
                         .allDay(false)
-                        .closed(false)
+                        .closed(true)   // 2023-07-29 에는 조회 안되도록 반영
                         .build(),
                 OperationInfo.builder()
                         .week(Week.SUNDAY)
