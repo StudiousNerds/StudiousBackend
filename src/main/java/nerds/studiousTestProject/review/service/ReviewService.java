@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.review.service;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
@@ -10,6 +11,8 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
+import nerds.studiousTestProject.reservation.service.ReservationService;
 import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
@@ -39,6 +42,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.*;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SubPhotoService subPhotoService;
+    private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
     private final HashtagRepository hashtagRepository;
     private final RoomRepository roomRepository;
@@ -59,34 +63,37 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
+        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
+
+        Review review = Review.builder()
+                .reservationRecord(reservationRecordService.findById(registerReviewRequest.getReservationId()))
+                .createdDate(LocalDate.now())
+                .detail(registerReviewRequest.getDetail())
+                .build();
+        reviewRepository.save(review);
+
         Grade grade = Grade.builder().cleanliness(registerReviewRequest.getCleanliness())
                 .deafening(registerReviewRequest.getDeafening())
                 .fixturesStatus(registerReviewRequest.getFixtureStatus())
                 .isRecommended(registerReviewRequest.getIsRecommend())
                 .build();
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+        grade.addReview(review);
 
-        Review review = Review.builder()
-                .grade(grade)
-                .createdDate(LocalDate.now())
-                .detail(registerReviewRequest.getDetail())
-                .build();
-        reviewRepository.save(review);
+        List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
+        for (String userHashtag : hashtags) {
+            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
+                    .studycafe(studycafe)
+                    .review(review)
+                    .name(HashtagName.valueOf(userHashtag))
+                    .build();
+            review.addHashtagRecord(hashtagRecord);
+        }
 
         List<String> photos = Arrays.stream(registerReviewRequest.getPhotos()).toList();
         for (String photo : photos) {
             SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
             subPhotoService.savePhoto(subPhoto);
-        }
-
-        List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
-        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
-        for (String hashtag : hashtags) {
-            HashtagRecord hashtagRecord = HashtagRecord.builder()
-                    .name(HashtagName.valueOf(hashtag))
-                    .build();
-            hashtagRecord.addCount();
-            studycafe.addHashtagRecord(hashtagRecord);
         }
 
         Double avgGrade = getAvgGrade(studycafe.getId());
@@ -96,11 +103,10 @@ public class ReviewService {
     }
 
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
-        Studycafe studycafe = studycafeRepository.findById(modifyReviewRequest.getCafeId())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        Grade grade = review.getGrade();
+        Review review = findById(reviewId);
+        Studycafe studycafe = findByStudycafeId(modifyReviewRequest.getCafeId());
 
+        Grade grade = review.getGrade();
         grade.updateGrade(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
@@ -110,44 +116,19 @@ public class ReviewService {
         Double avgGrade = getAvgGrade(studycafe.getId());
         studycafe.addTotalGrade(avgGrade);
 
-        /**
-         * 기존의 해시태그와 수정된 해시태그를 비교합니다.
-         * 1. 수정된 해시태그가 기존의 해시태그를 포함하고 있지 않다면(즉, 삭제된 해시태그), 해당 해시태그의 count값을 낮춥니다.
-         * 2. 기존의 해시태그가 수정된 해시태그를 포함하고 있지 않다면(즉, 새롭게 추가된 해시태그)
-         * 2-1) 이전에 나온적은 있는 해시태그라면, count값을 증가시킵니다.
-         * 2-1) 그 중에서도 이전에 나오지 못한 해시태그라면, 새롭게 추가해줍니다.
-         */
-        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
-        List<String> exHashtags = Arrays.stream(modifyReviewRequest.getExHashtags()).toList();
-        List<String> afterHashtags = Arrays.stream(modifyReviewRequest.getAfterHashtags()).toList();
-
-        // 위의 과정을 담아냈는데 좀 depth가 깊은 것 같아서 다들 혹시 좋은 방법이 있다면 추천 부탁드립니다ㅠㅠ
-        for (int i = 0; i < afterHashtags.size(); i++) {
-            if(!afterHashtags.contains(exHashtags.get(i))) {
-                HashtagRecord record = hashtagRepository
-                        .findByStudycafeIdAndName(studycafe.getId(), HashtagName.valueOf(exHashtags.get(i)));
-                record.subtractCount(1);
-            }
-            if(!exHashtags.contains(afterHashtags.get(i))) {
-                if(hashtagRecords.contains(afterHashtags.get(i))) {
-                    HashtagRecord savedRecord = hashtagRepository
-                            .findByStudycafeIdAndName(studycafe.getId(), HashtagName.valueOf(afterHashtags.get(i)));
-                    savedRecord.addCount(1);
-                } else {
-                    HashtagRecord hashtag = HashtagRecord.builder()
-                            .name(HashtagName.valueOf(afterHashtags.get(i)))
-                            .build();
-                    hashtag.addCount(1);
-                    studycafe.addHashtagRecord(hashtag);
-                }
-
-            }
+        hashtagRepository.deleteAllByReviewId(reviewId);
+        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
+        for (String userHashtag : hashtags) {
+            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
+                    .studycafe(studycafe)
+                    .review(review)
+                    .name(HashtagName.valueOf(userHashtag))
+                    .build();
+            review.addHashtagRecord(hashtagRecord);
         }
 
-        /**
-         * 사진은 같은 것들이 있으면 있는 것들을 삭제하고, 다시 받아온 url로 저장을 한다.
-         */
-        subPhotoService.removePhoto(reviewId);
+        // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
+        subPhotoService.removeAllPhotos(reviewId);
         List<String> photos = Arrays.stream(modifyReviewRequest.getPhotos()).toList();
         for (String photo : photos) {
             SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
@@ -158,6 +139,7 @@ public class ReviewService {
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
+
 
     public List<FindReviewResponse> findAllReviews(Long id) {
         List<Review> reviewList = getReviewList(id);
@@ -254,8 +236,12 @@ public class ReviewService {
         return  sum/ count;
     }
 
+    private Review findById(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
+    }
+
     private Studycafe findByStudycafeId(Long studycafeId) {
         return studycafeRepository.findById(studycafeId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STUDYCAFE));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 }
