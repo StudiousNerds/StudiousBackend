@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -20,6 +22,7 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.ManagedCafeInquireResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
@@ -66,6 +69,7 @@ public class StudycafeService {
     private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
+    private final TokenService tokenService;
 
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
@@ -196,7 +200,7 @@ public class StudycafeService {
     }
 
     @Transactional
-    public RegisterResponse register(RegisterRequest registerRequest) {
+    public RegisterResponse register(String accessToken, RegisterRequest registerRequest) {
         // 룸 정보 추가 검증
         validateRoomInfo(registerRequest);
 
@@ -206,9 +210,13 @@ public class StudycafeService {
         String longitude = cafeInfo.getAddressInfo().getLongitude();
         PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
 
+        // 현재 로그인된 유저 정보를 가져온다.
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+
         // 생성자에서는 필요한 부분만 초기화
         Studycafe studycafe = Studycafe.builder()
                 .name(cafeInfo.getName())
+                .member(member)
                 .address(cafeInfo.getAddressInfo().getBasic())
                 .photo(null)
                 .phoneNumber(null)
@@ -301,6 +309,20 @@ public class StudycafeService {
         return RegisterResponse.builder()
                 .cafeName(cafeInfo.getName())
                 .build();
+    }
+
+    public List<ManagedCafeInquireResponse> inquireManagedStudycafe(String accessToken, Pageable pageable) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
+                .stream()
+                .map(
+                        s -> ManagedCafeInquireResponse.builder()
+                                .id(s.getId())
+                                .name(s.getName())
+                                .address(s.getAddress())
+                                .photo(s.getPhoto())
+                                .build()
+                ).toList();
     }
 
     private void validateRoomInfo(RegisterRequest registerRequest) {
