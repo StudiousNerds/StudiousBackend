@@ -80,7 +80,7 @@ public class ReviewService {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
                     .name(HashtagName.valueOf(hashtag))
                     .build();
-            hashtagRecord.addCount(1);
+            hashtagRecord.addCount();
             studycafe.addHashtagRecord(hashtagRecord);
         }
 
