@@ -1,10 +1,10 @@
-package nerds.studiousTestProject.studycafe.dto;
+package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 
 import lombok.Builder;
 import lombok.Data;
 
-@Data
 @Builder
+@Data
 public class RecommendCafeResponse {
     private Long cafeId;
     private String cafeName;

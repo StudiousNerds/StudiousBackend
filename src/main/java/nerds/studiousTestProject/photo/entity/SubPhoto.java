@@ -17,9 +17,9 @@ import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class SubPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
