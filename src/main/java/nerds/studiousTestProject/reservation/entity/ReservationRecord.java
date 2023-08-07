@@ -79,4 +79,7 @@ public class ReservationRecord {
         this.status = ReservationStatus.CANCELED;
     }
 
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 }

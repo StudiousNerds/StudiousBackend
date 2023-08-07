@@ -52,12 +52,17 @@ public class Room {
     @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<ReservationRecord> reservationRecords = new ArrayList<>();
 
     // 다대일 양방향 연관관계
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Convenience> conveniences = new ArrayList<>();
+
+    public void addReservationRecord(ReservationRecord reservationRecord) {
+        reservationRecords.add(reservationRecord);
+        reservationRecord.setRoom(this);
+    }
 
     public void addConvenience(Convenience convenience) {
         conveniences.add(convenience);
