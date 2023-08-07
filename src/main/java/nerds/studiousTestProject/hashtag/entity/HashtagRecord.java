@@ -51,8 +51,8 @@ public class HashtagRecord {
         this.name = name;
     }
 
-    public void addCount(Integer count) {
-        this.count += count;
+    public void addCount() {
+        this.count++;
     }
 
     public void subtractCount(Integer count) {

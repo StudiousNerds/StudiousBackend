@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
@@ -112,16 +114,12 @@ public class RoomService {
 
     public List<PaidConvenience> getPaidConveniences(Long roomId) {
         Room room = findRoomById(roomId);
-        List<PaidConvenience> paidConvenienceList = new ArrayList<>();
-
         List<Convenience> conveniences = room.getConveniences();
-        for (Convenience convenience : conveniences) {
-            if(!convenience.isFree()) {
-                paidConvenienceList.add(PaidConvenience.from(convenience));
-            }
-        }
 
-        return paidConvenienceList;
+        return conveniences.stream()
+                .filter(convenience -> !convenience.isFree())
+                .map(PaidConvenience::from)
+                .toList();
     }
 
     public Room findRoomById(Long roomId){
