@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_START_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
@@ -70,9 +73,9 @@ public class RoomService {
 
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        int start = operationInfoRepository.findStartTime(Week.of(date)).getHour();
-        int end = operationInfoRepository.findEndTime(Week.of(date)).getHour();
-        int size = end - start;
+        Integer start = findStartTimeByWeek(Week.of(date)).getHour();
+        Integer end = findEndTimeByWeek(Week.of(date)).getHour();
+        Integer size = end - start;
         Integer timeList[] = new Integer[size+1];
 
         List<Boolean> values = reservationTimes.values().stream().toList();
@@ -125,5 +128,15 @@ public class RoomService {
     public Room findRoomById(Long roomId){
         return roomRepository.findById(roomId)
                 .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
+    }
+
+    public LocalTime findStartTimeByWeek(Week week) {
+        return operationInfoRepository.findStartTime(week)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_START_TIME));
+    }
+
+    public LocalTime findEndTimeByWeek(Week week) {
+        return operationInfoRepository.findEndTime(week)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_END_TIME));
     }
 }
