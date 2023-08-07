@@ -38,7 +38,9 @@ public enum ErrorCode {
     INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT("기준 인원 수는 최소 인원 수보다 크거나 같아야 합니다."),
     INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT("기준 인원수는 최대 인원 수보다 작아야합니다."),
     INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT("최대 인원수는 최소 인원 수보다 커야합니다."),
-    NOT_FOUND_REVEIW("리뷰를 찾을 수 없습니다.");
+    NOT_FOUND_REVEIW("리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_START_TIME("시작 시간을 찾을 수 없습니다."),
+    NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다.");
 
     private final String message;
     ErrorCode(String message) {
