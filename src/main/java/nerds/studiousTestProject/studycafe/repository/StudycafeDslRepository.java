@@ -45,8 +45,7 @@ public class StudycafeDslRepository {
         // 페이징 처리를 위해선 개수를 직접 쿼리를 날려 확인해야 한다! (QueryDSL의 count는 믿을게 못됨)
         JPAQuery<Long> count = getJoinedQuery(countQuery, searchRequest)
                 .where(
-                        inOperation(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
-                        dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
+                        dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
                         totalGradeGoe(searchRequest.getMinGrade()),
@@ -75,8 +74,8 @@ public class StudycafeDslRepository {
 
         List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
+                        dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
-                        dateAndTimeNotReserved(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         keywordContains(searchRequest.getKeyword()),
                         totalGradeGoe(searchRequest.getMinGrade()),
                         hashtagContains(searchRequest.getHashtags()),
@@ -91,13 +90,13 @@ public class StudycafeDslRepository {
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
-    public <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
+    private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
         if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null) {
                 query = query
-                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.closed.isFalse()).on(operationInfo.week.eq(Week.of(searchRequest.getDate())))
+                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())))
                         .leftJoin(room.reservationRecords, reservationRecord);
             }
 
@@ -132,13 +131,28 @@ public class StudycafeDslRepository {
         return headCount != null ? room.maxHeadCount.goe(headCount) : null;
     }
 
-    private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        BooleanExpression startTimeLoe = cafeStartTimeLoe(date, startTime);
-        BooleanExpression endTimeGoe = cafeEndTimeGoe(date, endTime);
-        return operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe);
+    private BooleanExpression dateAndTimeCanReserve(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        BooleanExpression inOperation = inOperation(date, startTime, endTime);
+        // inOperation이 false면 실행안하도록 하면 안되나...? isOperation이 false 여도 쿼리가 나감...
+
+        System.out.println(inOperation);
+        // inOperation 과 접목시키면 오류난다,,, 왜일까??
+        return inOperation != null ? inOperation.and(dateAndTimeNotReserved(date, startTime, endTime)) : null;
     }
 
-    private BooleanExpression cafeStartTimeLoe(LocalDate date, LocalTime startTime) {
+    private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        BooleanExpression closed = closed(date, startTime, endTime);
+        BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
+        BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
+
+        return closed != null ? closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe) : null;
+    }
+
+    private BooleanExpression closed(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        return (date != null || startTime != null || endTime != null) ? operationInfo.closed : null;
+    }
+
+    private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
         if (startTime == null) {
             return null;
         }
@@ -146,7 +160,7 @@ public class StudycafeDslRepository {
         return operationInfo.startTime.loe(startTime);
     }
 
-    private BooleanExpression cafeEndTimeGoe(LocalDate date, LocalTime endTime) {
+    private BooleanExpression cafeEndTimeGoe(LocalTime endTime) {
         if (endTime == null) {
             return null;
         }
@@ -163,11 +177,11 @@ public class StudycafeDslRepository {
         // 예약이 없는 경우를 대비하여 reservationRecord.isNull() 조건 추가
         return dateEq != null ? reservationRecord.isNull()
                 .or(
-                        (reservationRecord.status.eq(ReservationStatus.CONFIRMED).and(
-                                reservationRecord.date.eq(date)
+                        (reservationRecord.status.eq(ReservationStatus.CONFIRMED)
+                                .and(dateEq)
                                 .and(startTimeLoe)
                                 .and(endTimeGoe)
-                        )).not()
+                        ).not()
                 ) : null;
     }
 
@@ -180,7 +194,7 @@ public class StudycafeDslRepository {
             startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
         }
 
-        return reservationRecord.startTime.goe(startTime);
+        return reservationRecord.startTime.loe(startTime);
     }
 
     private BooleanExpression endTimeGoe(LocalTime endTime) {
@@ -188,7 +202,7 @@ public class StudycafeDslRepository {
             endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
         }
 
-        return reservationRecord.endTime.loe(endTime);
+        return reservationRecord.endTime.goe(endTime);
     }
 
     private BooleanExpression keywordContains(String keyword) {
@@ -226,5 +240,10 @@ public class StudycafeDslRepository {
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
+    }
+
+    private boolean isTrue(BooleanExpression before, BooleanExpression current) {
+        int length = before.toString().length();
+        return current.toString().substring(length + 3).equals("true");
     }
 }
