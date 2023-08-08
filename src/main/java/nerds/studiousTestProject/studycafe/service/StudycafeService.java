@@ -92,7 +92,7 @@ public class StudycafeService {
     }
 
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findStudycafeById(id);
 
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
@@ -101,7 +101,7 @@ public class StudycafeService {
                 .accumResCnt(studycafe.getAccumReserveCount())
                 .duration(studycafe.getDuration())
                 .nearestStation(studycafe.getNearestStation())
-                .hashtags(getHashtags(id))
+                .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(id))
                 .notification(studycafe.getNotificationInfo())
@@ -137,7 +137,7 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(getHashtags(studycafe.getId()))
+                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -158,7 +158,7 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(getHashtags(studycafe.getId()))
+                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
@@ -166,7 +166,7 @@ public class StudycafeService {
     }
 
     public Studycafe getStudyCafe(Long studycafeId) {
-        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        return findStudycafeById(studycafeId);
     }
 
     public Studycafe getStudyCafeByName(String cafeName) {
@@ -174,7 +174,7 @@ public class StudycafeService {
     }
 
     public String[] getNotice(Long id) {
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findStudycafeById(id);
 
         List<String> noticeList = studycafe.getNotices().stream().map(Notice::getDetail).toList();
         Integer arrSize = noticeList.size();
@@ -184,7 +184,7 @@ public class StudycafeService {
     }
 
     public String[] getConveniences(Long studycafeId) {
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findStudycafeById(studycafeId);
 
         List<ConvenienceName> convenienceList = studycafe.getConveniences().stream().map(Convenience::getName).toList();
         Integer arrSize = convenienceList.size();
@@ -193,22 +193,17 @@ public class StudycafeService {
         return conveniences;
     }
 
+
     public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getRefundPolicies().stream()
                 .map(RefundPolicyInResponse::from)
                 .collect(Collectors.toList());
     }
 
-    public String[] getHashtags(Long studycafeId) {
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-
-        List<HashtagName> hashtagList = studycafe.getHashtagRecords().stream().map(HashtagRecord::getName).toList();
-        Integer arrSize = hashtagList.size();
-        String hashtags[] = hashtagList.toArray(new String[arrSize]);
-
-        return hashtags;
+    private Studycafe findStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     public ValidResponse validateAccountInfo(AccountInfoRequest accountInfoRequest) {
