@@ -16,7 +16,8 @@ public enum ParamErrorCode {
     INVALID_MAX_GRADE("maxGrade", "최대 평점은 0이상 5이하여야 합니다."),
     INVALID_SORT_TYPE("sortType", "정렬 기준이 잘못되었습니다."),
     INVALID_HASHTAG_NAME("hashtags", "해시테그 이름이 잘못되었습니다."),
-    INVALID_CONVENIENCE_NAME("conveniences", "편의시설 이름이 잘못되었습니다");
+    INVALID_CONVENIENCE_NAME("conveniences", "편의시설 이름이 잘못되었습니다"),
+    INVALID_CAFE_ID("cafeId", "카페 아이디 값이 잘못되었습니다.");
 
     private static final Map<String, String> ENUM_MAP = Collections.unmodifiableMap(
             Stream.of(values()).collect(Collectors.toMap(ParamErrorCode::getParamName, ParamErrorCode::name))
