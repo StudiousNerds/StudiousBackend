@@ -10,7 +10,8 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.ManagedCafeInquireResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -110,4 +111,8 @@ public class StudycafeController {
         return studycafeService.inquireManagedEntryStudycafes(accessToken, PageRequestConverter.of(page, 4));
     }
 
+    @GetMapping("/studycafes/managements/{cafeId}")
+    public CafeDetailsResponse findManagedDetailStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
+        return studycafeService.inquireManagedStudycafe(accessToken, cafeId);
+    }
 }
