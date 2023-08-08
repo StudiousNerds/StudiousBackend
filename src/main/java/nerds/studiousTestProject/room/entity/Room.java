@@ -1,12 +1,10 @@
 package nerds.studiousTestProject.room.entity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,6 +39,8 @@ public class Room {
     private Integer price;
     private Integer minUsingTime;
 
+    private String photo;
+
     @Enumerated(value = EnumType.STRING)
     private PriceType type;
 
@@ -49,11 +49,19 @@ public class Room {
     private Studycafe studycafe;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<SubPhoto> subPhotos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<ReservationRecord> reservationRecords = new ArrayList<>();
 
     // 다대일 양방향 연관관계
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Convenience> conveniences = new ArrayList<>();
+
+    public void addSubPhoto(SubPhoto subPhoto) {
+        subPhotos.add(subPhoto);
+        subPhoto.setRoom(this);
+    }
 
     public void addReservationRecord(ReservationRecord reservationRecord) {
         reservationRecords.add(reservationRecord);
@@ -66,7 +74,7 @@ public class Room {
     }
 
     @Builder
-    public Room(Long id, Studycafe studycafe, String name, Integer standardHeadCount, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, PriceType type) {
+    public Room(Long id, Studycafe studycafe, String name, Integer standardHeadCount, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, String photo, PriceType type) {
         this.id = id;
         this.studycafe = studycafe;
         this.name = name;
@@ -75,6 +83,7 @@ public class Room {
         this.maxHeadCount = maxHeadCount;
         this.price = price;
         this.minUsingTime = minUsingTime;
+        this.photo = photo;
         this.type = type;
     }
 
