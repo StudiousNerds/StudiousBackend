@@ -215,6 +215,9 @@ public class StudycafeService {
         String longitude = cafeInfo.getAddressInfo().getLongitude();
         PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
 
+        List<String> cafePhotos = cafeInfo.getPhotos();
+        String cafeMainPhoto = cafePhotos.remove(0);
+
         // 생성자에서는 필요한 부분만 초기화
         Studycafe studycafe = Studycafe.builder()
                 .name(cafeInfo.getName())
@@ -229,6 +232,14 @@ public class StudycafeService {
                 .nearestStation(placeResponse.getNearestStation())
                 .introduction(cafeInfo.getIntroduction())
                 .build();
+
+        // 카페 사진 등록
+        for (String cafePhotoUrl : cafePhotos) {
+            studycafe.addSubPhoto(SubPhoto.builder()
+                    .url(cafePhotoUrl)
+                    .build()
+            );
+        }
 
         // 유의 사항 등록
         List<String> details = cafeInfo.getNotices();
@@ -284,6 +295,14 @@ public class StudycafeService {
                     .price(roomInfoRequest.getPrice())
                     .type(roomInfoRequest.getType())
                     .build();
+
+            // 룸 사진 등록
+            for (String roomPhotoUrl : roomPhotos) {
+                room.addSubPhoto(SubPhoto.builder()
+                        .url(roomPhotoUrl)
+                        .build()
+                );
+            }
 
             // 룸 편의시설 정보 등록
             List<ConvenienceInfoRequest> roomConveniences = roomInfoRequest.getConvenienceInfos();
