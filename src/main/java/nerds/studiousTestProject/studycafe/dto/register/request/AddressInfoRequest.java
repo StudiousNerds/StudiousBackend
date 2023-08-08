@@ -20,4 +20,12 @@ public class AddressInfoRequest {
 
     @NotBlank(message = "상세 주소는 필수입니다.")
     private String detail;  // 상세 주소
+
+    public Address of() {
+        return Address.builder()
+                .basic(basic)
+                .detail(detail)
+                .zipcode(zipcode)
+                .build();
+    }
 }
