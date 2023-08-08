@@ -354,11 +354,11 @@ public class StudycafeService {
      * @param registerRequest 스터디카페 등록 시 요청값
      */
     private void validateRoomInfo(RegisterRequest registerRequest) {
-        List<RoomInfo> roomInfos = registerRequest.getRoomInfos();
-        for (RoomInfo roomInfo : roomInfos) {
-            Integer standardHeadCount = roomInfo.getStandardHeadCount();
-            Integer minHeadCount = roomInfo.getMinHeadCount();
-            Integer maxHeadCount = roomInfo.getMaxHeadCount();
+        List<RoomInfoRequest> roomInfoRequests = registerRequest.getRoomInfos();
+        for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
+            Integer standardHeadCount = roomInfoRequest.getStandardHeadCount();
+            Integer minHeadCount = roomInfoRequest.getMinHeadCount();
+            Integer maxHeadCount = roomInfoRequest.getMaxHeadCount();
 
             // 최대 인원 수가 최대 인원 수 보다 작은 경우
             if (maxHeadCount < minHeadCount) {
