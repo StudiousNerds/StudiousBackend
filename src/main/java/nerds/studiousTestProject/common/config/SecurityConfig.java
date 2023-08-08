@@ -1,11 +1,15 @@
 package nerds.studiousTestProject.common.config;
 
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.common.exception.CustomAccessDeniedHandler;
+import nerds.studiousTestProject.common.exception.CustomAuthenticationEntryPoint;
+import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
 import nerds.studiousTestProject.common.filter.JwtAuthenticationFilter;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +29,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
@@ -43,7 +48,7 @@ public class SecurityConfig {
                 .requestMatchers("/studious/mypage/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN") // 닉네임, 비밀번호 수정 및 회원 탈퇴
                 .requestMatchers("/studious/search/**").permitAll()
                 .requestMatchers("/studious/valid/**").permitAll()   // 임시 허용
-                .requestMatchers("/studious/studycafes/registrations").permitAll()   // 임시 허용
+                .requestMatchers("/studious/studycafes/registrations").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
                 .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
                 .requestMatchers("/studious/members/test").hasRole("USER")      // 테스트 용
@@ -51,7 +56,12 @@ public class SecurityConfig {
                 .and()
                 .cors()
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
         return http.build();
     }
 
