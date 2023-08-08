@@ -46,7 +46,20 @@ public class Grade {
         this.total = total;
     }
 
-    public void addTotal(Double total) {
+    public void updateTotal(Double total) {
+        this.total = total;
+    }
+
+    public void addReview(Review review) {
+        this.review =  review;
+        review.setGrade(this);
+    }
+
+    public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total){
+        this.cleanliness = cleanliness;
+        this.deafening = deafening;
+        this.fixturesStatus = fixturesStatus;
+        this.isRecommended = isRecommended;
         this.total = total;
     }
 }

@@ -6,9 +6,8 @@ import lombok.Data;
 
 @Builder
 @Data
-public class RegisterReviewRequest {
+public class ModifyReviewRequest {
     private Long cafeId;
-    private Long reservationId;
     @NotBlank(message = "청결도 평점은 필수입니다.")
     private Integer cleanliness;
     @NotBlank(message = "방음 평점은 필수입니다.")
