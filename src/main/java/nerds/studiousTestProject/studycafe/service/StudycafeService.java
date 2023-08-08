@@ -7,11 +7,11 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
+import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -23,8 +23,14 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.ManagedCafeInquireResponse;
-import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
+import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
@@ -36,6 +42,7 @@ import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.entity.Address;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -257,7 +264,6 @@ public class StudycafeService {
         for (RefundPolicyRequest refundPolicyRequest : refundPolicies) {
             studycafe.addRefundPolicy(
                     RefundPolicy.builder()
-                            .studycafe(studycafe)
                             .refundDay(RefundDay.of(refundPolicyRequest.getDay()))
                             .rate(refundPolicyRequest.getRate())
                             .type("??")
@@ -375,5 +381,61 @@ public class StudycafeService {
                 throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT);
             }
         }
+    }
+
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long cafeId) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        // Entity -> DTO 변환 : DTO에서 하는 게 맞는지 여기서 하는게 맞는지 모르겠음
+        Address address = studycafe.getAddress();
+        AddressInfoResponse addressInfoResponse = AddressInfoResponse.builder()
+                .basic(address.getBasic())
+                .detail(address.getDetail())
+                .zipcode(address.getZipcode())
+                .build();
+
+        List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(
+                o -> OperationInfoResponse.builder()
+                        .week(o.getWeek())
+                        .startTime(o.getStartTime())
+                        .endTime(o.getEndTime())
+                        .allDay(o.getAllDay())
+                        .closed(o.getClosed())
+                        .build()).toList();
+
+        List<ConvenienceInfoResponse> convenienceInfoResponses = studycafe.getConveniences().stream().map(
+                c -> ConvenienceInfoResponse.builder()
+                        .name(c.getName())
+                        .price(c.getPrice())
+                        .build()
+        ).toList();
+
+        List<String> noticeResponses = studycafe.getNotices().stream().map(Notice::getDetail).toList();
+
+        // 사진 : 메인 사진(단일) + 서브 사진(리스트)
+        List<String> photos = new ArrayList<>();
+        photos.add(studycafe.getPhoto());
+        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getUrl).toList();
+        photos.addAll(subPhotos);
+
+        List<RefundPolicyResponse> refundPolicyResponses = studycafe.getRefundPolicies().stream().map(
+                r -> RefundPolicyResponse.builder()
+                        .day(r.getRefundDay().getRemain())
+                        .rate(r.getRate())
+                        .build()
+        ).toList();
+
+        return CafeDetailsResponse.builder()
+                .name(studycafe.getName())
+                .addressInfo(addressInfoResponse)
+                .introduction(studycafe.getIntroduction())
+                .operationInfos(operationInfoResponses)
+                .convenienceInfos(convenienceInfoResponses)
+                .photos(photos)
+                .notices(noticeResponses)
+                .refundPolicies(refundPolicyResponses)
+                .build();
     }
 }
