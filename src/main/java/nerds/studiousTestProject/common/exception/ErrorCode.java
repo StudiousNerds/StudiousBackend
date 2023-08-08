@@ -6,6 +6,7 @@ public enum ErrorCode {
     NOT_FOUND_RESERVATION_RECORD("예약내역을 찾을 수 없습니다."),
     NOT_FOUND_PAYMENT("결제 내역을 찾을 수 없습니다."),
     INVALID_REQUEST_BODY_TYPE_TO_TOSS("토스에게 요청하는 값은 null 값이 있어선 안됩니다."),
+    NOT_EXIST_PAGE("잘못된 페이지입니다."),
     MISMATCH_EMAIL("이메일이 일치하지 않습니다."),
     MISMATCH_PASSWORD("비밀번호가 일치하지 않습니다."),
     MISMATCH_PHONE_NUMBER("전화번호가 일치하지 않습니다."),
