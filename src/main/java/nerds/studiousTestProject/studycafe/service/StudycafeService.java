@@ -11,6 +11,7 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -312,6 +313,7 @@ public class StudycafeService {
                 .build();
     }
 
+    @Secured(value = MemberRole.ROLES.ADMIN)
     public List<ManagedCafeInquireResponse> inquireManagedStudycafe(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent();
