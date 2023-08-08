@@ -343,7 +343,7 @@ public class StudycafeService {
     }
 
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<CafeBasicInfoResponse> 경(String accessToken, Pageable pageable) {
+    public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
                 .stream().map(s -> CafeBasicInfoResponse.builder()
