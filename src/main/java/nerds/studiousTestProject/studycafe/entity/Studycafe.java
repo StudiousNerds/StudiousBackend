@@ -4,6 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.room.entity.Room;
 
@@ -38,8 +40,10 @@ public class Studycafe {
     private Member member;
 
     private String name;
-    private String address;
     private String photo;
+
+    @Embedded
+    private Address address;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -78,6 +82,9 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe")
     private List<RefundPolicy> refundPolicies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
+    private List<SubPhoto> subPhotos = new ArrayList<>();
+
     public void addRoom(Room room) {
         rooms.add(room);
         room.setStudycafe(this);
@@ -108,8 +115,13 @@ public class Studycafe {
         refundPolicy.setStudycafe(this);
     }
 
+    public void addSubPhoto(SubPhoto subPhoto) {
+        subPhotos.add(subPhoto);
+        subPhoto.setStudycafe(this);
+    }
+
     @Builder
-    public Studycafe(Long id, Member member, String name, String address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade, @Nullable String notificationInfo) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade, @Nullable String notificationInfo) {
         this.id = id;
         this.member = member;
         this.name = name;
