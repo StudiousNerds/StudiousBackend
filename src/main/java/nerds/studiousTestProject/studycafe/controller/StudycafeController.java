@@ -106,8 +106,8 @@ public class StudycafeController {
     }
 
     @GetMapping("/studycafes/managements")
-    public List<ManagedCafeInquireResponse> viewManagedStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
-        return studycafeService.inquireManagedStudycafe(accessToken, PageRequestConverter.of(page, 4));
+    public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
+        return studycafeService.inquireManagedEntryStudycafes(accessToken, PageRequestConverter.of(page, 4));
     }
 
 }
