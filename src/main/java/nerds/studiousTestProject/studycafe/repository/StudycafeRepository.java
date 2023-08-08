@@ -1,7 +1,6 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.studycafe.dto.manage.ManagedCafeInquireResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
