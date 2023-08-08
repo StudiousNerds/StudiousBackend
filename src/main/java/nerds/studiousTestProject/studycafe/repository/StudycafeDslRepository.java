@@ -206,7 +206,7 @@ public class StudycafeDslRepository {
     }
 
     private BooleanExpression keywordContains(String keyword) {
-        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.contains(keyword)) : null;
+        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.basic.contains(keyword)).or(studycafe.address.detail.contains(keyword)) : null;
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
