@@ -79,7 +79,7 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<Notice> notices = new ArrayList<>();
 
-    @OneToMany(mappedBy = "studycafe")
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<RefundPolicy> refundPolicies = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
