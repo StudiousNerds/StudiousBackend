@@ -28,7 +28,7 @@ import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
-import nerds.studiousTestProject.studycafe.dto.register.request.RoomInfo;
+import nerds.studiousTestProject.studycafe.dto.register.request.RoomInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -210,7 +210,7 @@ public class StudycafeService {
         validateRoomInfo(registerRequest);
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
-        CafeInfo cafeInfo = registerRequest.getCafeInfo();
+        CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
         String latitude = cafeInfo.getAddressInfo().getLatitude();
         String longitude = cafeInfo.getAddressInfo().getLongitude();
         PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
@@ -269,39 +269,43 @@ public class StudycafeService {
         }
 
         // 룸 정보 등록
-        List<RoomInfo> roomInfos = registerRequest.getRoomInfos();
-        for (RoomInfo roomInfo : roomInfos) {
+        List<RoomInfoRequest> roomInfoRequests = registerRequest.getRoomInfos();
+        for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
+            List<String> roomPhotos = roomInfoRequest.getPhotos();
+            String roomMainPhoto = roomPhotos.remove(0);
             Room room = Room.builder()
-                    .name(roomInfo.getName())
+                    .name(roomInfoRequest.getName())
+                    .photo(roomMainPhoto)
                     .studycafe(studycafe)   // 이부분 좀 애매
-                    .standardHeadCount(roomInfo.getStandardHeadCount())
-                    .minHeadCount(roomInfo.getMinHeadCount())
-                    .maxHeadCount(roomInfo.getMaxHeadCount())
-                    .minUsingTime(roomInfo.getMinUsingTime())
-                    .price(roomInfo.getPrice())
-                    .type(roomInfo.getType())
+                    .standardHeadCount(roomInfoRequest.getStandardHeadCount())
+                    .minHeadCount(roomInfoRequest.getMinHeadCount())
+                    .maxHeadCount(roomInfoRequest.getMaxHeadCount())
+                    .minUsingTime(roomInfoRequest.getMinUsingTime())
+                    .price(roomInfoRequest.getPrice())
+                    .type(roomInfoRequest.getType())
                     .build();
 
             // 룸 편의시설 정보 등록
-            List<ConvenienceName> roomConveniences = roomInfo.getConveniences();
-            for (ConvenienceName name : roomConveniences) {
+            List<ConvenienceInfoRequest> roomConveniences = roomInfoRequest.getConvenienceInfos();
+            for (ConvenienceInfoRequest convenienceInfoRequest : roomConveniences) {
                 room.addConvenience(
                         Convenience.builder()
-                                .name(name)
-                                .price(0)
+                                .name(convenienceInfoRequest.getName())
+                                .price(convenienceInfoRequest.getPrice())
+                                .isFree(convenienceInfoRequest.getPrice() == 0)
                                 .build()
                 );
             }
         }
 
         // 카페 편의시설 정보 등록
-        List<ConvenienceName> cafeConveniences = cafeInfo.getConveniences();
-        for (ConvenienceName name : cafeConveniences) {
+        List<ConvenienceInfoRequest> cafeConveniences = cafeInfo.getConvenienceInfos();
+        for (ConvenienceInfoRequest convenienceInfoRequest : cafeConveniences) {
             studycafe.addConvenience(
                     Convenience.builder()
-                            .name(name)
-                            .studycafe(studycafe)
-                            .price(0)
+                            .name(convenienceInfoRequest.getName())
+                            .price(convenienceInfoRequest.getPrice())
+                            .isFree(convenienceInfoRequest.getPrice() == 0)
                             .build()
             );
         }
