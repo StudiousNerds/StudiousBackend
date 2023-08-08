@@ -73,9 +73,9 @@ public class RoomService {
 
         Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        Integer start = findStartTimeByWeek(Week.of(date)).getHour();
-        Integer end = findEndTimeByWeek(Week.of(date)).getHour();
-        Integer size = end - start;
+        int start = findStartTimeByWeek(Week.of(date)).getHour();
+        int end = findEndTimeByWeek(Week.of(date)).getHour();
+        int size = end - start;
         Integer timeList[] = new Integer[size+1];
 
         List<Boolean> values = reservationTimes.values().stream().toList();

@@ -1,10 +1,12 @@
 package nerds.studiousTestProject.review.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +22,8 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "grade")
+    @OneToOne
+    @JoinColumn(name = "review_id")
     private Review review;
 
     private Integer cleanliness;
@@ -50,9 +53,8 @@ public class Grade {
         this.total = total;
     }
 
-    public void addReview(Review review) {
-        this.review =  review;
-        review.setGrade(this);
+    public void setReview(Review review) {
+        this.review = review;
     }
 
     public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total){
