@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.*;
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_REQUEST_BODY_TYPE;
+import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestControllerAdvice
 @Slf4j
