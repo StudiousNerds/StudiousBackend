@@ -4,7 +4,9 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,6 +30,8 @@ public class GlobalExceptionAdvice {
         // ConstraintViolationException 예외인 경우 예외 메시지를 직접 파싱하여 파라미터 이름을 찾아야 함... => 이 방법은 추후 리펙토링 예정
         // ex) search.request : XXX 형태에서 request 를 가져와야함
 
+        // 잘못된 uri가 경로 변수가 포함된 메소드에 매핑되버리는 경우는 여기서 처리되긴하는데... 404를 보내는게 맞는거같기도 하고,,,
+
         String param = e instanceof MethodArgumentTypeMismatchException ?
                 ((MethodArgumentTypeMismatchException) e).getName() : (e instanceof MissingServletRequestParameterException) ? ((MissingServletRequestParameterException) e).getParameterName() :
                 e.getMessage().split(" ")[0].split("\\.")[1].replace(":", "");
@@ -35,6 +39,19 @@ public class GlobalExceptionAdvice {
         ParamErrorCode paramErrorCode = ParamErrorCode.of(param);
         String code = paramErrorCode.name();
         String message = paramErrorCode.getMessage();
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.from(message, code));
+    }
+
+    @ExceptionHandler(value = MissingRequestHeaderException.class)
+    public ResponseEntity<ExceptionResponse> headerExceptionHandler(MissingRequestHeaderException e) {
+        String headerName = e.getHeaderName();
+        HeaderErrorCode headerErrorCode = HeaderErrorCode.of(headerName);
+        String code = headerErrorCode.name();
+        String message = headerErrorCode.getMessage();
+
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -75,6 +92,23 @@ public class GlobalExceptionAdvice {
         StringBuilder stringBuilder = new StringBuilder();
         log.info(stringBuilder.append(e.getClass().getSimpleName()).append(e.getErrorCode().getMessage()).append(e.getMessage()).toString());
         return ResponseEntity.badRequest().body(ExceptionResponse.from(e));
+    }
 
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<ExceptionResponse> handleUnAuthorizedException(NotAuthorizedException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), e.getErrorCode(), e.getMessage());
+        return ResponseEntity.status(UNAUTHORIZED).body(ExceptionResponse.from(e));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+
+        MethodErrorCode methodErrorCode = MethodErrorCode.of(e.getMethod());
+        String code = methodErrorCode.name();
+        String message = methodErrorCode.getMessage();
+        String entryMessage = methodErrorCode.getEntryMessage(e.getSupportedMethods());
+
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
+        return ResponseEntity.status(METHOD_NOT_ALLOWED).body(ExceptionResponse.from(entryMessage, code));
     }
 }
