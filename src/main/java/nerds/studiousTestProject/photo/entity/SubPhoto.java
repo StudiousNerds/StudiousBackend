@@ -47,4 +47,12 @@ public class SubPhoto {
         this.review = review;
         this.url = url;
     }
+
+    public void setStudycafe(Studycafe studycafe) {
+        this.studycafe = studycafe;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 }
