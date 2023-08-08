@@ -11,6 +11,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.entity.Address;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -297,7 +298,7 @@ class StudycafeDslRepositoryTest {
     private Studycafe studycafe1(List<HashtagRecord> hashtagRecords, List<Convenience> conveniences) {
         Studycafe studycafe = Studycafe.builder()
                 .name("테스트1 스터디카페")
-                .address("경기도 남양주시 진접읍")
+                .address(address())
                 .accumReserveCount(40)
                 .totalGrade(1.2)
                 .duration(null)
@@ -325,7 +326,7 @@ class StudycafeDslRepositoryTest {
     private Studycafe studycafe2(List<HashtagRecord> hashtagRecords) {
         Studycafe studycafe = Studycafe.builder()
                 .name("테스트2 스터디카페")
-                .address("경기도 남양주시 진접읍")
+                .address(address())
                 .accumReserveCount(30)
                 .totalGrade(2.4)
                 .duration(null)
@@ -349,7 +350,7 @@ class StudycafeDslRepositoryTest {
     private Studycafe studycafe3(List<Convenience> conveniences) {
         Studycafe studycafe = Studycafe.builder()
                 .name("테스트3 스터디카페")
-                .address("경기도 남양주시 진접읍")
+                .address(address())
                 .accumReserveCount(20)
                 .totalGrade(3.6)
                 .duration(null)
@@ -373,7 +374,7 @@ class StudycafeDslRepositoryTest {
     private Studycafe studycafe4() {
         Studycafe studycafe = Studycafe.builder()
                 .name("테스트4 스터디카페")
-                .address("경기도 남양주시 진접읍")
+                .address(address())
                 .accumReserveCount(10)
                 .totalGrade(4.8)
                 .duration(null)
@@ -388,6 +389,14 @@ class StudycafeDslRepositoryTest {
         }
 
         return studycafe;
+    }
+
+    private Address address() {
+        return Address.builder()
+                .basic("경기도 남양주시 진접읍 금강로 1530-14")
+                .detail("진접하우스토리 105동 1303호")
+                .zipcode("12010")
+                .build();
     }
 
     private List<OperationInfo> operationInfos() {
