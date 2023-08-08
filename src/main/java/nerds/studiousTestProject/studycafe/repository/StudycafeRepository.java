@@ -16,5 +16,6 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long> {
     List<Studycafe> findTop10ByOrderByCreatedAtDesc();
     Optional<Studycafe> findByName(String cafeName);
 
-    Page<ManagedCafeInquireResponse> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
+    Page<Studycafe> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
+    Optional<Studycafe> findByIdAndMember(Long id, Member member);
 }
