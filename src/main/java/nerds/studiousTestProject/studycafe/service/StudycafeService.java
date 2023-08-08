@@ -337,9 +337,16 @@ public class StudycafeService {
     }
 
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<ManagedCafeInquireResponse> inquireManagedStudycafe(String accessToken, Pageable pageable) {
+    public List<CafeBasicInfoResponse> 경(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent();
+        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
+                .stream().map(s -> CafeBasicInfoResponse.builder()
+                        .id(s.getId())
+                        .name(s.getName())
+                        .address(s.getAddress().getEntryAddress())
+                        .photo(s.getPhoto())
+                        .build()
+                ).toList();
     }
 
     private void validateRoomInfo(RegisterRequest registerRequest) {
