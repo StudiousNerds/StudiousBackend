@@ -43,6 +43,7 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
 import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +79,6 @@ public class StudycafeService {
      * @param pageable 페이지
      * @return 검색 결과
      */
-    @Transactional(readOnly = true)
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
 
         // 날짜 선택이 안되었는데 시간을 선택한 경우
@@ -200,7 +200,11 @@ public class StudycafeService {
     }
 
     @Transactional
+    @Secured(value = MemberRole.ROLES.ADMIN)
     public RegisterResponse register(String accessToken, RegisterRequest registerRequest) {
+        // 현재 로그인된 유저 정보를 가져온다.
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+
         // 룸 정보 추가 검증
         validateRoomInfo(registerRequest);
 
@@ -209,9 +213,6 @@ public class StudycafeService {
         String latitude = cafeInfo.getAddressInfo().getLatitude();
         String longitude = cafeInfo.getAddressInfo().getLongitude();
         PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
-
-        // 현재 로그인된 유저 정보를 가져온다.
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
 
         // 생성자에서는 필요한 부분만 초기화
         Studycafe studycafe = Studycafe.builder()
@@ -313,16 +314,7 @@ public class StudycafeService {
 
     public List<ManagedCafeInquireResponse> inquireManagedStudycafe(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
-                .stream()
-                .map(
-                        s -> ManagedCafeInquireResponse.builder()
-                                .id(s.getId())
-                                .name(s.getName())
-                                .address(s.getAddress())
-                                .photo(s.getPhoto())
-                                .build()
-                ).toList();
+        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent();
     }
 
     private void validateRoomInfo(RegisterRequest registerRequest) {
