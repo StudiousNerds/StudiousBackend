@@ -349,6 +349,10 @@ public class StudycafeService {
                 ).toList();
     }
 
+    /**
+     * 스터디카페 등록 시 룸 정보에 대한 검증을 하는 메소드 (검증 실패 시 예외 발생)
+     * @param registerRequest 스터디카페 등록 시 요청값
+     */
     private void validateRoomInfo(RegisterRequest registerRequest) {
         List<RoomInfo> roomInfos = registerRequest.getRoomInfos();
         for (RoomInfo roomInfo : roomInfos) {
