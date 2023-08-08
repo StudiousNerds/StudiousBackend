@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.studycafe.dto.manage.ManagedCafeInquireResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +16,5 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long> {
     List<Studycafe> findTop10ByOrderByCreatedAtDesc();
     Optional<Studycafe> findByName(String cafeName);
 
-    Page<Studycafe> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
+    Page<ManagedCafeInquireResponse> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
 }
