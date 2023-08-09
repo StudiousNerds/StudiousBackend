@@ -20,6 +20,7 @@ import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
+import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
@@ -194,10 +195,9 @@ public class ReviewService {
      * 리뷰 작성 가능한 내역을 조회하는 메소드
      */
     public List<AvailableReviewResponse> findAvailableReviews(String accessToken) {
-        Member member = memberService.getMemberFromAccessToken(accessToken);
-        List<ReservationRecord> reservationRecordList = reservationRecordService.findAllByMemberId(member.getId());
+        List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 
-       return  reservationRecordList.stream()
+        return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null)
                 .map(reservationRecord -> AvailableReviewResponse.builder()
                         .reservationId(reservationRecord.getId())
@@ -212,6 +212,32 @@ public class ReviewService {
                         .endTime(reservationRecord.getEndTime())
                         .duration(reservationRecord.getDuration())
                         .validDate(reservationRecord.getDate().plusDays(7))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 리뷰 작성한 내역을 조회하는 메소드
+     */
+    public List<WrittenReviewResponse> findWrittenReviews(String accessToken) {
+        List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
+
+        return reservationRecordList.stream()
+                .filter(reservationRecord -> reservationRecord.getReview() != null)
+                .map(reservationRecord -> WrittenReviewResponse.builder()
+                        .reservationId(reservationRecord.getId())
+                        .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
+                        .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
+                        .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
+                        .roomName(reservationRecord.getRoom().getName())
+                        .date(reservationRecord.getDate())
+                        .writeDate(reservationRecord.getReview().getCreatedDate())
+                        .cleanliness(reservationRecord.getReview().getGrade().getCleanliness())
+                        .deafening(reservationRecord.getReview().getGrade().getDeafening())
+                        .fixtureStatus(reservationRecord.getReview().getGrade().getFixturesStatus())
+                        .reviewPhoto(subPhotoService.findReviewPhotos(reservationRecord.getReview().getId())[0])
+                        .detail(reservationRecord.getReview().getDetail())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -280,6 +306,12 @@ public class ReviewService {
             count++;
         }
         return  sum/ count;
+    }
+
+    private List<ReservationRecord> getReservationRecords(String accessToken) {
+        Member member = memberService.getMemberFromAccessToken(accessToken);
+        List<ReservationRecord> reservationRecordList = reservationRecordService.findAllByMemberId(member.getId());
+        return reservationRecordList;
     }
 
     private Review findById(Long reviewId) {
