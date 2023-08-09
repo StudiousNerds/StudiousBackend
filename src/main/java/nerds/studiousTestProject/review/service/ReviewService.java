@@ -51,7 +51,6 @@ public class ReviewService {
     private final StudycafeRepository studycafeRepository;
     private final HashtagRepository hashtagRepository;
     private final RoomRepository roomRepository;
-    private final ReservationRecordRepository reservationRecordRepository;
     public final Double GRADE_COUNT = 3.0;
 
 
@@ -154,7 +153,7 @@ public class ReviewService {
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
         List<ReservationRecord> reservationRecordList = new ArrayList<>();
         for (Room room : roomList){
-            List<ReservationRecord> reservationRecords = reservationRecordRepository.findAllByRoomId(room.getId());
+            List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(room.getId());
             for (int i = 0; i < reservationRecords.size(); i++) {
                 reservationRecordList.add(reservationRecords.get(i));
             }
@@ -192,10 +191,32 @@ public class ReviewService {
         return getReviewInfo(reviewList);
     }
 
-
     /**
-     * 리뷰 작성 가능한 내역을 조회하는 메소드
+     * 룸 별, 리뷰를 보여줄 메소드
      */
+    public List<FindReviewResponse> findRoomReviews(Long studycafeId, Long roomId) {
+        List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(roomId);
+        List<ReservationRecord> reservationRecordList = new ArrayList<>();
+        List<Review> reviewList = new ArrayList<>();
+
+        for (int i = 0; i < reservationRecords.size(); i++) {
+            reservationRecordList.add(reservationRecords.get(i));
+        }
+
+        for (ReservationRecord reservationRecord : reservationRecordList) {
+            List<Review> reviews = reviewRepository.findTop3ByReservationRecordId(reservationRecord.getId());
+            for (int i = 0; i < reviews.size(); i++) {
+                reviewList.add(reviews.get(i));
+            }
+        }
+
+        return getReviewInfo(reviewList);
+    }
+
+
+        /**
+         * 리뷰 작성 가능한 내역을 조회하는 메소드
+         */
     public List<AvailableReviewResponse> findAvailableReviews(String accessToken) {
         List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 

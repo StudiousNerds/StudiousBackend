@@ -106,4 +106,8 @@ public class ReservationRecordService {
     public List<ReservationRecord> findAllByMemberId(Long memberId) {
         return reservationRecordRepository.findAllByMemberId(memberId);
     }
+
+    public List<ReservationRecord> findAllByRoomId(Long roomId) {
+        return reservationRecordRepository.findAllByRoomId(roomId);
+    }
 }
