@@ -69,4 +69,9 @@ public class ReviewController {
     public List<FindReviewResponse> findRoomReviews(@PathVariable("cafeId") Long studycafeId, @PathVariable("roomId") Long roomId) {
         return reviewService.findRoomReviews(studycafeId, roomId);
     }
+
+    @GetMapping("/studycafes/{cafeId}/reviews/sorted")
+    public List<FindReviewResponse> findAllReviewsSorted(@PathVariable("cafeId") Long studycafeId, @RequestParam("sort") String sortType) {
+        return reviewService.findAllReviewsSorted(studycafeId, sortType);
+    }
 }
