@@ -145,6 +145,11 @@ public class ReservationRecordService {
                 .refundPolicyOnDay(RefundPolicyInResponse.from(refundPolicyOnDay))
                 .build();
 
+    private RefundPolicy getRefundPolicyOnDay(List<RefundPolicy> refundPolicies, int remainDate) {
+        return refundPolicies.stream()
+                .filter(refundPolicy -> refundPolicy.getRefundDay().getRemain() == remainDate)
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
     }
 
     private static int getRemainDate(LocalDate reservationDate, LocalDate now) {
