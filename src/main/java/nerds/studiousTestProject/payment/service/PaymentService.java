@@ -60,6 +60,7 @@ public class PaymentService {
                 .method(responseFromToss.getMethod())
                 .orderId(responseFromToss.getOrderId())
                 .paymentKey(responseFromToss.getPaymentKey())
+                .price(responseFromToss.getTotalAmount())
                 .build());
         reservationRecordService.findByOrderId(orderId).completePay(payment);//결제 완료로 상태 변경
         return createPaymentConfirmResponse(responseFromToss);
