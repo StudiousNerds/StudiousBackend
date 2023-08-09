@@ -38,7 +38,7 @@ class ReviewRepositoryTest {
         ReservationRecord reservationRecord = reservationRecordRepository.save(ReservationRecord.builder().id(1L).room(room).build());
         reservationRecord.addReview(review);
         // when
-        List<Review> reviewList = reviewRepository.findAllByReservationRecordId(studycafe.getId());
+        List<Review> reviewList = reviewRepository.findTop3ByReservationRecordId(studycafe.getId());
         // then
         Assertions.assertThat(reviewList).contains(review);
     }

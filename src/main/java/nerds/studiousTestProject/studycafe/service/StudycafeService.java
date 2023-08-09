@@ -113,7 +113,7 @@ public class StudycafeService {
                 .deafening(reviewService.getAvgDeafening(id))
                 .fixturesStatus(reviewService.getAvgFixturesStatus(id))
                 .total(studycafe.getTotalGrade())
-                .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
+                .reviewInfo(reviewService.findTop3Reviews(studycafe.getId()))
                 .build();
     }
 

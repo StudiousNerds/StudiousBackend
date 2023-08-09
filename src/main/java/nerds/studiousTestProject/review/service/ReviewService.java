@@ -162,11 +162,11 @@ public class ReviewService {
         return reservationRecordList;
     }
 
-    private List<Review> getReviewList(Long studycafeId) {
+    private List<Review> getTop3ReviewList(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
+            List<Review> reviews = reviewRepository.findTop3ByReservationRecordId(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
                 reviewList.add(reviews.get(i));
             }
@@ -174,22 +174,24 @@ public class ReviewService {
         return reviewList;
     }
 
-    public List<FindReviewResponse> findAllReviews(Long id) {
-        List<Review> reviewList = getReviewList(id);
-        List<FindReviewResponse> reviewResponses = new ArrayList<>();
+    /**
+     * 상세페이지에서 보여줄 가장 최신 리뷰 3개를 가져오는 메소드
+     */
+    public List<FindReviewResponse> findTop3Reviews(Long studycafeId) {
+        List<Review> reviewList = getTop3ReviewList(studycafeId);
 
-        for (Review review : reviewList) {
-            reviewResponses.add(FindReviewResponse.builder()
-                    .grade(review.getGrade().getTotal())
-                    .email(review.getReservationRecord().getMember().getNickname())
-                    .detail(review.getDetail())
-                    .date(review.getCreatedDate())
-                    .photos(subPhotoService.findReviewPhotos(review.getId()))
-                    .build());
-        }
-
-        return reviewResponses;
+        return getReviewInfo(reviewList);
     }
+
+    /**
+     * 더보기 페이지로 넘어간 후, 모든 리뷰를 보여줄 메소드
+     */
+    public List<FindReviewResponse> findAllReviews(Long studycafeId) {
+        List<Review> reviewList = getAllReviews(studycafeId);
+
+        return getReviewInfo(reviewList);
+    }
+
 
     /**
      * 리뷰 작성 가능한 내역을 조회하는 메소드
@@ -242,8 +244,8 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public Integer getAvgCleanliness(Long id){
-        List<Review> reviewList = getReviewList(id);
+    public Integer getAvgCleanliness(Long studycafeId){
+        List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
         for (Review review : reviewList){
@@ -254,8 +256,8 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgDeafening(Long id) {
-        List<Review> reviewList = getReviewList(id);
+    public Integer getAvgDeafening(Long studycafeId) {
+        List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
         for (Review review : reviewList){
@@ -266,8 +268,8 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgFixturesStatus(Long id) {
-        List<Review> reviewList = getReviewList(id);
+    public Integer getAvgFixturesStatus(Long studycafeId) {
+        List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
         for (Review review : reviewList){
@@ -278,8 +280,8 @@ public class ReviewService {
         return sum / count;
     }
 
-    public Integer getAvgRecommendation(Long id) {
-        List<Review> reviewList = getReviewList(id);
+    public Integer getAvgRecommendation(Long studycafeId) {
+        List<Review> reviewList = getAllReviews(studycafeId);
         Integer recommend = 0, count = 0;
 
         for (Review review : reviewList){
@@ -296,8 +298,8 @@ public class ReviewService {
         return (cleanliness + deafening + fixtureStatus) / GRADE_COUNT;
     }
 
-    public Double getAvgGrade(Long id) {
-        List<Review> reviewList = getReviewList(id);
+    public Double getAvgGrade(Long studycafeId) {
+        List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0;
         Double sum = 0.0;
 
@@ -312,6 +314,30 @@ public class ReviewService {
         Member member = memberService.getMemberFromAccessToken(accessToken);
         List<ReservationRecord> reservationRecordList = reservationRecordService.findAllByMemberId(member.getId());
         return reservationRecordList;
+    }
+
+    private List<FindReviewResponse> getReviewInfo(List<Review> reviewList) {
+        return reviewList.stream()
+                .map(review -> FindReviewResponse.builder()
+                        .grade(review.getGrade().getTotal())
+                        .nickname(review.getReservationRecord().getMember().getNickname())
+                        .detail(review.getDetail())
+                        .date(review.getCreatedDate())
+                        .photos(subPhotoService.findReviewPhotos(review.getId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private List<Review> getAllReviews(Long studycafeId) {
+        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Review> reviewList = new ArrayList<>();
+        for (ReservationRecord reservationRecord : recordList) {
+            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
+            for (int i = 0; i < reviews.size(); i++) {
+                reviewList.add(reviews.get(i));
+            }
+        }
+        return reviewList;
     }
 
     private Review findById(Long reviewId) {
