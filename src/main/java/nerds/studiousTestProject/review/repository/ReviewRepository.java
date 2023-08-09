@@ -19,4 +19,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "where r.reservationRecord.id = :reservationId " +
             "order by r.createdDate desc")
     List<Review> findAllByReservationRecordId(@Param("reservationId") Long reservationId);
+
+    @Query(value = "select r " +
+            "from Review as r " +
+            "where r.reservationRecord.id = :reservationId " +
+            "order by r.grade.total desc")
+    List<Review> findAllByReservationRecordIdOrderByGradeDesc(@Param("reservationId") Long reservationId);
+
+    @Query(value = "select r " +
+            "from Review as r " +
+            "where r.reservationRecord.id = :reservationId " +
+            "order by r.grade.total asc")
+    List<Review> findAllByReservationRecordIdOrderByGradeAsc(@Param("reservationId") Long reservationId);
 }
