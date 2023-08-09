@@ -7,6 +7,7 @@ import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
+import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
@@ -28,34 +29,39 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/reviews")
+@RequestMapping("/studious")
 @Slf4j
 @Validated
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @PostMapping
+    @PostMapping("/reviews")
     public RegisterReviewResponse registerReview(@RequestBody @Valid RegisterReviewRequest registerReviewRequest) {
         return reviewService.registerReview(registerReviewRequest);
     }
 
-    @PatchMapping("/{reviewId}")
+    @PatchMapping("/reviews/{reviewId}")
     public ModifyReviewResponse modifyReview(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ModifyReviewRequest modifyReviewRequest) {
         return reviewService.modifyReview(reviewId, modifyReviewRequest);
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping("/reviews/{reviewId}")
     public DeleteReviewResponse deleteReview(@PathVariable("reviewId") Long reviewId, @RequestParam("studycafe") Long studycafeId) {
         return reviewService.deleteReview(reviewId, studycafeId);
     }
 
-    @GetMapping("/available")
+    @GetMapping("/reviews/available")
     public List<AvailableReviewResponse> InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return reviewService.findAvailableReviews(accessToken);
     }
 
-    @GetMapping
+    @GetMapping("/reviews")
     public List<WrittenReviewResponse> InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return reviewService.findWrittenReviews(accessToken);
+    }
+
+    @GetMapping("/studycafes/{cafeId}/reviews")
+    public List<FindReviewResponse> findAllReviews(@PathVariable("cafeId") Long studycafeId) {
+        return reviewService.findAllReviews(studycafeId);
     }
 }
