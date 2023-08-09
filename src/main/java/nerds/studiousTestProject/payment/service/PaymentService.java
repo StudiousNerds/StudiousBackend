@@ -55,13 +55,7 @@ public class PaymentService {
     public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, Integer amount) {
         ConfirmSuccessRequest request = ConfirmSuccessRequest.of(orderId,amount,paymentKey);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(request, CONFIRM_URI);
-        Payment payment = paymentRepository.save(Payment.builder()
-                .completeTime(responseFromToss.getRequestedAt())
-                .method(responseFromToss.getMethod())
-                .orderId(responseFromToss.getOrderId())
-                .paymentKey(responseFromToss.getPaymentKey())
-                .price(responseFromToss.getTotalAmount())
-                .build());
+        Payment payment = paymentRepository.save(responseFromToss.toPayment());
         reservationRecordService.findByOrderId(orderId).completePay(payment);//결제 완료로 상태 변경
         return createPaymentConfirmResponse(responseFromToss);
     }
@@ -86,11 +80,10 @@ public class PaymentService {
                 .build();
     }
 
-    public List<CancelResponse> cancel(CancelRequest cancelRequest, Long reservationId){
+    public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = reservationRecordService.findById(reservationId);
-        List<CancelResponse> cancelResponses = requestCancelToToss(cancelRequest, reservationRecord.getPayment().getPaymentKey());
+        requestCancelToToss(cancelRequest, reservationRecord.getPayment().getPaymentKey());
         reservationRecordService.cancel(reservationId); //결제 취소 상태로 변경
-        return cancelResponses;
     }
     @Transactional
     public List<CancelResponse> requestCancelToToss(CancelRequest cancelRequest, String paymentKey){
