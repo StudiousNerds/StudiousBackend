@@ -16,8 +16,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
             "and r.status = nerds.studiousTestProject.reservation.entity.ReservationStatus.CONFIRMED")
     List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
-    @Query("select r from ReservationRecord r where r.room.id = :roomId")
-    List<ReservationRecord> findAllByRoomId(@Param("roomId")Long roomId);
+    List<ReservationRecord> findAllByRoomId(Long roomId);
     Optional<ReservationRecord> findByOrderId(String orderId);
-
+    List<ReservationRecord> findAllByMemberId(Long memberId);
 }
