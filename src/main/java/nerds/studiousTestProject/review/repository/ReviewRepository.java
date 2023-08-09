@@ -12,5 +12,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "from Review as r " +
             "where r.reservationRecord.id = :reservationId " +
             "order by r.createdDate desc")
+    List<Review> findTop3ByReservationRecordId(@Param("reservationId") Long reservationId);
+
+    @Query(value = "select r " +
+            "from Review as r " +
+            "where r.reservationRecord.id = :reservationId " +
+            "order by r.createdDate desc")
     List<Review> findAllByReservationRecordId(@Param("reservationId") Long reservationId);
 }
