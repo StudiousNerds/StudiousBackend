@@ -40,8 +40,7 @@ public class Review {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<HashtagRecord> hashtagRecords;
 
-    @OneToOne
-    @JoinColumn(name = "grade_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Grade grade;
 
     @Column(name = "created_date")
@@ -56,8 +55,9 @@ public class Review {
         hashtagRecord.setReview(this);
     }
 
-    public void setGrade(Grade grade) {
+    public void addGrade(Grade grade) {
         this.grade = grade;
+        grade.setReview(this);
     }
 
     @Builder

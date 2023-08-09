@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.review.service;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
@@ -12,9 +11,9 @@ import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
-import nerds.studiousTestProject.reservation.service.ReservationService;
 import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
+import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
@@ -65,20 +64,20 @@ public class ReviewService {
     public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
         Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
 
-        Review review = Review.builder()
-                .reservationRecord(reservationRecordService.findById(registerReviewRequest.getReservationId()))
-                .createdDate(LocalDate.now())
-                .detail(registerReviewRequest.getDetail())
-                .build();
-        reviewRepository.save(review);
-
         Grade grade = Grade.builder().cleanliness(registerReviewRequest.getCleanliness())
                 .deafening(registerReviewRequest.getDeafening())
                 .fixturesStatus(registerReviewRequest.getFixtureStatus())
                 .isRecommended(registerReviewRequest.getIsRecommend())
                 .build();
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-        grade.addReview(review);
+
+        Review review = Review.builder()
+                .reservationRecord(reservationRecordService.findById(registerReviewRequest.getReservationId()))
+                .createdDate(LocalDate.now())
+                .detail(registerReviewRequest.getDetail())
+                .build();
+        reviewRepository.save(review);
+        review.addGrade(grade);
 
         List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
         for (String userHashtag : hashtags) {
@@ -113,6 +112,7 @@ public class ReviewService {
                 modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
+        // 리뷰가 수정되면서 grade가 바뀌면서 총점이 변경되는 경우가 있을 수 있으니, 스터디카페의 totalGrade 값 업데이트
         Double avgGrade = getAvgGrade(studycafe.getId());
         studycafe.addTotalGrade(avgGrade);
 
@@ -138,6 +138,19 @@ public class ReviewService {
         review.updateDetail(modifyReviewRequest.getDetail());
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
+    }
+
+    public DeleteReviewResponse deleteReview(Long reviewId, Long studycafeId) {
+        hashtagRepository.deleteAllByReviewId(reviewId);
+        subPhotoService.removeAllPhotos(reviewId);
+        reviewRepository.deleteById(reviewId);
+
+        // 리뷰가 삭제되면서 등급도 사라졌기 때문에 새롭게 스터디카페의 totalGrade값을 업데이트 해줌
+        Studycafe studycafe = findByStudycafeId(studycafeId);
+        Double avgGrade = getAvgGrade(studycafe.getId());
+        studycafe.addTotalGrade(avgGrade);
+
+        return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
 
