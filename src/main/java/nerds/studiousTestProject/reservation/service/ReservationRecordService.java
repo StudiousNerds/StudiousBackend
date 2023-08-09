@@ -18,6 +18,7 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
@@ -102,4 +103,7 @@ public class ReservationRecordService {
         return ReserveResponse.of(member, room, studycafe);
     }
 
+    public List<ReservationRecord> findAllByMemberId(Long memberId) {
+        return reservationRecordRepository.findAllByMemberId(memberId);
+    }
 }
