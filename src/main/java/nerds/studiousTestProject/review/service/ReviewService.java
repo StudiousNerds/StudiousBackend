@@ -177,18 +177,24 @@ public class ReviewService {
      * 상세페이지에서 보여줄 가장 최신 리뷰 3개를 가져오는 메소드
      */
     public List<FindReviewResponse> findTop3Reviews(Long studycafeId) {
-        List<Review> reviewList = getTop3ReviewList(studycafeId);
-
-        return getReviewInfo(reviewList);
+        return getReviewInfo(getTop3ReviewList(studycafeId));
     }
 
     /**
      * 더보기 페이지로 넘어간 후, 모든 리뷰를 보여줄 메소드
      */
     public List<FindReviewResponse> findAllReviews(Long studycafeId) {
-        List<Review> reviewList = getAllReviews(studycafeId);
+        return getReviewInfo(getAllReviews(studycafeId));
+    }
 
-        return getReviewInfo(reviewList);
+    /**
+     * 모든 리뷰를 보여주는 페이지에서 정렬하는 메소드
+     */
+    public List<FindReviewResponse> findAllReviewsSorted(Long studycafeId, String sortType) {
+        return switch (sortType) {
+            case "HIGH" ->  getReviewInfo(getAllHighReviews(studycafeId));
+            case "LOW" -> getReviewInfo(getAllLowReviews(studycafeId));
+        };
     }
 
     /**
@@ -212,7 +218,6 @@ public class ReviewService {
 
         return getReviewInfo(reviewList);
     }
-
 
         /**
          * 리뷰 작성 가능한 내역을 조회하는 메소드
@@ -354,6 +359,30 @@ public class ReviewService {
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
             List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
+            for (int i = 0; i < reviews.size(); i++) {
+                reviewList.add(reviews.get(i));
+            }
+        }
+        return reviewList;
+    }
+
+    private List<Review> getAllHighReviews(Long studycafeId) {
+        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Review> reviewList = new ArrayList<>();
+        for (ReservationRecord reservationRecord : recordList) {
+            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeDesc(reservationRecord.getId());
+            for (int i = 0; i < reviews.size(); i++) {
+                reviewList.add(reviews.get(i));
+            }
+        }
+        return reviewList;
+    }
+
+    private List<Review> getAllLowReviews(Long studycafeId) {
+        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Review> reviewList = new ArrayList<>();
+        for (ReservationRecord reservationRecord : recordList) {
+            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeAsc(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
                 reviewList.add(reviews.get(i));
             }
