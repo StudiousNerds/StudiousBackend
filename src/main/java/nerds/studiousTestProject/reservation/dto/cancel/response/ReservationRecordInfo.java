@@ -15,6 +15,7 @@ import java.time.LocalTime;
 @Builder
 public class ReservationRecordInfo {
     private String studycafeName;
+    private String studycafePhoto;
     private String roomName;
     private LocalDate reservationDate;
     private LocalTime reservationStartTime;
@@ -24,6 +25,7 @@ public class ReservationRecordInfo {
     public static ReservationRecordInfo of(Studycafe studycafe, Room room, ReservationRecord reservationRecord) {
         return ReservationRecordInfo.builder()
                 .studycafeName(studycafe.getName())
+                .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
                 .reservationDate(reservationRecord.getDate())
                 .reservationStartTime(reservationRecord.getStartTime())
