@@ -11,7 +11,6 @@ import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
@@ -210,7 +209,7 @@ public class ReviewService {
         }
 
         for (ReservationRecord reservationRecord : reservationRecordList) {
-            List<Review> reviews = reviewRepository.findTop3ByReservationRecordId(reservationRecord.getId());
+            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
                 reviewList.add(reviews.get(i));
             }
@@ -219,7 +218,17 @@ public class ReviewService {
         return getReviewInfo(reviewList);
     }
 
-        /**
+    /**
+     * 룸 별, 리뷰를 보여줄 때 정렬하는 메소드
+     */
+    public List<FindReviewResponse> findRoomReviewsSorted(Long studycafeId, Long roomId, String sortType) {
+        return switch (sortType) {
+            case "HIGH" ->  getReviewInfo(getRoomHighReviews(roomId));
+            case "LOW" -> getReviewInfo(getRoomLowReviews(roomId));
+        };
+    }
+
+    /**
          * 리뷰 작성 가능한 내역을 조회하는 메소드
          */
     public List<AvailableReviewResponse> findAvailableReviews(String accessToken) {
@@ -369,6 +378,28 @@ public class ReviewService {
     private List<Review> getAllHighReviews(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
+        return getRoomReviewsDesc(recordList, reviewList);
+    }
+
+    private List<Review> getAllLowReviews(Long studycafeId) {
+        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Review> reviewList = new ArrayList<>();
+        return getRoomReviewsAsc(recordList, reviewList);
+    }
+
+    private List<Review> getRoomHighReviews(Long roomId) {
+        List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
+        List<Review> reviewList = new ArrayList<>();
+        return getRoomReviewsDesc(recordList, reviewList);
+    }
+
+    private List<Review> getRoomLowReviews(Long roomId) {
+        List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
+        List<Review> reviewList = new ArrayList<>();
+        return getRoomReviewsAsc(recordList, reviewList);
+    }
+
+    private List<Review> getRoomReviewsDesc(List<ReservationRecord> recordList, List<Review> reviewList) {
         for (ReservationRecord reservationRecord : recordList) {
             List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeDesc(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
@@ -378,9 +409,7 @@ public class ReviewService {
         return reviewList;
     }
 
-    private List<Review> getAllLowReviews(Long studycafeId) {
-        List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Review> reviewList = new ArrayList<>();
+    private List<Review> getRoomReviewsAsc(List<ReservationRecord> recordList, List<Review> reviewList) {
         for (ReservationRecord reservationRecord : recordList) {
             List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeAsc(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
