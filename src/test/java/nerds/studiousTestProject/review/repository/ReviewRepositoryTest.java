@@ -16,8 +16,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ReviewRepositoryTest {
@@ -36,10 +34,11 @@ class ReviewRepositoryTest {
         // given
         Studycafe studycafe = studycafeRepository.save(Studycafe.builder().id(1L).build());
         Room room = roomRepository.save(Room.builder().id(1L).studycafe(studycafe).build());
+        Review review = reviewRepository.save(Review.builder().id(1L).createdDate(LocalDate.now()).build());
         ReservationRecord reservationRecord = reservationRecordRepository.save(ReservationRecord.builder().id(1L).room(room).build());
-        Review review = reviewRepository.save(Review.builder().id(1L).reservationRecord(reservationRecord).createdDate(LocalDate.now()).build());
+        reservationRecord.addReview(review);
         // when
-        List<Review> reviewList = reviewRepository.findAllById(studycafe.getId());
+        List<Review> reviewList = reviewRepository.findAllByReservationRecordId(studycafe.getId());
         // then
         Assertions.assertThat(reviewList).contains(review);
     }
