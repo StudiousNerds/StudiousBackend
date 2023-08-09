@@ -9,6 +9,7 @@ import nerds.studiousTestProject.review.dto.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
+import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +34,7 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @PostMapping()
+    @PostMapping
     public RegisterReviewResponse registerReview(@RequestBody @Valid RegisterReviewRequest registerReviewRequest) {
         return reviewService.registerReview(registerReviewRequest);
     }
@@ -51,5 +52,10 @@ public class ReviewController {
     @GetMapping("/available")
     public List<AvailableReviewResponse> InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return reviewService.findAvailableReviews(accessToken);
+    }
+
+    @GetMapping
+    public List<WrittenReviewResponse> InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return reviewService.findWrittenReviews(accessToken);
     }
 }
