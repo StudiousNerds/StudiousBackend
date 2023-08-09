@@ -26,10 +26,10 @@ public class ReservationRecordController {
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
 
-    @PostMapping("{reservationRecordId}/cancel")
-    public List<CancelResponse> cancelReservation(@PathVariable Long reservationRecordId,
+    @PostMapping("/mypage/reservation-settings/{reservationId}/cancellations")
+    public List<CancelResponse> cancelReservation(@PathVariable Long reservationId,
                                                   @RequestBody CancelRequest cancelRequest){
-        return paymentService.cancel(cancelRequest, reservationRecordId);
+        return paymentService.cancel(cancelRequest, reservationId);
     }
 
     @GetMapping("/reservations/studycafes/{cafeId}/rooms/{roomId}")
