@@ -11,7 +11,10 @@ import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfo;
+import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
+import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
@@ -118,32 +121,28 @@ public class ReservationRecordService {
         List<RefundPolicy> refundPolicies = studycafe.getRefundPolicies();
         Payment payment = reservationRecord.getPayment();
 
-        LocalDate reservationDate = reservationRecord.getDate();
-        final int remainDate = getRemainDate(reservationDate, LocalDate.now());
+        final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
+        RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
 
-        RefundPolicy refundPolicyOnDay = refundPolicies.stream()
-                .filter(refundPolicy -> refundPolicy.getRefundDay().getRemain() == remainDate)
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
+        return ReservationCancelResponse.builder()
+                .reservationInfo(ReservationRecordInfo.of(studycafe, room, reservationRecord))
+                .paymentInfo(calculateRefundMoney(payment, refundPolicyOnDay))
+                .refundPolicyInfo(RefundPolicyInfo.of(refundPolicies, refundPolicyOnDay))
+                .build();
 
+    }
+
+    private PaymentInfo calculateRefundMoney(Payment payment, RefundPolicy refundPolicyOnDay) {
         Integer totalPrice = payment.getPrice();
         int refundFee = totalPrice * refundPolicyOnDay.getRate() * (1 / 100);
         int refundPrice = totalPrice - refundFee;
-
-        return ReservationCancelResponse.builder()
-                .studycafeName(studycafe.getName())
-                .roomName(room.getName())
-                .reservationDate(reservationDate)
-                .reservationDuration(reservationRecord.getDuration())
-                .reservationStartTime(reservationRecord.getStartTime())
-                .reservationEndTime(reservationRecord.getEndTime())
-                .price(totalPrice)
-                .refundPolicy(refundPolicies.stream().map(RefundPolicyInResponse::from).collect(Collectors.toList()))
-                .paymentMethod(payment.getMethod())
-                .refundPrice(refundPrice)
+        return PaymentInfo.builder()
                 .refundFee(refundFee)
-                .refundPolicyOnDay(RefundPolicyInResponse.from(refundPolicyOnDay))
+                .refundPrice(refundPrice)
+                .price(totalPrice)
+                .paymentMethod(payment.getMethod())
                 .build();
+    }
 
     private RefundPolicy getRefundPolicyOnDay(List<RefundPolicy> refundPolicies, int remainDate) {
         return refundPolicies.stream()
@@ -152,7 +151,7 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
     }
 
-    private static int getRemainDate(LocalDate reservationDate, LocalDate now) {
+    private int getRemainDate(LocalDate reservationDate, LocalDate now) {
         int remainDate = reservationDate.getDayOfYear() - now.getDayOfYear();
         return remainDate > 8 ? 8 : remainDate;
     }
