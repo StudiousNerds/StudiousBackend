@@ -30,8 +30,7 @@ public class ReservationRecordController {
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId,
                                                   @RequestBody CancelRequest cancelRequest) {
         paymentService.cancel(cancelRequest, reservationId);
-        return ResponseEntity.created(URI.create("/mypage/reservatioin-settings?tab=cancel"))
-                .build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reservations/studycafes/{cafeId}/rooms/{roomId}")
