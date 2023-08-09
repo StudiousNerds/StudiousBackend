@@ -6,6 +6,8 @@ import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRepository;
+import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -13,6 +15,7 @@ import nerds.studiousTestProject.reservation.repository.ReservationRecordReposit
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
+import nerds.studiousTestProject.review.dto.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
 import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
@@ -31,6 +34,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.*;
 
@@ -42,23 +46,13 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SubPhotoService subPhotoService;
     private final ReservationRecordService reservationRecordService;
+    private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
     private final HashtagRepository hashtagRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     public final Double GRADE_COUNT = 3.0;
 
-    private List<Review> getReviewList(Long studycafeId) {
-        List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Review> reviewList = new ArrayList<>();
-        for (ReservationRecord r : recordList) {
-            List<Review> reviews = reviewRepository.findAllById(r.getId());
-            for (int i = 0; i < reviews.size(); i++) {
-                reviewList.add(reviews.get(i));
-            }
-        }
-        return reviewList;
-    }
 
     @Transactional
     public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
@@ -72,12 +66,14 @@ public class ReviewService {
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
-                .reservationRecord(reservationRecordService.findById(registerReviewRequest.getReservationId()))
                 .createdDate(LocalDate.now())
                 .detail(registerReviewRequest.getDetail())
                 .build();
         reviewRepository.save(review);
         review.addGrade(grade);
+
+        ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
+        reservationRecord.addReview(review);
 
         List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
         for (String userHashtag : hashtags) {
@@ -153,6 +149,29 @@ public class ReviewService {
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
+    public List<ReservationRecord> findAllReservation(Long studycafeId){
+        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+        List<ReservationRecord> reservationRecordList = new ArrayList<>();
+        for (Room room : roomList){
+            List<ReservationRecord> reservationRecords = reservationRecordRepository.findAllByRoomId(room.getId());
+            for (int i = 0; i < reservationRecords.size(); i++) {
+                reservationRecordList.add(reservationRecords.get(i));
+            }
+        }
+        return reservationRecordList;
+    }
+
+    private List<Review> getReviewList(Long studycafeId) {
+        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Review> reviewList = new ArrayList<>();
+        for (ReservationRecord reservationRecord : recordList) {
+            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
+            for (int i = 0; i < reviews.size(); i++) {
+                reviewList.add(reviews.get(i));
+            }
+        }
+        return reviewList;
+    }
 
     public List<FindReviewResponse> findAllReviews(Long id) {
         List<Review> reviewList = getReviewList(id);
@@ -171,16 +190,30 @@ public class ReviewService {
         return reviewResponses;
     }
 
-    public List<ReservationRecord> findAllReservation(Long studycafeId){
-        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-        List<ReservationRecord> reservationRecordList = new ArrayList<>();
-        for (Room r : roomList){
-            List<ReservationRecord> reservationRecords = reservationRecordRepository.findAllByRoomId(r.getId());
-            for (int i = 0; i < reservationRecords.size(); i++) {
-                reservationRecordList.add(reservationRecords.get(i));
-            }
-        }
-        return reservationRecordList;
+    /**
+     * 리뷰 작성 가능한 내역을 조회하는 메소드
+     */
+    public List<AvailableReviewResponse> findAvailableReviews(String accessToken) {
+        Member member = memberService.getMemberFromAccessToken(accessToken);
+        List<ReservationRecord> reservationRecordList = reservationRecordService.findAllByMemberId(member.getId());
+
+       return  reservationRecordList.stream()
+                .filter(reservationRecord -> reservationRecord.getReview() == null)
+                .map(reservationRecord -> AvailableReviewResponse.builder()
+                        .reservationId(reservationRecord.getId())
+                        .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
+                        .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
+                        .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
+                        .roomName(reservationRecord.getRoom().getName())
+                        .paymentType(reservationRecord.getPayment().getMethod())
+                        .price(reservationRecord.getRoom().getPrice() * reservationRecord.getDuration())
+                        .date(reservationRecord.getDate())
+                        .startTime(reservationRecord.getStartTime())
+                        .endTime(reservationRecord.getEndTime())
+                        .duration(reservationRecord.getDuration())
+                        .validDate(reservationRecord.getDate().plusDays(7))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Integer getAvgCleanliness(Long id){
