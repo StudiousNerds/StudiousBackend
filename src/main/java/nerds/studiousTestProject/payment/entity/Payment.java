@@ -22,6 +22,9 @@ public class Payment {
     private String method;
     private String completeTime;
     private Integer price;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+    private String cancelReason;
 
     @Builder
     public Payment(Long id, String orderId, String paymentKey, String method, String completeTime, Integer price) {
