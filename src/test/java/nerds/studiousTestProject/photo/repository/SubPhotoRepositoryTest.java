@@ -82,7 +82,9 @@ class SubPhotoRepositoryTest {
         // when
         subPhotoRepository.deleteAllByReviewId(1L);
         List<SubPhoto> photoList = subPhotoRepository.findAll();
+        List<Review> reviewList = reviewRepository.findAll();
         // then
         assertThat(photoList.size()).isEqualTo(0);
+        assertThat(reviewList.size()).isEqualTo(1);
     }
 }
