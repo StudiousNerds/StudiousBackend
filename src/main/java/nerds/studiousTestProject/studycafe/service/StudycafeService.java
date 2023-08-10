@@ -23,10 +23,12 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.NotificationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
@@ -44,6 +46,7 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.entity.Address;
 import nerds.studiousTestProject.studycafe.entity.Notice;
+import nerds.studiousTestProject.studycafe.entity.NotificationInfo;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
@@ -439,5 +442,64 @@ public class StudycafeService {
                 .notices(noticeResponses)
                 .refundPolicies(refundPolicyResponses)
                 .build();
+    }
+
+    /**
+     * 공지사항 조회 로직
+     * @param accessToken 사용자 엑세스 토큰
+     * @param cafeId 스터디카페 PK
+     * @return 스터디카페의 모든 공지사항
+     */
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
+        log.info("Hello");
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        return studycafe.getNotificationInfos().stream().map(
+                n -> NotificationInfoResponse.builder()
+                        .detail(n.getDetail())
+                        .startDate(n.getStartDate())
+                        .endDate(n.getEndDate())
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 공지사항 추가 로직
+     * @param accessToken 사용자 엑세스 토큰
+     * @param cafeId 스터디카페 PK
+     * @param notificationInfoRequest 공지사항 요청 값
+     */
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    @Transactional
+    public void insertNotificationInfos(String accessToken, Long cafeId, NotificationInfoRequest notificationInfoRequest) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우
+        if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
+            throw new BadRequestException(ErrorCode.START_DATE_AFTER_THAN_END_DATE);
+        }
+
+        studycafe.addNotificationInfo(
+                NotificationInfo.builder()
+                        .detail(notificationInfoRequest.getDetail())
+                        .startDate(notificationInfoRequest.getStartDate())
+                        .endDate(notificationInfoRequest.getEndDate())
+                        .build()
+        );
+    }
+
+    /**
+     * 스터디카페 삭제 메소드, 실제로 DB에서 삭제
+     * @param accessToken 사용자 엑세스 토큰
+     * @param cafeId 스터디카페 PK
+     */
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    @Transactional
+    public void deleteStudycafe(String accessToken, Long cafeId) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        studycafeRepository.deleteByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 }
