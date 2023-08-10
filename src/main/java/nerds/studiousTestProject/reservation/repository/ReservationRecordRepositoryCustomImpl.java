@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.ALL;
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.CANCELED;
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.USING;
@@ -46,7 +47,6 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
                 .fetch();
 
         Long count = getReservationSettings(countQuery, tab, studycafeName, startDate, endDate, member)
-                .groupBy(reservationRecord)
                 .fetchOne();
 
         return count == null ? Page.empty() : new PageImpl<>(content, pageable, count);
@@ -78,6 +78,7 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
     private BooleanExpression handleTab(ReservationSettingsStatus tab) {
         LocalDate nowDate = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
+        if (tab == ALL) return null;
         if (tab == CANCELED)
             return reservationRecord.status.eq(ReservationStatus.CANCELED);
         if (tab == BEFORE_USING)
