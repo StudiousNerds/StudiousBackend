@@ -2,6 +2,8 @@ package nerds.studiousTestProject.review.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import nerds.studiousTestProject.review.entity.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,21 +16,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "order by r.createdDate desc")
     List<Review> findTop3ByReservationRecordId(@Param("reservationId") Long reservationId);
 
-    @Query(value = "select r " +
-            "from Review as r " +
-            "where r.reservationRecord.id = :reservationId " +
-            "order by r.createdDate desc")
-    List<Review> findAllByReservationRecordId(@Param("reservationId") Long reservationId);
+    // 스터디카페의 평균 청결도, 방음도를 가져올 때 필요한 메소드인데, 그 때는 Pageable를 받지 않아서 따로 구분 했습니다!
+    List<Review> findAllByReservationRecordIdOrderByCreatedDatedDesc(Long reservationId);
 
-    @Query(value = "select r " +
-            "from Review as r " +
-            "where r.reservationRecord.id = :reservationId " +
-            "order by r.grade.total desc")
-    List<Review> findAllByReservationRecordIdOrderByGradeDesc(@Param("reservationId") Long reservationId);
-
-    @Query(value = "select r " +
-            "from Review as r " +
-            "where r.reservationRecord.id = :reservationId " +
-            "order by r.grade.total asc")
-    List<Review> findAllByReservationRecordIdOrderByGradeAsc(@Param("reservationId") Long reservationId);
+    Page<Review> findAllByReservationRecordId(Long reservationId, Pageable pageable);
 }

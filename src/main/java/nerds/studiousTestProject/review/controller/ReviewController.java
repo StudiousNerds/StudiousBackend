@@ -12,6 +12,7 @@ import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,22 +62,12 @@ public class ReviewController {
     }
 
     @GetMapping("/studycafes/{cafeId}/reviews")
-    public List<FindReviewResponse> findAllReviews(@PathVariable("cafeId") Long studycafeId) {
-        return reviewService.findAllReviews(studycafeId);
+    public List<FindReviewResponse> findAllReviews(@PathVariable("cafeId") Long studycafeId, Pageable pageable) {
+        return reviewService.findAllReviews(studycafeId, pageable);
     }
 
     @GetMapping("/studycafes/{cafeId}/rooms/{roomId}/reviews")
-    public List<FindReviewResponse> findRoomReviews(@PathVariable("cafeId") Long studycafeId, @PathVariable("roomId") Long roomId) {
-        return reviewService.findRoomReviews(studycafeId, roomId);
-    }
-
-    @GetMapping("/studycafes/{cafeId}/reviews/sorted")
-    public List<FindReviewResponse> findAllReviewsSorted(@PathVariable("cafeId") Long studycafeId, @RequestParam("sort") String sortType) {
-        return reviewService.findAllReviewsSorted(studycafeId, sortType);
-    }
-
-    @GetMapping("/studycafes/{cafeId}/rooms/{roomId}/reviews/sorted")
-    public List<FindReviewResponse> findRoomReviewsSorted(@PathVariable("cafeId") Long studycafeId, @PathVariable("roomId") Long roomId, @RequestParam("sort") String sortType) {
-        return reviewService.findRoomReviewsSorted(studycafeId, roomId, sortType);
+    public List<FindReviewResponse> findRoomReviews(@PathVariable("cafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
+        return reviewService.findRoomReviews(studycafeId, roomId, pageable);
     }
 }

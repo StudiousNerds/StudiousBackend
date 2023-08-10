@@ -27,6 +27,9 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,52 +183,22 @@ public class ReviewService {
     }
 
     /**
-     * 더보기 페이지로 넘어간 후, 모든 리뷰를 보여줄 메소드
+     * 모든 리뷰를 보여줄 메소드(정렬까지 포함)
+     * pageable를 통해서 sort까지 지정할 수 있습니다! (쿼리 파라미터를 통해 입력하면 알아서 처리해줌)
+     * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
      */
-    public List<FindReviewResponse> findAllReviews(Long studycafeId) {
-        return getReviewInfo(getAllReviews(studycafeId));
+    public List<FindReviewResponse> findAllReviews(Long studycafeId, Pageable pageable) {
+        return getReviewInfo(getAllReviewsSorted(studycafeId, pageable));
     }
 
-    /**
-     * 모든 리뷰를 보여주는 페이지에서 정렬하는 메소드
-     */
-    public List<FindReviewResponse> findAllReviewsSorted(Long studycafeId, String sortType) {
-        return switch (sortType) {
-            case "HIGH" ->  getReviewInfo(getAllHighReviews(studycafeId));
-            case "LOW" -> getReviewInfo(getAllLowReviews(studycafeId));
-        };
-    }
 
     /**
-     * 룸 별, 리뷰를 보여줄 메소드
+     * 룸 별, 리뷰를 보여줄 메소드(정렬까지 포함)
+     * pageable를 통해서 sort까지 지정할 수 있습니다! (쿼리 파라미터를 통해 입력하면 알아서 처리해줌)
+     * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
      */
-    public List<FindReviewResponse> findRoomReviews(Long studycafeId, Long roomId) {
-        List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(roomId);
-        List<ReservationRecord> reservationRecordList = new ArrayList<>();
-        List<Review> reviewList = new ArrayList<>();
-
-        for (int i = 0; i < reservationRecords.size(); i++) {
-            reservationRecordList.add(reservationRecords.get(i));
-        }
-
-        for (ReservationRecord reservationRecord : reservationRecordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
-            for (int i = 0; i < reviews.size(); i++) {
-                reviewList.add(reviews.get(i));
-            }
-        }
-
-        return getReviewInfo(reviewList);
-    }
-
-    /**
-     * 룸 별, 리뷰를 보여줄 때 정렬하는 메소드
-     */
-    public List<FindReviewResponse> findRoomReviewsSorted(Long studycafeId, Long roomId, String sortType) {
-        return switch (sortType) {
-            case "HIGH" ->  getReviewInfo(getRoomHighReviews(roomId));
-            case "LOW" -> getReviewInfo(getRoomLowReviews(roomId));
-        };
+    public List<FindReviewResponse> findRoomReviews(Long studycafeId, Long roomId, Pageable pageable) {
+        return getReviewInfo(getRoomReviewsSorted(studycafeId, roomId, pageable));
     }
 
     /**
@@ -367,7 +340,7 @@ public class ReviewService {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId());
+            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByCreatedDatedDesc(reservationRecord.getId());
             for (int i = 0; i < reviews.size(); i++) {
                 reviewList.add(reviews.get(i));
             }
@@ -375,45 +348,35 @@ public class ReviewService {
         return reviewList;
     }
 
-    private List<Review> getAllHighReviews(Long studycafeId) {
+    private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
+        pageable = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), pageable.getSort());
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
-        return getRoomReviewsDesc(recordList, reviewList);
-    }
-
-    private List<Review> getAllLowReviews(Long studycafeId) {
-        List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Review> reviewList = new ArrayList<>();
-        return getRoomReviewsAsc(recordList, reviewList);
-    }
-
-    private List<Review> getRoomHighReviews(Long roomId) {
-        List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
-        List<Review> reviewList = new ArrayList<>();
-        return getRoomReviewsDesc(recordList, reviewList);
-    }
-
-    private List<Review> getRoomLowReviews(Long roomId) {
-        List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
-        List<Review> reviewList = new ArrayList<>();
-        return getRoomReviewsAsc(recordList, reviewList);
-    }
-
-    private List<Review> getRoomReviewsDesc(List<ReservationRecord> recordList, List<Review> reviewList) {
         for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeDesc(reservationRecord.getId());
-            for (int i = 0; i < reviews.size(); i++) {
-                reviewList.add(reviews.get(i));
+            Page<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId(), pageable);
+
+            if(reviews != null && reviews.hasContent()) {
+                reviewList = reviews.getContent();
             }
         }
         return reviewList;
     }
 
-    private List<Review> getRoomReviewsAsc(List<ReservationRecord> recordList, List<Review> reviewList) {
-        for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByGradeAsc(reservationRecord.getId());
-            for (int i = 0; i < reviews.size(); i++) {
-                reviewList.add(reviews.get(i));
+    private List<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
+        pageable = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), pageable.getSort());
+        List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(roomId);
+        List<ReservationRecord> reservationRecordList = new ArrayList<>();
+        List<Review> reviewList = new ArrayList<>();
+
+        for (int i = 0; i < reservationRecords.size(); i++) {
+            reservationRecordList.add(reservationRecords.get(i));
+        }
+
+        for (ReservationRecord reservationRecord : reservationRecordList) {
+            Page<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId(), pageable);
+
+            if(reviews != null && reviews.hasContent()) {
+                reviewList = reviews.getContent();
             }
         }
         return reviewList;
