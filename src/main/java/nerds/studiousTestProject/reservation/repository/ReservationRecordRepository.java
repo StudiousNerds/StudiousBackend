@@ -4,12 +4,11 @@ import io.lettuce.core.dynamic.annotation.Param;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long> {
+public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long>, ReservationRecordRepositoryCustom {
     @Query(value = "select r.startTime, r.endTime " +
             "from ReservationRecord r " +
             "where r.date = :date and r.room.id = :roomId " +
