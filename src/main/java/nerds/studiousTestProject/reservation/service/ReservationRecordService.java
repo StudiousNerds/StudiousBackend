@@ -173,9 +173,9 @@ public class ReservationRecordService {
         return remainDate > 8 ? 8 : remainDate;
     }
 
-    public List<ReservationSettingsResponse> getAll(String tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
+    public List<ReservationSettingsResponse> getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
         initCondition(tab, startDate, endDate);
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, pageable);
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, memberService.getMemberFromAccessToken(accessToken), pageable);
         return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
     }
 
@@ -208,8 +208,8 @@ public class ReservationRecordService {
         return USING;
     }
 
-    private void initCondition(String tab, LocalDate startDate, LocalDate endDate) {
-        if(tab == null) tab = ALL.getStatusMessage();
+    private void initCondition(ReservationSettingsStatus tab, LocalDate startDate, LocalDate endDate) {
+        if(tab == null) tab = ALL;
         if(startDate == null) startDate = LocalDate.now().minusYears(1);
         if(endDate == null) endDate = LocalDate.now();
     }
