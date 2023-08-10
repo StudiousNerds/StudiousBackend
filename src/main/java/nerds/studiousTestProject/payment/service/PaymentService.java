@@ -90,16 +90,16 @@ public class PaymentService {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, paymentKey));
         List<CancelResponse> cancelResponses = new ArrayList<>();
         responseFromToss.getCancels().stream().forEach(cancel -> cancelResponses.add(CancelResponse.of(cancel)));
-        deletePaymentByCancel(responseFromToss);
+        cancelPaymentByCancel(responseFromToss);
         return cancelResponses;
     }
 
-    private void deletePaymentByCancel(PaymentResponseFromToss responseFromToss) {
+    private void cancelPaymentByCancel(PaymentResponseFromToss responseFromToss) {
         Payment payment = paymentRepository.findByPaymentKeyAndOrderId(
                         responseFromToss.getPaymentKey(),
                         responseFromToss.getOrderId())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-        paymentRepository.delete(payment);
+        payment.canceled(responseFromToss);
     }
 
 }
