@@ -1,5 +1,10 @@
 package nerds.studiousTestProject.photo.repository;
 
+import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.fixture.PhotoFixture;
+import nerds.studiousTestProject.fixture.ReviewFixture;
+import nerds.studiousTestProject.fixture.RoomFixture;
+import nerds.studiousTestProject.fixture.StudycafeFixture;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
@@ -15,8 +20,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+import static nerds.studiousTestProject.fixture.PhotoFixture.*;
+import static nerds.studiousTestProject.fixture.ReviewFixture.*;
+import static nerds.studiousTestProject.fixture.RoomFixture.*;
+import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+
+@RepositoryTest
 class SubPhotoRepositoryTest {
     @Autowired
     private SubPhotoRepository subPhotoRepository;
@@ -30,9 +39,9 @@ class SubPhotoRepositoryTest {
     @Test
     void findAllByReviewId() {
         // given
-        Review review = reviewRepository.save(Review.builder().id(1L).build());
-        SubPhoto subPhoto = subPhotoRepository.save(SubPhoto.builder().review(review).url("www.spring.com").build());
-        SubPhoto subPhoto1 = subPhotoRepository.save(SubPhoto.builder().review(review).url("www.sub.com").build());
+        Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
+        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.리뷰_생성(review, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.리뷰_생성(review, 2L));
         // when
         List<SubPhoto> reviewPhotoList = subPhotoRepository.findAllByReviewId(review.getId());
         // then
@@ -42,9 +51,9 @@ class SubPhotoRepositoryTest {
     @Test
     void findAllByStudycafeId() {
         // given
-        Studycafe studycafe = studycafeRepository.save(Studycafe.builder().id(1L).build());
-        SubPhoto subPhoto = subPhotoRepository.save(SubPhoto.builder().studycafe(studycafe).url("www.spring.com").build());
-        SubPhoto subPhoto1 = subPhotoRepository.save(SubPhoto.builder().studycafe(studycafe).url("www.sub.com").build());
+        Studycafe studycafe = studycafeRepository.save(FIRST_STUDYCAFE.생성(1L));
+        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.스터디카페_생성(studycafe, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.스터디카페_생성(studycafe, 2L));
         // when
         List<SubPhoto> studycafePhotoList = subPhotoRepository.findAllByStudycafeId(1L);
         // then
@@ -54,9 +63,9 @@ class SubPhotoRepositoryTest {
     @Test
     void findAllByRoomId() {
         // given
-        Room room = roomRepository.save(Room.builder().id(2L).build());
-        SubPhoto subPhoto = subPhotoRepository.save(SubPhoto.builder().room(room).url("www.spring.com").build());
-        SubPhoto subPhoto1 = subPhotoRepository.save(SubPhoto.builder().room(room).url("www.sub.com").build());
+        Room room = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
+        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.룸_생성(room, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.룸_생성(room, 2L));
         // when
         List<SubPhoto> studycafeRoomList = subPhotoRepository.findAllByRoomId(room.getId());
         // then
