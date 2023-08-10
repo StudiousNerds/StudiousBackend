@@ -40,6 +40,7 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
                 .from(reservationRecord);
 
         List<ReservationRecord> content = getReservationSettings(contentQuery, tab, studycafeName, startDate, endDate, member)
+                .orderBy(reservationRecord.date.desc(), reservationRecord.startTime.desc(), reservationRecord.endTime.asc())
                 .offset(pageable.getOffset())
                 .fetch();
 
