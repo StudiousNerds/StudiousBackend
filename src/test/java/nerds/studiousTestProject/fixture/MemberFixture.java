@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.fixture;
 
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.Member.MemberBuilder;

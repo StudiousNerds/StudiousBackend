@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.fixture;
 
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Grade.GradeBuilder;

@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static nerds.studiousTestProject.MemberFixture.*;
-import static nerds.studiousTestProject.ReservationRecordFixture.*;
-import static nerds.studiousTestProject.RoomFixture.*;
+import static nerds.studiousTestProject.fixture.MemberFixture.*;
+import static nerds.studiousTestProject.fixture.ReservationRecordFixture.*;
+import static nerds.studiousTestProject.fixture.RoomFixture.*;
 
 @RepositoryTest
 class ReservationRecordRepositoryTest {

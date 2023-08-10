@@ -14,9 +14,9 @@ import org.springframework.data.domain.Sort;
 import java.util.Arrays;
 import java.util.List;
 
-import static nerds.studiousTestProject.GradeFixture.*;
-import static nerds.studiousTestProject.ReservationRecordFixture.*;
-import static nerds.studiousTestProject.ReviewFixture.*;
+import static nerds.studiousTestProject.fixture.GradeFixture.*;
+import static nerds.studiousTestProject.fixture.ReservationRecordFixture.*;
+import static nerds.studiousTestProject.fixture.ReviewFixture.*;
 
 @RepositoryTest
 class ReviewRepositoryTest {
