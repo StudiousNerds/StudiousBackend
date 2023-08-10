@@ -17,7 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findTop3ByReservationRecordId(@Param("reservationId") Long reservationId);
 
     // 스터디카페의 평균 청결도, 방음도를 가져올 때 필요한 메소드인데, 그 때는 Pageable를 받지 않아서 따로 구분 했습니다!
-    List<Review> findAllByReservationRecordIdOrderByCreatedDatedDesc(Long reservationId);
+    List<Review> findAllByReservationRecordIdInOrderByCreatedDateDesc(List<Long> reservationId);
 
-    Page<Review> findAllByReservationRecordId(Long reservationId, Pageable pageable);
+    Page<Review> findAllByReservationRecordIdIn(List<Long> reservationId, Pageable pageable);
 }

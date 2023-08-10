@@ -340,12 +340,15 @@ public class ReviewService {
 
     private List<Review> getAllReviews(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<Long> reservationIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findAllByReservationRecordIdOrderByCreatedDatedDesc(reservationRecord.getId());
-            for (int i = 0; i < reviews.size(); i++) {
-                reviewList.add(reviews.get(i));
-            }
+            reservationIds.add(reservationRecord.getId());
+        }
+        List<Review> reviews = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(reservationIds);
+
+        for (int i = 0; i < reviews.size(); i++) {
+            reviewList.add(reviews.get(i));
         }
         return reviewList;
     }
@@ -353,33 +356,29 @@ public class ReviewService {
     private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
         pageable = getPageable(pageable);
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Review> reviewList = new ArrayList<>();
-        for (ReservationRecord reservationRecord : recordList) {
-            Page<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId(), pageable);
-
-            if(reviews != null && reviews.hasContent()) {
-                reviewList = reviews.getContent();
-            }
-        }
+        List<Review> reviewList = getReviewList(pageable, recordList);
         return reviewList;
     }
 
     private List<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
         pageable = getPageable(pageable);
         List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(roomId);
-        List<ReservationRecord> reservationRecordList = new ArrayList<>();
+        List<Review> reviewList = getReviewList(pageable, reservationRecords);
+        return reviewList;
+    }
+
+    private List<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
+        List<Long> reservationIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
 
-        for (int i = 0; i < reservationRecords.size(); i++) {
-            reservationRecordList.add(reservationRecords.get(i));
+        for (ReservationRecord reservationRecord : recordList) {
+            reservationIds.add(reservationRecord.getId());
         }
 
-        for (ReservationRecord reservationRecord : reservationRecordList) {
-            Page<Review> reviews = reviewRepository.findAllByReservationRecordId(reservationRecord.getId(), pageable);
+        Page<Review> reviews = reviewRepository.findAllByReservationRecordIdIn(reservationIds, pageable);
 
-            if(reviews != null && reviews.hasContent()) {
-                reviewList = reviews.getContent();
-            }
+        if(reviews != null && reviews.hasContent()) {
+            reviewList = reviews.getContent();
         }
         return reviewList;
     }
