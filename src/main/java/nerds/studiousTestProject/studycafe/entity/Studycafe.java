@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -63,9 +62,8 @@ public class Studycafe {
     private LocalDateTime createdAt;
     private Double totalGrade;
 
-    @Column(name = "notification_info")
-    @Nullable
-    private String notificationInfo;
+    @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
+    private List<NotificationInfo> notificationInfos = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<Room> rooms = new ArrayList<>();
@@ -120,8 +118,13 @@ public class Studycafe {
         subPhoto.setStudycafe(this);
     }
 
+    public void addNotificationInfo(NotificationInfo notificationInfo) {
+        notificationInfos.add(notificationInfo);
+        notificationInfo.setStudycafe(this);
+    }
+
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade, @Nullable String notificationInfo) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
         this.id = id;
         this.member = member;
         this.name = name;
@@ -134,6 +137,5 @@ public class Studycafe {
         this.introduction = introduction;
         this.createdAt = createdAt;
         this.totalGrade = totalGrade;
-        this.notificationInfo = notificationInfo;
     }
 }
