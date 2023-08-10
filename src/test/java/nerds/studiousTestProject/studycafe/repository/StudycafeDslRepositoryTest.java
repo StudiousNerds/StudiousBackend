@@ -13,6 +13,7 @@ import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.entity.Address;
 import nerds.studiousTestProject.studycafe.entity.Notice;
+import nerds.studiousTestProject.studycafe.entity.NotificationInfo;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -304,8 +306,12 @@ class StudycafeDslRepositoryTest {
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
-                .notificationInfo("공지 사항")
                 .build();
+
+        List<NotificationInfo> notificationInfos = notificationInfos();
+        for (NotificationInfo notificationInfo : notificationInfos) {
+            studycafe.addNotificationInfo(notificationInfo);
+        }
 
         List<OperationInfo> operationInfos = operationInfos();
         for (OperationInfo operationInfo : operationInfos) {
@@ -332,8 +338,12 @@ class StudycafeDslRepositoryTest {
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
-                .notificationInfo("공지 사항")
                 .build();
+
+        List<NotificationInfo> notificationInfos = notificationInfos();
+        for (NotificationInfo notificationInfo : notificationInfos) {
+            studycafe.addNotificationInfo(notificationInfo);
+        }
 
         List<OperationInfo> operationInfos = operationInfos();
         for (OperationInfo operationInfo : operationInfos) {
@@ -356,8 +366,12 @@ class StudycafeDslRepositoryTest {
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
-                .notificationInfo("공지 사항")
                 .build();
+
+        List<NotificationInfo> notificationInfos = notificationInfos();
+        for (NotificationInfo notificationInfo : notificationInfos) {
+            studycafe.addNotificationInfo(notificationInfo);
+        }
 
         List<OperationInfo> operationInfos = operationInfos();
         for (OperationInfo operationInfo : operationInfos) {
@@ -380,8 +394,12 @@ class StudycafeDslRepositoryTest {
                 .duration(null)
                 .nearestStation(null)
                 .introduction("소개글")
-                .notificationInfo("공지 사항")
                 .build();
+
+        List<NotificationInfo> notificationInfos = notificationInfos();
+        for (NotificationInfo notificationInfo : notificationInfos) {
+            studycafe.addNotificationInfo(notificationInfo);
+        }
 
         List<OperationInfo> operationInfos = operationInfos();
         for (OperationInfo operationInfo : operationInfos) {
@@ -397,6 +415,16 @@ class StudycafeDslRepositoryTest {
                 .detail("진접하우스토리 105동 1303호")
                 .zipcode("12010")
                 .build();
+    }
+
+    private List<NotificationInfo> notificationInfos() {
+        return Collections.singletonList(
+                NotificationInfo.builder()
+                        .detail("공지 사항")
+                        .startDate(LocalDate.of(2023, 6,30))
+                        .endDate(LocalDate.of(2024, 6, 30))
+                        .build()
+        );
     }
 
     private List<OperationInfo> operationInfos() {
