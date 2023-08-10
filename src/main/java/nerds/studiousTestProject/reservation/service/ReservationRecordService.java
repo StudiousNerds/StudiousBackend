@@ -24,13 +24,16 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
@@ -172,6 +175,37 @@ public class ReservationRecordService {
 
     public List<ReservationSettingsResponse> getAll(String tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
         initCondition(tab, startDate, endDate);
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, pageable);
+        return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
+    }
+
+    public ReservationSettingsResponse createReservationSettingsResponse(ReservationRecord reservationRecord) {
+        Room room = reservationRecord.getRoom();
+        Studycafe studycafe = room.getStudycafe();
+        Payment payment = reservationRecord.getPayment();
+        return ReservationSettingsResponse.builder()
+                .studycafeName(studycafe.getName())
+                .studycafePhoto(studycafe.getPhoto())
+                .roomName(room.getName())
+                .reservationDate(reservationRecord.getDate())
+                .reservationStartTime(reservationRecord.getStartTime())
+                .reservationEndTime(reservationRecord.getEndTime())
+                .usingTime(reservationRecord.getDuration())
+                .price(payment.getPrice())
+                .paymentMethod(payment.getMethod())
+                .cancelReason(payment.getCancelReason())
+                .reservationStatus(getReservationSettingsResponse(reservationRecord.getStatus(), reservationRecord.getDate(), reservationRecord.getStartTime(), reservationRecord.getEndTime()).getStatusMessage())
+                .build();
+    }
+
+    public ReservationSettingsStatus getReservationSettingsResponse(ReservationStatus reservationStatus, LocalDate reservationDate,
+                                                                    LocalTime startTime, LocalTime endTime) {
+        if (reservationStatus == ReservationStatus.CANCELED) return CANCELED;
+        LocalDate nowDate = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+        if (reservationDate.isBefore(nowDate) || (reservationDate == nowDate && startTime.isAfter(nowTime))) return BEFORE_USING;
+        if (reservationDate.isAfter(nowDate) || (reservationDate == nowDate && endTime.isBefore(nowTime))) return AFTER_USING;
+        return USING;
     }
 
     private void initCondition(String tab, LocalDate startDate, LocalDate endDate) {
