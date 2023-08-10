@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.reservation.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -8,6 +9,7 @@ import nerds.studiousTestProject.reservation.dto.mypage.ReservationSettingsStatu
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -31,17 +33,32 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
 
     @Override
     public Page<ReservationRecord> getReservationRecordsConditions(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member, Pageable pageable) {
-        List<ReservationRecord> reservationRecordList = jpaQueryFactory.selectFrom(reservationRecord)
-                .innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
+
+        JPAQuery<ReservationRecord> contentQuery = jpaQueryFactory.selectFrom(reservationRecord);
+
+        JPAQuery<Long> countQuery = jpaQueryFactory.select(reservationRecord.count())
+                .from(reservationRecord);
+
+        List<ReservationRecord> content = getReservationSettings(contentQuery, tab, studycafeName, startDate, endDate, member)
+                .offset(pageable.getOffset())
+                .fetch();
+
+        Long count = getReservationSettings(countQuery, tab, studycafeName, startDate, endDate, member)
+                .groupBy(reservationRecord)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, count);
+    }
+
+    public <T> JPAQuery<T> getReservationSettings(JPAQuery<T> query,ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member) {
+        return query.innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
                 .innerJoin(reservationRecord.room.studycafe, studycafe)
                 .where(
                         equalToStudycafeName(studycafeName),
                         handleTab(tab),
                         afterReservationStartDate(startDate),
                         beforeReservationEndDate(endDate)
-                )
-                .offset(pageable.getOffset())
-                .fetch();
+                );
     }
 
     private BooleanExpression equalToStudycafeName(String studycafeName) {
