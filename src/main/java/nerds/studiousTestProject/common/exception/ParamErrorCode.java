@@ -17,7 +17,11 @@ public enum ParamErrorCode {
     INVALID_SORT_TYPE("sortType", "정렬 기준이 잘못되었습니다."),
     INVALID_HASHTAG_NAME("hashtags", "해시테그 이름이 잘못되었습니다."),
     INVALID_CONVENIENCE_NAME("conveniences", "편의시설 이름이 잘못되었습니다"),
-    INVALID_CAFE_ID("cafeId", "카페 아이디 값이 잘못되었습니다.");
+    INVALID_CAFE_ID("cafeId", "카페 아이디 값이 잘못되었습니다."),
+
+    // 공지사항 조회에서 사용되는 값들
+    INVALID_START_DATE("startDate", "시작 날짜가 잘못되었습니다."),
+    INVALID_END_DATE("endDate", "마감 날짜가 잘못되었습니다.");
 
     private static final Map<String, String> ENUM_MAP = Collections.unmodifiableMap(
             Stream.of(values()).collect(Collectors.toMap(ParamErrorCode::getParamName, ParamErrorCode::name))
