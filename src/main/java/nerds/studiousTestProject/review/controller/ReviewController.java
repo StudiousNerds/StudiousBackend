@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -57,8 +58,10 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews")
-    public List<WrittenReviewResponse> InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return reviewService.findWrittenReviews(accessToken);
+    public List<WrittenReviewResponse> InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
+                                                            @RequestParam("startDate") LocalDate startDate,
+                                                            @RequestParam("endDate") LocalDate endDate) {
+        return reviewService.findWrittenReviews(accessToken, startDate, endDate);
     }
 
     @GetMapping("/studycafes/{cafeId}/reviews")

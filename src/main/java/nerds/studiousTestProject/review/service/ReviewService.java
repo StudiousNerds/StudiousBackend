@@ -227,16 +227,16 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-
     /**
      * 리뷰 작성한 내역을 조회하는 메소드
      */
-    public List<WrittenReviewResponse> findWrittenReviews(String accessToken) {
+    public List<WrittenReviewResponse> findWrittenReviews(String accessToken, LocalDate startDate, LocalDate endDate) {
         List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 
         return reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() != null &&
-                        reservationRecord.getReview().getCreatedDate().isAfter(LocalDate.now().minusYears(1)))
+                        reservationRecord.getReview().getCreatedDate().isAfter(startDate) &&
+                        reservationRecord.getReview().getCreatedDate().isBefore(endDate))
                 .map(reservationRecord -> WrittenReviewResponse.builder()
                         .reservationId(reservationRecord.getId())
                         .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
