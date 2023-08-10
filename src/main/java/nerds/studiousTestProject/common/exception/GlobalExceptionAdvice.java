@@ -114,4 +114,15 @@ public class GlobalExceptionAdvice {
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
         return ResponseEntity.status(METHOD_NOT_ALLOWED).body(ExceptionResponse.from(entryMessage, code));
     }
+
+    /**
+     * &#064;RequestBody 에서 (타입 오류 등의 이유로 Json Parser가) 바인딩 실패 시 호출되는 예외를 핸들링
+     * @param e HttpMessageNotReadableException
+     * @return 예외 메시지, 상태 코드를 담은 응답
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), NOT_PARSING_BODY.name(), NOT_PARSING_BODY.getMessage());
+        return ResponseEntity.status(BAD_REQUEST).body(ExceptionResponse.from(NOT_PARSING_BODY));
+    }
 }
