@@ -14,8 +14,8 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
-import nerds.studiousTestProject.reservation.dto.mypage.ReservationSettingsResponse;
-import nerds.studiousTestProject.reservation.dto.mypage.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsResponse;
+import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
@@ -39,7 +39,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESER
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
-import static nerds.studiousTestProject.reservation.dto.mypage.ReservationSettingsStatus.*;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.*;
 
 @RequiredArgsConstructor
 @Service
