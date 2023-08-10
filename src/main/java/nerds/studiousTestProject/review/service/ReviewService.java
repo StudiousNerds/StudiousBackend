@@ -166,11 +166,16 @@ public class ReviewService {
     private List<Review> getTop3ReviewList(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
+        List<Long> reservationIds = new ArrayList<>();
+
         for (ReservationRecord reservationRecord : recordList) {
-            List<Review> reviews = reviewRepository.findTop3ByReservationRecordId(reservationRecord.getId());
-            for (int i = 0; i < reviews.size(); i++) {
+            reservationIds.add(reservationRecord.getId());
+        }
+
+        List<Review> reviews = reviewRepository.findTop3ByReservationRecordId(reservationIds);
+
+        for (int i = 0; i < reviews.size(); i++) {
                 reviewList.add(reviews.get(i));
-            }
         }
         return reviewList;
     }
