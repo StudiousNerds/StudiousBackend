@@ -321,6 +321,8 @@ public class StudycafeService {
                                 .build()
                 );
             }
+
+            studycafe.addRoom(room);
         }
 
         // 카페 편의시설 정보 등록
