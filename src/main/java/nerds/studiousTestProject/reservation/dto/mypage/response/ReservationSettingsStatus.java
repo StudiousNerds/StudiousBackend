@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto.mypage;
+package nerds.studiousTestProject.reservation.dto.mypage.response;
 
 public enum ReservationSettingsStatus {
     ALL("전체"),
