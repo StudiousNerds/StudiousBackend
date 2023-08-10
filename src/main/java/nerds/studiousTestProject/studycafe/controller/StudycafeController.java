@@ -56,12 +56,12 @@ public class StudycafeController {
         return studycafeService.getMainPage();
     }
 
-    @PostMapping("/valid/accountInfo")
+    @PostMapping("/validations/accountInfos")
     public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
         return studycafeService.validateAccountInfo(accountInfoRequest);
     }
 
-    @PostMapping("/valid/businessInfo")
+    @PostMapping("/validations/businessInfos")
     public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
         log.info("business = {}", businessInfoRequest);
         return studycafeService.validateBusinessInfo(businessInfoRequest);
