@@ -24,6 +24,7 @@ import static nerds.studiousTestProject.fixture.PhotoFixture.*;
 import static nerds.studiousTestProject.fixture.ReviewFixture.*;
 import static nerds.studiousTestProject.fixture.RoomFixture.*;
 import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static org.assertj.core.api.Assertions.*;
 
 @RepositoryTest
 class SubPhotoRepositoryTest {
@@ -45,7 +46,7 @@ class SubPhotoRepositoryTest {
         // when
         List<SubPhoto> reviewPhotoList = subPhotoRepository.findAllByReviewId(review.getId());
         // then
-        Assertions.assertThat(reviewPhotoList).contains(subPhoto, subPhoto1);
+        assertThat(reviewPhotoList).contains(subPhoto, subPhoto1);
     }
 
     @Test
@@ -57,7 +58,7 @@ class SubPhotoRepositoryTest {
         // when
         List<SubPhoto> studycafePhotoList = subPhotoRepository.findAllByStudycafeId(1L);
         // then
-        Assertions.assertThat(studycafePhotoList).contains(subPhoto, subPhoto1);
+        assertThat(studycafePhotoList).contains(subPhoto, subPhoto1);
     }
 
     @Test
@@ -69,6 +70,19 @@ class SubPhotoRepositoryTest {
         // when
         List<SubPhoto> studycafeRoomList = subPhotoRepository.findAllByRoomId(room.getId());
         // then
-        Assertions.assertThat(studycafeRoomList).contains(subPhoto, subPhoto1);
+        assertThat(studycafeRoomList).contains(subPhoto, subPhoto1);
+    }
+
+    @Test
+    void deleteAllByReviewId() {
+        // given
+        Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
+        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.리뷰_생성(review, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.리뷰_생성(review, 2L));
+        // when
+        subPhotoRepository.deleteAllByReviewId(1L);
+        List<SubPhoto> photoList = subPhotoRepository.findAll();
+        // then
+        assertThat(photoList.size()).isEqualTo(0);
     }
 }
