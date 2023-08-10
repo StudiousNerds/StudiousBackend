@@ -80,4 +80,20 @@ public class StudycafeController {
     public CafeDetailsResponse findManagedDetailStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
         return studycafeService.inquireManagedStudycafe(accessToken, cafeId);
     }
+
+    @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
+    public List<NotificationInfoResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
+        log.info("cafeId = {}", cafeId);
+        return studycafeService.inquireNotificationInfos(accessToken, cafeId);
+    }
+
+    @PostMapping("/studycafes/managements/notificationInfos/{cafeId}")
+    public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody @Valid NotificationInfoRequest notificationInfoRequest) {
+        studycafeService.insertNotificationInfos(accessToken, cafeId, notificationInfoRequest);
+    }
+
+    @DeleteMapping("/studycafes/managements/{cafeId}")
+    public void delete(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
+        studycafeService.deleteStudycafe(accessToken, cafeId);
+    }
 }
