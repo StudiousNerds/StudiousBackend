@@ -1,5 +1,6 @@
 package nerds.studiousTestProject;
 
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord.ReservationRecordBuilder;
 import nerds.studiousTestProject.room.entity.Room;
@@ -34,6 +35,13 @@ public enum ReservationRecordFixture {
         return 기본_정보_생성()
                 .id(id)
                 .room(room)
+                .build();
+    }
+
+    public ReservationRecord 멤버_생성(Member member, Long id) {
+        return 기본_정보_생성()
+                .id(id)
+                .member(member)
                 .build();
     }
 }
