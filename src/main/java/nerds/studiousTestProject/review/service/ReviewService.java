@@ -208,7 +208,8 @@ public class ReviewService {
         List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 
         return  reservationRecordList.stream()
-                .filter(reservationRecord -> reservationRecord.getReview() == null)
+                .filter(reservationRecord -> reservationRecord.getReview() == null &&
+                        !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
                 .map(reservationRecord -> AvailableReviewResponse.builder()
                         .reservationId(reservationRecord.getId())
                         .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
@@ -234,7 +235,8 @@ public class ReviewService {
         List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 
         return reservationRecordList.stream()
-                .filter(reservationRecord -> reservationRecord.getReview() != null)
+                .filter(reservationRecord -> reservationRecord.getReview() != null &&
+                        reservationRecord.getReview().getCreatedDate().isAfter(LocalDate.now().minusYears(1)))
                 .map(reservationRecord -> WrittenReviewResponse.builder()
                         .reservationId(reservationRecord.getId())
                         .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
