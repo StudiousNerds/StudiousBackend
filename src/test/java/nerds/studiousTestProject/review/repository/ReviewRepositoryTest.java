@@ -62,4 +62,19 @@ class ReviewRepositoryTest {
         // then
         Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
     }
+
+    @Test
+    void findTop3ByReservationRecordId() {
+        // given
+        Review firstReview = reviewRepository.save(FIRST_REVIEW.생성(1L));
+        Review secondReview = reviewRepository.save(SECOND_REVIEW.생성(2L));
+        Review thirdReview = reviewRepository.save(THIRD_REVIEW.생성(3L));
+        reservationRecordRepository.save(FIRST_RESERVATION.생성(1L)).addReview(firstReview);
+        reservationRecordRepository.save(SECOND_RESERVATION.생성(2L)).addReview(secondReview);
+        reservationRecordRepository.save(THIRD_RESERVATION.생성(3L)).addReview(thirdReview);
+        // when
+        List<Review> reviewList = reviewRepository.findTop3ByReservationRecordId(Arrays.asList(1L, 2L, 3L));
+        // then
+        Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
+    }
 }
