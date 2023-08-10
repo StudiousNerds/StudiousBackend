@@ -42,6 +42,7 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
         List<ReservationRecord> content = getReservationSettings(contentQuery, tab, studycafeName, startDate, endDate, member)
                 .orderBy(reservationRecord.date.desc(), reservationRecord.startTime.desc(), reservationRecord.endTime.asc())
                 .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         Long count = getReservationSettings(countQuery, tab, studycafeName, startDate, endDate, member)
