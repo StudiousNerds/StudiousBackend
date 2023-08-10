@@ -2,6 +2,7 @@ package nerds.studiousTestProject;
 
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord.ReservationRecordBuilder;
+import nerds.studiousTestProject.room.entity.Room;
 
 public enum ReservationRecordFixture {
 
@@ -27,5 +28,12 @@ public enum ReservationRecordFixture {
         return ReservationRecord.builder()
                 .name(this.name)
                 .phoneNumber(this.phoneNumber);
+    }
+
+    public ReservationRecord 룸_생성(Room room, Long id) {
+        return 기본_정보_생성()
+                .id(id)
+                .room(room)
+                .build();
     }
 }
