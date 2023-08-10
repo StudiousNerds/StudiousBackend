@@ -1,8 +1,14 @@
 package nerds.studiousTestProject.common.config;
 
-/*
+
+import nerds.studiousTestProject.common.util.StringToReservationSettingsStatusConverter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    /*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -17,5 +23,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)    // 자격증명 허용
                 .maxAge(3600);   // 허용 시간
     }
+
+     */
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToReservationSettingsStatusConverter());
+    }
 }
- */
