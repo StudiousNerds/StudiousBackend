@@ -1,8 +1,6 @@
 package nerds.studiousTestProject.reservation.repository;
 
-import nerds.studiousTestProject.MemberFixture;
 import nerds.studiousTestProject.RepositoryTest;
-import nerds.studiousTestProject.ReservationRecordFixture;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.member.MemberRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
