@@ -52,7 +52,7 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
         return count == null ? Page.empty() : new PageImpl<>(content, pageable, count);
     }
 
-    public <T> JPAQuery<T> getReservationSettings(JPAQuery<T> query,ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member) {
+    private <T> JPAQuery<T> getReservationSettings(JPAQuery<T> query, ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member) {
         return query.innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
                 .innerJoin(reservationRecord.room.studycafe, studycafe)
                 .where(
