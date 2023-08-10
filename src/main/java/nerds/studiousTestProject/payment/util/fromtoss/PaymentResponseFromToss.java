@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.entity.PaymentStatus;
 
 import java.util.List;
 
@@ -70,6 +71,7 @@ public class PaymentResponseFromToss {
                 .price(totalAmount)
                 .completeTime(approvedAt)
                 .method(method)
+                .paymentStatus(PaymentStatus.valueOf(status))
                 .build();
     }
 }
