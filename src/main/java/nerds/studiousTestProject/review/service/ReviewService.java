@@ -351,7 +351,7 @@ public class ReviewService {
     }
 
     private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
-        pageable = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), pageable.getSort());
+        pageable = getPageable(pageable);
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
@@ -365,7 +365,7 @@ public class ReviewService {
     }
 
     private List<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
-        pageable = PageRequest.of(pageable.getPageNumber()-1, pageable.getPageSize(), pageable.getSort());
+        pageable = getPageable(pageable);
         List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(roomId);
         List<ReservationRecord> reservationRecordList = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
@@ -382,6 +382,10 @@ public class ReviewService {
             }
         }
         return reviewList;
+    }
+
+    private PageRequest getPageable(Pageable pageable) {
+        return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
     }
 
     private Review findById(Long reviewId) {
