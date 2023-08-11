@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import nerds.studiousTestProject.room.entity.PriceType;
+import nerds.studiousTestProject.room.entity.Room;
 
 import java.util.List;
 
@@ -42,4 +43,17 @@ public class RoomInfoRequest {
     @NotNull(message = "스터디룸 사진을 1개 이상 선택해주세요.")
     @Size(min = 1, message = "스터디룸 사진을 1개 이상 선택해주세요.")
     private List<String> photos;    // 룸 사진
+
+    public Room toEntity(String roomMainPhoto) {
+        return Room.builder()
+                .name(name)
+                .photo(roomMainPhoto)
+                .standardHeadCount(standardHeadCount)
+                .minHeadCount(minHeadCount)
+                .maxHeadCount(maxHeadCount)
+                .minUsingTime(minUsingTime)
+                .price(price)
+                .type(type)
+                .build();
+    }
 }

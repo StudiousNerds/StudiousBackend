@@ -3,6 +3,7 @@ package nerds.studiousTestProject.studycafe.dto.register.request;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -27,4 +28,14 @@ public class OperationInfoRequest {
 
     @NotNull(message = "휴일 여부를 체크해주세요.")
     private Boolean closed; // 휴일 여부
+
+    public OperationInfo toEntity() {
+        return OperationInfo.builder()
+                .week(week)
+                .startTime(startTime)
+                .endTime(endTime)
+                .allDay(allDay)
+                .closed(closed)
+                .build();
+    }
 }

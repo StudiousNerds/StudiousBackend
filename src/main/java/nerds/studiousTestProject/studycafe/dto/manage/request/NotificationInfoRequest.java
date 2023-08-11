@@ -3,6 +3,7 @@ package nerds.studiousTestProject.studycafe.dto.manage.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import nerds.studiousTestProject.studycafe.entity.NotificationInfo;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,4 +23,12 @@ public class NotificationInfoRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 //    @Pattern(regexp = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$", message = "시작 날짜 형식이 잘못되었습니다.")
     private LocalDate endDate;
+
+    public NotificationInfo toEntity() {
+        return NotificationInfo.builder()
+                .detail(detail)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+    }
 }
