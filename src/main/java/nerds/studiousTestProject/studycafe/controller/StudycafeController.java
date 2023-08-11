@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
@@ -43,7 +44,6 @@ public class StudycafeController {
 
     @GetMapping("/search")
     public List<SearchResponse> search(@RequestParam Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
-        log.info("searchRequest = {}", searchRequest);
         return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, 8));
     }
 
@@ -70,7 +70,6 @@ public class StudycafeController {
 
     @PostMapping("/studycafes/registrations")
     public RegisterResponse register(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody @Valid RegisterRequest registerRequest) {
-        log.info("request = {}", registerRequest);
         return studycafeService.register(accessToken, registerRequest);
     }
 
@@ -91,7 +90,6 @@ public class StudycafeController {
 
     @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
     public List<NotificationInfoResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
-        log.info("cafeId = {}", cafeId);
         return studycafeService.inquireNotificationInfos(accessToken, cafeId);
     }
 
