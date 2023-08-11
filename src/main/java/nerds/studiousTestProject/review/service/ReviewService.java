@@ -99,6 +99,7 @@ public class ReviewService {
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
 
+    @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest) {
         Review review = findById(reviewId);
         Studycafe studycafe = findByStudycafeId(modifyReviewRequest.getCafeId());
@@ -114,6 +115,7 @@ public class ReviewService {
         Double avgGrade = getAvgGrade(studycafe.getId());
         studycafe.addTotalGrade(avgGrade);
 
+        review.getHashtagRecords().removeAll(review.getHashtagRecords());
         hashtagRepository.deleteAllByReviewId(reviewId);
         List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
         for (String userHashtag : hashtags) {
@@ -138,7 +140,11 @@ public class ReviewService {
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
 
+    @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId, Long studycafeId) {
+        Review review = findById(reviewId);
+        review.getHashtagRecords().removeAll(review.getHashtagRecords());
+
         hashtagRepository.deleteAllByReviewId(reviewId);
         subPhotoService.removeAllPhotos(reviewId);
         reviewRepository.deleteById(reviewId);
