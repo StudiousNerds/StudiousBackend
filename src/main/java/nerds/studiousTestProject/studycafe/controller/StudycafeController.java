@@ -23,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,6 +82,11 @@ public class StudycafeController {
     @GetMapping("/studycafes/managements/{cafeId}")
     public CafeDetailsResponse findManagedDetailStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
         return studycafeService.inquireManagedStudycafe(accessToken, cafeId);
+    }
+
+    @PatchMapping("/studycafes/managements/{cafeId}")
+    public void editManagedStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
+        studycafeService.edit(accessToken, cafeId, cafeInfoEditRequest);
     }
 
     @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
