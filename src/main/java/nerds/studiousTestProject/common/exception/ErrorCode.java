@@ -40,7 +40,8 @@ public enum ErrorCode {
     INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT("최대 인원수는 최소 인원 수보다 커야합니다."),
     NOT_FOUND_REVEIW("리뷰를 찾을 수 없습니다."),
     NOT_FOUND_START_TIME("시작 시간을 찾을 수 없습니다."),
-    NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다.");
+    NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다."),
+    INVALID_RESERVATION_CANCEL_DATE("이미 지난 예약입니다.");
 
     private final String message;
     ErrorCode(String message) {

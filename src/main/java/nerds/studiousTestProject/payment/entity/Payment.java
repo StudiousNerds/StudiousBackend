@@ -21,13 +21,15 @@ public class Payment {
     private String paymentKey;
     private String method;
     private String completeTime;
+    private Integer price;
 
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String method, String completeTime) {
+    public Payment(Long id, String orderId, String paymentKey, String method, String completeTime, Integer price) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.method = method;
         this.completeTime = completeTime;
+        this.price = price;
     }
 }

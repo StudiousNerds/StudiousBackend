@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 

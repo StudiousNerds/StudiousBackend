@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.Payment;
 
 import java.util.List;
 
@@ -61,4 +62,14 @@ public class PaymentResponseFromToss {
     private List<CashReceipts> cashReceipts;
     @Nullable
     private Discount discount;
+
+    public Payment toPayment(){
+        return Payment.builder()
+                .paymentKey(paymentKey)
+                .orderId(orderId)
+                .price(totalAmount)
+                .completeTime(approvedAt)
+                .method(method)
+                .build();
+    }
 }
