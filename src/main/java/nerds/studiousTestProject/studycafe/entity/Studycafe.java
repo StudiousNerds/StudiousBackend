@@ -123,6 +123,36 @@ public class Studycafe {
         notificationInfo.setStudycafe(this);
     }
 
+    public void updateIntroduction(String introduction) {
+        if (introduction != null) {
+            this.introduction = introduction;
+        }
+    }
+
+    public void updateOperationInfos(List<OperationInfo> operationInfos) {
+        if (operationInfos != null) {
+            this.operationInfos = operationInfos;
+        }
+    }
+
+    public void updateConveniences(List<Convenience> conveniences) {
+        if (conveniences != null) {
+            this.conveniences = conveniences;
+        }
+    }
+
+    public void updateNotices(List<Notice> notices) {
+        if (notices != null) {
+            this.notices = notices;
+        }
+    }
+
+    public void updateRefundPolices(List<RefundPolicy> refundPolicies) {
+        if (refundPolicies != null) {
+            this.refundPolicies = refundPolicies;
+        }
+    }
+
     @Builder
     public Studycafe(Long id, Member member, String name, Address address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
         this.id = id;
