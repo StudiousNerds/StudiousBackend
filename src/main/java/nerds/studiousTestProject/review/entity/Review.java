@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,7 @@ import org.apache.catalina.LifecycleState;
 import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -37,8 +39,10 @@ public class Review {
     @JoinColumn(name = "reservation_id")
     private ReservationRecord reservationRecord;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
-    private List<HashtagRecord> hashtagRecords;
+    @OneToMany(mappedBy = "review",
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
+    private List<HashtagRecord> hashtagRecords = new ArrayList<>();
 
     @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Grade grade;
