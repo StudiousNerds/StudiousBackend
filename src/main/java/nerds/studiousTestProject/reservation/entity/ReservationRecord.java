@@ -80,6 +80,8 @@ public class ReservationRecord {
     }
 
     public void setRoom(Room room) {
-        this.room = room;
+        if (room != null) {
+            this.room = room;
+        }
     }
 }
