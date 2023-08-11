@@ -35,6 +35,7 @@ class HashtagRepositoryTest {
         hashtagRepository.deleteAllByReviewId(1L);
         Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVEIW));
         List<HashtagRecord> hashtagList = hashtagRepository.findAll();
+        // then
         Assertions.assertThat(hashtagList.size()).isEqualTo(0);
         Assertions.assertThat(review.getHashtagRecords()).isEmpty();
     }
