@@ -110,4 +110,8 @@ public class ReservationRecordService {
     public List<ReservationRecord> findAllByRoomId(Long roomId) {
         return reservationRecordRepository.findAllByRoomId(roomId);
     }
+
+    public List<ReservationRecord> findAllByStudycafeId(Long studycafeId) {
+        return reservationRecordRepository.findAllByStudycafeId(studycafeId);
+    }
 }
