@@ -2,6 +2,7 @@ package nerds.studiousTestProject.studycafe.dto.manage.response;
 
 import lombok.Builder;
 import lombok.Data;
+import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
 @Builder
@@ -9,4 +10,11 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 public class ConvenienceInfoResponse {
     private ConvenienceName name;
     private Integer price;
+
+    public static ConvenienceInfoResponse from(Convenience convenience) {
+        return ConvenienceInfoResponse.builder()
+                .name(convenience.getName())
+                .price(convenience.getPrice())
+                .build();
+    }
 }
