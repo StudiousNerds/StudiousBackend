@@ -4,32 +4,34 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @NoArgsConstructor
-public class Notice {
+public class NotificationInfo {
     @Id
     @GeneratedValue
     private Long id;
 
     private String detail;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
-    private Studycafe studycafe;
+    private LocalDate startDate;
+    private LocalDate endDate;  // endDate 가 지나면 자동으로 DB에서 삭제되도록 하는 기능을 구현해야함
 
     @Builder
-    public Notice(Long id, String detail, Studycafe studycafe) {
-        this.id = id;
+    public NotificationInfo(String detail, LocalDate startDate, LocalDate endDate) {
         this.detail = detail;
-        this.studycafe = studycafe;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Studycafe studycafe;
 
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {

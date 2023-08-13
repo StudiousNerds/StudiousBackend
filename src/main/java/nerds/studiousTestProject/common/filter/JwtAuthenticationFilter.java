@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveTokenFromRequest(request);
 
         // 2. validateToken 으로 토큰 유효성 검사
+        // null 체크를 하는 이유 : 토큰 값 없이 접속하는 사이트를 대비
         if (token != null && jwtTokenProvider.validateToken(token)) {
             // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가져와서 SecurityContext 에 저장
             Authentication authentication = jwtTokenProvider.getAuthentication(token);

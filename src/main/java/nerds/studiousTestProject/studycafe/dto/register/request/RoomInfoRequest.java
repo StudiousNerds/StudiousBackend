@@ -6,13 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.room.entity.PriceType;
+import nerds.studiousTestProject.room.entity.Room;
 
 import java.util.List;
 
 @Data
-public class RoomInfo {
+public class RoomInfoRequest {
     @NotBlank(message = "스터디룸 이름은 필수입니다.")
     private String name;    // 스터디룸 이름
 
@@ -35,10 +35,25 @@ public class RoomInfo {
     @Valid
     private PriceType type; // 가격 기준
 
+    @NotNull(message = "룸 편의시설을 1개 이상 선택해주세요.")
     @Size(min = 1, message = "룸 편의시설을 1개 이상 선택해주세요.")
     @Valid
-    private List<ConvenienceName> conveniences; // 룸 편의시설
+    private List<ConvenienceInfoRequest> convenienceInfos; // 룸 편의시설
 
+    @NotNull(message = "스터디룸 사진을 1개 이상 선택해주세요.")
     @Size(min = 1, message = "스터디룸 사진을 1개 이상 선택해주세요.")
     private List<String> photos;    // 룸 사진
+
+    public Room toEntity(String roomMainPhoto) {
+        return Room.builder()
+                .name(name)
+                .photo(roomMainPhoto)
+                .standardHeadCount(standardHeadCount)
+                .minHeadCount(minHeadCount)
+                .maxHeadCount(maxHeadCount)
+                .minUsingTime(minUsingTime)
+                .price(price)
+                .type(type)
+                .build();
+    }
 }

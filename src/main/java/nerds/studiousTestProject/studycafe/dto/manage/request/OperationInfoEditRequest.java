@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.register.request;
+package nerds.studiousTestProject.studycafe.dto.manage.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalTime;
 
 @Data
-public class OperationInfoRequest {
+public class OperationInfoEditRequest {
     @NotNull(message = "요일 입력은 필수입니다.")
     @Valid
     private Week week;    // 요일 (추후, 열거체로 리펙토링)

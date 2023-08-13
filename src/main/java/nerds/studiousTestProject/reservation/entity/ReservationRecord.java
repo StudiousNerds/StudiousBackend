@@ -87,4 +87,10 @@ public class ReservationRecord {
         this.review = review;
         review.setReservationRecord(this);
     }
+
+    public void setRoom(Room room) {
+        if (room != null) {
+            this.room = room;
+        }
+    }
 }

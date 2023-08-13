@@ -2,9 +2,10 @@ package nerds.studiousTestProject.studycafe.dto.register.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import nerds.studiousTestProject.studycafe.entity.Address;
 
 @Data
-public class AddressInfo {
+public class AddressInfoRequest {
     @NotBlank(message = "위도는 필수입니다.")
     private String latitude;    // 위도
 
@@ -19,4 +20,12 @@ public class AddressInfo {
 
     @NotBlank(message = "상세 주소는 필수입니다.")
     private String detail;  // 상세 주소
+
+    public Address of() {
+        return Address.builder()
+                .basic(basic)
+                .detail(detail)
+                .zipcode(zipcode)
+                .build();
+    }
 }

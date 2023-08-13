@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class AccountInfo {
+public class AccountInfoRequest {
     @NotBlank(message = "은행명은 필수입니다.")
     private String name;        // 은행명 (추후, 열거체로 리펙토링)
 
