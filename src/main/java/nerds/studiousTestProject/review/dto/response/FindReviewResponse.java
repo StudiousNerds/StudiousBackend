@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 public class FindReviewResponse {
     private Double grade;
-    private String email;
+    private String nickname;
     private String detail;
     private LocalDate date;
     private String[] photos;
