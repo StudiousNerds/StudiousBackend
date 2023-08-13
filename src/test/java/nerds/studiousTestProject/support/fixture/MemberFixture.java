@@ -6,7 +6,7 @@ import nerds.studiousTestProject.member.entity.member.Member.MemberBuilder;
 public enum MemberFixture {
 
     BEAVER("길가은", "rlfrkdms@naver.com"),
-    MINU("김민우", "rlaalsdn@naver.com"),
+    BURNED_POTATO("김민우", "rlaalsdn@naver.com"),
     POTATO("최보현", "chlqhgus@naver.com");
 
     private final String name;
