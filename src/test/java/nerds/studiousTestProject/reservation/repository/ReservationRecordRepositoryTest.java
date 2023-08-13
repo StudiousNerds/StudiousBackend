@@ -19,10 +19,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import static nerds.studiousTestProject.support.fixture.MemberFixture.BEAVER;
-import static nerds.studiousTestProject.support.fixture.MemberFixture.MINU;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
@@ -46,7 +45,7 @@ class ReservationRecordRepositoryTest {
     void 예약_목록_전체를_페이징하여_조회한다() {
 
         Member member1 = 멤버_저장(BEAVER.생성(1L));
-        Member member2 = 멤버_저장(MINU.생성(2L));
+        Member member2 = 멤버_저장(BURNED_POTATO.생성(2L));
         Studycafe studycafe = 스터디카페_저장(NERDS.생성());
         Room room = 룸_저장(RoomFixture.ROOM_FOUR_SIX.스터디카페_생성(studycafe));
 
@@ -60,10 +59,28 @@ class ReservationRecordRepositoryTest {
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(12, 0), member2, room));
         Pageable pageable = PageRequest.of(0, 2);
         Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.ALL, null, null, null, member1, pageable);
-        List<ReservationRecord> content = page.getContent();
         assertAll(
                 ()->assertThat(page.getTotalPages()).isEqualTo(3),
                 ()->assertThat(page.getContent()).containsExactly(reservation2, reservation1)
+        );
+    }
+
+    @Test
+    void 예약_취소_탭을_페이징해_조회한다(){
+
+        Member member1 = 멤버_저장(BEAVER.생성(1L));
+        Studycafe studycafe = 스터디카페_저장(NERDS.생성());
+        Room room = 룸_저장(RoomFixture.ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(16, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(23, 0), member1, room));
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.CANCELED, null, null, null, member1, pageable);
+        assertAll(
+                ()->assertThat(page.getTotalPages()).isEqualTo(1),
+                ()->assertThat(page.getContent()).containsExactly(reservation1)
         );
     }
 
