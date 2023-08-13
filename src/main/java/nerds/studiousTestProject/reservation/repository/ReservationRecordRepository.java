@@ -22,4 +22,6 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     Optional<ReservationRecord> findByOrderId(String orderId);
     List<ReservationRecord> findAllByMemberId(Long memberId);
 
+    Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
+
 }
