@@ -6,6 +6,7 @@ public enum ErrorCode {
     NOT_FOUND_RESERVATION_RECORD("예약내역을 찾을 수 없습니다."),
     NOT_FOUND_PAYMENT("결제 내역을 찾을 수 없습니다."),
     INVALID_REQUEST_BODY_TYPE_TO_TOSS("토스에게 요청하는 값은 null 값이 있어선 안됩니다."),
+    NOT_EXIST_PAGE("잘못된 페이지입니다."),
     MISMATCH_EMAIL("이메일이 일치하지 않습니다."),
     MISMATCH_PASSWORD("비밀번호가 일치하지 않습니다."),
     MISMATCH_PHONE_NUMBER("전화번호가 일치하지 않습니다."),
@@ -32,15 +33,19 @@ public enum ErrorCode {
     INVALID_REQUEST_BODY_TYPE("유효하지 않은 요청입니다."),
     NOT_FOUND_STUDYCAFE("스터디카페를 찾을 수 없습니다."),
     NOT_FOUND_HASHTAG("해시태그를 찾을 수 없습니다."),
-
     NOT_FOUND_MEMBER("멤버를 찾을 수 없습니다."),
     START_TIME_AFTER_THAN_END_TIME("시작 시간은 끝 시간보다 클 수 없습니다."),
     INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT("기준 인원 수는 최소 인원 수보다 크거나 같아야 합니다."),
     INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT("기준 인원수는 최대 인원 수보다 작아야합니다."),
     INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT("최대 인원수는 최소 인원 수보다 커야합니다."),
+    START_DATE_AFTER_THAN_END_DATE("시작 기간은 끝 기간보다 클 수 없습니다."),
+    NOT_PARSING_BODY("JSON 형식이 잘못되었습니다."),
     NOT_FOUND_REVEIW("리뷰를 찾을 수 없습니다."),
     NOT_FOUND_START_TIME("시작 시간을 찾을 수 없습니다."),
-    NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다.");
+    NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다."),
+    INVALID_RESERVATION_CANCEL_DATE("이미 지난 예약입니다."),
+    PAYMENT_NOT_CANCELED("결제가 취소되지 않았습니다."),
+    CANT_CONVERT_TO_RESERVATION_SETTING_STATUS("해당하는 탭이 없습니다.");
 
     private final String message;
     ErrorCode(String message) {

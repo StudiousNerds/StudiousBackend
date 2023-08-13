@@ -32,6 +32,8 @@ public class Notice {
     }
 
     public void setStudycafe(Studycafe studycafe) {
-        this.studycafe = studycafe;
+        if (studycafe != null) {
+            this.studycafe = studycafe;
+        }
     }
 }

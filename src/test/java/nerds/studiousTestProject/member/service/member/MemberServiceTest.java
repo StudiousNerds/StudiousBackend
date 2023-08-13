@@ -206,7 +206,7 @@ class MemberServiceTest {
         memberService.deactivate(accessToken, withdrawRequest);
 
         // then
-        Assertions.assertThat(member.isUsable()).isFalse();
+        Assertions.assertThat(member.isEnabled()).isFalse();
     }
 
 

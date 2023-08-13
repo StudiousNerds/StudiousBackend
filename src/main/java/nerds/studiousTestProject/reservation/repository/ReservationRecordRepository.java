@@ -1,15 +1,17 @@
 package nerds.studiousTestProject.reservation.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long> {
+public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long>, ReservationRecordRepositoryCustom {
     @Query(value = "select r.startTime, r.endTime " +
             "from ReservationRecord r " +
             "where r.date = :date and r.room.id = :roomId " +
@@ -19,4 +21,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     List<ReservationRecord> findAllByRoomId(Long roomId);
     Optional<ReservationRecord> findByOrderId(String orderId);
     List<ReservationRecord> findAllByMemberId(Long memberId);
+
+    Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
+
 }

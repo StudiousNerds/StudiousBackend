@@ -1,8 +1,6 @@
 package nerds.studiousTestProject.room.repository;
 
 import nerds.studiousTestProject.RepositoryTest;
-import nerds.studiousTestProject.fixture.RoomFixture;
-import nerds.studiousTestProject.fixture.StudycafeFixture;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -12,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.fixture.RoomFixture.ROOM_FOUR_SIX;
 import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
 
 @RepositoryTest
 class RoomRepositoryTest {

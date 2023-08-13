@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class BusinessInfo {
+public class BusinessInfoRequest {
     @Size(min = 10, max = 10, message = "사업자 등록번호는 하이픈(-)을 포함하지 않는 10자리 숫자입니다.")
     private String number; // 사업자 등록 번호
 
@@ -16,7 +16,7 @@ public class BusinessInfo {
 
     @NotNull(message = "계좌 정보는 필수입니다.")
     @Valid
-    private AccountInfo accountInfo;    // 계좌 정보
+    private AccountInfoRequest accountInfo;    // 계좌 정보
 
     @NotBlank(message = "사업자 등록증은 필수입니다.")
     private String registration;    // 사업자 등록증

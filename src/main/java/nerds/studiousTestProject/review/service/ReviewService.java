@@ -23,7 +23,6 @@ import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
-import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -158,15 +157,7 @@ public class ReviewService {
     }
 
     public List<ReservationRecord> findAllReservation(Long studycafeId){
-        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-        List<ReservationRecord> reservationRecordList = new ArrayList<>();
-        for (Room room : roomList){
-            List<ReservationRecord> reservationRecords = reservationRecordService.findAllByRoomId(room.getId());
-            for (int i = 0; i < reservationRecords.size(); i++) {
-                reservationRecordList.add(reservationRecords.get(i));
-            }
-        }
-        return reservationRecordList;
+        return reservationRecordService.findAllByStudycafeId(studycafeId);
     }
 
     private List<Review> getTop3ReviewList(Long studycafeId) {

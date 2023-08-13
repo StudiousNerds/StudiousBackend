@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.payment;
 
-import nerds.studiousTestProject.payment.dto.confirm.response.fromtoss.PaymentResponseFromToss;
-import nerds.studiousTestProject.payment.dto.confirm.response.fromtoss.Cancels;
+import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancels;
 
 import java.util.List;
 
@@ -49,4 +49,6 @@ public class PaymentFixture {
                 .paymentKey(paymentKey)
                 .build();
     }
+
+
 }
