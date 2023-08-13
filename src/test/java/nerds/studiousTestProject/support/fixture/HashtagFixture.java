@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.fixture;
+package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
