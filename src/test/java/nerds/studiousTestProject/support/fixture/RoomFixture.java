@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.entity.Room.RoomBuilder;

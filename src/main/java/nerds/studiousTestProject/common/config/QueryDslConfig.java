@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.config;
+package nerds.studiousTestProject.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

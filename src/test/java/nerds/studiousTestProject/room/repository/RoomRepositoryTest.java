@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.RoomFixture.ROOM_FOUR_SIX;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
 
 @RepositoryTest
 class RoomRepositoryTest {
