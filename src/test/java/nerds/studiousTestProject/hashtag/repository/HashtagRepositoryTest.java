@@ -1,10 +1,10 @@
 package nerds.studiousTestProject.hashtag.repository;
 
-import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.fixture.HashtagFixture;
-import nerds.studiousTestProject.fixture.ReviewFixture;
+import nerds.studiousTestProject.support.fixture.HashtagFixture;
+import nerds.studiousTestProject.support.fixture.ReviewFixture;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;

@@ -1,4 +1,4 @@
-package nerds.studiousTestProject;
+package nerds.studiousTestProject.support;
 
 import nerds.studiousTestProject.common.config.QueryDslConfig;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
