@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.RoomFixture.ROOM_FOUR_SIX;
+import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
 
 @RepositoryTest
 class RoomRepositoryTest {
@@ -23,9 +24,9 @@ class RoomRepositoryTest {
     @Test
     void findAllByStudycafeId() {
         // given
-        Studycafe studycafe = studycafeRepository.save(Studycafe.builder().id(1L).build());
-        Room room = roomRepository.save(Room.builder().id(1L).studycafe(studycafe).build());
-        Room room1 = roomRepository.save(Room.builder().id(2L).studycafe(studycafe).build());
+        Studycafe studycafe = studycafeRepository.save(FIRST_STUDYCAFE.생성(1L));
+        Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe, 1L));
+        Room room1 = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe,2L));
         // when
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafe.getId());
         // then

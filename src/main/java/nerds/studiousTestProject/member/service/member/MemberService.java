@@ -97,7 +97,7 @@ public class MemberService {
             throw new NotFoundException(ErrorCode.NOT_DEFAULT_TYPE_USER);
         }
 
-        if (!member.isUsable()) {
+        if (!member.isEnabled()) {
             throw new NotFoundException(ErrorCode.EXPIRE_USER);
         }
 

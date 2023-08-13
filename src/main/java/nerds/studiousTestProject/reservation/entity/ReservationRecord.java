@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.member.entity.member.Member;
 
@@ -66,6 +67,9 @@ public class ReservationRecord {
 
     private String orderId;
 
+    @OneToOne(mappedBy = "reservationRecord")
+    private Review review;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
@@ -79,4 +83,14 @@ public class ReservationRecord {
         this.status = ReservationStatus.CANCELED;
     }
 
+    public void addReview(Review review) {
+        this.review = review;
+        review.setReservationRecord(this);
+    }
+
+    public void setRoom(Room room) {
+        if (room != null) {
+            this.room = room;
+        }
+    }
 }

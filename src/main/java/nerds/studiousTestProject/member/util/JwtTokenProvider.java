@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
@@ -126,24 +127,21 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String token) {
         if (checkLogout(token)) {
-            log.info("msg = {}", ErrorCode.ALREADY_LOGOUT_USER.getMessage());
-            return false;
+            throw new NotAuthorizedException(ErrorCode.ALREADY_LOGOUT_USER);
         }
 
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("msg = {}", ErrorCode.INVALID_TOKEN.getMessage());
+            throw new NotAuthorizedException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
-            log.info("msg = {}", ErrorCode.EXPIRED_TOKEN_VALID_TIME.getMessage());
+            throw new NotAuthorizedException(ErrorCode.EXPIRED_TOKEN_VALID_TIME);
         } catch (UnsupportedJwtException e) {
-            log.info("msg = {}", ErrorCode.NOT_SUPPORTED_JWT.getMessage());
+            throw new NotAuthorizedException(ErrorCode.NOT_SUPPORTED_JWT);
         } catch (IllegalArgumentException e) {
-            log.info("msg = {}", ErrorCode.NOT_FOUND_TOKEN.getMessage());
+            throw new NotAuthorizedException(ErrorCode.NOT_FOUND_TOKEN);
         }
-
-        return false;
     }
 
     /**

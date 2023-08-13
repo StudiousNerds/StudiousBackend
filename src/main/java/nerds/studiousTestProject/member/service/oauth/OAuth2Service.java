@@ -14,7 +14,7 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.service.member.MemberService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import nerds.studiousTestProject.member.util.MultiValueMapConverter;
+import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

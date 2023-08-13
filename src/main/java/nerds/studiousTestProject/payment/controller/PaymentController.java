@@ -2,12 +2,12 @@ package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
-import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
-import nerds.studiousTestProject.payment.dto.request.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.request.PaymentResponse;
+import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
+import nerds.studiousTestProject.payment.dto.request.response.PaymentResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -27,17 +27,17 @@ public class PaymentController {
     }
 
     @GetMapping("/success")
-    public ConfirmSuccessResponse payConfirmSuccess(@RequestParam String orderId,
-                                                    @RequestParam Integer amount,
-                                                    @RequestParam String paymentKey) {
-        return paymentService.confirmPayToToss(orderId, paymentKey, amount);
+    public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
+                                            @RequestParam Integer amount,
+                                            @RequestParam String paymentKey) {
+        paymentService.confirmPayToToss(orderId, paymentKey, amount);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/fail")
     public ConfirmFailResponse payConfirmFail(@RequestParam String code,
                                               @RequestParam String message,
                                               @RequestParam String orderId) {
-
         return paymentService.confirmFail(message, orderId);
     }
 
