@@ -12,11 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.ALL;
 import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
