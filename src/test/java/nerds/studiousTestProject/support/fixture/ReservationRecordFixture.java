@@ -5,8 +5,6 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord.ReservationRecordBuilder;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
