@@ -58,6 +58,8 @@ public class Member implements UserDetails {
     private String phoneNumber;
     private Date createdDate;
 
+    private String photo; // 사용자 프로필 사진
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> bookmark = new ArrayList<>();
