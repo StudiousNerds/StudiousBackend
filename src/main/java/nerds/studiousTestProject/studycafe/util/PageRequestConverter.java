@@ -9,11 +9,11 @@ import org.springframework.data.domain.Pageable;
  * - size값 8로 고정
  */
 public class PageRequestConverter {
-    public static Pageable of(Integer page) {
+    public static Pageable of(Integer page, int size) {
         if (page == null || page < 1) {
             page = 1;
         }
 
-        return PageRequest.of(page - 1, 8);
+        return PageRequest.of(page - 1, size);
     }
 }

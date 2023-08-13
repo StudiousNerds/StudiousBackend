@@ -17,9 +17,9 @@ import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class SubPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,5 +46,17 @@ public class SubPhoto {
         this.studycafe = studycafe;
         this.review = review;
         this.url = url;
+    }
+
+    public void setStudycafe(Studycafe studycafe) {
+        if (studycafe != null) {
+            this.studycafe = studycafe;
+        }
+    }
+
+    public void setRoom(Room room) {
+        if (room != null) {
+            this.room = room;
+        }
     }
 }

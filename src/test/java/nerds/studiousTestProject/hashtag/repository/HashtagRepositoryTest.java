@@ -1,40 +1,42 @@
-//package nerds.studiousTestProject.hashtag.repository;
-//
-//import jakarta.persistence.EntityNotFoundException;
-//import nerds.studiousTestProject.hashtag.entity.Hashtag;
-//import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
-//import nerds.studiousTestProject.studycafe.entity.Studycafe;
-//import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-//import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//@DataJpaTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//class HashtagRepositoryTest {
-//
-//    @Autowired
-//    private HashtagRepository hashtagRepository;
-//    @Autowired
-//    private StudycafeRepository studycafeRepository;
-//
-//    @Test
-//    void findByStudycafeId() {
-//        // given
-//        Studycafe studycafe = studycafeRepository.save(Studycafe.builder().id(1L).build());
-//        List<Hashtag> hashtagList = new ArrayList<>();
-//        hashtagList.add(Hashtag.갓성비);
-//        hashtagList.add(Hashtag.면접용);
-//        hashtagRepository.save(HashtagRecord.builder().id(1L).studycafe(studycafe).hashtags(hashtagList).build());
-//        // when
-//        HashtagRecord hashtagRecord = hashtagRepository.findByStudycafeId(studycafe.getId()).orElseThrow(() -> new EntityNotFoundException("No such Studycafe"));
-//        List<Hashtag> hashtags = hashtagRecord.getHashtags();
-//        // then
-//        Assertions.assertThat(hashtags).contains(Hashtag.갓성비, Hashtag.면접용);
-//    }
-//}
+package nerds.studiousTestProject.hashtag.repository;
+
+import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.fixture.HashtagFixture;
+import nerds.studiousTestProject.fixture.ReviewFixture;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.review.entity.Review;
+import nerds.studiousTestProject.review.repository.ReviewRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@RepositoryTest
+class HashtagRepositoryTest {
+    @Autowired
+    private HashtagRepository hashtagRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Test
+    void deleteAllByReviewId() {
+        // given
+        HashtagRecord hashtag = hashtagRepository.save(HashtagFixture.FIRST_HASHTAG.생성(1L));
+        Review save = reviewRepository.save(ReviewFixture.FIRST_REVIEW.생성(1L));
+        save.addHashtagRecord(hashtag);
+        List<Long> reviewId = new ArrayList<>();
+        reviewId.add(1L);
+        // when
+        save.getHashtagRecords().removeAll(save.getHashtagRecords());
+        hashtagRepository.deleteAllByReviewId(1L);
+        Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVEIW));
+        List<HashtagRecord> hashtagList = hashtagRepository.findAll();
+        // then
+        Assertions.assertThat(hashtagList.size()).isEqualTo(0);
+        Assertions.assertThat(review.getHashtagRecords()).isEmpty();
+    }
+}

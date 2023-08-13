@@ -18,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -58,14 +59,16 @@ public class Member implements UserDetails {
     private String phoneNumber;
     private Date createdDate;
 
+    private String photo; // 사용자 프로필 사진
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> bookmark = new ArrayList<>();
 
-    private boolean usable;
+    private Boolean usable;
 
     @Nullable
-    private Date resignedDate;
+    private LocalDate resignedDate;
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
@@ -84,7 +87,7 @@ public class Member implements UserDetails {
 
     public void withdraw() {
         this.usable = false;
-        this.resignedDate = new Date();
+        this.resignedDate = LocalDate.now();
     }
 
     @Override
@@ -121,6 +124,6 @@ public class Member implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return usable;
     }
 }
