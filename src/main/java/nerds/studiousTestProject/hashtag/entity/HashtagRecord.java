@@ -45,7 +45,9 @@ public class HashtagRecord {
      * @param studycafe
      */
     public void setStudycafe(Studycafe studycafe) {
-        this.studycafe = studycafe;
+        if (studycafe != null) {
+            this.studycafe = studycafe;
+        }
     }
 
     public void setReview(Review review) {
