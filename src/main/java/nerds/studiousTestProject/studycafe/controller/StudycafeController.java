@@ -11,6 +11,11 @@ import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRe
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.NotificationInfoResponse;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -39,6 +44,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/studious")
 @Slf4j
+@Validated
 public class StudycafeController {
     private final StudycafeService studycafeService;
 

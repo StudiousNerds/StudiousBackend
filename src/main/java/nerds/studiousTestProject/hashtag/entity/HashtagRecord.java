@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
@@ -28,6 +29,10 @@ public class HashtagRecord {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
     private Integer count;
 
@@ -45,10 +50,15 @@ public class HashtagRecord {
         }
     }
 
+    public void setReview(Review review) {
+        this.review = review;
+    }
+
     @Builder
-    public HashtagRecord(Long id, Studycafe studycafe, Integer count, HashtagName name) {
+    public HashtagRecord(Long id, Studycafe studycafe,Review review, Integer count, HashtagName name) {
         this.id = id;
         this.studycafe = studycafe;
+        this.review = review;
         this.count = count;
         this.name = name;
     }

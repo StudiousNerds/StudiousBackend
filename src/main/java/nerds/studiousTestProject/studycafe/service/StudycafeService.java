@@ -13,12 +13,17 @@ import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
+
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
+
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
+
 import nerds.studiousTestProject.studycafe.dto.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
@@ -38,6 +43,14 @@ import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResp
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
+=======
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
+
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
@@ -66,23 +79,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class StudycafeService {
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
     private final RoomService roomService;
     private final SubPhotoService subPhotoService;
-    private final HashtagService hashtagService;
-    private final ConvenienceService convenienceService;
     private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
@@ -114,9 +126,8 @@ public class StudycafeService {
     }
 
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = findStudycafeById(id);
 
-        /*
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
@@ -124,12 +135,12 @@ public class StudycafeService {
                 .accumResCnt(studycafe.getAccumReserveCount())
                 .duration(studycafe.getDuration())
                 .nearestStation(studycafe.getNearestStation())
-                .hashtags(hashtagService.findHashtags(id))
+                .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                 .introduction(studycafe.getIntroduction())
-                .conveniences(convenienceService.getAllCafeConveniences(id))
+                .conveniences(getConveniences(id))
                 .notification(studycafe.getNotificationInfo())
-                .refundPolicy(studycafe.getRefundPolicyInfo())
-                .notice(getNotices(id))
+                .refundPolicy(getRefundPolicy(id))
+                .notice(getNotice(id))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), id))
                 .recommendationRate(reviewService.getAvgRecommendation(id))
                 .cleanliness(reviewService.getAvgCleanliness(id))
@@ -138,9 +149,6 @@ public class StudycafeService {
                 .total(studycafe.getTotalGrade())
                 .reviewInfo(reviewService.findAllReviews(studycafe.getId()))
                 .build();
-
-         */
-        return null;
     }
 
     public MainPageResponse getMainPage() {
@@ -163,7 +171,7 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -184,29 +192,52 @@ public class StudycafeService {
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(hashtagService.findHashtags(studycafe.getId()))
+                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
         return eventStudycafeList;
     }
 
-    public Studycafe getStudyCafe(Long studycafeId){
-        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public Studycafe getStudyCafe(Long studycafeId) {
+        return findStudycafeById(studycafeId);
     }
 
-    public Studycafe getStudyCafeByName(String cafeName){
+    public Studycafe getStudyCafeByName(String cafeName) {
         return studycafeRepository.findByName(cafeName).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public String[] getNotice(Long id){
-        Studycafe studycafe = studycafeRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public String[] getNotice(Long id) {
+        Studycafe studycafe = findStudycafeById(id);
 
         List<String> noticeList = studycafe.getNotices().stream().map(Notice::getDetail).toList();
         Integer arrSize = noticeList.size();
         String notices[] = noticeList.toArray(new String[arrSize]);
 
         return notices;
+    }
+
+    public String[] getConveniences(Long studycafeId) {
+        Studycafe studycafe = findStudycafeById(studycafeId);
+
+        List<ConvenienceName> convenienceList = studycafe.getConveniences().stream().map(Convenience::getName).toList();
+        Integer arrSize = convenienceList.size();
+        String conveniences[] = convenienceList.toArray(new String[arrSize]);
+
+        return conveniences;
+    }
+
+
+    public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
+        Studycafe studycafe = findStudycafeById(studycafeId);
+
+        return studycafe.getRefundPolicies().stream()
+                .map(RefundPolicyInResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    private Studycafe findStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     public ValidResponse validateAccountInfo(AccountInfoRequest accountInfoRequest) {
