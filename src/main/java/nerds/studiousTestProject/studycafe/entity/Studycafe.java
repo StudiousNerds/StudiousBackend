@@ -151,6 +151,7 @@ public class Studycafe {
         if (refundPolicies != null) {
             this.refundPolicies = refundPolicies;
         }
+    }
 
     public void addTotalGrade(Double totalGrade) {
         this.totalGrade = totalGrade;

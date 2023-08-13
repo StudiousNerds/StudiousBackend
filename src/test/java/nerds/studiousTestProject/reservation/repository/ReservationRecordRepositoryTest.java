@@ -4,7 +4,6 @@ import nerds.studiousTestProject.RepositoryTest;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.support.fixture.RoomFixture;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.member.MemberRepository;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
@@ -27,11 +26,11 @@ import static nerds.studiousTestProject.support.fixture.MemberFixture.BEAVER;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.*;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
 import static nerds.studiousTestProject.fixture.MemberFixture.*;
 import static nerds.studiousTestProject.fixture.ReservationRecordFixture.*;
 import static nerds.studiousTestProject.fixture.ReviewFixture.*;
-import static nerds.studiousTestProject.fixture.RoomFixture2.*;
 import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,7 +97,7 @@ class ReservationRecordRepositoryTest {
         Member member1 = 멤버_저장(BEAVER.생성(1L));
         Member member2 = 멤버_저장(BURNED_POTATO.생성(2L));
         Studycafe studycafe = 스터디카페_저장(NERDS.생성());
-        Room room = 룸_저장(RoomFixture.ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -121,7 +120,7 @@ class ReservationRecordRepositoryTest {
 
         Member member1 = 멤버_저장(BEAVER.생성(1L));
         Studycafe studycafe = 스터디카페_저장(NERDS.생성());
-        Room room = 룸_저장(RoomFixture.ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
 
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));

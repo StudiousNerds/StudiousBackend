@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.service;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
@@ -8,8 +7,6 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.service.ConvenienceService;
-import nerds.studiousTestProject.hashtag.service.HashtagService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -17,18 +14,16 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
 import nerds.studiousTestProject.photo.service.SubPhotoService;
-import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
-import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
 
-import nerds.studiousTestProject.studycafe.dto.EventCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
-import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
-import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
@@ -43,13 +38,6 @@ import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResp
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
-=======
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
-import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfo;
 
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
@@ -62,9 +50,7 @@ import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
-import nerds.studiousTestProject.studycafe.entity.Address;
 import nerds.studiousTestProject.studycafe.entity.Notice;
-import nerds.studiousTestProject.studycafe.entity.NotificationInfo;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
@@ -137,8 +123,7 @@ public class StudycafeService {
                 .nearestStation(studycafe.getNearestStation())
                 .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                 .introduction(studycafe.getIntroduction())
-                .conveniences(getConveniences(id))
-                .notification(studycafe.getNotificationInfo())
+                .conveniences(getConveniences(id)) // notice 추가 해야 함
                 .refundPolicy(getRefundPolicy(id))
                 .notice(getNotice(id))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), id))

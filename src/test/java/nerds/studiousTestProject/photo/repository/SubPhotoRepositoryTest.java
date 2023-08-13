@@ -1,10 +1,6 @@
 package nerds.studiousTestProject.photo.repository;
 
 import nerds.studiousTestProject.RepositoryTest;
-import nerds.studiousTestProject.fixture.PhotoFixture;
-import nerds.studiousTestProject.fixture.ReviewFixture;
-import nerds.studiousTestProject.fixture.RoomFixture;
-import nerds.studiousTestProject.fixture.StudycafeFixture;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
@@ -12,18 +8,15 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
 import static nerds.studiousTestProject.fixture.PhotoFixture.*;
 import static nerds.studiousTestProject.fixture.ReviewFixture.*;
-import static nerds.studiousTestProject.fixture.RoomFixture.*;
 import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 @RepositoryTest
