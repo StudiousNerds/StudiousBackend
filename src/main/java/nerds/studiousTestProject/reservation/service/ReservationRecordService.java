@@ -114,6 +114,18 @@ public class ReservationRecordService {
         return ReserveResponse.of(member, room, studycafe);
     }
 
+    public List<ReservationRecord> findAllByMemberId(Long memberId) {
+        return reservationRecordRepository.findAllByMemberId(memberId);
+    }
+
+    public List<ReservationRecord> findAllByRoomId(Long roomId) {
+        return reservationRecordRepository.findAllByRoomId(roomId);
+    }
+
+    public List<ReservationRecord> findAllByStudycafeId(Long studycafeId) {
+        return reservationRecordRepository.findAllByStudycafeId(studycafeId);
+    }
+        
     public ReservationCancelResponse cancelInfo(Long reservationId) {
         ReservationRecord reservationRecord = findById(reservationId);
         Room room = reservationRecord.getRoom();

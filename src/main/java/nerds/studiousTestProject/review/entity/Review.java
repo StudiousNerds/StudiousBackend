@@ -33,8 +33,8 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @OneToOne
+    @JoinColumn(name = "reservation_id")
     private ReservationRecord reservationRecord;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
@@ -61,9 +61,8 @@ public class Review {
     }
 
     @Builder
-    public Review(Long id, ReservationRecord reservationRecord, Grade grade, LocalDate createdDate, String detail, String comment) {
+    public Review(Long id, Grade grade, LocalDate createdDate, String detail, String comment) {
         this.id = id;
-        this.reservationRecord = reservationRecord;
         this.grade = grade;
         this.createdDate = createdDate;
         this.detail = detail;
@@ -72,5 +71,9 @@ public class Review {
 
     public void updateDetail(String detail) {
         this.detail = detail;
+    }
+
+    public void setReservationRecord(ReservationRecord reservationRecord) {
+        this.reservationRecord = reservationRecord;
     }
 }
