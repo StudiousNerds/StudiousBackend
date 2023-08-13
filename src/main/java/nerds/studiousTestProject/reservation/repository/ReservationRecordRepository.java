@@ -1,7 +1,10 @@
 package nerds.studiousTestProject.reservation.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
@@ -19,8 +22,4 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     Optional<ReservationRecord> findByOrderId(String orderId);
     List<ReservationRecord> findAllByMemberId(Long memberId);
 
-    @Query(value = "select r from ReservationRecord r " +
-            "where r.room.id in (select ro.id from Room ro where ro.studycafe.id = :studycafeId) " +
-            "and r.review.id is not null")
-    List<ReservationRecord> findAllByStudycafeId(@Param("studycafeId") Long studycafeId);
 }
