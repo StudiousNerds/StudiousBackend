@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
@@ -23,7 +24,11 @@ import nerds.studiousTestProject.studycafe.dto.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
@@ -91,6 +96,8 @@ public class StudycafeService {
      * @return 검색 결과
      */
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
+
+        // 이 부분도 추가 Validator 도입 예정
 
         // 날짜 선택이 안되었는데 시간을 선택한 경우
         if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
@@ -265,27 +272,13 @@ public class StudycafeService {
         // 환불 정책 등록
         List<RefundPolicyRequest> refundPolicies = cafeInfo.getRefundPolicies();
         for (RefundPolicyRequest refundPolicyRequest : refundPolicies) {
-            studycafe.addRefundPolicy(
-                    RefundPolicy.builder()
-                            .refundDay(RefundDay.of(refundPolicyRequest.getDay()))
-                            .rate(refundPolicyRequest.getRate())
-                            .type("??")
-                            .build()
-            );
+            studycafe.addRefundPolicy(refundPolicyRequest.toEntity());
         }
 
         // 운영 시간 정보 등록
         List<OperationInfoRequest> operationInfoRequests = cafeInfo.getOperationInfos();
         for (OperationInfoRequest operationInfoRequest : operationInfoRequests) {
-            studycafe.addOperationInfo(
-                    OperationInfo.builder()
-                            .week(operationInfoRequest.getWeek())
-                            .startTime(operationInfoRequest.getStartTime())
-                            .endTime(operationInfoRequest.getEndTime())
-                            .allDay(operationInfoRequest.getAllDay())
-                            .closed(operationInfoRequest.getClosed())
-                            .build()
-            );
+            studycafe.addOperationInfo(operationInfoRequest.toEntity());
         }
 
         // 룸 정보 등록
@@ -293,36 +286,17 @@ public class StudycafeService {
         for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
             List<String> roomPhotos = roomInfoRequest.getPhotos();
             String roomMainPhoto = roomPhotos.remove(0);
-            Room room = Room.builder()
-                    .name(roomInfoRequest.getName())
-                    .photo(roomMainPhoto)
-                    .studycafe(studycafe)   // 이부분 좀 애매
-                    .standardHeadCount(roomInfoRequest.getStandardHeadCount())
-                    .minHeadCount(roomInfoRequest.getMinHeadCount())
-                    .maxHeadCount(roomInfoRequest.getMaxHeadCount())
-                    .minUsingTime(roomInfoRequest.getMinUsingTime())
-                    .price(roomInfoRequest.getPrice())
-                    .type(roomInfoRequest.getType())
-                    .build();
+            Room room = roomInfoRequest.toEntity(roomMainPhoto);
 
             // 룸 사진 등록
             for (String roomPhotoUrl : roomPhotos) {
-                room.addSubPhoto(SubPhoto.builder()
-                        .url(roomPhotoUrl)
-                        .build()
-                );
+                room.addSubPhoto(SubPhoto.builder().url(roomPhotoUrl).build());
             }
 
             // 룸 편의시설 정보 등록
             List<ConvenienceInfoRequest> roomConveniences = roomInfoRequest.getConvenienceInfos();
             for (ConvenienceInfoRequest convenienceInfoRequest : roomConveniences) {
-                room.addConvenience(
-                        Convenience.builder()
-                                .name(convenienceInfoRequest.getName())
-                                .price(convenienceInfoRequest.getPrice())
-                                .isFree(convenienceInfoRequest.getPrice() == 0)
-                                .build()
-                );
+                room.addConvenience(convenienceInfoRequest.toEntity());
             }
 
             studycafe.addRoom(room);
@@ -331,13 +305,7 @@ public class StudycafeService {
         // 카페 편의시설 정보 등록
         List<ConvenienceInfoRequest> cafeConveniences = cafeInfo.getConvenienceInfos();
         for (ConvenienceInfoRequest convenienceInfoRequest : cafeConveniences) {
-            studycafe.addConvenience(
-                    Convenience.builder()
-                            .name(convenienceInfoRequest.getName())
-                            .price(convenienceInfoRequest.getPrice())
-                            .isFree(convenienceInfoRequest.getPrice() == 0)
-                            .build()
-            );
+            studycafe.addConvenience(convenienceInfoRequest.toEntity());
         }
 
         studycafeRepository.save(studycafe);    // 스터디카페 저장
@@ -351,13 +319,7 @@ public class StudycafeService {
     public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
-                .stream().map(s -> CafeBasicInfoResponse.builder()
-                        .id(s.getId())
-                        .name(s.getName())
-                        .address(s.getAddress().getEntryAddress())
-                        .photo(s.getPhoto())
-                        .build()
-                ).toList();
+                .stream().map(CafeBasicInfoResponse::from).toList();
     }
 
     /**
@@ -370,6 +332,8 @@ public class StudycafeService {
             Integer standardHeadCount = roomInfoRequest.getStandardHeadCount();
             Integer minHeadCount = roomInfoRequest.getMinHeadCount();
             Integer maxHeadCount = roomInfoRequest.getMaxHeadCount();
+
+            // 밑의 코드는 추후 Validator 를 도입 예정
 
             // 최대 인원 수가 최대 인원 수 보다 작은 경우
             if (maxHeadCount < minHeadCount) {
@@ -388,49 +352,23 @@ public class StudycafeService {
         }
     }
 
+    /**
+     * 등록된 모든 스터디카페를 조회하는 메소드
+     * @param accessToken 사용자 엑세스 토크
+     * @param cafeId 스터디카페 pk
+     * @return 등록된 모든 스터디카페 정보
+     */
     @Secured(value = MemberRole.ROLES.ADMIN)
     public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long cafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        // Entity -> DTO 변환 : DTO에서 하는 게 맞는지 여기서 하는게 맞는지 모르겠음
-        Address address = studycafe.getAddress();
-        AddressInfoResponse addressInfoResponse = AddressInfoResponse.builder()
-                .basic(address.getBasic())
-                .detail(address.getDetail())
-                .zipcode(address.getZipcode())
-                .build();
-
-        List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(
-                o -> OperationInfoResponse.builder()
-                        .week(o.getWeek())
-                        .startTime(o.getStartTime())
-                        .endTime(o.getEndTime())
-                        .allDay(o.getAllDay())
-                        .closed(o.getClosed())
-                        .build()).toList();
-
-        List<ConvenienceInfoResponse> convenienceInfoResponses = studycafe.getConveniences().stream().map(
-                c -> ConvenienceInfoResponse.builder()
-                        .name(c.getName())
-                        .price(c.getPrice())
-                        .build()
-        ).toList();
-
+        AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
+        List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(OperationInfoResponse::from).toList();
+        List<ConvenienceInfoResponse> convenienceInfoResponses = studycafe.getConveniences().stream().map(ConvenienceInfoResponse::from).toList();
         List<String> noticeResponses = studycafe.getNotices().stream().map(Notice::getDetail).toList();
-
-        // 사진 : 메인 사진(단일) + 서브 사진(리스트)
-        List<String> photos = new ArrayList<>();
-        photos.add(studycafe.getPhoto());
-        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getUrl).toList();
-        photos.addAll(subPhotos);
-
-        List<RefundPolicyResponse> refundPolicyResponses = studycafe.getRefundPolicies().stream().map(
-                r -> RefundPolicyResponse.builder()
-                        .day(r.getRefundDay().getRemain())
-                        .rate(r.getRate())
-                        .build()
-        ).toList();
+        List<String> photos = getPhotos(studycafe); // 사진 : 메인 사진(단일) + 서브 사진(리스트)
+        List<RefundPolicyResponse> refundPolicyResponses = studycafe.getRefundPolicies().stream().map(RefundPolicyResponse::from).toList();
 
         return CafeDetailsResponse.builder()
                 .name(studycafe.getName())
@@ -444,6 +382,62 @@ public class StudycafeService {
                 .build();
     }
 
+    private List<String> getPhotos(Studycafe studycafe) {
+        List<String> photos = new ArrayList<>();
+        photos.add(studycafe.getPhoto());
+        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getUrl).toList();
+        photos.addAll(subPhotos);
+        return photos;
+    }
+
+    /**
+     * 등록된 스터디카페 수정 메소드
+     * @param accessToken 사용자 엑세스 토큰
+     * @param cafeId 스터디카페 PK
+     * @param cafeInfoEditRequest 수정된 데이터
+     */
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    @Transactional
+    public void edit(String accessToken, Long cafeId, CafeInfoEditRequest cafeInfoEditRequest) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
+        String introduction = cafeInfoEditRequest.getIntroduction();
+        if (introduction != null) {
+            studycafe.updateIntroduction(introduction);
+        }
+
+        List<OperationInfoEditRequest> operationInfoEditRequests = cafeInfoEditRequest.getOperationInfos();
+        if (operationInfoEditRequests != null) {
+            List<OperationInfo> operationInfos = operationInfoEditRequests.stream().map(OperationInfoEditRequest::toEntity).toList();
+            studycafe.updateOperationInfos(operationInfos);
+        }
+
+        List<ConvenienceInfoEditRequest> convenienceInfoEditRequests = cafeInfoEditRequest.getConvenienceInfos();
+        if (convenienceInfoEditRequests != null) {
+            List<Convenience> conveniences = convenienceInfoEditRequests.stream().map(ConvenienceInfoEditRequest::toEntity).toList();
+            studycafe.updateConveniences(conveniences);
+        }
+
+        // 사진은 추후
+
+        List<String> notices = cafeInfoEditRequest.getNotices();
+        if (notices != null) {
+            studycafe.updateNotices(notices.stream().map(
+                    n -> Notice.builder()
+                            .detail(n)
+                            .build()
+                    ).toList()
+            );
+        }
+
+        List<RefundPolicyEditRequest> refundPolicies = cafeInfoEditRequest.getRefundPolicies();
+        if (refundPolicies != null) {
+            studycafe.updateRefundPolices(refundPolicies.stream().map(RefundPolicyEditRequest::toEntity).toList());
+        }
+
+    }
+
     /**
      * 공지사항 조회 로직
      * @param accessToken 사용자 엑세스 토큰
@@ -452,17 +446,10 @@ public class StudycafeService {
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
-        log.info("Hello");
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        return studycafe.getNotificationInfos().stream().map(
-                n -> NotificationInfoResponse.builder()
-                        .detail(n.getDetail())
-                        .startDate(n.getStartDate())
-                        .endDate(n.getEndDate())
-                        .build()
-        ).toList();
+        return studycafe.getNotificationInfos().stream().map(NotificationInfoResponse::from).toList();
     }
 
     /**
@@ -477,18 +464,12 @@ public class StudycafeService {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우
+        // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
         if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
             throw new BadRequestException(ErrorCode.START_DATE_AFTER_THAN_END_DATE);
         }
 
-        studycafe.addNotificationInfo(
-                NotificationInfo.builder()
-                        .detail(notificationInfoRequest.getDetail())
-                        .startDate(notificationInfoRequest.getStartDate())
-                        .endDate(notificationInfoRequest.getEndDate())
-                        .build()
-        );
+        studycafe.addNotificationInfo(notificationInfoRequest.toEntity());
     }
 
     /**
