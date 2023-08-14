@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS `convenience` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `grade` (
-    `id`              bigint     NOT NULL AUTO_INCREMENT,
-    `cleanliness`     int        NOT NULL,
-    `deafening`       int        NOT NULL,
-    `fixtures_status` int        NOT NULL,
-    `is_recommended`  TINYINT(1) NOT NULL,
-    `total`           decimal    NOT NULL,
-    `review_id`       bigint     NOT NULL,
+    `id`              bigint       NOT NULL AUTO_INCREMENT,
+    `cleanliness`     int          NOT NULL,
+    `deafening`       int          NOT NULL,
+    `fixtures_status` int          NOT NULL,
+    `is_recommended`  TINYINT(1)   NOT NULL,
+    `total`           decimal(3,2) NOT NULL,
+    `review_id`       bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `member` (
     `resigned_date` DATE,
     `usable`        TINYINT(1)   NOT NULL,
     `birthday`      DATE         NOT NULL,
-    `created_date`  TIMESTAMP    NOT NULL,
+    `created_date`  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     `provider_id`   bigint,
     `email`         varchar(255) NOT NULL,
     `name`          varchar(255) NOT NULL,
@@ -90,13 +90,13 @@ CREATE TABLE IF NOT EXISTS `announcement` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `operation_info` (
-    `id`           bigint     NOT NULL AUTO_INCREMENT,
-    `is_all_day`   TINYINT(1) DEFAULT 'false',
-    `closed`       TINYINT(1) DEFAULT 'false',
+    `id`           bigint       NOT NULL AUTO_INCREMENT,
+    `is_all_day`   TINYINT(1)            DEFAULT '0',
+    `closed`       TINYINT(1)            DEFAULT '0',
     `end_time`     TIME,
     `start_time`   TIME,
-    `week`         varchar(255)       NOT NULL,
-    `studycafe_id` bigint     NOT NULL,
+    `week`         varchar(255) NOT NULL,
+    `studycafe_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -202,9 +202,9 @@ CREATE TABLE IF NOT EXISTS `room` (
 CREATE TABLE IF NOT EXISTS `studycafe` (
     `id`                  bigint       NOT NULL AUTO_INCREMENT,
     `name`                varchar(255) NOT NULL,
-    `accum_reserve_count` int          DEFAULT 0
-    `total_grade`         decimal      DEFAULT 0,
-    `created_at`          TIMESTAMP    DEFAULT now(), --now 안되면 not null
+    `accum_reserve_count` int          DEFAULT '0',
+    `total_grade`         decimal(3,2) DEFAULT '0',
+    `created_at`          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     `address_basic`       varchar(255) NOT NULL,
     `address_detail`      varchar(255) NOT NULL,
     `address_zipcode`     varchar(255) NOT NULL,
