@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS `convenience` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `is_free`       TINYINT(1)   NOT NULL,
     `price`         int          NOT NULL,
+    `usage`         varchar(255) NOT NULL,
     `room_id`       bigint,
     `studycafe_id`  bigint,
     `name`          varchar(255) NOT NULL,
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `grade` (
     `deafening`       int        NOT NULL,
     `fixtures_status` int        NOT NULL,
     `is_recommended`  TINYINT(1) NOT NULL,
-    `total`           double     NOT NULL,
+    `total`           decimal    NOT NULL,
     `review_id`       bigint     NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -25,39 +26,28 @@ CREATE TABLE IF NOT EXISTS `grade` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `hashtag_record` (
-    `id`           bigint       NOT NULL AUTO_INCREMENT,
-    `count`        int,
-    `review_id`    bigint       NOT NULL,
-    `studycafe_id` bigint       NOT NULL,
-    `name`         varchar(255) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 1
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `member` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `resigned_date` DATE,
     `usable`        TINYINT(1)   NOT NULL,
-    `birthday`      DATE,
-    `created_date`  TIMESTAMP,
+    `birthday`      DATE         NOT NULL,
+    `created_date`  TIMESTAMP    NOT NULL,
     `provider_id`   bigint,
     `email`         varchar(255) NOT NULL,
     `name`          varchar(255) NOT NULL,
     `nickname`      varchar(255) NOT NULL,
     `password`      varchar(255) NOT NULL,
-    `phone_number`  varchar(255),
+    `phone_number`  varchar(255) NOT NULL,
     `photo`         varchar(255),
-    `type`          varchar(255) DEFAULT 'DEFAULT',
+    `type`          varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `member_bookmark` (
+CREATE TABLE IF NOT EXISTS `bookmark` (
     `id`           bigint NOT NULL AUTO_INCREMENT,
     `member_id`    bigint NOT NULL,
     `studycafe_id` bigint NOT NULL,
@@ -67,28 +57,18 @@ CREATE TABLE IF NOT EXISTS `member_bookmark` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `member_roles` (
+CREATE TABLE IF NOT EXISTS `role` (
+    `id`        bigint       NOT NULL AUTO_INCREMENT,
     `member_id` bigint       NOT NULL,
-    `roles`     varchar(255)
-) ENGINE = InnoDB
+    `value`     varchar(255) NOT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `notice` (
-    `id`           bigint       NOT NULL,
-    `studycafe_id` bigint       NOT NULL,
-    `detail`       varchar(255),
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 1
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `notification_info` (
-    `id`           bigint       NOT NULL,
-    `end_date`     date,
-    `start_date`   date,
+    `id`           bigint       NOT NULL AUTO_INCREMENT,
     `studycafe_id` bigint       NOT NULL,
     `detail`       varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
@@ -97,14 +77,26 @@ CREATE TABLE IF NOT EXISTS `notification_info` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS `announcement` (
+    `id`           bigint       NOT NULL AUTO_INCREMENT,
+    `end_date`     date         NOT NULL,
+    `start_date`   date         NOT NULL,
+    `detail`       varchar(255) NOT NULL,
+    `studycafe_id` bigint       NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `operation_info` (
-    `id`           bigint     NOT NULL,
-    `all_day`      TINYINT(1) NOT NULL,
-    `closed`       TINYINT(1) NOT NULL,
+    `id`           bigint     NOT NULL AUTO_INCREMENT,
+    `is_all_day`   TINYINT(1) DEFAULT 'false',
+    `closed`       TINYINT(1) DEFAULT 'false',
     `end_time`     TIME,
     `start_time`   TIME,
+    `week`         varchar(255)       NOT NULL,
     `studycafe_id` bigint     NOT NULL,
-    `week` varchar(255)       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -115,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `payment` (
     `id`             bigint       NOT NULL AUTO_INCREMENT,
     `price`          int          NOT NULL,
     `cancel_reason`  varchar(255),
-    `complete_time`  varchar(255),
+    `complete_time`  TIMESTAMP    NOT NULL,
     `method`         varchar(255) NOT NULL,
     `order_id`       varchar(255) NOT NULL,
     `payment_key`    varchar(255) NOT NULL,
@@ -129,8 +121,8 @@ CREATE TABLE IF NOT EXISTS `payment` (
 CREATE TABLE IF NOT EXISTS `refund_policy` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
     `rate`         int          NOT NULL,
-    `refund_day`   varchar(255) NOT NULL,
-    `type`         varchar(255),
+    `remaining`    varchar(255) NOT NULL,
+    `usage`        varchar(255) NOT NULL,--환불 정책명 (멘토님이 확장성 - 편의시설 결제 취소) 필드명 변경
     `studycafe_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -139,21 +131,30 @@ CREATE TABLE IF NOT EXISTS `refund_policy` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `reservation_record` (
-    `id`               bigint       NOT NULL AUTO_INCREMENT,
-    `complete_payment` TINYINT(1),
-    `date`             date         NOT NULL,
-    `duration`         int          NOT NULL,
-    `start_time`       time         NOT NULL,
-    `end_time`         time         NOT NULL,
-    `head_count`       int          NOT NULL,
-    `name`             varchar(255) NOT NULL,
-    `order_id`         varchar(255),
-    `phone_number`     varchar(255) NOT NULL,
-    `request`          varchar(255),
-    `status`           varchar(255) NOT NULL,
-    `member_id`        bigint       NOT NULL,
-    `payment_id`       bigint,
-    `room_id`          bigint       NOT NULL,
+    `id`                bigint       NOT NULL AUTO_INCREMENT,
+    `date`              date         NOT NULL,
+    `duration`          int          NOT NULL, -- 시간 단위
+    `start_time`        time         NOT NULL,
+    `end_time`          time         NOT NULL,
+    `head_count`        int          NOT NULL,
+    `user_name`         varchar(255) NOT NULL,
+    `order_id`          varchar(255),
+    `user_phone_number` varchar(255) NOT NULL,
+    `request`           varchar(255),
+    `status`            varchar(255) NOT NULL,
+    `member_id`         bigint       NOT NULL,
+    `payment_id`        bigint,
+    `room_id`           bigint       NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `convenience_record` (
+    `id`                    bigint NOT NULL AUTO_INCREMENT,
+    `reservation_record_id` bigint NOT NULL,
+    `convenience_id`        bigint NOT NULL
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -161,11 +162,21 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `review` (
-    `id`             bigint       NOT NULL AUTO_INCREMENT,
-    `created_date`   date         NOT NULL,
-    `comment`        varchar(255),
-    `detail`         varchar(255),
-    `reservation_id` bigint       NOT NULL,
+    `id`                    bigint       NOT NULL AUTO_INCREMENT,
+    `created_date`          date         NOT NULL,
+    `comment`               varchar(255), -- 사장님 댓글
+    `detail`                varchar(255) NOT NULL,
+    `reservation_record_id` bigint       NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `hashtag_record` (
+    `id`           bigint       NOT NULL AUTO_INCREMENT,
+    `name`         varchar(255) NOT NULL,
+    `review_id`    bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -174,15 +185,14 @@ CREATE TABLE IF NOT EXISTS `review` (
 
 CREATE TABLE IF NOT EXISTS `room` (
     `id`                  bigint       NOT NULL AUTO_INCREMENT,
-    `max_head_count`      int          NOT NULL,
+    `name`                varchar(255) NOT NULL,
     `min_head_count`      int          NOT NULL,
+    `standard_head_count` int          NOT NULL,
+    `max_head_count`      int          NOT NULL,
     `min_using_time`      int          NOT NULL,
     `price`               int          NOT NULL,
-    `standard_head_count` int,
-    `name`                varchar(255) NOT NULL,
-    `photo`               varchar(255), -- 머지 ?
-    `type`                varchar(255) NOT NULL,
-    `studycafe_id`        bigint,
+    `price_type`          varchar(255) NOT NULL,
+    `studycafe_id`        bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -191,19 +201,30 @@ CREATE TABLE IF NOT EXISTS `room` (
 
 CREATE TABLE IF NOT EXISTS `studycafe` (
     `id`                  bigint       NOT NULL AUTO_INCREMENT,
-    `accum_reserve_count` int          NOT NULL, --처음에 0? 그럼 그냥 default?
-    `duration`            int, --?
-    `total_grade`         double,
-    `created_at`          datetime(6),
-    `member_id`           bigint,
-    `basic`               varchar(255), --모지 ?
-    `detail`              varchar(255),
-    `introduction`        varchar(255),
     `name`                varchar(255) NOT NULL,
+    `accum_reserve_count` int          DEFAULT 0
+    `total_grade`         decimal      DEFAULT 0,
+    `created_at`          TIMESTAMP    DEFAULT now(), --now 안되면 not null
+    `address_basic`       varchar(255) NOT NULL,
+    `address_detail`      varchar(255) NOT NULL,
+    `address_zipcode`     varchar(255) NOT NULL,
+    `introduction`        varchar(255) NOT NULL,
+    `walking_time`        int,
     `nearest_station`     varchar(255),
-    `phone_number`        varchar(255), --스카 번호 ? 근데 폰 번호는 이름이 이상하지 얺너
+    `tel`                 varchar(255) NOT NULL,
     `photo`               varchar(255) NOT NULL,
-    `zipcode`             varchar(255),
+    `member_id`           bigint       NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `accum_hashtag_history` (
+    `id`           bigint       NOT NULL AUTO_INCREMENT,
+    `count`        int          NOT NULL,
+    `name`         varchar(255) NOT NULL,
+    `studycafe_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -212,8 +233,9 @@ CREATE TABLE IF NOT EXISTS `studycafe` (
 
 CREATE TABLE IF NOT EXISTS `sub_photo` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
-    `url`          varchar(255),
-    `studycafe_id` bigint, --타입 지정하는 컬럼 추가 하기로 하지 않았나 id null 겁사로만 하는건 위험 ?
+    `path`         varchar(255) NOT NULL,
+    `usage`        varchar(255) NOT NULL,
+    `studycafe_id` bigint,
     `review_id`    bigint,
     `room_id`      bigint,
     PRIMARY KEY (`id`)
@@ -222,12 +244,8 @@ CREATE TABLE IF NOT EXISTS `sub_photo` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
---이거 뭔지 ?
-alter table grade
-    add constraint UK_we0avakghgh4ao6asasoe4se unique (review_id)
-    Hibernate:
-alter table reservation_record
-    add constraint UK_hs9rx6h5qvlbscyo17mykcxyk unique (payment_id)
-    Hibernate:
-alter table review
-    add constraint UK_hyxvthxr4ats27c7vko0rb4xg unique (reservation_id)
+alter table grade add constraint grade_review_unique_key unique (review_id)
+
+alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id)
+
+alter table review add constraint review_reservation_record_unique_key unique (reservation_record_id)
