@@ -29,7 +29,6 @@ public class BookmarkService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final StudycafeService studycafeService;
-    private final SubPhotoService subPhotoService;
 
     @Transactional
     public ResponseEntity<?> registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
@@ -66,18 +65,17 @@ public class BookmarkService {
     private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<Long> bookmarkList) {
         for (Long studycafeId : bookmarkList) {
             Studycafe studycafe = studycafeService.getStudyCafe(studycafeId);
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             FindBookmarkResponse bookmarkCafe = FindBookmarkResponse.builder()
                     .pageNumber(pageNumber)
                     .totalRecord(bookmarkList.size())
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags(studycafeService.getHashtagRecords(studycafe))
                     .build();
             bookmarkCafeList.add(bookmarkCafe);
         }

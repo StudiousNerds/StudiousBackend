@@ -7,6 +7,8 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -121,7 +123,7 @@ public class StudycafeService {
                 .accumResCnt(studycafe.getAccumReserveCount())
                 .duration(studycafe.getDuration())
                 .nearestStation(studycafe.getNearestStation())
-                .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                .hashtags(getHashtagRecords(studycafe))
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(id)) // notice 추가 해야 함
                 .refundPolicy(getRefundPolicy(id))
@@ -136,6 +138,7 @@ public class StudycafeService {
                 .build();
     }
 
+
     public MainPageResponse getMainPage() {
         List<RecommendCafeResponse> recommendStduycafes = getRecommendStudycafes();
         List<EventCafeResponse> eventStudycafes = getEventStudycafes();
@@ -147,16 +150,15 @@ public class StudycafeService {
         List<RecommendCafeResponse> recommedStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             RecommendCafeResponse foundStudycafe = RecommendCafeResponse.builder()
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags(getHashtagRecords(studycafe))
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -168,16 +170,15 @@ public class StudycafeService {
         List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             EventCafeResponse foundStudycafe = EventCafeResponse.builder()
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getDuration())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags(getHashtagRecords(studycafe))
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
@@ -215,6 +216,17 @@ public class StudycafeService {
         return studycafe.getRefundPolicies().stream()
                 .map(RefundPolicyInResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    public String[] getHashtagRecords(Studycafe studycafe) {
+        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
+        List<HashtagName> hashtagList = new ArrayList<>();
+
+        for (int i = 0; i < hashtagRecords.size(); i++) {
+            hashtagList.add(studycafe.getHashtagRecords().get(i).getName());
+        }
+
+        return (String[]) hashtagList.toArray();
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
