@@ -50,7 +50,7 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<OperationInfo> operationInfos = new ArrayList<>();
 
-    private Integer duration;
+    private Integer walkingTime;
 
     @Column(name = "nearest_station")
     private String nearestStation;
@@ -165,7 +165,7 @@ public class Studycafe {
         this.address = address;
         this.photo = photo;
         this.phoneNumber = phoneNumber;
-        this.duration = duration;
+        this.walkingTime = duration;
         this.nearestStation = nearestStation;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
