@@ -72,7 +72,7 @@ public class BookmarkService {
                     .cafeName(studycafe.getName())
                     .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
-                    .distance(studycafe.getDuration())
+                    .distance(studycafe.getWalkingTime())
                     .nearestStation(studycafe.getNearestStation())
                     .grade(studycafe.getTotalGrade())
                     .hashtags(studycafeService.getHashtagRecords(studycafe))

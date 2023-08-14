@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public enum RefundDay {
+public enum Remaining {
 
     BEFORE8("이용 8일 전", 8),
     BEFORE7("이용 7일 전", 7),
@@ -18,18 +18,18 @@ public enum RefundDay {
     NOW("이용 당일", 0);
 
     private static final Map<Integer, String> ENUM_MAP = Collections.unmodifiableMap(
-            Stream.of(values()).collect(Collectors.toMap(RefundDay::getRemain, RefundDay::name))
+            Stream.of(values()).collect(Collectors.toMap(Remaining::getRemain, Remaining::name))
     );
     private final String message;
     private final int remain;
 
-    RefundDay(String message, int remain) {
+    Remaining(String message, int remain) {
         this.message = message;
         this.remain = remain;
     }
 
-    public static RefundDay of(int remain) {
-        return RefundDay.valueOf(ENUM_MAP.get(remain));
+    public static Remaining of(int remain) {
+        return Remaining.valueOf(ENUM_MAP.get(remain));
     }
 
     public String getMessage() {
