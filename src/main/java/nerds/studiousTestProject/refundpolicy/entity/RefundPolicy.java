@@ -25,7 +25,7 @@ public class RefundPolicy {
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
-    private RefundDay refundDay;
+    private Remaining remaining;
     private Integer rate;
     private String type;
 
@@ -34,9 +34,9 @@ public class RefundPolicy {
     private Studycafe studycafe;
 
     @Builder
-    public RefundPolicy(Long id, RefundDay refundDay, Integer rate, String type, Studycafe studycafe) {
+    public RefundPolicy(Long id, Remaining remaining, Integer rate, String type, Studycafe studycafe) {
         this.id = id;
-        this.refundDay = refundDay;
+        this.remaining = remaining;
         this.rate = rate;
         this.type = type;
         this.studycafe = studycafe;

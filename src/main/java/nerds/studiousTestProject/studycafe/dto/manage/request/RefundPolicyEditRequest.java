@@ -1,8 +1,8 @@
 package nerds.studiousTestProject.studycafe.dto.manage.request;
 
 import lombok.Data;
-import nerds.studiousTestProject.refundpolicy.entity.RefundDay;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
+import nerds.studiousTestProject.refundpolicy.entity.Remaining;
 import org.hibernate.validator.constraints.Range;
 
 @Data
@@ -15,7 +15,7 @@ public class RefundPolicyEditRequest {
 
     public RefundPolicy toEntity() {
         return RefundPolicy.builder()
-                .refundDay(RefundDay.of(day))
+                .remaining(Remaining.of(day))
                 .rate(rate)
                 .build();
     }
