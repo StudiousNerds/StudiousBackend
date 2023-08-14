@@ -37,7 +37,7 @@ public class BookmarkService {
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.registerBookmark(studyCafe.getName());
+        member.registerBookmark(studyCafe.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
     }
@@ -46,7 +46,7 @@ public class BookmarkService {
         List<FindBookmarkResponse> bookmarkCafeList = new ArrayList<>();
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Member bookmarkedMember = memberRepository.findById(member.getId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER));
-        List<String> bookmarkList = bookmarkedMember.getBookmark();
+        List<Long> bookmarkList = bookmarkedMember.getBookmark();
 
         getBookmarkList(pageNumber, bookmarkCafeList, bookmarkList);
         return bookmarkCafeList;
@@ -58,14 +58,14 @@ public class BookmarkService {
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.deleteBookmark(studyCafe.getName());
+        member.deleteBookmark(studyCafe.getId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
     }
 
-    private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<String> bookmarkList) {
-        for (String s : bookmarkList) {
-            Studycafe studycafe = studycafeService.getStudyCafeByName(s);
+    private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<Long> bookmarkList) {
+        for (Long studycafeId : bookmarkList) {
+            Studycafe studycafe = studycafeService.getStudyCafe(studycafeId);
             String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             FindBookmarkResponse bookmarkCafe = FindBookmarkResponse.builder()
                     .pageNumber(pageNumber)

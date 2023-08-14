@@ -188,10 +188,6 @@ public class StudycafeService {
         return findStudycafeById(studycafeId);
     }
 
-    public Studycafe getStudyCafeByName(String cafeName) {
-        return studycafeRepository.findByName(cafeName).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-    }
-
     public String[] getNotice(Long id) {
         Studycafe studycafe = findStudycafeById(id);
 

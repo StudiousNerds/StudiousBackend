@@ -63,7 +63,7 @@ public class Member implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
-    private List<String> bookmark = new ArrayList<>();
+    private List<Long> bookmark = new ArrayList<>();
 
     private Boolean usable;
 
@@ -77,12 +77,12 @@ public class Member implements UserDetails {
         this.password = encodedPassword;
     }
 
-    public void registerBookmark(String studycafeName){
-        bookmark.add(studycafeName);
+    public void registerBookmark(Long studycafeId){
+        bookmark.add(studycafeId);
     }
 
-    public void deleteBookmark(String studycafeName){
-        bookmark.remove(studycafeName);
+    public void deleteBookmark(Long studycafeId){
+        bookmark.remove(studycafeId);
     }
 
     public void withdraw() {
