@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -18,10 +19,11 @@ public class Notice {
     @GeneratedValue
     private Long id;
 
+    @Column(name = "detail", nullable = false)
     private String detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
+    @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
     @Builder

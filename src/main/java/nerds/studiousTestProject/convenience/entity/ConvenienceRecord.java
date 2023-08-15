@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.convenience.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -21,11 +22,11 @@ public class ConvenienceRecord {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_record_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_record_id", nullable = false)
     private ReservationRecord reservationRecord;
 
-    @ManyToOne
-    @JoinColumn(name = "convenience_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "convenience_id", nullable = false)
     private Convenience convenience;
 }
