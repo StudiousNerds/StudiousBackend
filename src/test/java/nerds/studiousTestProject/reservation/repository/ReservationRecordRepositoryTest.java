@@ -5,7 +5,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.repository.member.MemberRepository;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.review.entity.Review;
