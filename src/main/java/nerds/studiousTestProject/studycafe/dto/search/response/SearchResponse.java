@@ -15,7 +15,6 @@ public class SearchResponse {
     private String nearestStation;
     private Double grade;
 
-    @QueryProjection
     public SearchResponse(Long id, String name, String photo, Integer accumRevCnt, Integer walkingTime, String nearestStation, Double grade) {
         this.id = id;
         this.name = name;
