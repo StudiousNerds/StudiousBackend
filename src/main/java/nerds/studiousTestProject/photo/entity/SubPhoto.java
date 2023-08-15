@@ -26,15 +26,15 @@ public class SubPhoto {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne
-    @JoinColumn(name = "studycafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
     @ManyToOne
-    @JoinColumn(name = "review_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "review_id")
     private Review review;
 
     @Column(name = "path", nullable = false)
