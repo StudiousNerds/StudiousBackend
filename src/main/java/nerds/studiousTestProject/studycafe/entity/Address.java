@@ -10,18 +10,18 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address {
-    private String basic;   // 기본 주소
-    private String detail;  // 상세 주소
-    private String zipcode; // 우편 번호
+    private String addressBasic;   // 기본 주소
+    private String addressDetail;  // 상세 주소
+    private String addressZipcode; // 우편 번호
 
     public String getEntryAddress() {
-        return basic + " " + detail;
+        return addressBasic + " " + addressDetail;
     }
 
     @Builder
-    public Address(String basic, String detail, String zipcode) {
-        this.basic = basic;
-        this.detail = detail;
-        this.zipcode = zipcode;
+    public Address(String addressBasic, String addressDetail, String addressZipcode) {
+        this.addressBasic = addressBasic;
+        this.addressDetail = addressDetail;
+        this.addressZipcode = addressZipcode;
     }
 }
