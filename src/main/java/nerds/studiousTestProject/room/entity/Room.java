@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.room.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,22 +31,30 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "standard_head_count", nullable = false)
     private Integer standardHeadCount; // 기존 인원수
+
+    @Column(name = "min_head_count", nullable = false)
     private Integer minHeadCount;
+
+    @Column(name = "max_head_count", nullable = false)
     private Integer maxHeadCount;
 
+    @Column(name = "price", nullable = false)
     private Integer price;
+
+    @Column(name = "min_using_time", nullable = false)
     private Integer minUsingTime;
 
-    private String photo;
-
+    @Column(name = "price_type", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private PriceType type;
+    private PriceType priceType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
+    @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
@@ -83,8 +92,7 @@ public class Room {
         this.maxHeadCount = maxHeadCount;
         this.price = price;
         this.minUsingTime = minUsingTime;
-        this.photo = photo;
-        this.type = type;
+        this.priceType = type;
     }
 
     public void setStudycafe(Studycafe studycafe) {

@@ -269,7 +269,7 @@ public class StudycafeService {
                 .totalGrade(0.0)
                 .createdAt(LocalDateTime.now())
                 .accumReserveCount(0)
-                .duration(placeResponse.getDuration())
+                .walkingTime(placeResponse.getDuration())
                 .nearestStation(placeResponse.getNearestStation())
                 .introduction(cafeInfo.getIntroduction())
                 .build();
@@ -409,7 +409,7 @@ public class StudycafeService {
     private List<String> getPhotos(Studycafe studycafe) {
         List<String> photos = new ArrayList<>();
         photos.add(studycafe.getPhoto());
-        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getUrl).toList();
+        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getPath).toList();
         photos.addAll(subPhotos);
         return photos;
     }
