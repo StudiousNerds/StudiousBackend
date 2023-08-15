@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.member.entity.member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,9 +26,10 @@ public class Role {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Column(name = "value", nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberRole value;
 
