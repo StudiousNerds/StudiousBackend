@@ -2,14 +2,14 @@ package nerds.studiousTestProject.bookmark.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.photo.service.SubPhotoService;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.bookmark.dto.BookmarkReuqest;
 import nerds.studiousTestProject.bookmark.dto.FindBookmarkResponse;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.MemberService;
+import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.*;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_MEMBER;
 
 @Slf4j
 @Service
@@ -77,7 +77,7 @@ public class BookmarkService {
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                     .build();
             bookmarkCafeList.add(bookmarkCafe);
         }
