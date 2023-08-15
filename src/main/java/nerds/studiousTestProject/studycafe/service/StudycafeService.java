@@ -119,8 +119,8 @@ public class StudycafeService {
                 .cafeName(studycafe.getName())
                 .photos(subPhotoService.findCafePhotos(id))
                 .accumResCnt(studycafe.getAccumReserveCount())
-                .duration(studycafe.getWalkingTime())
-                .nearestStation(studycafe.getNearestStation())
+                .duration(studycafe.getNearestStationInfo().getWalkingTime())
+                .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                 .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(id)) // notice 추가 해야 함
@@ -153,8 +153,8 @@ public class StudycafeService {
                     .cafeName(studycafe.getName())
                     .photo(cafePhotos[0])
                     .accumRevCnt(studycafe.getAccumReserveCount())
-                    .distance(studycafe.getWalkingTime())
-                    .nearestStation(studycafe.getNearestStation())
+                    .distance(studycafe.getNearestStationInfo().getWalkingTime())
+                    .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
                     .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
@@ -174,8 +174,8 @@ public class StudycafeService {
                     .cafeName(studycafe.getName())
                     .photo(cafePhotos[0])
                     .accumRevCnt(studycafe.getAccumReserveCount())
-                    .distance(studycafe.getWalkingTime())
-                    .nearestStation(studycafe.getNearestStation())
+                    .distance(studycafe.getNearestStationInfo().getWalkingTime())
+                    .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
                     .hashtags((String[]) studycafe.getHashtagRecords().toArray())
                     .build();
@@ -257,12 +257,11 @@ public class StudycafeService {
                 .member(member)
                 .address(cafeInfo.getAddressInfo().of())
                 .photo(cafeMainPhoto)
-                .phoneNumber(null)
+                .tel(null)
                 .totalGrade(0.0)
                 .createdAt(LocalDateTime.now())
                 .accumReserveCount(0)
-                .duration(placeResponse.getDuration())
-                .nearestStation(placeResponse.getNearestStation())
+                .nearestStationInfo(nearestStationInfoResponse.toEmbedded())
                 .introduction(cafeInfo.getIntroduction())
                 .build();
 
