@@ -43,7 +43,7 @@ import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoReq
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RoomInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
@@ -121,7 +121,7 @@ public class StudycafeService {
                 .accumResCnt(studycafe.getAccumReserveCount())
                 .duration(studycafe.getNearestStationInfo().getWalkingTime())
                 .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
-                .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(id)) // notice 추가 해야 함
                 .refundPolicy(getRefundPolicy(id))
@@ -156,7 +156,7 @@ public class StudycafeService {
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -177,7 +177,7 @@ public class StudycafeService {
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getHashtagRecords().toArray())
+                    .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
@@ -246,7 +246,7 @@ public class StudycafeService {
         CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
         String latitude = cafeInfo.getAddressInfo().getLatitude();
         String longitude = cafeInfo.getAddressInfo().getLongitude();
-        PlaceResponse placeResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
+        NearestStationInfoResponse nearestStationInfoResponse = nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
 
         List<String> cafePhotos = cafeInfo.getPhotos();
         String cafeMainPhoto = cafePhotos.remove(0);

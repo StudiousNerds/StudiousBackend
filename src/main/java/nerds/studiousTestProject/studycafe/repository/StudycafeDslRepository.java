@@ -212,7 +212,7 @@ public class StudycafeDslRepository {
     }
 
     private BooleanExpression keywordContains(String keyword) {
-        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.basic.contains(keyword)).or(studycafe.address.detail.contains(keyword)) : null;
+        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.addressBasic.contains(keyword)).or(studycafe.address.addressDetail.contains(keyword)) : null;
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
@@ -246,10 +246,5 @@ public class StudycafeDslRepository {
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
-    }
-
-    private boolean isTrue(BooleanExpression before, BooleanExpression current) {
-        int length = before.toString().length();
-        return current.toString().substring(length + 3).equals("true");
     }
 }
