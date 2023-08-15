@@ -108,7 +108,7 @@ public class StudycafeService {
             throw new BadRequestException(ErrorCode.START_TIME_AFTER_THAN_END_TIME);
         }
 
-        return studycafeDslRepository.searchAll(searchRequest, pageable).getContent();
+        return studycafeDslRepository.searchAll(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
     }
 
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
