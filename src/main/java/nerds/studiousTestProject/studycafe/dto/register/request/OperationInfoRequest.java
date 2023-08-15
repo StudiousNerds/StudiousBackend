@@ -24,7 +24,7 @@ public class OperationInfoRequest {
     private LocalTime endTime;  // 마감 시간
 
     @NotNull(message = "24시간 여부를 체크해주세요.")
-    private Boolean allDay; // 24시간 여부
+    private Boolean isAllDay; // 24시간 여부
 
     @NotNull(message = "휴일 여부를 체크해주세요.")
     private Boolean closed; // 휴일 여부
@@ -34,7 +34,7 @@ public class OperationInfoRequest {
                 .week(week)
                 .startTime(startTime)
                 .endTime(endTime)
-                .allDay(allDay)
+                .isAllDay(isAllDay)
                 .closed(closed)
                 .build();
     }
