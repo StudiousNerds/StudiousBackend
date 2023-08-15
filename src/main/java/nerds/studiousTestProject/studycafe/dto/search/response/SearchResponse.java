@@ -11,16 +11,18 @@ public class SearchResponse {
     private String name;
     private String photo;
     private Integer accumRevCnt;
-    private Integer duration;
+    private Integer walkingTime;
+    private String nearestStation;
     private Double grade;
 
     @QueryProjection
-    public SearchResponse(Long id, String name, String photo, Integer accumRevCnt, Integer duration, Double grade) {
+    public SearchResponse(Long id, String name, String photo, Integer accumRevCnt, Integer walkingTime, String nearestStation, Double grade) {
         this.id = id;
         this.name = name;
         this.photo = photo;
         this.accumRevCnt = accumRevCnt;
-        this.duration = duration;
+        this.walkingTime = walkingTime;
+        this.nearestStation = nearestStation;
         this.grade = grade;
     }
 }
