@@ -66,7 +66,7 @@ public class StudycafeDslRepository {
                                 studycafe.name,
                                 studycafe.photo,    // 사진 (추후 수정 예정)
                                 studycafe.accumReserveCount,
-                                studycafe.duration,
+                                studycafe.walkingTime,
                                 studycafe.totalGrade
                         )
                 )
