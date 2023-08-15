@@ -3,6 +3,7 @@ package nerds.studiousTestProject.studycafe.dto.search.response;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Data;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Builder
 @Data
@@ -23,5 +24,16 @@ public class SearchResponse {
         this.walkingTime = walkingTime;
         this.nearestStation = nearestStation;
         this.grade = grade;
+    }
+
+    public static SearchResponse from(Studycafe studycafe) {
+        return SearchResponse.builder()
+                .id(studycafe.getId())
+                .photo(studycafe.getPhoto())
+                .grade(studycafe.getTotalGrade())
+                .accumRevCnt(studycafe.getAccumReserveCount())
+                .walkingTime(studycafe.getNearestStationInfo().getWalkingTime())
+                .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
+                .build();
     }
 }
