@@ -57,86 +57,88 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
-        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
-
-        Grade grade = Grade.builder().cleanliness(registerReviewRequest.getCleanliness())
-                .deafening(registerReviewRequest.getDeafening())
-                .fixturesStatus(registerReviewRequest.getFixtureStatus())
-                .isRecommended(registerReviewRequest.getIsRecommend())
-                .build();
-        grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-
-        Review review = Review.builder()
-                .createdDate(LocalDate.now())
-                .detail(registerReviewRequest.getDetail())
-                .build();
-        reviewRepository.save(review);
-        review.addGrade(grade);
-
-        ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
-        reservationRecord.addReview(review);
-
-        List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
-        for (String userHashtag : hashtags) {
-            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
-                    .studycafe(studycafe)
-                    .review(review)
-                    .name(HashtagName.valueOf(userHashtag))
-                    .build();
-            review.addHashtagRecord(hashtagRecord);
-        }
-
-        List<String> photos = Arrays.stream(registerReviewRequest.getPhotos()).toList();
-        for (String photo : photos) {
-            SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
-            subPhotoService.savePhoto(subPhoto);
-        }
-
-        Double avgGrade = getAvgGrade(studycafe.getId());
-        studycafe.addTotalGrade(avgGrade);
-
-        return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
+//        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
+//
+//        Grade grade = Grade.builder().cleanliness(registerReviewRequest.getCleanliness())
+//                .deafening(registerReviewRequest.getDeafening())
+//                .fixturesStatus(registerReviewRequest.getFixtureStatus())
+//                .isRecommended(registerReviewRequest.getIsRecommend())
+//                .build();
+//        grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+//
+//        Review review = Review.builder()
+//                .createdDate(LocalDate.now())
+//                .detail(registerReviewRequest.getDetail())
+//                .build();
+//        reviewRepository.save(review);
+//        review.addGrade(grade);
+//
+//        ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
+//        reservationRecord.addReview(review);
+//
+//        List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
+//        for (String userHashtag : hashtags) {
+//            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
+//                    .studycafe(studycafe)
+//                    .review(review)
+//                    .name(HashtagName.valueOf(userHashtag))
+//                    .build();
+//            review.addHashtagRecord(hashtagRecord);
+//        }
+//
+//        List<String> photos = Arrays.stream(registerReviewRequest.getPhotos()).toList();
+//        for (String photo : photos) {
+//            SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
+//            subPhotoService.savePhoto(subPhoto);
+//        }
+//
+//        Double avgGrade = getAvgGrade(studycafe.getId());
+//        studycafe.addTotalGrade(avgGrade);
+//
+//        return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
+        return null;
     }
 
     @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest) {
-        Review review = findById(reviewId);
-        Studycafe studycafe = findByStudycafeId(modifyReviewRequest.getCafeId());
-
-        Grade grade = review.getGrade();
-        grade.updateGrade(modifyReviewRequest.getCleanliness(),
-                modifyReviewRequest.getDeafening(),
-                modifyReviewRequest.getFixtureStatus(),
-                modifyReviewRequest.getIsRecommend(),
-                getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-
-        // 리뷰가 수정되면서 grade가 바뀌면서 총점이 변경되는 경우가 있을 수 있으니, 스터디카페의 totalGrade 값 업데이트
-        Double avgGrade = getAvgGrade(studycafe.getId());
-        studycafe.addTotalGrade(avgGrade);
-
-        review.getHashtagRecords().removeAll(review.getHashtagRecords());
-        hashtagRepository.deleteAllByReviewId(reviewId);
-        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
-        for (String userHashtag : hashtags) {
-            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
-                    .studycafe(studycafe)
-                    .review(review)
-                    .name(HashtagName.valueOf(userHashtag))
-                    .build();
-            review.addHashtagRecord(hashtagRecord);
-        }
-
-        // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
-        subPhotoService.removeAllPhotos(reviewId);
-        List<String> photos = Arrays.stream(modifyReviewRequest.getPhotos()).toList();
-        for (String photo : photos) {
-            SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
-            subPhotoService.savePhoto(subPhoto);
-        }
-
-        review.updateDetail(modifyReviewRequest.getDetail());
-
-        return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
+//        Review review = findById(reviewId);
+//        Studycafe studycafe = findByStudycafeId(modifyReviewRequest.getCafeId());
+//
+//        Grade grade = review.getGrade();
+//        grade.updateGrade(modifyReviewRequest.getCleanliness(),
+//                modifyReviewRequest.getDeafening(),
+//                modifyReviewRequest.getFixtureStatus(),
+//                modifyReviewRequest.getIsRecommend(),
+//                getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+//
+//        // 리뷰가 수정되면서 grade가 바뀌면서 총점이 변경되는 경우가 있을 수 있으니, 스터디카페의 totalGrade 값 업데이트
+//        Double avgGrade = getAvgGrade(studycafe.getId());
+//        studycafe.addTotalGrade(avgGrade);
+//
+//        review.getHashtagRecords().removeAll(review.getHashtagRecords());
+//        hashtagRepository.deleteAllByReviewId(reviewId);
+//        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
+//        for (String userHashtag : hashtags) {
+//            HashtagRecord hashtagRecord = HashtagRecord.builder().count(1)
+//                    .studycafe(studycafe)
+//                    .review(review)
+//                    .name(HashtagName.valueOf(userHashtag))
+//                    .build();
+//            review.addHashtagRecord(hashtagRecord);
+//        }
+//
+//        // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
+//        subPhotoService.removeAllPhotos(reviewId);
+//        List<String> photos = Arrays.stream(modifyReviewRequest.getPhotos()).toList();
+//        for (String photo : photos) {
+//            SubPhoto subPhoto = SubPhoto.builder().review(review).url(photo).build();
+//            subPhotoService.savePhoto(subPhoto);
+//        }
+//
+//        review.updateDetail(modifyReviewRequest.getDetail());
+//
+//        return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
+        return null;
     }
 
     @Transactional
