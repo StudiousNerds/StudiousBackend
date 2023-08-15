@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.repository.member;
+package nerds.studiousTestProject.member.repository;
 
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
