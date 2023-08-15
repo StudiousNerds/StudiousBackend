@@ -37,7 +37,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class StudycafeDslRepository {
     private final JPAQueryFactory queryFactory;
 
-    public Page<SearchResponse> searchAll(SearchRequest searchRequest, Pageable pageable) {
+    public Page<Studycafe> searchAll(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -59,20 +59,11 @@ public class StudycafeDslRepository {
             return Page.empty();
         }
 
-        JPAQuery<SearchResponse> contentQuery = queryFactory
-                .select(
-                        new QSearchResponse(
-                                studycafe.id,
-                                studycafe.name,
-                                studycafe.photo,    // 사진 (추후 수정 예정)
-                                studycafe.accumReserveCount,
-                                studycafe.duration,
-                                studycafe.totalGrade
-                        )
-                )
+        JPAQuery<Studycafe> contentQuery = queryFactory
+                .select(studycafe)
                 .from(studycafe);
 
-        List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
+        List<Studycafe> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
