@@ -7,7 +7,7 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
