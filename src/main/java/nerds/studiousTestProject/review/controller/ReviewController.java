@@ -48,8 +48,8 @@ public class ReviewController {
     }
 
     @DeleteMapping("/reviews/{reviewId}")
-    public DeleteReviewResponse deleteReview(@PathVariable("reviewId") Long reviewId, @RequestParam("studycafe") Long studycafeId) {
-        return reviewService.deleteReview(reviewId, studycafeId);
+    public DeleteReviewResponse deleteReview(@PathVariable("reviewId") Long reviewId) {
+        return reviewService.deleteReview(reviewId);
     }
 
     @GetMapping("/reviews/available")
@@ -64,13 +64,13 @@ public class ReviewController {
         return reviewService.findWrittenReviews(accessToken, startDate, endDate);
     }
 
-    @GetMapping("/studycafes/{cafeId}/reviews")
-    public List<FindReviewResponse> findAllReviews(@PathVariable("cafeId") Long studycafeId, Pageable pageable) {
+    @GetMapping("/studycafes/{studycafeId}/reviews")
+    public List<FindReviewResponse> findAllReviews(@PathVariable("studycafeId") Long studycafeId, Pageable pageable) {
         return reviewService.findAllReviews(studycafeId, pageable);
     }
 
-    @GetMapping("/studycafes/{cafeId}/rooms/{roomId}/reviews")
-    public List<FindReviewResponse> findRoomReviews(@PathVariable("cafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
+    @GetMapping("/studycafes/{studycafeId}/rooms/{roomId}/reviews")
+    public List<FindReviewResponse> findRoomReviews(@PathVariable("studycafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
         return reviewService.findRoomReviews(studycafeId, roomId, pageable);
     }
 }

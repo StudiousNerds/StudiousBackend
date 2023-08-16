@@ -50,8 +50,8 @@ public class StudycafeController {
     }
 
     @GetMapping("/studycafes/{cafeId}")
-    public FindStudycafeResponse findStudycafeInfo(@PathVariable("cafeId") Long cafeId, @RequestBody FindStudycafeRequest findStudycafeRequest) {
-        return studycafeService.findByDate(cafeId, findStudycafeRequest);
+    public FindStudycafeResponse findStudycafeInfo(@PathVariable("studycafeId") Long studycafeId, @RequestBody FindStudycafeRequest findStudycafeRequest) {
+        return studycafeService.findByDate(studycafeId, findStudycafeRequest);
     }
 
     @GetMapping("/main")
@@ -80,28 +80,28 @@ public class StudycafeController {
         return studycafeService.inquireManagedEntryStudycafes(accessToken, PageRequestConverter.of(page, 4));
     }
 
-    @GetMapping("/studycafes/managements/{cafeId}")
-    public CafeDetailsResponse findManagedDetailStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
-        return studycafeService.inquireManagedStudycafe(accessToken, cafeId);
+    @GetMapping("/studycafes/managements/{studycafeId}")
+    public CafeDetailsResponse findManagedDetailStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId) {
+        return studycafeService.inquireManagedStudycafe(accessToken, studycafeId);
     }
 
-    @PatchMapping("/studycafes/managements/{cafeId}")
-    public void editManagedStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
-        studycafeService.edit(accessToken, cafeId, cafeInfoEditRequest);
+    @PatchMapping("/studycafes/managements/{studycafeId}")
+    public void editManagedStudycafe(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
+        studycafeService.edit(accessToken, studycafeId, cafeInfoEditRequest);
     }
 
-    @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
-    public List<NotificationInfoResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
-        return studycafeService.inquireNotificationInfos(accessToken, cafeId);
+    @GetMapping("/studycafes/managements/notificationInfos/{studycafeId}")
+    public List<NotificationInfoResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId) {
+        return studycafeService.inquireNotificationInfos(accessToken, studycafeId);
     }
 
-    @PostMapping("/studycafes/managements/notificationInfos/{cafeId}")
-    public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody @Valid NotificationInfoRequest notificationInfoRequest) {
-        studycafeService.insertNotificationInfos(accessToken, cafeId, notificationInfoRequest);
+    @PostMapping("/studycafes/managements/notificationInfos/{studycafeId}")
+    public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId, @RequestBody @Valid NotificationInfoRequest notificationInfoRequest) {
+        studycafeService.insertNotificationInfos(accessToken, studycafeId, notificationInfoRequest);
     }
 
-    @DeleteMapping("/studycafes/managements/{cafeId}")
-    public void delete(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
-        studycafeService.deleteStudycafe(accessToken, cafeId);
+    @DeleteMapping("/studycafes/managements/{studycafeId}")
+    public void delete(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId) {
+        studycafeService.deleteStudycafe(accessToken, studycafeId);
     }
 }
