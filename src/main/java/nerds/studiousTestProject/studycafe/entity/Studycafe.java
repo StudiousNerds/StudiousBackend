@@ -36,7 +36,7 @@ public class Studycafe {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Column(name = "name", nullable = false)
