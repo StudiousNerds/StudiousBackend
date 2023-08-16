@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.photo.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
@@ -8,7 +7,6 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +28,7 @@ public class SubPhotoService {
         String reviewPhotos[] = new String[arrSize];
 
         for (int i = 0; i < arrSize; i++){
-            reviewPhotos[i] = photoList.get(i).getUrl();
+            reviewPhotos[i] = photoList.get(i).getPath();
         }
 
         return reviewPhotos;
@@ -44,7 +42,7 @@ public class SubPhotoService {
         cafePhotos[0] = studycafe.getPhoto();
 
         for (int i = 1; i < arrSize; i++){
-            cafePhotos[i] = photoList.get(i).getUrl();
+            cafePhotos[i] = photoList.get(i).getPath();
         }
 
         return cafePhotos;
@@ -56,7 +54,7 @@ public class SubPhotoService {
         String roomPhotos[] = new String[arrSize];
 
         for (int i = 0; i < arrSize; i++){
-            roomPhotos[i] = photoList.get(i).getUrl();
+            roomPhotos[i] = photoList.get(i).getPath();
         }
 
         return roomPhotos;

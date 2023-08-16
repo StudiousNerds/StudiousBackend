@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -69,9 +70,9 @@ public class PaymentResponseFromToss {
                 .paymentKey(paymentKey)
                 .orderId(orderId)
                 .price(totalAmount)
-                .completeTime(approvedAt)
+                .completeTime(LocalDateTime.parse(approvedAt))
                 .method(method)
-                .paymentStatus(PaymentStatus.valueOf(status))
+                .status(PaymentStatus.valueOf(status))
                 .build();
     }
 }
