@@ -99,7 +99,7 @@ public class StudycafeDslRepository {
                     query = query
                             .leftJoin(reservationRecord.review, review);
 
-                    if (searchRequest.getHashtags() != null) {
+                    if (searchRequest.getMinGrade() != null) {
                         query = query
                                 .leftJoin(review.grade, grade);
                     }
