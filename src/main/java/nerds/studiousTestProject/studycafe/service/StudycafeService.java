@@ -7,6 +7,8 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -136,6 +138,7 @@ public class StudycafeService {
                 .build();
     }
 
+
     public MainPageResponse getMainPage() {
         List<RecommendCafeResponse> recommendStduycafes = getRecommendStudycafes();
         List<EventCafeResponse> eventStudycafes = getEventStudycafes();
@@ -147,11 +150,10 @@ public class StudycafeService {
         List<RecommendCafeResponse> recommedStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             RecommendCafeResponse foundStudycafe = RecommendCafeResponse.builder()
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
@@ -168,15 +170,15 @@ public class StudycafeService {
         List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
             EventCafeResponse foundStudycafe = EventCafeResponse.builder()
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
+                    .hashtags(getHashtagRecords(studycafe))
                     .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                     .build();
             eventStudycafeList.add(foundStudycafe);
@@ -186,10 +188,6 @@ public class StudycafeService {
 
     public Studycafe getStudyCafe(Long studycafeId) {
         return findStudycafeById(studycafeId);
-    }
-
-    public Studycafe getStudyCafeByName(String cafeName) {
-        return studycafeRepository.findByName(cafeName).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     public String[] getNotice(Long id) {
@@ -219,6 +217,17 @@ public class StudycafeService {
         return studycafe.getRefundPolicies().stream()
                 .map(RefundPolicyInResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    public String[] getHashtagRecords(Studycafe studycafe) {
+        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
+        List<HashtagName> hashtagList = new ArrayList<>();
+
+        for (int i = 0; i < hashtagRecords.size(); i++) {
+            hashtagList.add(studycafe.getHashtagRecords().get(i).getName());
+        }
+
+        return (String[]) hashtagList.toArray();
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
@@ -400,7 +409,7 @@ public class StudycafeService {
     private List<String> getPhotos(Studycafe studycafe) {
         List<String> photos = new ArrayList<>();
         photos.add(studycafe.getPhoto());
-        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getUrl).toList();
+        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getPath).toList();
         photos.addAll(subPhotos);
         return photos;
     }
