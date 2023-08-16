@@ -29,17 +29,16 @@ public class BookmarkService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final StudycafeService studycafeService;
-    private final SubPhotoService subPhotoService;
 
     @Transactional
-    public ResponseEntity<?> registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+    public void registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.registerBookmark(studyCafe.getName());
+        member.registerBookmark(studyCafe.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
+        return;
     }
 
     public List<FindBookmarkResponse> findBookmark(String accessToken, Integer pageNumber){
@@ -53,26 +52,25 @@ public class BookmarkService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+    public void deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.deleteBookmark(studyCafe.getName());
+        member.deleteBookmark(studyCafe.getId());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
+        return;
     }
 
-    private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<String> bookmarkList) {
-        for (String s : bookmarkList) {
-            Studycafe studycafe = studycafeService.getStudyCafeByName(s);
-            String[] cafePhotos = subPhotoService.findCafePhotos(studycafe.getId());
+    private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<Long> bookmarkList) {
+        for (Long studycafeId : bookmarkList) {
+            Studycafe studycafe = studycafeService.getStudyCafe(studycafeId);
             FindBookmarkResponse bookmarkCafe = FindBookmarkResponse.builder()
                     .pageNumber(pageNumber)
                     .totalRecord(bookmarkList.size())
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
-                    .photo(cafePhotos[0])
+                    .photo(studycafe.getPhoto())
                     .accumRevCnt(studycafe.getAccumReserveCount())
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())

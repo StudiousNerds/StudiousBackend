@@ -56,7 +56,7 @@ public class RoomService {
                     .minCount(room.getMinHeadCount())
                     .maxCount(room.getMaxHeadCount())
                     .price(room.getPrice())
-                    .type(room.getType().toString())
+                    .type(room.getPriceType().toString())
                     .minUsingTime(room.getMinUsingTime())
                     .photos(subPhotoService.findRoomPhotos(room.getId()))
                     .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))

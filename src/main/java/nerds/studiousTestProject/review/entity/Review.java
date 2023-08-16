@@ -16,6 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import org.apache.catalina.LifecycleState;
+import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,9 +44,11 @@ public class Review {
     @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Grade grade;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", nullable = false)
+    @CreatedDate
     private LocalDate createdDate;
 
+    @Column(name = "detail", nullable = false)
     private String detail;
 
     private String comment;
