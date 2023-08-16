@@ -5,7 +5,7 @@ import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateRespo
 import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

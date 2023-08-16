@@ -23,9 +23,9 @@ public class AddressInfoRequest {
 
     public Address of() {
         return Address.builder()
-                .basic(basic)
-                .detail(detail)
-                .zipcode(zipcode)
+                .addressBasic(basic)
+                .addressDetail(detail)
+                .addressZipcode(zipcode)
                 .build();
     }
 }

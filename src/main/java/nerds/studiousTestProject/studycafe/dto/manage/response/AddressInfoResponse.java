@@ -13,9 +13,9 @@ public class AddressInfoResponse {
 
     public static AddressInfoResponse from(Address address) {
         return AddressInfoResponse.builder()
-                .basic(address.getBasic())
-                .detail(address.getDetail())
-                .zipcode(address.getZipcode())
+                .basic(address.getAddressBasic())
+                .detail(address.getAddressDetail())
+                .zipcode(address.getAddressZipcode())
                 .build();
     }
 }

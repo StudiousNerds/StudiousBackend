@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.studycafe.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,8 +20,13 @@ public class NotificationInfo {
     @GeneratedValue
     private Long id;
 
+    @Column(name = "detail", nullable = false)
     private String detail;
+
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;  // endDate 가 지나면 자동으로 DB에서 삭제되도록 하는 기능을 구현해야함
 
     @Builder
