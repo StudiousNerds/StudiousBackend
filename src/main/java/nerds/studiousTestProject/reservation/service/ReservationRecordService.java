@@ -72,7 +72,7 @@ public class ReservationRecordService {
                         .startTime(reservation.getStartTime())
                         .endTime(reservation.getEndTime())
                         .headCount(reservation.getHeadCount())
-                        .name(user.getName())
+                        .userName(user.getName())
                         .phoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(room)
