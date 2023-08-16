@@ -32,6 +32,13 @@ public class MyPageMemberController {
     private final MemberService memberService;
     private final BookmarkService bookmarkService;
 
+    @PostMapping("/members/photo")
+    @Secured(value = MemberRole.ROLES.USER)
+    public void addProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam MultipartFile file) {
+        log.info("file = {}", file);
+        memberService.addPhoto(accessToken, file);
+    }
+
     @PatchMapping("/members/nickname")
     public void patchNickname(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchNicknameRequest patchNicknameRequest) {
         memberService.replaceNickname(accessToken, patchNicknameRequest);
