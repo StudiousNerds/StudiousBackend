@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.StorageService;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.general.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.general.find.FindPasswordRequest;
@@ -15,7 +17,6 @@ import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.token.LogoutAccessToken;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
@@ -23,13 +24,13 @@ import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,8 @@ public class MemberService {
     private final LogoutAccessTokenService logoutAccessTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
+    private final StorageService storageService;
 
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
@@ -109,6 +112,13 @@ public class MemberService {
         return LogoutResponse.builder()
                 .memberId(memberId)
                 .build();
+    }
+
+    @Transactional
+    public void addPhoto(String accessToken, MultipartFile file) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        String photoUrl = storageService.uploadFile(file);
+        member.updatePhoto(photoUrl);
     }
 
     @Transactional
