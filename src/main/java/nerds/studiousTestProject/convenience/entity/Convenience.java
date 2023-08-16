@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.convenience.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,17 +28,26 @@ public class Convenience {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
+    @JoinColumn(name = "studycafe_id", nullable = true)
     private Studycafe studycafe;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id", nullable = true)
     private Room room;
 
+    @Column(name = "name", nullable = false)
     @Enumerated(EnumType.STRING)
     private ConvenienceName name;
+
+    @Column(name = "price", nullable = false)
     private Integer price;
+
+    @Column(name = "is_free", nullable = false)
     private Boolean isFree;
+
+    @Column(name = "usage", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ConvenienceUsage usage;
 
     public boolean isFree(){
         return this.isFree;

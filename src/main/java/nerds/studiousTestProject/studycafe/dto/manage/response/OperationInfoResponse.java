@@ -13,7 +13,7 @@ public class OperationInfoResponse {
     private Week week;    // 요일 (추후, 열거체로 리펙토링)
     private LocalTime startTime;    // 시작 시간
     private LocalTime endTime;  // 마감 시간
-    private Boolean allDay; // 24시간 여부
+    private Boolean isAllDay; // 24시간 여부
     private Boolean closed; // 휴일 여부
 
     public static OperationInfoResponse from(OperationInfo operationInfo) {
@@ -21,7 +21,7 @@ public class OperationInfoResponse {
                 .week(operationInfo.getWeek())
                 .startTime(operationInfo.getStartTime())
                 .endTime(operationInfo.getEndTime())
-                .allDay(operationInfo.getAllDay())
+                .isAllDay(operationInfo.getIsAllDay())
                 .closed(operationInfo.getClosed())
                 .build();
     }
