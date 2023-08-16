@@ -7,8 +7,7 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.hashtag.service.AccumHashtagHistoryService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -17,6 +16,7 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
@@ -87,6 +87,8 @@ public class StudycafeService {
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
+    private final AccumHashtagHistoryService accumHashtagHistoryService;
+    private final ReservationRecordService reservationRecordService;
 
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
@@ -113,27 +115,27 @@ public class StudycafeService {
         return studycafeDslRepository.searchAll(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
     }
 
-    public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
-        Studycafe studycafe = findStudycafeById(id);
+    public FindStudycafeResponse findByDate(Long studycafeId, FindStudycafeRequest findStudycafeRequest){
+        Studycafe studycafe = findStudycafeById(studycafeId);
 
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
-                .photos(subPhotoService.findCafePhotos(id))
-                .accumResCnt(studycafe.getAccumReserveCount())
+                .photos(subPhotoService.findCafePhotos(studycafeId))
+                .accumResCnt(getAccumResCnt(studycafeId))
                 .duration(studycafe.getNearestStationInfo().getWalkingTime())
                 .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
-                .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
+                .hashtags(getHashtagRecords(studycafe))
                 .introduction(studycafe.getIntroduction())
-                .conveniences(getConveniences(id)) // notice 추가 해야 함
-                .refundPolicy(getRefundPolicy(id))
-                .notice(getNotice(id))
-                .rooms(roomService.getRooms(findStudycafeRequest.getDate(), id))
-                .recommendationRate(reviewService.getAvgRecommendation(id))
-                .cleanliness(reviewService.getAvgCleanliness(id))
-                .deafening(reviewService.getAvgDeafening(id))
-                .fixturesStatus(reviewService.getAvgFixturesStatus(id))
-                .total(studycafe.getTotalGrade())
+                .conveniences(getConveniences(studycafeId)) // notice 추가 해야 함
+                .refundPolicy(getRefundPolicy(studycafeId))
+                .notice(getNotice(studycafeId))
+                .rooms(roomService.getRooms(findStudycafeRequest.getDate(), studycafeId))
+                .recommendationRate(reviewService.getAvgRecommendation(studycafeId))
+                .cleanliness(reviewService.getAvgCleanliness(studycafeId))
+                .deafening(reviewService.getAvgDeafening(studycafeId))
+                .fixturesStatus(reviewService.getAvgFixturesStatus(studycafeId))
+                .total(getTotalGrade(studycafeId))
                 .reviewInfo(reviewService.findTop3Reviews(studycafe.getId()))
                 .build();
     }
@@ -154,11 +156,11 @@ public class StudycafeService {
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
                     .photo(studycafe.getPhoto())
-                    .accumRevCnt(studycafe.getAccumReserveCount())
+                    .accumRevCnt(getAccumResCnt(studycafe.getId()))
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
-                    .grade(studycafe.getTotalGrade())
-                    .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
+                    .grade(getTotalGrade(studycafe.getId()))
+                    .hashtags(getHashtagRecords(studycafe))
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -174,12 +176,11 @@ public class StudycafeService {
                     .cafeId(studycafe.getId())
                     .cafeName(studycafe.getName())
                     .photo(studycafe.getPhoto())
-                    .accumRevCnt(studycafe.getAccumReserveCount())
+                    .accumRevCnt(getAccumResCnt(studycafe.getId()))
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
-                    .grade(studycafe.getTotalGrade())
+                    .grade(getTotalGrade(studycafe.getId()))
                     .hashtags(getHashtagRecords(studycafe))
-                    .hashtags((String[]) studycafe.getAccumHashtagHistories().toArray())
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
@@ -220,14 +221,15 @@ public class StudycafeService {
     }
 
     public String[] getHashtagRecords(Studycafe studycafe) {
-        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
-        List<HashtagName> hashtagList = new ArrayList<>();
+        return accumHashtagHistoryService.getTop5AccumHashtagHistory(studycafe);
+    }
 
-        for (int i = 0; i < hashtagRecords.size(); i++) {
-            hashtagList.add(studycafe.getHashtagRecords().get(i).getName());
-        }
+    public Integer getAccumResCnt(Long studycafeId) {
+        return reservationRecordService.findAllByStudycafeId(studycafeId).size();
+    }
 
-        return (String[]) hashtagList.toArray();
+    public Double getTotalGrade(Long studycafeId) {
+        return reviewService.getAvgGrade(studycafeId);
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
@@ -277,7 +279,7 @@ public class StudycafeService {
         // 카페 사진 등록
         for (String cafePhotoUrl : cafePhotos) {
             studycafe.addSubPhoto(SubPhoto.builder()
-                    .url(cafePhotoUrl)
+                    .path(cafePhotoUrl)
                     .build()
             );
         }
@@ -314,7 +316,7 @@ public class StudycafeService {
 
             // 룸 사진 등록
             for (String roomPhotoUrl : roomPhotos) {
-                room.addSubPhoto(SubPhoto.builder().url(roomPhotoUrl).build());
+                room.addSubPhoto(SubPhoto.builder().path(roomPhotoUrl).build());
             }
 
             // 룸 편의시설 정보 등록
@@ -379,13 +381,13 @@ public class StudycafeService {
     /**
      * 등록된 모든 스터디카페를 조회하는 메소드
      * @param accessToken 사용자 엑세스 토크
-     * @param cafeId 스터디카페 pk
+     * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long cafeId) {
+    public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
         List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(OperationInfoResponse::from).toList();
@@ -417,14 +419,14 @@ public class StudycafeService {
     /**
      * 등록된 스터디카페 수정 메소드
      * @param accessToken 사용자 엑세스 토큰
-     * @param cafeId 스터디카페 PK
+     * @param studycafeId 스터디카페 PK
      * @param cafeInfoEditRequest 수정된 데이터
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void edit(String accessToken, Long cafeId, CafeInfoEditRequest cafeInfoEditRequest) {
+    public void edit(String accessToken, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         String introduction = cafeInfoEditRequest.getIntroduction();
         if (introduction != null) {
@@ -465,13 +467,13 @@ public class StudycafeService {
     /**
      * 공지사항 조회 로직
      * @param accessToken 사용자 엑세스 토큰
-     * @param cafeId 스터디카페 PK
+     * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
+    public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return studycafe.getNotificationInfos().stream().map(NotificationInfoResponse::from).toList();
     }
@@ -479,14 +481,14 @@ public class StudycafeService {
     /**
      * 공지사항 추가 로직
      * @param accessToken 사용자 엑세스 토큰
-     * @param cafeId 스터디카페 PK
+     * @param studycafeId 스터디카페 PK
      * @param notificationInfoRequest 공지사항 요청 값
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void insertNotificationInfos(String accessToken, Long cafeId, NotificationInfoRequest notificationInfoRequest) {
+    public void insertNotificationInfos(String accessToken, Long studycafeId, NotificationInfoRequest notificationInfoRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
         if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
@@ -499,12 +501,12 @@ public class StudycafeService {
     /**
      * 스터디카페 삭제 메소드, 실제로 DB에서 삭제
      * @param accessToken 사용자 엑세스 토큰
-     * @param cafeId 스터디카페 PK
+     * @param studycafeId 스터디카페 PK
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void deleteStudycafe(String accessToken, Long cafeId) {
+    public void deleteStudycafe(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        studycafeRepository.deleteByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 }
