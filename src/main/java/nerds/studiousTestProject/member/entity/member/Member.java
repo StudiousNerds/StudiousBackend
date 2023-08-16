@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +63,8 @@ public class Member implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date", unique = true)
+    @CreatedDate
     private Date createdDate;
 
     @Column(name = "photo", nullable = true)
