@@ -31,14 +31,14 @@ public class BookmarkService {
     private final StudycafeService studycafeService;
 
     @Transactional
-    public ResponseEntity<?> registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+    public void registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
         member.registerBookmark(studyCafe.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
+        return;
     }
 
     public List<FindBookmarkResponse> findBookmark(String accessToken, Integer pageNumber){
@@ -52,14 +52,14 @@ public class BookmarkService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
+    public void deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
         member.deleteBookmark(studyCafe.getId());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
+        return;
     }
 
     private void getBookmarkList(Integer pageNumber, List<FindBookmarkResponse> bookmarkCafeList, List<Long> bookmarkList) {
