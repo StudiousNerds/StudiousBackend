@@ -111,11 +111,21 @@ public class Member implements UserDetails {
         }
     }
 
+    public void updatePhoto(String photo) {
+        if (photo != null && !photo.isEmpty()) {
+            this.photo = photo;
+        }
+    }
+
     public void updateNickname(String nickname) {
-        this.nickname = nickname;
+        if (nickname != null && !nickname.isEmpty()) {
+            this.nickname = nickname;
+        }
     }
     public void updatePassword(String encodedPassword) {
-        this.password = encodedPassword;
+        if (encodedPassword != null && !encodedPassword.isEmpty()) {
+            this.password = encodedPassword;
+        }
     }
 
     public void registerBookmark(String studycafeName){
