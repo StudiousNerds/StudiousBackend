@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.hashtag.entity;
+package nerds.studiousTestProject.member.entity.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,36 +10,32 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.review.entity.Review;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Entity
-public class HashtagRecord {
+@Getter
+@NoArgsConstructor
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = false)
-    private Review review;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "value", nullable = false)
     @Enumerated(EnumType.STRING)
-    private HashtagName name;
+    private MemberRole value;
 
-    public void setReview(Review review) {
-        this.review = review;
-    }
-
-    @Builder
-    public HashtagRecord(Long id ,Review review, HashtagName name) {
-        this.id = id;
-        this.review = review;
-        this.name = name;
+    public void setMember(Member member) {
+        if (member != null) {
+            this.member = member;
+        }
     }
 }

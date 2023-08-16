@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.request.ReservationInfo;
 import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
