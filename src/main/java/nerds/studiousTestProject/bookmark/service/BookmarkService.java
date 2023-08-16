@@ -36,7 +36,7 @@ public class BookmarkService {
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.registerBookmark(studyCafe.getId());
+        // member.registerBookmark(studyCafe.getId());
 
         return;
     }
@@ -47,7 +47,7 @@ public class BookmarkService {
         Member bookmarkedMember = memberRepository.findById(member.getId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER));
         List<String> bookmarkList = bookmarkedMember.getBookmarks().stream().map(b -> b.getStudycafe().getName()).toList();
 
-        getBookmarkList(pageNumber, bookmarkCafeList, bookmarkList);
+        // getBookmarkList(pageNumber, bookmarkCafeList, bookmarkList);
         return bookmarkCafeList;
     }
 
@@ -57,7 +57,7 @@ public class BookmarkService {
 
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
-        member.deleteBookmark(studyCafe.getId());
+        // member.deleteBookmark(studyCafe.getId());
 
         return;
     }
