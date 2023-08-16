@@ -220,14 +220,15 @@ public class StudycafeService {
     }
 
     public String[] getHashtagRecords(Studycafe studycafe) {
-        List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
-        List<HashtagName> hashtagList = new ArrayList<>();
+        // List<HashtagRecord> hashtagRecords = studycafe.getHashtagRecords();
+        // List<HashtagName> hashtagList = new ArrayList<>();
 
-        for (int i = 0; i < hashtagRecords.size(); i++) {
-            hashtagList.add(studycafe.getHashtagRecords().get(i).getName());
-        }
+        // for (int i = 0; i < hashtagRecords.size(); i++) {
+            // hashtagList.add(studycafe.getHashtagRecords().get(i).getName());
+        // }
 
-        return (String[]) hashtagList.toArray();
+        // return (String[]) hashtagList.toArray();
+        return null;
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
@@ -277,7 +278,7 @@ public class StudycafeService {
         // 카페 사진 등록
         for (String cafePhotoUrl : cafePhotos) {
             studycafe.addSubPhoto(SubPhoto.builder()
-                    .url(cafePhotoUrl)
+                    .path(cafePhotoUrl)
                     .build()
             );
         }
@@ -314,7 +315,7 @@ public class StudycafeService {
 
             // 룸 사진 등록
             for (String roomPhotoUrl : roomPhotos) {
-                room.addSubPhoto(SubPhoto.builder().url(roomPhotoUrl).build());
+                room.addSubPhoto(SubPhoto.builder().path(roomPhotoUrl).build());
             }
 
             // 룸 편의시설 정보 등록
