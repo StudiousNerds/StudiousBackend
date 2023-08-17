@@ -22,13 +22,5 @@ public class FindStudycafeResponse {
     private String introduction;
     private String[] conveniences;
     private List<AnnouncementInResponse> announcement;
-    private List<RefundPolicyInResponse> refundPolicy;
-    private String[] notice;
     private List<FindRoomResponse> rooms;
-    private Integer recommendationRate;
-    private Integer cleanliness;
-    private Integer deafening;
-    private Integer fixturesStatus;
-    private Double total;
-    private List<FindReviewResponse> reviewInfo;
 }

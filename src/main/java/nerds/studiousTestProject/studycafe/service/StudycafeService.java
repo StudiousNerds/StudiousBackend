@@ -129,17 +129,17 @@ public class StudycafeService {
                 .hashtags(getHashtagRecords(studycafe))
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(studycafeId))
-                .refundPolicy(getRefundPolicy(studycafeId))
-                .notice(getNotice(studycafeId))
                 .announcement(getAnnouncement(studycafeId))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), studycafeId))
-                .recommendationRate(reviewService.getAvgRecommendation(studycafeId))
-                .cleanliness(reviewService.getAvgCleanliness(studycafeId))
-                .deafening(reviewService.getAvgDeafening(studycafeId))
-                .fixturesStatus(reviewService.getAvgFixturesStatus(studycafeId))
-                .total(getTotalGrade(studycafeId))
-                .reviewInfo(reviewService.findTop3Reviews(studycafe.getId()))
                 .build();
+    }
+
+    public List<RefundPolicyInResponse> findRefundPolicy(Long studycafeId) {
+        return getRefundPolicy(studycafeId);
+    }
+
+    public List<String> findNotice(Long studycafeId) {
+        return getNotice(studycafeId);
     }
 
 
@@ -193,14 +193,10 @@ public class StudycafeService {
         return findStudycafeById(studycafeId);
     }
 
-    public String[] getNotice(Long id) {
-        Studycafe studycafe = findStudycafeById(id);
+    public List<String> getNotice(Long studycafeId) {
+        Studycafe studycafe = findStudycafeById(studycafeId);
 
-        List<String> noticeList = studycafe.getNotices().stream().map(Notice::getDetail).toList();
-        Integer arrSize = noticeList.size();
-        String notices[] = noticeList.toArray(new String[arrSize]);
-
-        return notices;
+        return studycafe.getNotices().stream().map(Notice::getDetail).toList();
     }
 
     public String[] getConveniences(Long studycafeId) {

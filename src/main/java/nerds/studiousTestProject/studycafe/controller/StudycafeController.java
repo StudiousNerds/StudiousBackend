@@ -3,6 +3,7 @@ package nerds.studiousTestProject.studycafe.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
@@ -49,9 +50,19 @@ public class StudycafeController {
         return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, 8));
     }
 
-    @GetMapping("/studycafes/{cafeId}")
+    @GetMapping("/studycafes/{studycafeId}")
     public FindStudycafeResponse findStudycafeInfo(@PathVariable("studycafeId") Long studycafeId, @RequestBody FindStudycafeRequest findStudycafeRequest) {
         return studycafeService.findByDate(studycafeId, findStudycafeRequest);
+    }
+
+    @GetMapping("/studycafes/{studycafeId}/refundPolicy")
+    public List<RefundPolicyInResponse> findStudycafeRefundPolicy(@PathVariable("studycafeId") Long studycafeId) {
+        return studycafeService.findRefundPolicy(studycafeId);
+    }
+
+    @GetMapping("/studycafes/{studycafeId}/notice")
+    public List<String> findStudycafeNotice(@PathVariable("studycafeId") Long studycafeId) {
+        return studycafeService.findNotice(studycafeId);
     }
 
     @GetMapping("/main")
