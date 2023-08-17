@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.photo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,26 +26,27 @@ public class SubPhoto {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne
-    @JoinColumn(name = "studycafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "studycafe_id")
     private Studycafe studycafe;
 
     @ManyToOne
-    @JoinColumn(name = "review_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "review_id")
     private Review review;
 
-    private String url;
+    @Column(name = "path", nullable = false)
+    private String path;
 
     @Builder
-    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String url) {
+    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String path) {
         this.id = id;
         this.room = room;
         this.studycafe = studycafe;
         this.review = review;
-        this.url = url;
+        this.path = path;
     }
 
     public void setStudycafe(Studycafe studycafe) {

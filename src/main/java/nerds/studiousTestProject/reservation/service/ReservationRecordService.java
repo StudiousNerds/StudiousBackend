@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
 import nerds.studiousTestProject.payment.dto.request.request.ReservationInfo;
 import nerds.studiousTestProject.payment.dto.request.request.ReserveUser;
@@ -72,7 +72,7 @@ public class ReservationRecordService {
                         .startTime(reservation.getStartTime())
                         .endTime(reservation.getEndTime())
                         .headCount(reservation.getHeadCount())
-                        .name(user.getName())
+                        .userName(user.getName())
                         .phoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(room)
@@ -163,7 +163,7 @@ public class ReservationRecordService {
 
     private RefundPolicy getRefundPolicyOnDay(List<RefundPolicy> refundPolicies, int remainDate) {
         return refundPolicies.stream()
-                .filter(refundPolicy -> refundPolicy.getRefundDay().getRemain() == remainDate)
+                .filter(refundPolicy -> refundPolicy.getRemaining().getRemain() == remainDate)
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
     }

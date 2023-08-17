@@ -12,7 +12,7 @@ public class RefundPolicyResponse {
 
     public static RefundPolicyResponse from(RefundPolicy refundPolicy) {
         return RefundPolicyResponse.builder()
-                .day(refundPolicy.getRefundDay().getRemain())
+                .day(refundPolicy.getRemaining().getRemain())
                 .rate(refundPolicy.getRate())
                 .build();
     }

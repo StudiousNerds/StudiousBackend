@@ -1,13 +1,12 @@
 package nerds.studiousTestProject.review.repository;
-import nerds.studiousTestProject.RepositoryTest;
-import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.fixture.HashtagFixture;
+import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRepository;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +18,10 @@ import org.springframework.data.domain.Sort;
 import java.util.Arrays;
 import java.util.List;
 
-import static nerds.studiousTestProject.fixture.GradeFixture.*;
-import static nerds.studiousTestProject.fixture.HashtagFixture.*;
-import static nerds.studiousTestProject.fixture.ReservationRecordFixture.*;
-import static nerds.studiousTestProject.fixture.ReviewFixture.*;
+import static nerds.studiousTestProject.support.fixture.GradeFixture.*;
+import static nerds.studiousTestProject.support.fixture.HashtagFixture.*;
+import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.*;
+import static nerds.studiousTestProject.support.fixture.ReviewFixture.*;
 
 @RepositoryTest
 class ReviewRepositoryTest {
@@ -43,11 +42,12 @@ class ReviewRepositoryTest {
         Review firstReview = reviewRepository.save(FIRST_REVIEW.생성(1L));
         Review secondReview = reviewRepository.save(SECOND_REVIEW.생성(2L));
         Review thirdReview = reviewRepository.save(THIRD_REVIEW.생성(3L));
-        reservationRecordRepository.save(FIRST_RESERVATION.생성(1L)).addReview(firstReview);
-        reservationRecordRepository.save(SECOND_RESERVATION.생성(2L)).addReview(secondReview);
-        reservationRecordRepository.save(THIRD_RESERVATION.생성(3L)).addReview(thirdReview);
+        reservationRecordRepository.save(CONFIRM_RESERVATION.생성(1L)).addReview(firstReview);
+        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.생성(2L)).addReview(secondReview);
+        reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
         // when
-        List<Review> reviewList = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(Arrays.asList(1L, 2L, 3L));
+        List<Review> reviewList = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(
+                Arrays.asList(firstReview.getId(), secondReview.getId(), thirdReview.getId()));
         // then
         Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
     }
@@ -60,14 +60,15 @@ class ReviewRepositoryTest {
         Grade secondGrade = gradeRepository.save(SECOND_GRADE.생성(2L));
         Grade thirdGrade = gradeRepository.save(THIRD_GRADE.생성(3L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
-        Review secondReview = reviewRepository.save(FIRST_REVIEW.평점_생성(secondGrade, 2L));
-        Review thirdReview = reviewRepository.save(FIRST_REVIEW.평점_생성(thirdGrade, 3L));
-        reservationRecordRepository.save(FIRST_RESERVATION.생성(1L)).addReview(firstReview);
-        reservationRecordRepository.save(SECOND_RESERVATION.생성(2L)).addReview(secondReview);
-        reservationRecordRepository.save(THIRD_RESERVATION.생성(3L)).addReview(thirdReview);
+        Review secondReview = reviewRepository.save(SECOND_REVIEW.평점_생성(secondGrade, 2L));
+        Review thirdReview = reviewRepository.save(THIRD_REVIEW.평점_생성(thirdGrade, 3L));
+        reservationRecordRepository.save(CONFIRM_RESERVATION.생성(1L)).addReview(firstReview);
+        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.생성(2L)).addReview(secondReview);
+        reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("grade.total").descending());
         // when
-        Page<Review> reviewPage = reviewRepository.findAllByReservationRecordIdIn(Arrays.asList(1L, 2L, 3L), pageable);
+        Page<Review> reviewPage = reviewRepository.findAllByReservationRecordIdIn(Arrays.asList(
+                firstReview.getId(), secondReview.getId(), thirdReview.getId()), pageable);
         List<Review> reviewList = reviewPage.getContent();
         // then
         Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
@@ -80,11 +81,12 @@ class ReviewRepositoryTest {
         Review firstReview = reviewRepository.save(FIRST_REVIEW.생성(1L));
         Review secondReview = reviewRepository.save(SECOND_REVIEW.생성(2L));
         Review thirdReview = reviewRepository.save(THIRD_REVIEW.생성(3L));
-        reservationRecordRepository.save(FIRST_RESERVATION.생성(1L)).addReview(firstReview);
-        reservationRecordRepository.save(SECOND_RESERVATION.생성(2L)).addReview(secondReview);
-        reservationRecordRepository.save(THIRD_RESERVATION.생성(3L)).addReview(thirdReview);
+        reservationRecordRepository.save(CONFIRM_RESERVATION.생성(1L)).addReview(firstReview);
+        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.생성(2L)).addReview(secondReview);
+        reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
         // when
-        List<Review> reviewList = reviewRepository.findTop3ByReservationRecordId(Arrays.asList(1L, 2L, 3L));
+        List<Review> reviewList = reviewRepository.findTop3ByReservationRecordId(Arrays.asList(
+                firstReview.getId(), secondReview.getId(), thirdReview.getId()));
         // then
         Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
     }
@@ -98,7 +100,7 @@ class ReviewRepositoryTest {
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
         // when
-        reviewRepository.deleteById(1L);
+        reviewRepository.deleteById(firstReview.getId());
         List<Review> reviewList = reviewRepository.findAll();
         List<Grade> gradeList = gradeRepository.findAll();
         List<HashtagRecord> hashtagRecordList = hashtagRepository.findAll();

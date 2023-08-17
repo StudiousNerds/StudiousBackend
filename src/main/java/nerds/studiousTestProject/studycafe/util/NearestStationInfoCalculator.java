@@ -4,7 +4,7 @@ import io.netty.handler.codec.http.HttpScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
-import nerds.studiousTestProject.studycafe.dto.register.response.PlaceResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.util.kakao.request.KakaoDistanceSearchRequest;
 import nerds.studiousTestProject.studycafe.util.kakao.response.KakaoDistanceSearchResponse;
 import nerds.studiousTestProject.studycafe.util.tmap.request.TMapDistanceCalcRequest;
@@ -42,9 +42,9 @@ public class NearestStationInfoCalculator {
      * @param longitude 경도
      * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null을 담은 객체 반환)
      */
-    public PlaceResponse getPlaceResponse(String latitude, String longitude) {
+    public NearestStationInfoResponse getPlaceResponse(String latitude, String longitude) {
         KakaoDistanceSearchResponse response;
-        PlaceResponse.PlaceResponseBuilder builder = PlaceResponse.builder();
+        NearestStationInfoResponse.NearestStationInfoResponseBuilder builder = NearestStationInfoResponse.builder();
         try {
             response = getKakaoDistanceSearchResponse(latitude, longitude);
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class NearestStationInfoCalculator {
         List<Map<String, Object>> features = (List<Map<String, Object>>) map.get("features");
 
         return builder
-                .duration(calcDuration(features))
+                .walkingTime(calcDuration(features))
                 .nearestStation(response.getName())
                 .build();
     }

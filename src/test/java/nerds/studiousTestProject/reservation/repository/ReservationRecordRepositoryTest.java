@@ -1,11 +1,11 @@
 package nerds.studiousTestProject.reservation.repository;
 
-import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.repository.member.MemberRepository;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.review.entity.Review;
@@ -22,16 +22,16 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static nerds.studiousTestProject.support.fixture.MemberFixture.*;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.BEAVER;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
+import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.IN_PROGRESS_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.*;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
-import static nerds.studiousTestProject.fixture.MemberFixture.*;
-import static nerds.studiousTestProject.fixture.ReservationRecordFixture.*;
-import static nerds.studiousTestProject.fixture.ReviewFixture.*;
-import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.ReviewFixture.*;
+import static nerds.studiousTestProject.support.fixture.StudycafeFixture.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,11 +53,11 @@ class ReservationRecordRepositoryTest {
     @Test
     void findAllByRoomId() {
         // given
-        Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
-        ReservationRecord save1 = reservationRecordRepository.save(FIRST_RESERVATION.룸_생성(room1, 1L));
-        ReservationRecord save2 = reservationRecordRepository.save(SECOND_RESERVATION.룸_생성(room1, 2L));
+        Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(2L));
+        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
+        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
         // when
-        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByRoomId(1L);
+        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByRoomId(2L);
         // then
         assertThat(reservationRecordList).contains(save1, save2);
     }
@@ -65,11 +65,11 @@ class ReservationRecordRepositoryTest {
     @Test
     void findAllByMemberId() {
         // given
-        Member member = memberRepository.save(FIRST_MEMBER.생성(1L));
-        ReservationRecord save1 = reservationRecordRepository.save(FIRST_RESERVATION.멤버_생성(member, 1L));
-        ReservationRecord save2 = reservationRecordRepository.save(FIRST_RESERVATION.멤버_생성(member, 2L));
+        Member member = memberRepository.save(POTATO.생성(3L));
+        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.멤버_생성(member, 7L));
+        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.멤버_생성(member, 8L));
         // when
-        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByMemberId(1L);
+        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByMemberId(member.getId());
         // then
         assertThat(reservationRecordList).contains(save1, save2);
     }
@@ -81,8 +81,8 @@ class ReservationRecordRepositoryTest {
         Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
         studycafe.addRoom(room1);
         Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
-        ReservationRecord save1 = reservationRecordRepository.save(FIRST_RESERVATION.룸_생성(room1, 1L));
-        ReservationRecord save2 = reservationRecordRepository.save(SECOND_RESERVATION.룸_생성(room1, 2L));
+        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
+        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
         save1.addReview(review);
         // when
         List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByStudycafeId(studycafe.getId());

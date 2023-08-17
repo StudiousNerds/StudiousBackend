@@ -1,11 +1,13 @@
 package nerds.studiousTestProject.studycafe.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,23 +23,32 @@ public class OperationInfo {
     @GeneratedValue
     private Long id;
 
+    @Column(name = "week", nullable = false)
     @Enumerated(EnumType.STRING)
     private Week week;
 
+    @JoinColumn(name = "studycafe_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Studycafe studycafe;
 
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
+
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
-    private Boolean allDay;
+
+    @Column(name = "is_all_day", nullable = false)
+    private Boolean isAllDay;
+
+    @Column(name = "closed", nullable = false)
     private Boolean closed;
 
     @Builder
-    public OperationInfo(Week week, LocalTime startTime, LocalTime endTime, Boolean allDay, Boolean closed) {
+    public OperationInfo(Week week, LocalTime startTime, LocalTime endTime, Boolean isAllDay, Boolean closed) {
         this.week = week;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.allDay = allDay;
+        this.isAllDay = isAllDay;
         this.closed = closed;
     }
 

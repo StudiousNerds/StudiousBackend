@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.service.member;
+package nerds.studiousTestProject.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +15,15 @@ import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.token.LogoutAccessToken;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
-import nerds.studiousTestProject.member.repository.member.MemberRepository;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,27 +52,13 @@ public class MemberService {
      *                      이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
      * @return 회원가입한 정보로 만든 토큰 값
      */
-
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
         MemberType type = MemberType.handle(signUpRequest.getType());
         validate(signUpRequest, type);
 
-        String encode = getEncodedPassword(signUpRequest);
-        Member member = Member.builder()
-                .email(signUpRequest.getEmail())
-                .password(encode)
-                .providerId(signUpRequest.getProviderId())
-                .name(signUpRequest.getName())
-                .nickname(signUpRequest.getNickname())
-                .phoneNumber(signUpRequest.getPhoneNumber())
-                .birthday(signUpRequest.getBirthday())
-                .roles(signUpRequest.getRoles())
-                .type(type)
-                .createdDate(new Date())
-                .usable(true)
-                .resignedDate(null)
-                .build();
+        String encodedPassword = getEncodedPassword(signUpRequest);
+        Member member = signUpRequest.toEntity(encodedPassword);
 
         log.info("created member = {}", member);
         memberRepository.save(member);

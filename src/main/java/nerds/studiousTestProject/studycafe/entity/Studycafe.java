@@ -16,11 +16,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.hashtag.entity.AccumHashtagHistory;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.room.entity.Room;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,31 +36,38 @@ public class Studycafe {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "photo", nullable = false)
     private String photo;
 
     @Embedded
     private Address address;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @Column(name = "tel", nullable = false)
+    private String tel;
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<OperationInfo> operationInfos = new ArrayList<>();
 
-    private Integer duration;
+    @Embedded
+    private NearestStationInfo nearestStationInfo;
 
-    @Column(name = "nearest_station")
-    private String nearestStation;
-
-    @Column(name = "accum_reserve_count")
+    @Column(name = "accum_reserve_count", nullable = true)
     private Integer accumReserveCount;
 
+    @Column(name = "introduction", nullable = false)
     private String introduction;
+
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column(name = "total_grade", nullable = true)
     private Double totalGrade;
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
@@ -69,7 +77,7 @@ public class Studycafe {
     private List<Room> rooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
-    private List<HashtagRecord> hashtagRecords = new ArrayList<>();
+    private List<AccumHashtagHistory> accumHashtagHistories = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<Convenience> conveniences = new ArrayList<>();
@@ -98,9 +106,9 @@ public class Studycafe {
         convenience.setStudycafe(this);
     }
 
-    public void addHashtagRecord(HashtagRecord hashtagRecord) {
-        hashtagRecords.add(hashtagRecord);
-        hashtagRecord.setStudycafe(this);
+    public void addAccumHashtagHistory(AccumHashtagHistory accumHashtagHistory) {
+        accumHashtagHistories.add(accumHashtagHistory);
+        accumHashtagHistory.setStudycafe(this);
     }
 
     public void addOperationInfo(OperationInfo operationInfo) {
@@ -158,15 +166,14 @@ public class Studycafe {
     }
 
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String phoneNumber, Integer duration, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
         this.id = id;
         this.member = member;
         this.name = name;
         this.address = address;
         this.photo = photo;
-        this.phoneNumber = phoneNumber;
-        this.duration = duration;
-        this.nearestStation = nearestStation;
+        this.tel = tel;
+        this.nearestStationInfo = nearestStationInfo;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
         this.createdAt = createdAt;

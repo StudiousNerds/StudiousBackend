@@ -13,7 +13,6 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long> {
     Optional<Studycafe> findById(Long id);
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
     List<Studycafe> findTop10ByOrderByCreatedAtDesc();
-    Optional<Studycafe> findByName(String cafeName);
     Page<Studycafe> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
     Optional<Studycafe> findByIdAndMember(Long id, Member member);
     Optional<Studycafe> deleteByIdAndMember(Long id, Member member);

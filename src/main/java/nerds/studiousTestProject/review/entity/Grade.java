@@ -23,19 +23,22 @@ public class Grade {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
+    @Column(name = "cleanliness", nullable = false)
     private Integer cleanliness;
 
+    @Column(name = "deafening", nullable = false)
     private Integer deafening;
 
-    @Column(name = "fixtures_status")
+    @Column(name = "fixtures_status", nullable = false)
     private Integer fixturesStatus;
 
-    @Column(name = "is_recommended")
+    @Column(name = "is_recommended", nullable = false)
     private Boolean isRecommended;
 
+    @Column(name = "total", nullable = false)
     private Double total;
 
     @Builder
