@@ -7,7 +7,7 @@ import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
-import nerds.studiousTestProject.reservation.service.ReservationService;
+import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
@@ -39,7 +37,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 public class RoomService {
     private final RoomRepository roomRepository;
     private final SubPhotoService subPhotoService;
-    private final ReservationService reservationService;
+    private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
     private final OperationInfoRepository operationInfoRepository;
 
@@ -70,8 +68,8 @@ public class RoomService {
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
 
-        Map<Integer, Boolean> reservationTimes = reservationService.getReservationTimes(date, studycafeId, roomId);
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
+        studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         int start = findStartTimeByWeek(Week.of(date)).getHour();
         int end = findEndTimeByWeek(Week.of(date)).getHour();
         int size = end - start;
@@ -89,16 +87,16 @@ public class RoomService {
         return timeList;
     }
 
-    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date,Long studycafeId, Long roomId){
+    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId){
         Integer oneMonth = date.lengthOfMonth();
-        LocalDate firstDayOfMonth = date.withDayOfMonth(1);
+        int today = date.getDayOfMonth();
         Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
 
-        for (int i = 0; i <= oneMonth; i++){
+        for (int i = today; i <= oneMonth; i++){
             log.info("반복문 확인", i);
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
             reservationList.put(date.toString(), canReserveTime);
-            date.plusDays(i);
+            date.plusDays(1);
         }
 
         return reservationList;
