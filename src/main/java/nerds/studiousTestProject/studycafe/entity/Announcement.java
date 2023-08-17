@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
-public class NotificationInfo {
+public class Announcement {
     @Id
     @GeneratedValue
     private Long id;
@@ -30,7 +30,7 @@ public class NotificationInfo {
     private LocalDate endDate;  // endDate 가 지나면 자동으로 DB에서 삭제되도록 하는 기능을 구현해야함
 
     @Builder
-    public NotificationInfo(String detail, LocalDate startDate, LocalDate endDate) {
+    public Announcement(String detail, LocalDate startDate, LocalDate endDate) {
         this.detail = detail;
         this.startDate = startDate;
         this.endDate = endDate;
