@@ -92,12 +92,12 @@ public class StudycafeController {
 
     @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
     public List<AnnouncementResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
-        return studycafeService.inquireNotificationInfos(accessToken, cafeId);
+        return studycafeService.inquireAnnouncements(accessToken, cafeId);
     }
 
     @PostMapping("/studycafes/managements/notificationInfos/{cafeId}")
     public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
-        studycafeService.insertNotificationInfos(accessToken, cafeId, announcementRequest);
+        studycafeService.insertAnnouncements(accessToken, cafeId, announcementRequest);
     }
 
     @DeleteMapping("/studycafes/managements/{cafeId}")

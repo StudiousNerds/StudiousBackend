@@ -468,7 +468,7 @@ public class StudycafeService {
      * @return 스터디카페의 모든 공지사항
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<AnnouncementResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
+    public List<AnnouncementResponse> inquireAnnouncements(String accessToken, Long cafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -483,7 +483,7 @@ public class StudycafeService {
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void insertNotificationInfos(String accessToken, Long cafeId, AnnouncementRequest announcementRequest) {
+    public void insertAnnouncements(String accessToken, Long cafeId, AnnouncementRequest announcementRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
