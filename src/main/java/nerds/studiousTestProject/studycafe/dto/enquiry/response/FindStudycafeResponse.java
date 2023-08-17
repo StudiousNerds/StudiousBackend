@@ -3,7 +3,7 @@ package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
-import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
+import nerds.studiousTestProject.review.dto.find.response.FindReviewResponse;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInResponse;
 
