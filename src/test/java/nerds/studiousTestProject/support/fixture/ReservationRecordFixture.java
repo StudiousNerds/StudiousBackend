@@ -55,4 +55,16 @@ public enum ReservationRecordFixture {
                 .room(room)
                 .build();
     }
+
+    public ReservationRecord 룸_생성(Room room, Long id) {
+        return 기본_정보_빌더_생성(id)
+                .room(room)
+                .build();
+    }
+
+    public ReservationRecord 멤버_생성(Member member, Long id) {
+        return 기본_정보_빌더_생성(id)
+                .member(member)
+                .build();
+    }
 }

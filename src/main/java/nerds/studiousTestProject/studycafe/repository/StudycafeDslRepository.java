@@ -12,8 +12,7 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
-import nerds.studiousTestProject.studycafe.dto.search.response.QSearchResponse;
-import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +26,8 @@ import java.util.List;
 
 import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
+import static nerds.studiousTestProject.review.entity.QGrade.grade;
+import static nerds.studiousTestProject.review.entity.QReview.review;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
 import static nerds.studiousTestProject.studycafe.entity.QOperationInfo.operationInfo;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
@@ -37,7 +38,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class StudycafeDslRepository {
     private final JPAQueryFactory queryFactory;
 
-    public Page<SearchResponse> searchAll(SearchRequest searchRequest, Pageable pageable) {
+    public Page<Studycafe> searchAll(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -59,20 +60,11 @@ public class StudycafeDslRepository {
             return Page.empty();
         }
 
-        JPAQuery<SearchResponse> contentQuery = queryFactory
-                .select(
-                        new QSearchResponse(
-                                studycafe.id,
-                                studycafe.name,
-                                studycafe.photo,    // 사진 (추후 수정 예정)
-                                studycafe.accumReserveCount,
-                                studycafe.duration,
-                                studycafe.totalGrade
-                        )
-                )
+        JPAQuery<Studycafe> contentQuery = queryFactory
+                .select(studycafe)
                 .from(studycafe);
 
-        List<SearchResponse> content = getJoinedQuery(contentQuery, searchRequest)
+        List<Studycafe> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
@@ -91,13 +83,32 @@ public class StudycafeDslRepository {
     }
 
     private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
             query = query.leftJoin(studycafe.rooms, room);
 
-            if (searchRequest.getDate() != null) {
+            if (searchRequest.getDate() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
                 query = query
-                        .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())))
                         .leftJoin(room.reservationRecords, reservationRecord);
+
+                if (searchRequest.getDate() != null) {
+                    query = query
+                            .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())));
+                }
+
+                if (searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
+                    query = query
+                            .leftJoin(reservationRecord.review, review);
+
+                    if (searchRequest.getMinGrade() != null) {
+                        query = query
+                                .leftJoin(review.grade, grade);
+                    }
+
+                    if (searchRequest.getHashtags() != null) {
+                        query = query
+                                .leftJoin(review.hashtagRecords, hashtagRecord);
+                    }
+                }
             }
 
             if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
@@ -108,11 +119,6 @@ public class StudycafeDslRepository {
                         .leftJoin(studycafe.conveniences, cConveniences)
                         .leftJoin(room.conveniences, rConveniences);
             }
-        }
-
-        if (searchRequest.getHashtags() != null) {
-            query = query
-                    .leftJoin(studycafe.hashtagRecords, hashtagRecord);
         }
 
         return query;
@@ -206,11 +212,11 @@ public class StudycafeDslRepository {
     }
 
     private BooleanExpression keywordContains(String keyword) {
-        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.basic.contains(keyword)).or(studycafe.address.detail.contains(keyword)) : null;
+        return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.addressBasic.contains(keyword)).or(studycafe.address.addressDetail.contains(keyword)) : null;
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
-        return minGrade != null ? studycafe.totalGrade.goe(minGrade) : null;
+        return minGrade != null ? grade.total.goe(minGrade) : null;
     }
 
     private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
@@ -240,10 +246,5 @@ public class StudycafeDslRepository {
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
-    }
-
-    private boolean isTrue(BooleanExpression before, BooleanExpression current) {
-        int length = before.toString().length();
-        return current.toString().substring(length + 3).equals("true");
     }
 }

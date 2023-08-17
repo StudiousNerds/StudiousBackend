@@ -1,18 +1,17 @@
 package nerds.studiousTestProject.reservation.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +20,6 @@ import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.member.entity.member.Member;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -30,42 +28,50 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "reservation_record")
 public class ReservationRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Room room;
+    @Column(name = "user_name",nullable = false)
+    private String userName;
 
-    private String name;
+    @Column(name = "phone_number",nullable = false)
     private String phoneNumber;
 
+    @Column(name = "date",nullable = false)
     private LocalDate date;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time",nullable = false)
     private LocalTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time",nullable = false)
     private LocalTime endTime;
+
+    @Column(name = "duration",nullable = false)
     private Integer duration;
+
+    @Column(name = "head_count",nullable = false)
     private Integer headCount;
 
+    @Column(name = "status",nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
 
-    // 편의시설 사용 여부
-    @Column(name = "complete_payment")
-    private Boolean completePayment;
-
+    @Column(name = "request")
     private String request;
 
+    @Column(name = "order_id")
     private String orderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @OneToOne(mappedBy = "reservationRecord")
     private Review review;

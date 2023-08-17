@@ -1,6 +1,6 @@
 package nerds.studiousTestProject.studycafe.repository;
 
-import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.assertj.core.api.Assertions;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.*;
-import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.StudycafeFixture.*;
 
 @RepositoryTest
 public class StudycafeRepositoryTest {

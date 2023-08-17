@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.refundpolicy.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,19 +25,24 @@ public class RefundPolicy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "remaining", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private RefundDay refundDay;
+    private Remaining remaining;
+
+    @Column(name = "rate",nullable = false)
     private Integer rate;
+
+    @Column(name = "type",nullable = false)
     private String type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studycafe_id")
+    @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
     @Builder
-    public RefundPolicy(Long id, RefundDay refundDay, Integer rate, String type, Studycafe studycafe) {
+    public RefundPolicy(Long id, Remaining remaining, Integer rate, String type, Studycafe studycafe) {
         this.id = id;
-        this.refundDay = refundDay;
+        this.remaining = remaining;
         this.rate = rate;
         this.type = type;
         this.studycafe = studycafe;

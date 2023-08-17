@@ -10,7 +10,7 @@ import nerds.studiousTestProject.member.dto.general.login.LoginRequest;
 import nerds.studiousTestProject.member.dto.general.logout.LogoutResponse;
 import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;

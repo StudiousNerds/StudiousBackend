@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.bookmark;
+package nerds.studiousTestProject.bookmark.dto;
 
 import lombok.Builder;
 import lombok.Data;

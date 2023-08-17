@@ -2,19 +2,15 @@ package nerds.studiousTestProject.review.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +18,7 @@ import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.apache.catalina.LifecycleState;
 import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +33,7 @@ public class Review {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "reservation_id")
+    @JoinColumn(name = "reservation_record_id")
     private ReservationRecord reservationRecord;
 
     @OneToMany(mappedBy = "review",
@@ -47,9 +44,11 @@ public class Review {
     @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Grade grade;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", nullable = false)
+    @CreatedDate
     private LocalDate createdDate;
 
+    @Column(name = "detail", nullable = false)
     private String detail;
 
     private String comment;

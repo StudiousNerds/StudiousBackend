@@ -1,9 +1,9 @@
-package nerds.studiousTestProject.member.service.member;
+package nerds.studiousTestProject.member.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.repository.member.MemberRepository;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

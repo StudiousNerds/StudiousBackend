@@ -12,7 +12,7 @@ import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfo;
 import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfoFactory;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.service.member.MemberService;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import org.springframework.core.ParameterizedTypeReference;

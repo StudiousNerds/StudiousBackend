@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.fixture;
+package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhoto.SubPhotoBuilder;

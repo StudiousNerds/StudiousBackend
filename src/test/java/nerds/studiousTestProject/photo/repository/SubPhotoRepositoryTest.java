@@ -1,6 +1,6 @@
 package nerds.studiousTestProject.photo.repository;
 
-import nerds.studiousTestProject.RepositoryTest;
+import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static nerds.studiousTestProject.fixture.PhotoFixture.*;
-import static nerds.studiousTestProject.fixture.ReviewFixture.*;
-import static nerds.studiousTestProject.fixture.StudycafeFixture.*;
+import static nerds.studiousTestProject.support.fixture.PhotoFixture.*;
+import static nerds.studiousTestProject.support.fixture.ReviewFixture.*;
+import static nerds.studiousTestProject.support.fixture.StudycafeFixture.*;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -73,7 +73,7 @@ class SubPhotoRepositoryTest {
         SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.리뷰_생성(review, 1L));
         SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.리뷰_생성(review, 2L));
         // when
-        subPhotoRepository.deleteAllByReviewId(1L);
+        subPhotoRepository.deleteAllByReviewId(review.getId());
         List<SubPhoto> photoList = subPhotoRepository.findAll();
         List<Review> reviewList = reviewRepository.findAll();
         // then
