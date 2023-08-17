@@ -71,7 +71,7 @@ public class Studycafe {
     private Double totalGrade;
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
-    private List<NotificationInfo> notificationInfos = new ArrayList<>();
+    private List<Announcement> announcements = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<Room> rooms = new ArrayList<>();
@@ -126,9 +126,9 @@ public class Studycafe {
         subPhoto.setStudycafe(this);
     }
 
-    public void addNotificationInfo(NotificationInfo notificationInfo) {
-        notificationInfos.add(notificationInfo);
-        notificationInfo.setStudycafe(this);
+    public void addAnnouncement(Announcement announcement) {
+        announcements.add(announcement);
+        announcement.setStudycafe(this);
     }
 
     public void updateIntroduction(String introduction) {

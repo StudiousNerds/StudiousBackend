@@ -7,10 +7,10 @@ import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequ
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.NotificationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -91,13 +91,13 @@ public class StudycafeController {
     }
 
     @GetMapping("/studycafes/managements/notificationInfos/{cafeId}")
-    public List<NotificationInfoResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
+    public List<AnnouncementResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId) {
         return studycafeService.inquireNotificationInfos(accessToken, cafeId);
     }
 
     @PostMapping("/studycafes/managements/notificationInfos/{cafeId}")
-    public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody @Valid NotificationInfoRequest notificationInfoRequest) {
-        studycafeService.insertNotificationInfos(accessToken, cafeId, notificationInfoRequest);
+    public void addNotificationInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long cafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
+        studycafeService.insertNotificationInfos(accessToken, cafeId, announcementRequest);
     }
 
     @DeleteMapping("/studycafes/managements/{cafeId}")

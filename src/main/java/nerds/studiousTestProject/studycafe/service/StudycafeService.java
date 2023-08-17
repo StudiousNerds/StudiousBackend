@@ -7,8 +7,6 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -28,14 +26,14 @@ import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.NotificationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
@@ -470,31 +468,31 @@ public class StudycafeService {
      * @return 스터디카페의 모든 공지사항
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
+    public List<AnnouncementResponse> inquireNotificationInfos(String accessToken, Long cafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        return studycafe.getNotificationInfos().stream().map(NotificationInfoResponse::from).toList();
+        return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
     }
 
     /**
      * 공지사항 추가 로직
      * @param accessToken 사용자 엑세스 토큰
      * @param cafeId 스터디카페 PK
-     * @param notificationInfoRequest 공지사항 요청 값
+     * @param announcementRequest 공지사항 요청 값
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void insertNotificationInfos(String accessToken, Long cafeId, NotificationInfoRequest notificationInfoRequest) {
+    public void insertNotificationInfos(String accessToken, Long cafeId, AnnouncementRequest announcementRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(cafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
-        if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
+        if (announcementRequest.getStartDate().isAfter(announcementRequest.getEndDate())) {
             throw new BadRequestException(ErrorCode.START_DATE_AFTER_THAN_END_DATE);
         }
 
-        studycafe.addNotificationInfo(notificationInfoRequest.toEntity());
+        studycafe.addAnnouncement(announcementRequest.toEntity());
     }
 
     /**
