@@ -45,6 +45,7 @@ import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoReq
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RoomInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -127,9 +128,10 @@ public class StudycafeService {
                 .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                 .hashtags(getHashtagRecords(studycafe))
                 .introduction(studycafe.getIntroduction())
-                .conveniences(getConveniences(studycafeId)) // notice 추가 해야 함
+                .conveniences(getConveniences(studycafeId))
                 .refundPolicy(getRefundPolicy(studycafeId))
                 .notice(getNotice(studycafeId))
+                .announcement(getAnnouncement(studycafeId))
                 .rooms(roomService.getRooms(findStudycafeRequest.getDate(), studycafeId))
                 .recommendationRate(reviewService.getAvgRecommendation(studycafeId))
                 .cleanliness(reviewService.getAvgCleanliness(studycafeId))
@@ -217,6 +219,14 @@ public class StudycafeService {
 
         return studycafe.getRefundPolicies().stream()
                 .map(RefundPolicyInResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<AnnouncementInResponse> getAnnouncement(Long studycafeId) {
+        Studycafe studycafe = findStudycafeById(studycafeId);
+
+        return studycafe.getAnnouncements().stream()
+                .map(AnnouncementInResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -475,7 +485,7 @@ public class StudycafeService {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        return studycafe.getNotificationInfos().stream().map(NotificationInfoResponse::from).toList();
+        return studycafe.getAnnouncements().stream().map(NotificationInfoResponse::from).toList();
     }
 
     /**
