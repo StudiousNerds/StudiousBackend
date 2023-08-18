@@ -50,7 +50,7 @@ public class BookmarkService {
         Member bookmarkedMember = memberRepository.findById(member.getId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER));
         List<Studycafe> bookmarkList = bookmarkedMember.getBookmarks().stream().map(b -> b.getStudycafe()).toList();
 
-        getBookmarkList(pageNumber, bookmarkCafeList, bookmarkList);
+        // getBookmarkList(pageNumber, bookmarkCafeList, bookmarkList);
         return bookmarkCafeList;
     }
 
