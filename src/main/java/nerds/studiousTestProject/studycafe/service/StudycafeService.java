@@ -70,8 +70,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_DATE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_NEAREST_STATION;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_WALKINGTIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_DATE_AFTER_THAN_END_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
