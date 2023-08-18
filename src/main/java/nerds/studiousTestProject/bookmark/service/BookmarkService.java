@@ -6,16 +6,13 @@ import nerds.studiousTestProject.bookmark.dto.BookmarkReuqest;
 import nerds.studiousTestProject.bookmark.dto.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.hashtag.service.AccumHashtagHistoryService;
+import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.MemberService;
-import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +29,7 @@ public class BookmarkService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final StudycafeService studycafeService;
-    private final AccumHashtagHistoryService accumHashtagHistoryService;
+    private final HashtagRecordService hashtagRecordService;
     private final ReservationRecordService reservationRecordService;
 
     @Transactional
@@ -81,7 +78,7 @@ public class BookmarkService {
                     .distance(studycafe.getNearestStationInfo().getWalkingTime())
                     .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
                     .grade(studycafe.getTotalGrade())
-                    .hashtags(accumHashtagHistoryService.getTop5AccumHashtagHistory(studycafe))
+                    .hashtags((String[]) hashtagRecordService.findStudycafeHashtag(studycafe.getId()).toArray())
                     .build();
             bookmarkCafeList.add(bookmarkCafe);
         }
