@@ -3,14 +3,14 @@ package nerds.studiousTestProject.review.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.review.dto.request.ModifyReviewRequest;
-import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
-import nerds.studiousTestProject.review.dto.response.AvailableReviewResponse;
-import nerds.studiousTestProject.review.dto.response.DeleteReviewResponse;
-import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
-import nerds.studiousTestProject.review.dto.response.ModifyReviewResponse;
-import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
-import nerds.studiousTestProject.review.dto.response.WrittenReviewResponse;
+import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
+import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
+import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
+import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
+import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
+import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
+import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
+import nerds.studiousTestProject.review.dto.written.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -65,12 +65,12 @@ public class ReviewController {
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews")
-    public List<FindReviewResponse> findAllReviews(@PathVariable("studycafeId") Long studycafeId, Pageable pageable) {
+    public FindReviewSortedResponse findAllReviews(@PathVariable("studycafeId") Long studycafeId, Pageable pageable) {
         return reviewService.findAllReviews(studycafeId, pageable);
     }
 
     @GetMapping("/studycafes/{studycafeId}/rooms/{roomId}/reviews")
-    public List<FindReviewResponse> findRoomReviews(@PathVariable("studycafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
+    public FindReviewSortedResponse findRoomReviews(@PathVariable("studycafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
         return reviewService.findRoomReviews(studycafeId, roomId, pageable);
     }
 }
