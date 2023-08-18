@@ -3,11 +3,10 @@ package nerds.studiousTestProject.studycafe.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.hashtag.service.AccumHashtagHistoryService;
+import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
@@ -70,6 +69,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_DATE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_NEAREST_STATION;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_WALKINGTIME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.START_DATE_AFTER_THAN_END_DATE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT;
@@ -88,7 +92,7 @@ public class StudycafeService {
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
-    private final AccumHashtagHistoryService accumHashtagHistoryService;
+    private final HashtagRecordService hashtagRecordService;
     private final ReservationRecordService reservationRecordService;
 
     /**
@@ -104,13 +108,13 @@ public class StudycafeService {
 
         // 날짜 선택이 안되었는데 시간을 선택한 경우
         if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
-            throw new BadRequestException(ErrorCode.NOT_FOUND_DATE);
+            throw new BadRequestException(NOT_FOUND_DATE);
         }
 
         // 시작 시간이 끝 시간보다 이후인 경우
         if (searchRequest.getStartTime() != null && searchRequest.getEndTime() != null &&
                 !searchRequest.getStartTime().isBefore(searchRequest.getEndTime())) {
-            throw new BadRequestException(ErrorCode.START_TIME_AFTER_THAN_END_TIME);
+            throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
         }
 
         return studycafeDslRepository.searchAll(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
@@ -124,9 +128,9 @@ public class StudycafeService {
                 .cafeName(studycafe.getName())
                 .photos(subPhotoService.findCafePhotos(studycafeId))
                 .accumResCnt(getAccumResCnt(studycafeId))
-                .duration(studycafe.getNearestStationInfo().getWalkingTime())
-                .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
-                .hashtags(getHashtagRecords(studycafe))
+                .duration(getWalkingtime(studycafe))
+                .nearestStation(getNearestStation(studycafe))
+                .hashtags(getHashtagRecords(studycafe.getId()))
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(studycafeId))
                 .announcement(getAnnouncement(studycafeId))
@@ -159,10 +163,10 @@ public class StudycafeService {
                     .cafeName(studycafe.getName())
                     .photo(studycafe.getPhoto())
                     .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                    .distance(studycafe.getNearestStationInfo().getWalkingTime())
-                    .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
+                    .distance(getWalkingtime(studycafe))
+                    .nearestStation(getNearestStation(studycafe))
                     .grade(getTotalGrade(studycafe.getId()))
-                    .hashtags(getHashtagRecords(studycafe))
+                    .hashtags(getHashtagRecords(studycafe.getId()))
                     .build();
             recommedStudycafeList.add(foundStudycafe);
         }
@@ -179,10 +183,10 @@ public class StudycafeService {
                     .cafeName(studycafe.getName())
                     .photo(studycafe.getPhoto())
                     .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                    .distance(studycafe.getNearestStationInfo().getWalkingTime())
-                    .nearestStation(studycafe.getNearestStationInfo().getNearestStation())
+                    .distance(getWalkingtime(studycafe))
+                    .nearestStation(getNearestStation(studycafe))
                     .grade(getTotalGrade(studycafe.getId()))
-                    .hashtags(getHashtagRecords(studycafe))
+                    .hashtags(getHashtagRecords(studycafe.getId()))
                     .build();
             eventStudycafeList.add(foundStudycafe);
         }
@@ -209,6 +213,21 @@ public class StudycafeService {
         return conveniences;
     }
 
+    public Integer getWalkingtime(Studycafe studycafe) {
+        try {
+            return studycafe.getNearestStationInfo().getWalkingTime();
+        } catch (Exception exception) {
+            return 0;
+        }
+    }
+
+    public String getNearestStation(Studycafe studycafe) {
+        try {
+            return studycafe.getNearestStationInfo().getNearestStation();
+        } catch (Exception exception) {
+            return " ";
+        }
+    }
 
     public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
@@ -226,8 +245,8 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public String[] getHashtagRecords(Studycafe studycafe) {
-        return accumHashtagHistoryService.getTop5AccumHashtagHistory(studycafe);
+    public String[] getHashtagRecords(Long studycafeId) {
+        return (String[]) hashtagRecordService.findStudycafeHashtag(studycafeId).toArray();
     }
 
     public Integer getAccumResCnt(Long studycafeId) {
@@ -498,7 +517,7 @@ public class StudycafeService {
 
         // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
         if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
-            throw new BadRequestException(ErrorCode.START_DATE_AFTER_THAN_END_DATE);
+            throw new BadRequestException(START_DATE_AFTER_THAN_END_DATE);
         }
 
         studycafe.addNotificationInfo(notificationInfoRequest.toEntity());
