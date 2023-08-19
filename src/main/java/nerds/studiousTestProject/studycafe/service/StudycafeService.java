@@ -73,8 +73,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_DAT
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_DATE_AFTER_THAN_END_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
@@ -172,7 +170,7 @@ public class StudycafeService {
     }
 
     public List<EventCafeResponse> getEventStudycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedAtDesc();
+        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
         List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
@@ -293,7 +291,7 @@ public class StudycafeService {
                 .photo(cafeMainPhoto)
                 .tel(null)
                 .totalGrade(0.0)
-                .createdAt(LocalDateTime.now())
+                .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
                 .nearestStationInfo(nearestStationInfoResponse.toEmbedded())
                 .introduction(cafeInfo.getIntroduction())
@@ -367,7 +365,7 @@ public class StudycafeService {
     @Secured(value = MemberRole.ROLES.ADMIN)
     public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
+        return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
     }
 
@@ -378,7 +376,6 @@ public class StudycafeService {
     private void validateRoomInfo(RegisterRequest registerRequest) {
         List<RoomInfoRequest> roomInfoRequests = registerRequest.getRoomInfos();
         for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
-            Integer standardHeadCount = roomInfoRequest.getStandardHeadCount();
             Integer minHeadCount = roomInfoRequest.getMinHeadCount();
             Integer maxHeadCount = roomInfoRequest.getMaxHeadCount();
 
@@ -387,16 +384,6 @@ public class StudycafeService {
             // 최대 인원 수가 최대 인원 수 보다 작은 경우
             if (maxHeadCount < minHeadCount) {
                 throw new BadRequestException(INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT);
-            }
-
-            // 기준 인원 수가 최소 인원 수 보다 작은 경우
-            if (standardHeadCount < minHeadCount) {
-                throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MIN_HEADCOUNT);
-            }
-
-            // 기준 인원 수가 최대 인원 수보다 큰 경우
-            if (standardHeadCount > maxHeadCount) {
-                throw new BadRequestException(INVALID_BETWEEN_STANDARD_HEADCOUNT_AND_MAX_HEADCOUNT);
             }
         }
     }
