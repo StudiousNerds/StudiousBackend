@@ -1,5 +1,5 @@
---(id, path, usage, studycafe_id, review_id, room_id)
-------------------- 스카 1 -----------------------
+-- (id, path, usage, studycafe_id, review_id, room_id)
+-- ----------------- 스카 1 -----------------------
 -- 룸 사진 4장인 경우
 INSERT IGNORE INTO `sub_photo` VALUES (1, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 1);
 INSERT IGNORE INTO `sub_photo` VALUES (2, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 1);
@@ -14,7 +14,7 @@ INSERT IGNORE INTO `sub_photo` VALUES (8, 'https://studiousbucket.s3.ap-northeas
 INSERT IGNORE INTO `sub_photo` VALUES (9, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 3); -- 스카 1
 -- 룸 사진 1장인 경우
 INSERT IGNORE INTO `sub_photo` VALUES (10, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 4); -- 스카 1
--------------------------------------------------
+-- -----------------------------------------------
 INSERT IGNORE INTO `sub_photo` VALUES (11, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 5); -- 스카 2
 INSERT IGNORE INTO `sub_photo` VALUES (12, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 6);
 INSERT IGNORE INTO `sub_photo` VALUES (13, 'https://studiousbucket.s3.ap-northeast-2.amazonaws.com/aced27ec-c691-426c-a02f-36a0fab429f4.png', 'ROOM', null, null, 6); -- 스카 3

@@ -1,4 +1,4 @@
---(id, is_free (0:false), price, type, roomId, studycafeId, name)
+-- (id, is_free (0:false), price, type, roomId, studycafeId, name)
 INSERT IGNORE INTO `convenience` VALUES (1, 1, 0, 'ROOM', 1, null, 'HDMI');
 INSERT IGNORE INTO `convenience` VALUES (2, 0, 1000, 'ROOM', 1, null, 'MONITOR');
 INSERT IGNORE INTO `convenience` VALUES (3, 1, 0, 'ROOM', 1, null, 'PEN');

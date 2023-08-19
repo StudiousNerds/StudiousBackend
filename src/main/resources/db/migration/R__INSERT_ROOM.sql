@@ -1,4 +1,4 @@
---(id, name, min_head_count, max_head_count, min_using_time, price, type, studycafeId)
+-- (id, name, min_head_count, max_head_count, min_using_time, price, type, studycafeId)
 INSERT IGNORE INTO `room` VALUES (1, 'roomA', 4, 6, 1, 1500, 'PER_PERSON', 1);
 INSERT IGNORE INTO `room` VALUES (2, 'roomB', 6, 8, 1, 6000, 'PER_HOUR', 1);
 INSERT IGNORE INTO `room` VALUES (3, 'roomC', 4, 6, 2, 1500, 'PER_PERSON', 1);
