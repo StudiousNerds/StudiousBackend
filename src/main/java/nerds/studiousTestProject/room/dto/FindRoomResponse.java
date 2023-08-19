@@ -14,7 +14,6 @@ import java.util.Map;
 public class FindRoomResponse {
     private Long id;
     private String name;
-    private Integer standCount;
     private Integer minCount;
     private Integer maxCount;
     private Integer price;
