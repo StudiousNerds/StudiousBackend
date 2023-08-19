@@ -2,7 +2,7 @@
 INSERT IGNORE INTO `room` VALUES (1, 'roomA', 4, 6, 1, 1500, 'PER_PERSON', 1);
 INSERT IGNORE INTO `room` VALUES (2, 'roomB', 6, 8, 1, 6000, 'PER_HOUR', 1);
 INSERT IGNORE INTO `room` VALUES (3, 'roomC', 4, 6, 2, 1500, 'PER_PERSON', 1);
-INSERT IGNORE INTO `room` VALUES (4, 'room1', 4, 6, 2, 6000, 'PER_HOUR', 2);
+INSERT IGNORE INTO `room` VALUES (4, 'room1', 4, 6, 2, 6000, 'PER_HOUR', 1);
 INSERT IGNORE INTO `room` VALUES (5, 'room2', 5, 5, 2, 1500, 'PER_PERSON', 2);
 INSERT IGNORE INTO `room` VALUES (6, 'rooma', 4, 6, 2, 6000, 'PER_HOUR', 3);
 INSERT IGNORE INTO `room` VALUES (7, 'roomb', 4, 6, 1, 1500, 'PER_PERSON', 3);
