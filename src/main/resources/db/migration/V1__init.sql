@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `refund_policy` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
     `rate`         int          NOT NULL,
     `remaining`    varchar(255) NOT NULL,
-    `usage`        varchar(255) NOT NULL,--환불 정책명 (멘토님이 확장성 - 편의시설 결제 취소) 필드명 변경
+    `usage`        varchar(255) NOT NULL,
     `studycafe_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
 CREATE TABLE IF NOT EXISTS `convenience_record` (
     `id`                    bigint NOT NULL AUTO_INCREMENT,
     `reservation_record_id` bigint NOT NULL,
-    `convenience_id`        bigint NOT NULL
+    `convenience_id`        bigint NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -187,7 +187,6 @@ CREATE TABLE IF NOT EXISTS `room` (
     `id`                  bigint       NOT NULL AUTO_INCREMENT,
     `name`                varchar(255) NOT NULL,
     `min_head_count`      int          NOT NULL,
-    `standard_head_count` int          NOT NULL,
     `max_head_count`      int          NOT NULL,
     `min_using_time`      int          NOT NULL,
     `price`               int          NOT NULL,
@@ -204,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `studycafe` (
     `name`                varchar(255) NOT NULL,
     `accum_reserve_count` int          DEFAULT '0',
     `total_grade`         decimal(3,2) DEFAULT '0',
-    `created_at`          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    `created_date`        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     `address_basic`       varchar(255) NOT NULL,
     `address_detail`      varchar(255) NOT NULL,
     `address_zipcode`     varchar(255) NOT NULL,
@@ -244,8 +243,8 @@ CREATE TABLE IF NOT EXISTS `sub_photo` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-alter table grade add constraint grade_review_unique_key unique (review_id)
+alter table grade add constraint grade_review_unique_key unique (review_id);
 
-alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id)
+alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
 
-alter table review add constraint review_reservation_record_unique_key unique (reservation_record_id)
+alter table review add constraint review_reservation_record_unique_key unique (reservation_record_id);
