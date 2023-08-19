@@ -1,0 +1,23 @@
+--(id, name, min_head_count, max_head_count, min_using_time, price, type, studycafeId)
+INSERT IGNORE INTO `room` VALUES (1, 'roomA', 4, 6, 1, 1500, 'PER_PERSON', 1);
+INSERT IGNORE INTO `room` VALUES (2, 'roomB', 6, 8, 1, 6000, 'PER_HOUR', 1);
+INSERT IGNORE INTO `room` VALUES (3, 'roomC', 4, 6, 2, 1500, 'PER_PERSON', 1);
+INSERT IGNORE INTO `room` VALUES (4, 'room1', 4, 6, 2, 6000, 'PER_HOUR', 2);
+INSERT IGNORE INTO `room` VALUES (5, 'room2', 5, 5, 2, 1500, 'PER_PERSON', 2);
+INSERT IGNORE INTO `room` VALUES (6, 'rooma', 4, 6, 2, 6000, 'PER_HOUR', 3);
+INSERT IGNORE INTO `room` VALUES (7, 'roomb', 4, 6, 1, 1500, 'PER_PERSON', 3);
+INSERT IGNORE INTO `room` VALUES (8, '1번방', 4, 6, 1, 6000, 'PER_HOUR', 4);
+INSERT IGNORE INTO `room` VALUES (9, '2번방', 4, 6, 1, 6000, 'PER_HOUR', 4);
+INSERT IGNORE INTO `room` VALUES (10, '큰방', 4, 6, 1, 8000, 'PER_HOUR', 5);
+INSERT IGNORE INTO `room` VALUES (11, '작은방', 4, 6, 1, 1500, 'PER_PERSON', 5);
+INSERT IGNORE INTO `room` VALUES (12, '에어컨방', 4, 6, 1, 1500, 'PER_PERSON', 6);
+INSERT IGNORE INTO `room` VALUES (13, '티비방', 4, 6, 1, 1500, 'PER_PERSON', 7);
+INSERT IGNORE INTO `room` VALUES (14, '뭘방', 4, 6, 1, 6000, 'PER_HOUR', 8);
+INSERT IGNORE INTO `room` VALUES (15, '어딜방', 4, 6, 2, 6000, 'PER_HOUR', 8);
+INSERT IGNORE INTO `room` VALUES (16, '여길방', 6, 8, 2, 8000, 'PER_HOUR', 8);
+INSERT IGNORE INTO `room` VALUES (17, '이쪽방', 4, 6, 2, 1500, 'PER_PERSON', 9);
+INSERT IGNORE INTO `room` VALUES (18, '저쪽방', 4, 6, 2, 1500, 'PER_PERSON', 9);
+INSERT IGNORE INTO `room` VALUES (19, '누구방', 4, 6, 2, 1500, 'PER_PERSON', 10);
+INSERT IGNORE INTO `room` VALUES (20, '누굴방', 2, 4, 2, 4000, 'PER_HOUR', 11);
+INSERT IGNORE INTO `room` VALUES (21, '감자방', 4, 6, 2, 6000, 'PER_HOUR', 12);
+INSERT IGNORE INTO `room` VALUES (22, '고구마방', 8, 10, 1, 10000, 'PER_HOUR', 12);
