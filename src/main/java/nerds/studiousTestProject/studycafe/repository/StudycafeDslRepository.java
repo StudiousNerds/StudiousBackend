@@ -241,10 +241,10 @@ public class StudycafeDslRepository {
         switch (sortType != null ? sortType : SortType.GRADE_DESC) {
             case RESERVATION_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.accumReserveCount));
             case GRADE_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.totalGrade));
-            case CREATED_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
+            case CREATED_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));
         }
 
-        orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdAt));
+        orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
 }

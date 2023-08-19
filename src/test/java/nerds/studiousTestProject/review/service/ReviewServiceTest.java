@@ -4,7 +4,7 @@
 //import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 //import nerds.studiousTestProject.photo.service.SubPhotoService;
 //import nerds.studiousTestProject.review.dto.request.RegisterReviewRequest;
-//import nerds.studiousTestProject.review.dto.response.RegisterReviewResponse;
+//import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 //import nerds.studiousTestProject.review.repository.ReviewRepository;
 //import org.assertj.core.api.Assertions;
 //import org.junit.jupiter.api.Test;

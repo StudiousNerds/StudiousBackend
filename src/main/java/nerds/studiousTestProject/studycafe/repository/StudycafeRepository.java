@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface StudycafeRepository extends JpaRepository<Studycafe, Long> {
     Optional<Studycafe> findById(Long id);
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
-    List<Studycafe> findTop10ByOrderByCreatedAtDesc();
-    Page<Studycafe> findByMemberOrderByCreatedAtAsc(Member member, Pageable pageable);
+    List<Studycafe> findTop10ByOrderByCreatedDateDesc();
+    Page<Studycafe> findByMemberOrderByCreatedDateAsc(Member member, Pageable pageable);
     Optional<Studycafe> findByIdAndMember(Long id, Member member);
     Optional<Studycafe> deleteByIdAndMember(Long id, Member member);
 }

@@ -1,12 +1,11 @@
 package nerds.studiousTestProject.review.repository;
 import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
-import nerds.studiousTestProject.hashtag.repository.HashtagRepository;
+import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ class ReviewRepositoryTest {
     @Autowired
     private GradeRepository gradeRepository;
     @Autowired
-    private HashtagRepository hashtagRepository;
+    private HashtagRecordRepository hashtagRecordRepository;
 
     @Test
     @DisplayName("예약 id가 주어졌을 때 생성날짜를 기준으로 내림차순 정렬하여 그에 해당하는 리뷰들을 모두 다 가져오는지 테스트")
@@ -95,7 +94,7 @@ class ReviewRepositoryTest {
     @DisplayName("리뷰 삭제 시, 해시태그와 등급이 같이 삭제되는지 테스트")
     void deleteById() {
         // given
-        HashtagRecord hashtag = hashtagRepository.save(FIRST_HASHTAG.생성(1L));
+        HashtagRecord hashtag = hashtagRecordRepository.save(FIRST_HASHTAG.생성(1L));
         Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
@@ -103,7 +102,7 @@ class ReviewRepositoryTest {
         reviewRepository.deleteById(firstReview.getId());
         List<Review> reviewList = reviewRepository.findAll();
         List<Grade> gradeList = gradeRepository.findAll();
-        List<HashtagRecord> hashtagRecordList = hashtagRepository.findAll();
+        List<HashtagRecord> hashtagRecordList = hashtagRecordRepository.findAll();
         // then
         Assertions.assertThat(reviewList.size()).isEqualTo(0);
         Assertions.assertThat(gradeList.size()).isEqualTo(0);
@@ -114,14 +113,14 @@ class ReviewRepositoryTest {
     @DisplayName("제대로 review에 반영되어 저장되었는지 확인하는 테스트")
     void saveTest() {
         // given
-        HashtagRecord hashtag = hashtagRepository.save(FIRST_HASHTAG.생성(1L));
+        HashtagRecord hashtag = hashtagRecordRepository.save(FIRST_HASHTAG.생성(1L));
         Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
         // when
         List<Review> reviewList = reviewRepository.findAll();
         List<Grade> gradeList = gradeRepository.findAll();
-        List<HashtagRecord> hashtagRecordList = hashtagRepository.findAll();
+        List<HashtagRecord> hashtagRecordList = hashtagRecordRepository.findAll();
         // then
         Assertions.assertThat(reviewList.size()).isEqualTo(1);
         Assertions.assertThat(gradeList.size()).isEqualTo(1);
