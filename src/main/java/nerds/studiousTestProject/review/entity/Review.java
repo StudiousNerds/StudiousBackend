@@ -51,6 +51,8 @@ public class Review {
     @Column(name = "detail", nullable = false)
     private String detail;
 
+    private String photo; // 리뷰의 대표사진
+
     private String comment;
 
     public void addHashtagRecord(HashtagRecord hashtagRecord) {
@@ -64,11 +66,12 @@ public class Review {
     }
 
     @Builder
-    public Review(Long id, Grade grade, LocalDate createdDate, String detail, String comment) {
+    public Review(Long id, Grade grade, LocalDate createdDate, String detail, String photo, String comment) {
         this.id = id;
         this.grade = grade;
         this.createdDate = createdDate;
         this.detail = detail;
+        this.photo = photo;
         this.comment = comment;
     }
 

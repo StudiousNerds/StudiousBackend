@@ -34,9 +34,6 @@ public class Room {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "standard_head_count", nullable = false)
-    private Integer standardHeadCount; // 기존 인원수
-
     @Column(name = "min_head_count", nullable = false)
     private Integer minHeadCount;
 
@@ -83,11 +80,10 @@ public class Room {
     }
 
     @Builder
-    public Room(Long id, Studycafe studycafe, String name, Integer standardHeadCount, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, String photo, PriceType type) {
+    public Room(Long id, Studycafe studycafe, String name, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, String photo, PriceType type) {
         this.id = id;
         this.studycafe = studycafe;
         this.name = name;
-        this.standardHeadCount = standardHeadCount;
         this.minHeadCount = minHeadCount;
         this.maxHeadCount = maxHeadCount;
         this.price = price;

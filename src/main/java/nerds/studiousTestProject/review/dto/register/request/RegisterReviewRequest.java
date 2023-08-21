@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.review.dto.request;
+package nerds.studiousTestProject.review.dto.register.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -6,8 +6,9 @@ import lombok.Data;
 
 @Builder
 @Data
-public class ModifyReviewRequest {
+public class RegisterReviewRequest {
     private Long cafeId;
+    private Long reservationId;
     @NotBlank(message = "청결도 평점은 필수입니다.")
     private Integer cleanliness;
     @NotBlank(message = "방음 평점은 필수입니다.")

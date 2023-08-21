@@ -2,10 +2,8 @@ package nerds.studiousTestProject.studycafe.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -63,15 +61,15 @@ public class Studycafe {
     @Column(name = "introduction", nullable = false)
     private String introduction;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_date", updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 
     @Column(name = "total_grade", nullable = true)
     private Double totalGrade;
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
-    private List<NotificationInfo> notificationInfos = new ArrayList<>();
+    private List<Announcement> announcements = new ArrayList<>();
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
     private List<Room> rooms = new ArrayList<>();
@@ -126,9 +124,9 @@ public class Studycafe {
         subPhoto.setStudycafe(this);
     }
 
-    public void addNotificationInfo(NotificationInfo notificationInfo) {
-        notificationInfos.add(notificationInfo);
-        notificationInfo.setStudycafe(this);
+    public void addNotificationInfo(Announcement announcement) {
+        announcements.add(announcement);
+        announcement.setStudycafe(this);
     }
 
     public void updateIntroduction(String introduction) {
@@ -166,7 +164,7 @@ public class Studycafe {
     }
 
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade) {
         this.id = id;
         this.member = member;
         this.name = name;
@@ -176,7 +174,7 @@ public class Studycafe {
         this.nearestStationInfo = nearestStationInfo;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
-        this.createdAt = createdAt;
+        this.createdDate = createdDate;
         this.totalGrade = totalGrade;
     }
 }

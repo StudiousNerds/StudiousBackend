@@ -16,9 +16,6 @@ public class RoomInfoRequest {
     @NotBlank(message = "스터디룸 이름은 필수입니다.")
     private String name;    // 스터디룸 이름
 
-    @Positive(message = "기준 인원 수는 필수입니다.")
-    private Integer standardHeadCount;  // 기준 인원 수
-
     @Positive(message = "최소 인원 수는 필수입니다.")
     private Integer minHeadCount;  // 최소 인원 수
 
@@ -48,7 +45,6 @@ public class RoomInfoRequest {
         return Room.builder()
                 .name(name)
                 .photo(roomMainPhoto)
-                .standardHeadCount(standardHeadCount)
                 .minHeadCount(minHeadCount)
                 .maxHeadCount(maxHeadCount)
                 .minUsingTime(minUsingTime)

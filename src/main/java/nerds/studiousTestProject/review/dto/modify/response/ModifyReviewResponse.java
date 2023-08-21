@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.review.dto.response;
+package nerds.studiousTestProject.review.dto.modify.response;
 
 import lombok.Builder;
 import lombok.Data;
