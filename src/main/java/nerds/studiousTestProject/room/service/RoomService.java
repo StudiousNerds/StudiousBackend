@@ -52,7 +52,6 @@ public class RoomService {
             rooms.add(FindRoomResponse.builder()
                     .id(room.getId())
                     .name(room.getName())
-                    .standCount(room.getStandardHeadCount())
                     .minCount(room.getMinHeadCount())
                     .maxCount(room.getMaxHeadCount())
                     .price(room.getPrice())

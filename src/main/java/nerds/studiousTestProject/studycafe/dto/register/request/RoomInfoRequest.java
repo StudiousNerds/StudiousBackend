@@ -48,7 +48,6 @@ public class RoomInfoRequest {
         return Room.builder()
                 .name(name)
                 .photo(roomMainPhoto)
-                .standardHeadCount(standardHeadCount)
                 .minHeadCount(minHeadCount)
                 .maxHeadCount(maxHeadCount)
                 .minUsingTime(minUsingTime)

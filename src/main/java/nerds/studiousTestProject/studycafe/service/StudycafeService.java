@@ -267,7 +267,7 @@ public class StudycafeService {
                 .photo(cafeMainPhoto)
                 .tel(null)
                 .totalGrade(0.0)
-                .createdAt(LocalDateTime.now())
+                .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
                 .nearestStationInfo(nearestStationInfoResponse.toEmbedded())
                 .introduction(cafeInfo.getIntroduction())
