@@ -103,7 +103,7 @@ public class StudycafeController {
 
     @GetMapping("/studycafes/managements/notificationInfos/{studycafeId}")
     public List<AnnouncementResponse> findNotificationInfos(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId) {
-        return studycafeService.inquireNotificationInfos(accessToken, studycafeId);
+        return studycafeService.inquireAnnouncements(accessToken, studycafeId);
     }
 
     @PostMapping("/studycafes/managements/notificationInfos/{studycafeId}")
