@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,7 +45,7 @@ public class Member implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 
     @Column(name = "type", nullable = false)
@@ -110,11 +111,21 @@ public class Member implements UserDetails {
         }
     }
 
+    public void updatePhoto(String photo) {
+        if (photo != null && !photo.isEmpty()) {
+            this.photo = photo;
+        }
+    }
+
     public void updateNickname(String nickname) {
-        this.nickname = nickname;
+        if (nickname != null && !nickname.isEmpty()) {
+            this.nickname = nickname;
+        }
     }
     public void updatePassword(String encodedPassword) {
-        this.password = encodedPassword;
+        if (encodedPassword != null && !encodedPassword.isEmpty()) {
+            this.password = encodedPassword;
+        }
     }
 
     public void deleteBookmark(Bookmark bookmark){

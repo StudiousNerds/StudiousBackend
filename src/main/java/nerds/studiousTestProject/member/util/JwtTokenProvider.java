@@ -80,6 +80,7 @@ public class JwtTokenProvider {
         try {
              userDetails = userDetailsService.loadUserByUsername(username);
         } catch (Exception e) {
+            log.info("CustomerUserDetailsService exception = {}", e.getMessage());
             throw new BadRequestException(ErrorCode.INVALID_TOKEN);
         }
 
