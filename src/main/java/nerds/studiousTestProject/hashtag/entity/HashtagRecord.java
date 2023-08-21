@@ -16,9 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.review.entity.Review;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class HashtagRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

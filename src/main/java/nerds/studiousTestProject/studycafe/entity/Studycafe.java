@@ -62,9 +62,9 @@ public class Studycafe {
     @Column(name = "introduction", nullable = false)
     private String introduction;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_date", updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 
     @Column(name = "total_grade", nullable = true)
     private Double totalGrade;
@@ -165,7 +165,7 @@ public class Studycafe {
     }
 
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdAt, Double totalGrade) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade) {
         this.id = id;
         this.member = member;
         this.name = name;
@@ -175,7 +175,7 @@ public class Studycafe {
         this.nearestStationInfo = nearestStationInfo;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
-        this.createdAt = createdAt;
+        this.createdDate = createdDate;
         this.totalGrade = totalGrade;
     }
 }

@@ -57,7 +57,9 @@ public class Grade {
     }
 
     public void setReview(Review review) {
-        this.review = review;
+        if (review != null) {
+            this.review = review;
+        }
     }
 
     public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total){
