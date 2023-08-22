@@ -29,6 +29,7 @@ import nerds.studiousTestProject.review.dto.written.response.WrittenReviewRespon
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
@@ -316,13 +317,23 @@ public class ReviewService {
         return reviewList.stream()
                 .map(review -> FindReviewResponse.builder()
                         .grade(review.getGrade().getTotal())
-                        .nickname(review.getReservationRecord().getMember().getNickname())
+                        .nickname(getMember(review).getNickname())
+                        .roomName(getRoom(review).getName())
+                        .minHeadCount(getRoom(review).getMinHeadCount())
+                        .maxHeadCount(getRoom(review).getMaxHeadCount())
                         .detail(review.getDetail())
                         .date(review.getCreatedDate())
-                        .roomName(review.getReservationRecord().getRoom().getName())
                         .photos(subPhotoService.findReviewPhotos(review.getId()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Member getMember(Review review) {
+        return reservationRecordService.findByReviewId(review.getId()).getMember();
+    }
+
+    private Room getRoom(Review review) {
+        return reservationRecordService.findByReviewId(review.getId()).getRoom();
     }
 
     private List<Review> getAllReviews(Long studycafeId) {
