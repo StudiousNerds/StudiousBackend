@@ -32,10 +32,6 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_record_id")
-    private ReservationRecord reservationRecord;
-
     @OneToMany(mappedBy = "review",
             orphanRemoval = true,
             fetch = FetchType.LAZY)   // 반대쪽(주인)에 자신이 매핑되있는 필드명을 적는다
@@ -51,8 +47,10 @@ public class Review {
     @Column(name = "detail", nullable = false)
     private String detail;
 
+    @Column(name = "photo", nullable = true)
     private String photo; // 리뷰의 대표사진
 
+    @Column(name = "comment", nullable = true)
     private String comment;
 
     public void addHashtagRecord(HashtagRecord hashtagRecord) {
@@ -77,9 +75,5 @@ public class Review {
 
     public void updateDetail(String detail) {
         this.detail = detail;
-    }
-
-    public void setReservationRecord(ReservationRecord reservationRecord) {
-        this.reservationRecord = reservationRecord;
     }
 }
