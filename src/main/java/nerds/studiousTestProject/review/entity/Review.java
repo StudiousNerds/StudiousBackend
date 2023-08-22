@@ -15,9 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
-import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import org.apache.catalina.LifecycleState;
-import org.bouncycastle.pqc.crypto.newhope.NHOtherInfoGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
@@ -31,10 +28,6 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "reservation_record_id")
-    private ReservationRecord reservationRecord;
 
     @OneToMany(mappedBy = "review",
             orphanRemoval = true,
@@ -79,9 +72,5 @@ public class Review {
 
     public void updateDetail(String detail) {
         this.detail = detail;
-    }
-
-    public void setReservationRecord(ReservationRecord reservationRecord) {
-        this.reservationRecord = reservationRecord;
     }
 }
