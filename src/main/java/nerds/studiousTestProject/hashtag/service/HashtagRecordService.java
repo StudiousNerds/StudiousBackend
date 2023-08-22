@@ -21,6 +21,11 @@ public class HashtagRecordService {
 
     public List<HashtagName> findStudycafeHashtag(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+
+        if (hashtagNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<HashtagName> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < TOTAL_HASHTAGS_COUNT; i++) {
             hashtagNameList.add(hashtagNames.get(i));
