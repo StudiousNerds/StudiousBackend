@@ -7,38 +7,34 @@ import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
-
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
-
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
-
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
@@ -53,7 +49,6 @@ import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
 import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
@@ -81,7 +76,6 @@ public class StudycafeService {
     private final ReviewService reviewService;
     private final RoomService roomService;
     private final SubPhotoService subPhotoService;
-    private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
@@ -108,7 +102,7 @@ public class StudycafeService {
             throw new BadRequestException(ErrorCode.START_TIME_AFTER_THAN_END_TIME);
         }
 
-        return studycafeDslRepository.searchAll(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
+        return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
     }
 
     public FindStudycafeResponse findByDate(Long id, FindStudycafeRequest findStudycafeRequest){
@@ -164,7 +158,7 @@ public class StudycafeService {
     }
 
     public List<EventCafeResponse> getEventStudycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedAtDesc();
+        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
         List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
         for (Studycafe studycafe : topTenCafeList) {
@@ -341,7 +335,7 @@ public class StudycafeService {
     @Secured(value = MemberRole.ROLES.ADMIN)
     public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(String accessToken, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
-        return studycafeRepository.findByMemberOrderByCreatedAtAsc(member, pageable).getContent()
+        return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
     }
 
