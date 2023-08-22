@@ -246,8 +246,8 @@ public class StudycafeDslRepository {
             case RESERVATION_DESC -> orderSpecifiers.add(reservationRecord.count().desc());
             case GRADE_DESC -> orderSpecifiers.add(grade.total.avg().desc());
             case CREATED_DESC -> orderSpecifiers.add(studycafe.createdDate.desc());
-            case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
-            case REVIEW_DESC -> orderSpecifiers.add(review.count().desc());
+//            case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
+//            case REVIEW_DESC -> orderSpecifiers.add(review.count().desc());
         }
 
         orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));

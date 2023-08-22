@@ -77,7 +77,7 @@ public class ReservationRecordService {
                         .endTime(reservation.getEndTime())
                         .headCount(reservation.getHeadCount())
                         .userName(user.getName())
-                        .phoneNumber(user.getPhoneNumber())
+                        .userPhoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(room)
                         .orderId(orderId)
@@ -154,6 +154,11 @@ public class ReservationRecordService {
 
     public List<ReservationRecord> findAllByStudycafeId(Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
+    }
+
+    public ReservationRecord findByReviewId(Long reviewId) {
+        return reservationRecordRepository.findByReviewId(reviewId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
         
     public ReservationCancelResponse cancelInfo(Long reservationId) {

@@ -69,7 +69,7 @@ public class StudycafeRepositoryTest {
     @DisplayName("최근 등록 순으로 10개를 제대로 가져오는지 확인")
     void findTop10ByOrderByCreatedAtDesc(){
         // when
-        List<Studycafe> top10ByOrderByCreatedDate = studycafeRepository.findTop10ByOrderByCreatedAtDesc();
+        List<Studycafe> top10ByOrderByCreatedDate = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
         //then
         Assertions.assertThat(top10ByOrderByCreatedDate).contains(cafe1, cafe2, cafe5, cafe10, cafe6, cafe4, cafe9, cafe3, cafe7, cafe8);
     }

@@ -73,7 +73,8 @@ public class ReservationRecord {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    @OneToOne(mappedBy = "reservationRecord")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id", nullable = true)
     private Review review;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -90,8 +91,9 @@ public class ReservationRecord {
     }
 
     public void addReview(Review review) {
-        this.review = review;
-        review.setReservationRecord(this);
+        if (review != null) {
+            this.review = review;
+        }
     }
 
     public void setRoom(Room room) {
