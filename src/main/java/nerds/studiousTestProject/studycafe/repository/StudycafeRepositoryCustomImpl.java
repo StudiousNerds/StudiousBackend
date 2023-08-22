@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.repository;
 
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -35,10 +34,11 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 @RequiredArgsConstructor
-public class StudycafeDslRepository {
+public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public Page<Studycafe> searchAll(SearchRequest searchRequest, Pageable pageable) {
+    @Override
+    public Page<Studycafe> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -53,10 +53,12 @@ public class StudycafeDslRepository {
                         hashtagContains(searchRequest.getHashtags()),
                         convenienceContains(searchRequest.getConveniences())
                 )
-                .groupBy(studycafe.id);
+                .groupBy(studycafe.id)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
 
         // 조회 결과가 없으면(조회 결과 개수가 0인 경우) 굳이 쿼리를 날리지 않고 빈 Page 리턴
-        if (count.fetchOne() == null) {
+        if (count.fetchFirst() == null) {
             return Page.empty();
         }
 
@@ -83,10 +85,10 @@ public class StudycafeDslRepository {
     }
 
     private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
             query = query.leftJoin(studycafe.rooms, room);
 
-            if (searchRequest.getDate() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
+            if (searchRequest.getDate() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
                 query = query
                         .leftJoin(room.reservationRecords, reservationRecord);
 
@@ -95,11 +97,11 @@ public class StudycafeDslRepository {
                             .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())));
                 }
 
-                if (searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null) {
+                if (searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.RESERVATION_DESC)) {
                     query = query
                             .leftJoin(reservationRecord.review, review);
 
-                    if (searchRequest.getMinGrade() != null) {
+                    if (searchRequest.getMinGrade() != null || searchRequest.getSortType().equals(SortType.GRADE_DESC)) {
                         query = query
                                 .leftJoin(review.grade, grade);
                     }
@@ -239,12 +241,14 @@ public class StudycafeDslRepository {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
         switch (sortType != null ? sortType : SortType.GRADE_DESC) {
-            case RESERVATION_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.accumReserveCount));
-            case GRADE_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.DESC, studycafe.totalGrade));
-            case CREATED_DESC -> orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));
+            case RESERVATION_DESC -> orderSpecifiers.add(reservationRecord.count().desc());
+            case GRADE_DESC -> orderSpecifiers.add(grade.total.avg().desc());
+            case CREATED_DESC -> orderSpecifiers.add(studycafe.createdDate.desc());
+            case REVIEW_DESC -> orderSpecifiers.add(review.count().desc());
+            case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
         }
 
-        orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));
+        orderSpecifiers.add(studycafe.createdDate.asc());
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
 }
