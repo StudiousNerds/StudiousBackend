@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
@@ -50,6 +52,8 @@ public class ReservationRecordService {
     private final RoomRepository roomRepository;
     private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
+    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
+
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
@@ -80,6 +84,27 @@ public class ReservationRecordService {
                         .member(member)
                         .build()
         );
+    }
+
+    public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        LocalTime openTime = studycafe.getOperationInfos().get(0).getStartTime();
+        LocalTime endTime = studycafe.getOperationInfos().get(1).getEndTime();
+
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
+        Integer minUsingTime = room.getMinUsingTime() / 60;
+
+        for (int i = openTime.getHour(); i <= endTime.getHour(); i += minUsingTime) {
+            reservationTimes.put(i, true);
+        }
+
+        List<Object[]> allReservedTime = reservationRecordRepository.findAllReservedTime(date, roomId);
+        for (Object[] localTimes : allReservedTime) {
+            for (int i = ((LocalTime) localTimes[0]).getHour(); i < ((LocalTime) localTimes[1]).getHour(); i++) {
+                reservationTimes.put(i, false);
+            }
+        }
+        return reservationTimes;
     }
 
     public ReservationRecord findByOrderId(String orderId) {

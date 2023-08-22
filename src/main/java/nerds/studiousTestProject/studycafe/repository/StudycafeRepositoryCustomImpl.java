@@ -85,7 +85,9 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null || searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
+        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null ||
+                searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null ||
+                searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
             query = query.leftJoin(studycafe.rooms, room);
 
             if (searchRequest.getDate() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
@@ -97,7 +99,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                             .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())));
                 }
 
-                if (searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.RESERVATION_DESC)) {
+                if (searchRequest.getMinGrade() != null || (!searchRequest.getSortType().equals(SortType.CREATED_DESC) && !searchRequest.getSortType().equals(SortType.RESERVATION_DESC)) || searchRequest.getHashtags() != null) {
                     query = query
                             .leftJoin(reservationRecord.review, review);
 

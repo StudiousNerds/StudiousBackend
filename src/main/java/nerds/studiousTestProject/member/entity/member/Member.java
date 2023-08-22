@@ -127,12 +127,8 @@ public class Member implements UserDetails {
         }
     }
 
-    public void registerBookmark(String studycafeName){
-//        bookmarks.add(studycafeName);
-    }
-
-    public void deleteBookmark(String studycafeName){
-        bookmarks.remove(studycafeName);
+    public void deleteBookmark(Bookmark bookmark){
+        bookmarks.remove(bookmark);
     }
 
     public void withdraw() {

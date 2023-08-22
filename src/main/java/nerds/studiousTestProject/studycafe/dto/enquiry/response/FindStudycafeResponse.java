@@ -3,8 +3,9 @@ package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
-import nerds.studiousTestProject.review.dto.response.FindReviewResponse;
+import nerds.studiousTestProject.review.dto.find.response.FindReviewResponse;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInResponse;
 
 import java.util.List;
 
@@ -20,14 +21,6 @@ public class FindStudycafeResponse {
     private String[] hashtags;
     private String introduction;
     private String[] conveniences;
-    private String notification;
-    private List<RefundPolicyInResponse> refundPolicy;
-    private String[] notice;
+    private List<AnnouncementInResponse> announcement;
     private List<FindRoomResponse> rooms;
-    private Integer recommendationRate;
-    private Integer cleanliness;
-    private Integer deafening;
-    private Integer fixturesStatus;
-    private Double total;
-    private List<FindReviewResponse> reviewInfo;
 }

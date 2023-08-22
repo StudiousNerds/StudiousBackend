@@ -1,0 +1,25 @@
+-- (id, is_free (0:false), price, type, roomId, studycafeId, name)
+INSERT IGNORE INTO `convenience` VALUES (1, 1, 0, 'ROOM', 1, null, 'HDMI');
+INSERT IGNORE INTO `convenience` VALUES (2, 0, 1000, 'ROOM', 1, null, 'MONITOR');
+INSERT IGNORE INTO `convenience` VALUES (3, 1, 0, 'ROOM', 1, null, 'PEN');
+INSERT IGNORE INTO `convenience` VALUES (4, 1, 0, 'ROOM', 1, null, 'BOARD');
+INSERT IGNORE INTO `convenience` VALUES (5, 1, 0, 'ROOM', 1, null, 'TABLET_PC');
+INSERT IGNORE INTO `convenience` VALUES (6, 0, 2000, 'ROOM', 1, null, 'BEAM');
+INSERT IGNORE INTO `convenience` VALUES (7, 0, 500, 'ROOM', 1, null, 'POINTER');
+INSERT IGNORE INTO `convenience` VALUES (8, 0, 1000, 'ROOM', 1, null, 'NOTEBOOK');
+INSERT IGNORE INTO `convenience` VALUES (9, 1, 0, 'ROOM', 1, null, 'AIR_CONDITIONER');
+INSERT IGNORE INTO `convenience` VALUES (10, 0, 1000, 'ROOM', 2, null, 'MONITOR');
+INSERT IGNORE INTO `convenience` VALUES (11, 1, 0, 'ROOM', 2, null, 'PEN');
+INSERT IGNORE INTO `convenience` VALUES (12, 1, 0, 'ROOM', 2, null, 'BOARD');
+INSERT IGNORE INTO `convenience` VALUES (13, 0, 2000, 'ROOM', 2, null, 'BEAM');
+INSERT IGNORE INTO `convenience` VALUES (14, 0, 500, 'ROOM', 2, null, 'POINTER');
+INSERT IGNORE INTO `convenience` VALUES (15, 0, 1000, 'ROOM', 2, null, 'NOTEBOOK');
+INSERT IGNORE INTO `convenience` VALUES (16, 1, 0, 'STUDYCAFE', null, 1, 'PARKING');
+INSERT IGNORE INTO `convenience` VALUES (17, 1, 0, 'STUDYCAFE', null, 1, 'PRINT');
+INSERT IGNORE INTO `convenience` VALUES (18, 1, 0, 'STUDYCAFE', null, 1, 'ELEVATOR');
+INSERT IGNORE INTO `convenience` VALUES (19, 1, 0, 'STUDYCAFE', null, 1, 'PURIFIER');
+INSERT IGNORE INTO `convenience` VALUES (20, 1, 0, 'STUDYCAFE', null, 1, 'BLANKET');
+INSERT IGNORE INTO `convenience` VALUES (21, 1, 0, 'STUDYCAFE', null, 1, 'BEVERAGE');
+INSERT IGNORE INTO `convenience` VALUES (22, 1, 0, 'STUDYCAFE', null, 1, 'WIFI');
+INSERT IGNORE INTO `convenience` VALUES (23, 1, 0, 'STUDYCAFE', null, 1, 'NO_KIDS_ZONE');
+INSERT IGNORE INTO `convenience` VALUES (24, 1, 0, 'STUDYCAFE', null, 1, 'READING_DESK');

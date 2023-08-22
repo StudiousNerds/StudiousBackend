@@ -4,6 +4,7 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord.ReservationRecordBuilder;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
+import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,8 +36,8 @@ public enum ReservationRecordFixture {
 
     public ReservationRecordBuilder 기본_정보_빌더_생성(Long id){
         return ReservationRecord.builder()
-                .name(this.reserveUserName)
-                .phoneNumber(this.phoneNumber)
+                .userName(this.reserveUserName)
+                .userPhoneNumber(this.phoneNumber)
                 .status(this.reservationStatus)
                 .headCount(this.headCount);
     }
@@ -45,7 +46,7 @@ public enum ReservationRecordFixture {
         return 예약_내역_생성(null, reserveDate, startTime, endTime, member, room);
     }
 
-    public ReservationRecord 예약_내역_생성(Long id, LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member,  Room room){
+    public ReservationRecord 예약_내역_생성(Long id, LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room){
         return 기본_정보_빌더_생성(id)
                 .date(reserveDate)
                 .startTime(startTime)
@@ -53,6 +54,22 @@ public enum ReservationRecordFixture {
                 .duration(endTime.getHour() - startTime.getHour())
                 .member(member)
                 .room(room)
+                .build();
+    }
+
+    public ReservationRecord 예약_내역_생성(LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room, Review review){
+        return 예약_내역_생성(null, reserveDate, startTime, endTime, member, room, review);
+    }
+
+    public ReservationRecord 예약_내역_생성(Long id, LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room, Review review){
+        return 기본_정보_빌더_생성(id)
+                .date(reserveDate)
+                .startTime(startTime)
+                .endTime(endTime)
+                .duration(endTime.getHour() - startTime.getHour())
+                .member(member)
+                .room(room)
+                .review(review)
                 .build();
     }
 
