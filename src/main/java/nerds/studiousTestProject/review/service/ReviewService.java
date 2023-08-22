@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -338,7 +339,7 @@ public class ReviewService {
 //            reviewList.add(reviews.get(i));
 //        }
 //        return reviewList;
-        return null;
+        return Collections.emptyList();
     }
 
     private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
@@ -370,7 +371,7 @@ public class ReviewService {
 //        }
 //
 //        return reviewList;
-        return null;
+        return Collections.emptyList();
     }
 
     private PageRequest getPageable(Pageable pageable) {
