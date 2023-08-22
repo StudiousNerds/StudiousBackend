@@ -243,7 +243,7 @@ public class StudycafeService {
     }
 
     public String[] getHashtagRecords(Long studycafeId) {
-        return (String[]) hashtagRecordService.findStudycafeHashtag(studycafeId).toArray();
+        return hashtagRecordService.findStudycafeHashtag(studycafeId).stream().map(Enum::name).toArray(String[]::new);
     }
 
     public Integer getAccumResCnt(Long studycafeId) {
