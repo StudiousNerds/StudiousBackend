@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `convenience` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `is_free`       TINYINT(1)   NOT NULL,
     `price`         int          NOT NULL,
-    `usage`         varchar(255) NOT NULL,
+    `type`          varchar(255) NOT NULL,
     `room_id`       bigint,
     `studycafe_id`  bigint,
     `name`          varchar(255) NOT NULL,
@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS `payment` (
     `order_id`       varchar(255) NOT NULL,
     `payment_key`    varchar(255) NOT NULL,
     `payment_status` varchar(255) NOT NULL,
+    `canceler`       varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -122,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `refund_policy` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
     `rate`         int          NOT NULL,
     `remaining`    varchar(255) NOT NULL,
-    `usage`        varchar(255) NOT NULL,
+    `type`         varchar(255) NOT NULL,
     `studycafe_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -145,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
     `member_id`         bigint       NOT NULL,
     `payment_id`        bigint,
     `room_id`           bigint       NOT NULL,
+    `review_id`         bigint,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -166,7 +168,6 @@ CREATE TABLE IF NOT EXISTS `review` (
     `created_date`          date         NOT NULL,
     `comment`               varchar(255), -- 사장님 댓글
     `detail`                varchar(255) NOT NULL,
-    `reservation_record_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -233,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `accum_hashtag_history` (
 CREATE TABLE IF NOT EXISTS `sub_photo` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
     `path`         varchar(255) NOT NULL,
-    `usage`        varchar(255) NOT NULL,
+    `type`         varchar(255) NOT NULL,
     `studycafe_id` bigint,
     `review_id`    bigint,
     `room_id`      bigint,
