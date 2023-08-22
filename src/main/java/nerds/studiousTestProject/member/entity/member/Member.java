@@ -51,7 +51,7 @@ public class Member implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private MemberType type;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = true)
     private String name;
 
     @Column(name = "nickname", nullable = false)
@@ -60,7 +60,7 @@ public class Member implements UserDetails {
     @Column(name = "birthday", nullable = true)
     private LocalDate birthday;
 
-    @Column(name = "phone_number", nullable = true)
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column(name = "created_date", unique = true)
