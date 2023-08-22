@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,14 +58,14 @@ public class Member implements UserDetails {
     private String nickname;
 
     @Column(name = "birthday", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column(name = "created_date", unique = true)
     @CreatedDate
-    private Date createdDate;
+    private LocalDate createdDate;
 
     @Column(name = "photo", nullable = true)
     private String photo; // 사용자 프로필 사진
@@ -81,7 +80,7 @@ public class Member implements UserDetails {
     private LocalDate resignedDate;
 
     @Builder
-    public Member(Long id, Long providerId, String email, String password, MemberType type, String name, String nickname, Date birthday, String phoneNumber, Date createdDate, String photo, Boolean usable, LocalDate resignedDate) {
+    public Member(Long id, Long providerId, String email, String password, MemberType type, String name, String nickname, LocalDate birthday, String phoneNumber, LocalDate createdDate, String photo, Boolean usable, LocalDate resignedDate) {
         this.id = id;
         this.providerId = providerId;
         this.email = email;
