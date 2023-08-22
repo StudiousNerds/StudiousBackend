@@ -74,23 +74,6 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    @DisplayName("예약 내역 id로 리뷰를 찾는데 생성일자를 내림차순으로 정렬했을 때 상위 3개를 가져오는지 테스트")
-    void findTop3ByReservationRecordId() {
-        // given
-        Review firstReview = reviewRepository.save(FIRST_REVIEW.생성(1L));
-        Review secondReview = reviewRepository.save(SECOND_REVIEW.생성(2L));
-        Review thirdReview = reviewRepository.save(THIRD_REVIEW.생성(3L));
-        reservationRecordRepository.save(CONFIRM_RESERVATION.생성(1L)).addReview(firstReview);
-        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.생성(2L)).addReview(secondReview);
-        reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
-        // when
-        List<Review> reviewList = reviewRepository.findTop3ByReservationRecordId(Arrays.asList(
-                firstReview.getId(), secondReview.getId(), thirdReview.getId()));
-        // then
-        Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
-    }
-
-    @Test
     @DisplayName("리뷰 삭제 시, 해시태그와 등급이 같이 삭제되는지 테스트")
     void deleteById() {
         // given
