@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.reservation.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -89,6 +88,12 @@ public class ReservationRecord {
 
     public void canceled() {
         this.status = ReservationStatus.CANCELED;
+    }
+
+    public void addReview(Review review) {
+        if (review != null) {
+            this.review = review;
+        }
     }
 
     public void setRoom(Room room) {

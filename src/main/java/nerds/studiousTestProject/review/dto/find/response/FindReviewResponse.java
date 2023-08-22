@@ -8,12 +8,12 @@ import java.time.LocalDate;
 @Builder
 @Data
 public class FindReviewResponse {
-    private Integer totalPage;
-    private Integer currentPage;
     private Double grade;
     private String nickname;
+    private String roomName;
+    private Integer minHeadCount;
+    private Integer maxHeadCount;
     private String detail;
     private LocalDate date;
-    private String roomName;
     private String[] photos;
 }

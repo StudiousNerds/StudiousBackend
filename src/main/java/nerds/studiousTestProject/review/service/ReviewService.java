@@ -29,6 +29,7 @@ import nerds.studiousTestProject.review.dto.written.response.WrittenReviewRespon
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
+import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +79,7 @@ public class ReviewService {
         review.addGrade(grade);
 
         ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
-//        reservationRecord.addReview(review);
+        reservationRecord.addReview(review);
 
         List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
         for (String userHashtag : hashtags) {
@@ -317,29 +317,39 @@ public class ReviewService {
         return reviewList.stream()
                 .map(review -> FindReviewResponse.builder()
                         .grade(review.getGrade().getTotal())
-//                        .nickname(review.getReservationRecord().getMember().getNickname())
+                        .nickname(getMember(review).getNickname())
+                        .roomName(getRoom(review).getName())
+                        .minHeadCount(getRoom(review).getMinHeadCount())
+                        .maxHeadCount(getRoom(review).getMaxHeadCount())
                         .detail(review.getDetail())
                         .date(review.getCreatedDate())
-//                        .roomName(review.getReservationRecord().getRoom().getName())
                         .photos(subPhotoService.findReviewPhotos(review.getId()))
                         .build())
                 .collect(Collectors.toList());
     }
 
+    private Member getMember(Review review) {
+        return reservationRecordService.findByReviewId(review.getId()).getMember();
+    }
+
+    private Room getRoom(Review review) {
+        return reservationRecordService.findByReviewId(review.getId()).getRoom();
+    }
+
     private List<Review> getAllReviews(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Long> reservationIds = new ArrayList<>();
+        List<Long> reviewIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
-            reservationIds.add(reservationRecord.getId());
+            reviewIds.add(reservationRecord.getReview().getId());
         }
-//        List<Review> reviews = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(reservationIds);
-//
-//        for (int i = 0; i < reviews.size(); i++) {
-//            reviewList.add(reviews.get(i));
-//        }
-//        return reviewList;
-        return Collections.emptyList();
+
+        List<Review> reviews = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
+
+        for (int i = 0; i < reviews.size(); i++) {
+            reviewList.add(reviews.get(i));
+        }
+        return reviewList;
     }
 
     private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
@@ -357,21 +367,20 @@ public class ReviewService {
     }
 
     private List<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
-        List<Long> reservationIds = new ArrayList<>();
+        List<Long> reviewIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
 
         for (ReservationRecord reservationRecord : recordList) {
-            reservationIds.add(reservationRecord.getId());
+            reviewIds.add(reservationRecord.getReview().getId());
         }
 
-//        Page<Review> reviews = reviewRepository.findAllByReservationRecordIdIn(reservationIds, pageable);
-//
-//        if(reviews != null && reviews.hasContent()) {
-//            reviewList = reviews.getContent();
-//        }
-//
-//        return reviewList;
-        return Collections.emptyList();
+        Page<Review> reviews = reviewRepository.findAllByIdIn(reviewIds, pageable);
+
+        if(reviews != null && reviews.hasContent()) {
+            reviewList = reviews.getContent();
+        }
+
+        return reviewList;
     }
 
     private PageRequest getPageable(Pageable pageable) {
