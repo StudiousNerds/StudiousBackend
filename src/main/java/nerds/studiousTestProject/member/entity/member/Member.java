@@ -73,10 +73,10 @@ public class Member implements UserDetails {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(name = "usable", nullable = false)
     private Boolean usable;
 
-    @Column(nullable = true)
+    @Column(name = "resigned_date", nullable = true)
     private LocalDate resignedDate;
 
     @Builder
