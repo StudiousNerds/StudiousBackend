@@ -38,7 +38,7 @@ public class MemberController {
         return memberService.issueToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
-    @GetMapping("/email")
+    @PostMapping("/email")
     public FindEmailResponse findEmail(@RequestBody FindEmailRequest findEmailRequest) {
         return memberService.findEmailFromPhoneNumber(findEmailRequest);
     }

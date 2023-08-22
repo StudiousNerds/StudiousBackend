@@ -27,14 +27,14 @@ import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.NotificationInfoRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.NotificationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
@@ -481,31 +481,31 @@ public class StudycafeService {
      * @return 스터디카페의 모든 공지사항
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<NotificationInfoResponse> inquireNotificationInfos(String accessToken, Long studycafeId) {
+    public List<AnnouncementResponse> inquireAnnouncements(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        return studycafe.getAnnouncements().stream().map(NotificationInfoResponse::from).toList();
+        return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
     }
 
     /**
      * 공지사항 추가 로직
      * @param accessToken 사용자 엑세스 토큰
      * @param studycafeId 스터디카페 PK
-     * @param notificationInfoRequest 공지사항 요청 값
+     * @param announcementRequest 공지사항 요청 값
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void insertNotificationInfos(String accessToken, Long studycafeId, NotificationInfoRequest notificationInfoRequest) {
+    public void insertAnnouncements(String accessToken, Long studycafeId, AnnouncementRequest announcementRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
-        if (notificationInfoRequest.getStartDate().isAfter(notificationInfoRequest.getEndDate())) {
+        if (announcementRequest.getStartDate().isAfter(announcementRequest.getEndDate())) {
             throw new BadRequestException(START_DATE_AFTER_THAN_END_DATE);
         }
 
-        studycafe.addNotificationInfo(notificationInfoRequest.toEntity());
+        studycafe.addAnnouncement(announcementRequest.toEntity());
     }
 
     /**

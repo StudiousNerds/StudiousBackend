@@ -18,23 +18,23 @@ import java.util.List;
 @RepositoryTest
 class HashtagRepositoryTest {
     @Autowired
-    private HashtagRecordRepository hashtagRecordRepository;
+    private HashtagRepository hashtagRepository;
     @Autowired
     private ReviewRepository reviewRepository;
 
     @Test
     void deleteAllByReviewId() {
         // given
-        HashtagRecord hashtag = hashtagRecordRepository.save(HashtagFixture.FIRST_HASHTAG.생성(1L));
+        HashtagRecord hashtag = hashtagRepository.save(HashtagFixture.FIRST_HASHTAG.생성(1L));
         Review save = reviewRepository.save(ReviewFixture.FIRST_REVIEW.생성(1L));
         save.addHashtagRecord(hashtag);
         List<Long> reviewId = new ArrayList<>();
         reviewId.add(1L);
         // when
         save.getHashtagRecords().removeAll(save.getHashtagRecords());
-        hashtagRecordRepository.deleteAllByReviewId(1L);
+        hashtagRepository.deleteAllByReviewId(1L);
         Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVEIW));
-        List<HashtagRecord> hashtagList = hashtagRecordRepository.findAll();
+        List<HashtagRecord> hashtagList = hashtagRepository.findAll();
         // then
         Assertions.assertThat(hashtagList.size()).isEqualTo(0);
         Assertions.assertThat(review.getHashtagRecords()).isEmpty();

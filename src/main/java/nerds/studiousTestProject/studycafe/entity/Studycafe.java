@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +34,7 @@ public class Studycafe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -124,7 +125,7 @@ public class Studycafe {
         subPhoto.setStudycafe(this);
     }
 
-    public void addNotificationInfo(Announcement announcement) {
+    public void addAnnouncement(Announcement announcement) {
         announcements.add(announcement);
         announcement.setStudycafe(this);
     }
