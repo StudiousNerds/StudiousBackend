@@ -45,7 +45,7 @@ class ReviewRepositoryTest {
         reservationRecordRepository.save(IN_PROGRESS_RESERVATION.생성(2L)).addReview(secondReview);
         reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
         // when
-        List<Review> reviewList = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(
+        List<Review> reviewList = reviewRepository.findAllByIdInOrderByCreatedDateDesc(
                 Arrays.asList(firstReview.getId(), secondReview.getId(), thirdReview.getId()));
         // then
         Assertions.assertThat(reviewList).containsExactly(firstReview, secondReview, thirdReview);
@@ -66,7 +66,7 @@ class ReviewRepositoryTest {
         reservationRecordRepository.save(CANCELED_RESERVATION.생성(3L)).addReview(thirdReview);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("grade.total").descending());
         // when
-        Page<Review> reviewPage = reviewRepository.findAllByReservationRecordIdIn(Arrays.asList(
+        Page<Review> reviewPage = reviewRepository.findAllByIdIn(Arrays.asList(
                 firstReview.getId(), secondReview.getId(), thirdReview.getId()), pageable);
         List<Review> reviewList = reviewPage.getContent();
         // then

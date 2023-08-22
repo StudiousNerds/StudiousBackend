@@ -338,12 +338,13 @@ public class ReviewService {
 
     private List<Review> getAllReviews(Long studycafeId) {
         List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Long> reservationIds = new ArrayList<>();
+        List<Long> reviewIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
-            reservationIds.add(reservationRecord.getId());
+            reviewIds.add(reservationRecord.getReview().getId());
         }
-        List<Review> reviews = reviewRepository.findAllByReservationRecordIdInOrderByCreatedDateDesc(reservationIds);
+
+        List<Review> reviews = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
 
         for (int i = 0; i < reviews.size(); i++) {
             reviewList.add(reviews.get(i));
@@ -366,14 +367,14 @@ public class ReviewService {
     }
 
     private List<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
-        List<Long> reservationIds = new ArrayList<>();
+        List<Long> reviewIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
 
         for (ReservationRecord reservationRecord : recordList) {
-            reservationIds.add(reservationRecord.getId());
+            reviewIds.add(reservationRecord.getReview().getId());
         }
 
-        Page<Review> reviews = reviewRepository.findAllByReservationRecordIdIn(reservationIds, pageable);
+        Page<Review> reviews = reviewRepository.findAllByIdIn(reviewIds, pageable);
 
         if(reviews != null && reviews.hasContent()) {
             reviewList = reviews.getContent();
