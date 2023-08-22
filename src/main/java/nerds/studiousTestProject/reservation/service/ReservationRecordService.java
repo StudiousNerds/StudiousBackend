@@ -155,6 +155,11 @@ public class ReservationRecordService {
     public List<ReservationRecord> findAllByStudycafeId(Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
+
+    public ReservationRecord findByReviewId(Long reviewId) {
+        return reservationRecordRepository.findByReviewId(reviewId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
         
     public ReservationCancelResponse cancelInfo(Long reservationId) {
         ReservationRecord reservationRecord = findById(reservationId);
