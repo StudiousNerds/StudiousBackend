@@ -10,15 +10,15 @@ public enum PhotoFixture {
     FIRST_PHOTO("www.spring.com"),
     SECOND_PHOTO("www.jpa.com");
 
-    private final String url;
+    private final String path;
 
-    PhotoFixture(String url) {
-        this.url = url;
+    PhotoFixture(String path) {
+        this.path = path;
     }
 
     public SubPhotoBuilder 기본_정보_생성() {
         return SubPhoto.builder()
-                .url(this.url);
+                .path(this.path);
     }
 
     public SubPhoto 생성(Long id) {
