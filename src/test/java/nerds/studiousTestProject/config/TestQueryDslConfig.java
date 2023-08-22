@@ -1,9 +1,9 @@
-package nerds.studiousTestProject.studycafe.config;
+package nerds.studiousTestProject.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
+import nerds.studiousTestProject.support.EntitySaveProvider;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -17,12 +17,8 @@ public class TestQueryDslConfig {
         return new JPAQueryFactory(entityManager);
     }
 
-    /**
-     * 테스트할 Repo 의존관계 주입
-     * @return StudycafeDslRepository
-     */
     @Bean
-    public StudycafeDslRepository studycafeDslRepository() {
-        return new StudycafeDslRepository(jpaQueryFactory());
+    public EntitySaveProvider entitySaveProvider() {
+        return new EntitySaveProvider();
     }
 }
