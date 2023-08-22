@@ -47,6 +47,7 @@ import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInR
 import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
@@ -98,6 +99,9 @@ public class StudycafeService {
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
 
         // 이 부분도 추가 Validator 도입 예정
+        if (searchRequest.getSortType() == null) {
+            searchRequest.setSortType(SortType.GRADE_DESC);
+        }
 
         // 날짜 선택이 안되었는데 시간을 선택한 경우
         if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
