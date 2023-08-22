@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,6 +26,6 @@ public class HashtagRecordService {
 //            hashtagNameList.add(hashtagNames.get(i));
 //        }
 //        return hashtagNameList;
-        return null;
+        return Collections.emptyList();
     }
 }
