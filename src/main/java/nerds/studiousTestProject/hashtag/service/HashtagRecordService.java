@@ -20,12 +20,11 @@ public class HashtagRecordService {
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
     public List<HashtagName> findStudycafeHashtag(Long studycafeId) {
-//        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
-//        List<HashtagName> hashtagNameList = new ArrayList<>();
-//        for (int i = 0; i < TOTAL_HASHTAGS_COUNT; i++) {
-//            hashtagNameList.add(hashtagNames.get(i));
-//        }
-//        return hashtagNameList;
-        return Collections.emptyList();
+        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+        List<HashtagName> hashtagNameList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_HASHTAGS_COUNT; i++) {
+            hashtagNameList.add(hashtagNames.get(i));
+        }
+        return hashtagNameList;
     }
 }
