@@ -35,7 +35,7 @@ public enum ReservationRecordFixture {
 
     public ReservationRecordBuilder 기본_정보_빌더_생성(Long id){
         return ReservationRecord.builder()
-                .userName(this.reserveUserName)
+                .name(this.reserveUserName)
                 .phoneNumber(this.phoneNumber)
                 .status(this.reservationStatus)
                 .headCount(this.headCount);

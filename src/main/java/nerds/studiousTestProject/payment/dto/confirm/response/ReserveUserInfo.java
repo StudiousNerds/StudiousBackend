@@ -21,7 +21,7 @@ public class ReserveUserInfo {
     public static ReserveUserInfo of(ReservationRecord reservationRecord) {
         return ReserveUserInfo.builder()
                 .name(reservationRecord.getUserName())
-                .phoneNumber(reservationRecord.getPhoneNumber())
+                .phoneNumber(reservationRecord.getUserPhoneNumber())
                 .request(reservationRecord.getRequest())
                 .build();
     }

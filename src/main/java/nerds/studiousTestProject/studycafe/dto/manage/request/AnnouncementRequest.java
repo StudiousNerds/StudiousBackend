@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-public class NotificationInfoRequest {
+public class AnnouncementRequest {
     @NotNull(message = "공지사항은 필수입니다.")
     @Length(min = 10, max = 100, message = "공지사항은 10 ~ 100자 사이여야 합니다.")
     private String detail;
