@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVEIW;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class SubPhotoService {
 
     public String[] findReviewPhotos(Long reviewId){
         List<SubPhoto> photoList = subPhotoRepository.findAllByReviewId(reviewId);
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
         Integer arrSize = photoList.size();
         String reviewPhotos[] = new String[arrSize];
         reviewPhotos[0] = review.getPhoto();
