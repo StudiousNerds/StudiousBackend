@@ -26,10 +26,10 @@ public class RefundPolicy {
     private Long id;
 
     @Column(name = "remaining", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Remaining remaining;
 
-    @Column(name = "rate",nullable = false)
+    @Column(name = "rate", nullable = false)
     private Integer rate;
 
     @Column(name = "type", nullable = false)
