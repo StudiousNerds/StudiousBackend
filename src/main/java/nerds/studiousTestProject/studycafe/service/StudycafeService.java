@@ -97,21 +97,9 @@ public class StudycafeService {
      * @return 검색 결과
      */
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
-
-        // 이 부분도 추가 Validator 도입 예정
+        // 이 부분 Converter 도입 예정
         if (searchRequest.getSortType() == null) {
             searchRequest.setSortType(SortType.GRADE_DESC);
-        }
-
-        // 날짜 선택이 안되었는데 시간을 선택한 경우
-        if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
-            throw new BadRequestException(NOT_FOUND_DATE);
-        }
-
-        // 시작 시간이 끝 시간보다 이후인 경우
-        if (searchRequest.getStartTime() != null && searchRequest.getEndTime() != null &&
-                !searchRequest.getStartTime().isBefore(searchRequest.getEndTime())) {
-            throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
         }
 
         return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
@@ -272,9 +260,6 @@ public class StudycafeService {
         // 현재 로그인된 유저 정보를 가져온다.
         Member member = tokenService.getMemberFromAccessToken(accessToken);
 
-        // 룸 정보 추가 검증
-        validateRoomInfo(registerRequest);
-
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
         String latitude = cafeInfo.getAddressInfo().getLatitude();
@@ -368,25 +353,6 @@ public class StudycafeService {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
-    }
-
-    /**
-     * 스터디카페 등록 시 룸 정보에 대한 검증을 하는 메소드 (검증 실패 시 예외 발생)
-     * @param registerRequest 스터디카페 등록 시 요청값
-     */
-    private void validateRoomInfo(RegisterRequest registerRequest) {
-        List<RoomInfoRequest> roomInfoRequests = registerRequest.getRoomInfos();
-        for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
-            Integer minHeadCount = roomInfoRequest.getMinHeadCount();
-            Integer maxHeadCount = roomInfoRequest.getMaxHeadCount();
-
-            // 밑의 코드는 추후 Validator 를 도입 예정
-
-            // 최대 인원 수가 최대 인원 수 보다 작은 경우
-            if (maxHeadCount < minHeadCount) {
-                throw new BadRequestException(INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT);
-            }
-        }
     }
 
     /**
