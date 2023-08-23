@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.repository;
 
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -35,10 +34,11 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 @RequiredArgsConstructor
-public class StudycafeDslRepository {
+public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public Page<Studycafe> searchAll(SearchRequest searchRequest, Pageable pageable) {
+    @Override
+    public Page<Studycafe> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -246,11 +246,11 @@ public class StudycafeDslRepository {
             case RESERVATION_DESC -> orderSpecifiers.add(reservationRecord.count().desc());
             case GRADE_DESC -> orderSpecifiers.add(grade.total.avg().desc());
             case CREATED_DESC -> orderSpecifiers.add(studycafe.createdDate.desc());
-//            case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
-//            case REVIEW_DESC -> orderSpecifiers.add(review.count().desc());
+            case REVIEW_DESC -> orderSpecifiers.add(review.count().desc());
+            case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
         }
 
-        orderSpecifiers.add(new OrderSpecifier(Order.ASC, studycafe.createdDate));
+        orderSpecifiers.add(studycafe.createdDate.asc());
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
 }

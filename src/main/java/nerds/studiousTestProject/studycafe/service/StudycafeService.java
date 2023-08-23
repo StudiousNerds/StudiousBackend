@@ -10,7 +10,6 @@ import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
 import nerds.studiousTestProject.photo.service.SubPhotoService;
@@ -48,6 +47,7 @@ import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInR
 import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
+import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
@@ -55,7 +55,6 @@ import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.repository.StudycafeDslRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
 import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
@@ -84,7 +83,6 @@ public class StudycafeService {
     private final ReviewService reviewService;
     private final RoomService roomService;
     private final SubPhotoService subPhotoService;
-    private final StudycafeDslRepository studycafeDslRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
@@ -101,6 +99,9 @@ public class StudycafeService {
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
 
         // 이 부분도 추가 Validator 도입 예정
+        if (searchRequest.getSortType() == null) {
+            searchRequest.setSortType(SortType.GRADE_DESC);
+        }
 
         // 날짜 선택이 안되었는데 시간을 선택한 경우
         if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
@@ -113,7 +114,7 @@ public class StudycafeService {
             throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
         }
 
-        return studycafeDslRepository.searchAll(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
+        return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
     }
 
     public FindStudycafeResponse findByDate(Long studycafeId, FindStudycafeRequest findStudycafeRequest){
@@ -242,7 +243,7 @@ public class StudycafeService {
     }
 
     public String[] getHashtagRecords(Long studycafeId) {
-        return (String[]) hashtagRecordService.findStudycafeHashtag(studycafeId).toArray();
+        return hashtagRecordService.findStudycafeHashtag(studycafeId).stream().map(Enum::name).toArray(String[]::new);
     }
 
     public Integer getAccumResCnt(Long studycafeId) {
@@ -289,7 +290,7 @@ public class StudycafeService {
                 .member(member)
                 .address(cafeInfo.getAddressInfo().of())
                 .photo(cafeMainPhoto)
-                .tel(null)
+                .tel(cafeInfo.getTel())
                 .totalGrade(0.0)
                 .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
