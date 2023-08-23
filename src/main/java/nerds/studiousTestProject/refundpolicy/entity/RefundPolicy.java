@@ -32,15 +32,16 @@ public class RefundPolicy {
     @Column(name = "rate",nullable = false)
     private Integer rate;
 
-    @Column(name = "type",nullable = false)
-    private String type;
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RefundPolicyType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
     @Builder
-    public RefundPolicy(Long id, Remaining remaining, Integer rate, String type, Studycafe studycafe) {
+    public RefundPolicy(Long id, Remaining remaining, Integer rate, RefundPolicyType type, Studycafe studycafe) {
         this.id = id;
         this.remaining = remaining;
         this.rate = rate;
