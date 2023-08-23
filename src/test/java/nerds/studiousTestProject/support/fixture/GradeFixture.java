@@ -43,11 +43,4 @@ public enum GradeFixture {
                 .isRecommended(this.isRecommended)
                 .total(this.total);
     }
-
-    public Grade 리뷰_생성(Review review, Long id) {
-        return 기본_정보_생성()
-                .id(id)
-                .review(review)
-                .build();
-    }
 }
