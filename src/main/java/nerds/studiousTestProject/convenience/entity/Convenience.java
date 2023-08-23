@@ -56,12 +56,14 @@ public class Convenience {
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {
             this.studycafe = studycafe;
+            this.type = ConvenienceType.STUDYCAFE;
         }
     }
 
     public void setRoom(Room room) {
         if (room != null) {
             this.room = room;
+            this.type = ConvenienceType.ROOM;
         }
     }
 }

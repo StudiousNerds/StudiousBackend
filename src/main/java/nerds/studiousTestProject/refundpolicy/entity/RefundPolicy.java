@@ -51,6 +51,7 @@ public class RefundPolicy {
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {
             this.studycafe = studycafe;
+            this.type = RefundPolicyType.STUDYCAFE;
         }
     }
 }
