@@ -3,6 +3,7 @@ package nerds.studiousTestProject.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
@@ -57,6 +58,7 @@ public class ReviewService {
     private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
     private final HashtagRecordRepository hashtagRecordRepository;
+    private final TokenService tokenService;
     public final Double GRADE_COUNT = 3.0;
 
 
@@ -308,7 +310,7 @@ public class ReviewService {
     }
 
     private List<ReservationRecord> getReservationRecords(String accessToken) {
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         List<ReservationRecord> reservationRecordList = reservationRecordService.findAllByMemberId(member.getId());
         return reservationRecordList;
     }
