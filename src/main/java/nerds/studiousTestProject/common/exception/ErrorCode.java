@@ -42,7 +42,7 @@ public enum ErrorCode {
     START_DATE_AFTER_THAN_END_DATE("시작 기간은 끝 기간보다 클 수 없습니다."),
     INVALID_SORT_TYPE("정렬 기준이 잘못되었습니다."),
     NOT_PARSING_BODY("JSON 형식이 잘못되었습니다."),
-    NOT_FOUND_REVEIW("리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW("리뷰를 찾을 수 없습니다."),
     NOT_FOUND_START_TIME("시작 시간을 찾을 수 없습니다."),
     NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다."),
     INVALID_RESERVATION_CANCEL_DATE("이미 지난 예약입니다."),
