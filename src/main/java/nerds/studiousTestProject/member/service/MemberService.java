@@ -290,25 +290,4 @@ public class MemberService {
         String password = signUpRequest.getPassword() == null ? UUID.randomUUID().toString() : signUpRequest.getPassword();
         return passwordEncoder.encode(password);
     }
-
-    public Member getMemberFromAccessToken(String accessToken) {
-        String resolvedAccessToken = jwtTokenProvider.resolveToken(accessToken);
-        Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
-
-        Member member =  memberRepository.findById(memberId).
-                orElseThrow(() -> new NotFoundException(ErrorCode.MISMATCH_USERNAME_TOKEN));
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            log.info("auth = {}", authentication);
-            throw new NotFoundException(ErrorCode.NOT_AUTHORIZE_ACCESS);
-        }
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        if (!userDetails.getUsername().equals(member.getUsername())) {
-            throw new NotFoundException(ErrorCode.NOT_AUTHORIZE_ACCESS);
-        }
-
-        return member;
-    }
 }
