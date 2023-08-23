@@ -290,7 +290,7 @@ public class StudycafeService {
                 .member(member)
                 .address(cafeInfo.getAddressInfo().of())
                 .photo(cafeMainPhoto)
-                .tel(null)
+                .tel(cafeInfo.getTel())
                 .totalGrade(0.0)
                 .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
