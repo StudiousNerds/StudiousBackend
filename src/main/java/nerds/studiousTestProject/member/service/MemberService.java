@@ -24,9 +24,6 @@ import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -186,7 +183,7 @@ public class MemberService {
         String oldPassword = patchPasswordRequest.getOldPassword();
         String newPassword = patchPasswordRequest.getNewPassword();
 
-        Member member = getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
@@ -198,15 +195,21 @@ public class MemberService {
 
     @Transactional
     public void replaceNickname(String accessToken, PatchNicknameRequest patchNicknameRequest) {
-        Member member = getMemberFromAccessToken(accessToken);
-        member.updateNickname(patchNicknameRequest.getNewNickname());
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        String newNickname = patchNicknameRequest.getNewNickname();
+
+        if (memberRepository.existsByPhoneNumber(newNickname)) {
+            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
+        }
+
+        member.updateNickname(newNickname);
     }
 
     @Transactional
     public void deactivate(String accessToken, WithdrawRequest withdrawRequest) {
         String password = withdrawRequest.getPassword();
 
-        Member member = getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
@@ -225,7 +228,7 @@ public class MemberService {
      */
     @Transactional
     public JwtTokenResponse reissueToken(String accessToken, String refreshToken) {
-        Member member = getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         RefreshToken redisRefreshToken = refreshTokenService.findByMemberId(member.getId());
         if (redisRefreshToken == null) {
             throw new NotFoundException(EXPIRED_TOKEN_VALID_TIME);
@@ -270,6 +273,10 @@ public class MemberService {
 
         if (memberRepository.existsByPhoneNumber(signUpRequest.getPhoneNumber())) {
             throw new BadRequestException(ALREADY_EXIST_PHONE_NUMBER);
+        }
+
+        if (memberRepository.existsByNickname(signUpRequest.getNickname())) {
+            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
         }
     }
 
