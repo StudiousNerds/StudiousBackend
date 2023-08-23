@@ -25,6 +25,10 @@ public enum GradeFixture {
         this.total = total;
     }
 
+    public Grade 생성() {
+        return 생성(null);
+    }
+
     public Grade 생성(Long id) {
         return 기본_정보_생성()
                 .id(id)
