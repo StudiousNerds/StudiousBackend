@@ -6,8 +6,8 @@ import nerds.studiousTestProject.hashtag.entity.HashtagRecord.HashtagRecordBuild
 import nerds.studiousTestProject.review.entity.Review;
 
 public enum HashtagFixture {
-    FIRST_HASHTAG(HashtagName.COST_EFFECTIVE),
-    SECOND_HASHTAG(HashtagName.ACCESS);
+    COST_EFFECTIVE_HASHTAG(HashtagName.COST_EFFECTIVE),
+    ACCESS_HASHTAG(HashtagName.ACCESS);
 
     private HashtagName name;
 
