@@ -6,6 +6,7 @@ import nerds.studiousTestProject.bookmark.dto.BookmarkReuqest;
 import nerds.studiousTestProject.bookmark.dto.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
@@ -26,17 +27,17 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_MEM
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookmarkService {
-    private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final StudycafeService studycafeService;
     private final HashtagRecordService hashtagRecordService;
     private final ReservationRecordService reservationRecordService;
+    private final TokenService tokenService;
 
     @Transactional
     public void registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
@@ -46,7 +47,7 @@ public class BookmarkService {
 
     public List<FindBookmarkResponse> findBookmark(String accessToken, Integer pageNumber){
         List<FindBookmarkResponse> bookmarkCafeList = new ArrayList<>();
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         Member bookmarkedMember = memberRepository.findById(member.getId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER));
         List<Studycafe> bookmarkList = bookmarkedMember.getBookmarks().stream().map(b -> b.getStudycafe()).toList();
 
@@ -58,7 +59,7 @@ public class BookmarkService {
     public void deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
         Long studycafeId = bookmarkReuqest.getStudycafeId();
 
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
         member.deleteBookmark(Bookmark.builder().studycafe(studyCafe).build());

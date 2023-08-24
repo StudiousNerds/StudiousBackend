@@ -26,21 +26,22 @@ public class RefundPolicy {
     private Long id;
 
     @Column(name = "remaining", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Remaining remaining;
 
-    @Column(name = "rate",nullable = false)
+    @Column(name = "rate", nullable = false)
     private Integer rate;
 
-    @Column(name = "type",nullable = false)
-    private String type;
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RefundPolicyType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
     @Builder
-    public RefundPolicy(Long id, Remaining remaining, Integer rate, String type, Studycafe studycafe) {
+    public RefundPolicy(Long id, Remaining remaining, Integer rate, RefundPolicyType type, Studycafe studycafe) {
         this.id = id;
         this.remaining = remaining;
         this.rate = rate;
@@ -51,6 +52,7 @@ public class RefundPolicy {
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {
             this.studycafe = studycafe;
+            this.type = RefundPolicyType.STUDYCAFE;
         }
     }
 }

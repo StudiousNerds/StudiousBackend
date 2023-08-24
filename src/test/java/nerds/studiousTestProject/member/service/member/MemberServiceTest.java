@@ -23,8 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -261,7 +261,7 @@ class MemberServiceTest {
                 .nickname("킹민우")
                 .roles(Collections.singletonList("USER"))
                 .phoneNumber("01090432652")
-                .birthday(new Date())
+                .birthday(LocalDate.of(1999, 12, 18))
                 .build();
     }
 

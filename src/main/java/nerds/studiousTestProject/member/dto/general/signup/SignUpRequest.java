@@ -7,7 +7,7 @@ import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.member.Role;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,7 +19,7 @@ public class SignUpRequest {
     private String nickname;
     private Long providerId;
     private MemberType type;
-    private Date birthday;
+    private LocalDate birthday;
     private String phoneNumber;
     private List<String> roles;
 
@@ -33,7 +33,7 @@ public class SignUpRequest {
                 .type(MemberType.handle(type))
                 .birthday(birthday)
                 .phoneNumber(phoneNumber)
-                .createdDate(new Date())
+                .createdDate(LocalDate.now())
                 .usable(true)
                 .resignedDate(null)
                 .build();

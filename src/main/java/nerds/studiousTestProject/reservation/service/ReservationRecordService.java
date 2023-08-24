@@ -3,6 +3,7 @@ package nerds.studiousTestProject.reservation.service;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
@@ -50,8 +51,9 @@ public class ReservationRecordService {
 
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
-    private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
+    private final TokenService tokenService;
+
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
 
@@ -59,7 +61,7 @@ public class ReservationRecordService {
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
         saveReservationRecord(
-                memberService.getMemberFromAccessToken(accessToken),
+                tokenService.getMemberFromAccessToken(accessToken),
                 findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
@@ -138,7 +140,7 @@ public class ReservationRecordService {
     }
 
     public ReserveResponse reserve(Long cafeId, Long roomId, String accessToken) {
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
         return ReserveResponse.of(member, room, studycafe);
@@ -205,7 +207,7 @@ public class ReservationRecordService {
 
     public List<ReservationSettingsResponse> getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
         initCondition(tab, startDate, endDate);
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, memberService.getMemberFromAccessToken(accessToken), pageable);
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), pageable);
         return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
     }
 

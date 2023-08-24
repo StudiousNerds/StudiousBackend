@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.*;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -24,17 +26,17 @@ public class TokenService {
         Long memberId = jwtTokenProvider.parseToken(resolvedAccessToken);
 
         Member member =  memberRepository.findById(memberId).
-                orElseThrow(() -> new NotAuthorizedException(ErrorCode.MISMATCH_USERNAME_TOKEN));
+                orElseThrow(() -> new NotAuthorizedException(MISMATCH_USERNAME_TOKEN));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
             log.info("auth = {}", authentication);
-            throw new NotAuthorizedException(ErrorCode.NOT_AUTHORIZE_ACCESS);
+            throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         if (!userDetails.getUsername().equals(member.getUsername())) {
-            throw new NotAuthorizedException(ErrorCode.NOT_AUTHORIZE_ACCESS);
+            throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
         }
 
         return member;

@@ -45,8 +45,10 @@ public class Review {
     @Column(name = "detail", nullable = false)
     private String detail;
 
+    @Column(name = "photo", nullable = true)
     private String photo; // 리뷰의 대표사진
 
+    @Column(name = "comment", nullable = true)
     private String comment;
 
     public void addHashtagRecord(HashtagRecord hashtagRecord) {

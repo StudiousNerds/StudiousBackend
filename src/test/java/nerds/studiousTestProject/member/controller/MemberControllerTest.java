@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 
 class MemberControllerTest {
 
@@ -52,7 +52,7 @@ class MemberControllerTest {
                 .roles(Collections.singletonList("USER"))
                 .type(MemberType.DEFAULT)
                 .phoneNumber("01090432652")
-                .birthday(new Date())
+                .birthday(LocalDate.of(1999, 12, 18))
                 .providerId(null)
                 .build();
     }
