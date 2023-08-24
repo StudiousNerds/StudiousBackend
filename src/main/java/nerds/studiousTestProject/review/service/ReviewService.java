@@ -3,6 +3,7 @@ package nerds.studiousTestProject.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
@@ -37,6 +38,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SubPhotoService subPhotoService;
+    private final StorageService storageService;
     private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
     private final HashtagRecordService hashtagRecordService;
@@ -62,16 +65,16 @@ public class ReviewService {
 
 
     @Transactional
-    public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
+    public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
                 .createdDate(LocalDate.now())
                 .detail(registerReviewRequest.getDetail())
+                .grade(grade)
                 .build();
         reviewRepository.save(review);
-        review.addGrade(grade);
 
         ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
@@ -85,17 +88,14 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
         }
 
-        List<String> photos = registerReviewRequest.getPhotos();
-        for (String photo : photos) {
-            SubPhoto subPhoto = SubPhoto.builder().review(review).path(photo).build();
-            subPhotoService.savePhoto(subPhoto);
-        }
+        saveSubPhotos(review, files);
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
 
+
     @Transactional
-    public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest) {
+    public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
         Review review = findById(reviewId);
 
         Grade grade = review.getGrade();
@@ -117,12 +117,8 @@ public class ReviewService {
         }
 
         // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
-        subPhotoService.removeAllPhotos(reviewId);
-        List<String> photos = modifyReviewRequest.getPhotos();
-        for (String photo : photos) {
-            SubPhoto subPhoto = SubPhoto.builder().review(review).path(photo).build();
-            subPhotoService.savePhoto(subPhoto);
-        }
+        deleteAllPhotos(reviewId);
+        saveSubPhotos(review, files);
 
         review.updateDetail(modifyReviewRequest.getDetail());
 
@@ -135,15 +131,12 @@ public class ReviewService {
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
 
         hashtagRecordService.deleteAllByReviewId(reviewId);
-        subPhotoService.removeAllPhotos(reviewId);
+        deleteAllPhotos(reviewId);
         reviewRepository.deleteById(reviewId);
 
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
-    public List<ReservationRecord> findAllReservation(Long studycafeId){
-        return reservationRecordService.findAllByStudycafeId(studycafeId);
-    }
 
     /**
      * 모든 리뷰를 보여줄 메소드(정렬까지 포함)
@@ -300,6 +293,29 @@ public class ReviewService {
             count++;
         }
         return  sum/ count;
+    }
+
+    private void saveSubPhotos(Review review, List<MultipartFile> files) {
+        List<SubPhoto> photoList = new ArrayList<>();
+
+        for (int i = 0; i < files.size(); i++) {
+            String photoUrl = storageService.uploadFile(files.get(i));
+            photoList.add(SubPhoto.builder().review(review).path(photoUrl).build());
+        }
+
+        subPhotoService.saveAllPhotos(photoList);
+    }
+
+    private void deleteAllPhotos(Long reviewId) {
+        List<String> reviewPhotos = subPhotoService.findReviewPhotos(reviewId);
+        for (int i = 0; i < reviewPhotos.size(); i++) {
+            storageService.deleteFile(reviewPhotos.get(i));
+        }
+        subPhotoService.removeAllPhotos(reviewId);
+    }
+
+    private List<ReservationRecord> findAllReservation(Long studycafeId){
+        return reservationRecordService.findAllByStudycafeId(studycafeId);
     }
 
     private List<ReservationRecord> getReservationRecords(String accessToken) {
