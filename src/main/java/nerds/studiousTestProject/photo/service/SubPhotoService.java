@@ -25,7 +25,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 @Transactional(readOnly = true)
 public class SubPhotoService {
     private final SubPhotoRepository subPhotoRepository;
-    private final StudycafeRepository studycafeRepository;
     private final ReviewRepository reviewRepository;
 
     public List<String> findReviewPhotos(Long reviewId){
@@ -37,25 +36,6 @@ public class SubPhotoService {
         reviewPhotos.addAll(reviewSubPhoto);
 
         return reviewPhotos;
-    }
-
-    public List<String> findStudycafePhotos(Long studycafeId){
-        List<SubPhoto> photoList = subPhotoRepository.findAllByStudycafeId(studycafeId);
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        List<String> studycafePhotos = new ArrayList<>();
-        studycafePhotos.add(studycafe.getPhoto());
-        List<String> studycafeSubPhoto = photoList.stream().map(SubPhoto::getPath).collect(Collectors.toList());
-        studycafePhotos.addAll(studycafeSubPhoto);
-
-        return studycafePhotos;
-    }
-
-    public List<String> findRoomPhotos(Long roomId){
-        List<SubPhoto> photoList = subPhotoRepository.findAllByRoomId(roomId);
-
-        return photoList.stream()
-                .map(SubPhoto::getPath)
-                .collect(Collectors.toList());
     }
 
     @Transactional

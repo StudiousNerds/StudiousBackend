@@ -12,7 +12,6 @@ import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
-import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.service.ReviewService;
@@ -82,7 +81,6 @@ public class StudycafeService {
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
     private final RoomService roomService;
-    private final SubPhotoService subPhotoService;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
@@ -123,7 +121,7 @@ public class StudycafeService {
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
-                .photos(subPhotoService.findStudycafePhotos(studycafeId))
+                .photos(getPhotos(studycafe))
                 .accumResCnt(getAccumResCnt(studycafeId))
                 .duration(getWalkingtime(studycafe))
                 .nearestStation(getNearestStation(studycafe))
