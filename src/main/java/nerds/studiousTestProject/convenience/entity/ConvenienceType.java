@@ -1,6 +1,6 @@
 package nerds.studiousTestProject.convenience.entity;
 
-public enum ConvenienceUsage {
+public enum ConvenienceType {
     STUDYCAFE,
     ROOM
 }

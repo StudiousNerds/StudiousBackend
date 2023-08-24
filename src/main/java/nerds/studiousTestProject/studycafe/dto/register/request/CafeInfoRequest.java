@@ -21,6 +21,9 @@ public class CafeInfoRequest {
     @Size(min = 20, max = 100, message = "공간 소개 글은 최소 20자에서 최대 100자 사이여야 합니다.")
     private String introduction;    // 공간 소개
 
+    @NotBlank(message = "전화번호는 필수입니다.")
+    private String tel;
+
     @Size(min = 8, max = 8, message = "운영 시간은 필수입니다.")
     @Valid
     private List<OperationInfoRequest> operationInfos;   // 운영 시간

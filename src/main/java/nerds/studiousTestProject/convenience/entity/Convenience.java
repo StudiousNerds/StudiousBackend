@@ -45,9 +45,9 @@ public class Convenience {
     @Column(name = "is_free", nullable = false)
     private Boolean isFree;
 
-    @Column(name = "usage", nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ConvenienceUsage usage;
+    private ConvenienceType type;
 
     public boolean isFree(){
         return this.isFree;
@@ -56,12 +56,14 @@ public class Convenience {
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {
             this.studycafe = studycafe;
+            this.type = ConvenienceType.STUDYCAFE;
         }
     }
 
     public void setRoom(Room room) {
         if (room != null) {
             this.room = room;
+            this.type = ConvenienceType.ROOM;
         }
     }
 }

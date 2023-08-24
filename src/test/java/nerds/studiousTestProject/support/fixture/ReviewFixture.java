@@ -12,12 +12,16 @@ public enum ReviewFixture {
     SECOND_REVIEW(LocalDate.now().minusDays(1), "여긴 좀 별로.."),
     THIRD_REVIEW(LocalDate.now().minusDays(5), "최악임...");
 
-    private final LocalDate createdAt;
     private final String detail;
+    private final LocalDate createdDate;
 
-    ReviewFixture(LocalDate createdAt, String detail) {
-        this.createdAt = createdAt;
+    ReviewFixture(LocalDate createdDate, String detail) {
+        this.createdDate = createdDate;
         this.detail = detail;
+    }
+
+    public Review 생성() {
+        return 생성(null);
     }
 
     public Review 생성(Long id) {
@@ -26,10 +30,8 @@ public enum ReviewFixture {
                 .build();
     }
 
-    public ReviewBuilder 기본_정보_생성() {
-        return Review.builder()
-                .createdDate(this.createdAt)
-                .detail(this.detail);
+    public Review 평점_생성(Grade grade) {
+        return 평점_생성(grade, null);
     }
 
     public Review 평점_생성(Grade grade, Long id) {
@@ -37,5 +39,11 @@ public enum ReviewFixture {
                 .id(id)
                 .grade(grade)
                 .build();
+    }
+
+    public ReviewBuilder 기본_정보_생성() {
+        return Review.builder()
+                .createdDate(this.createdDate)
+                .detail(this.detail);
     }
 }
