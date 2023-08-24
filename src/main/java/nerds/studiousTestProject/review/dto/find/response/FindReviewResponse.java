@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Data
@@ -15,5 +16,5 @@ public class FindReviewResponse {
     private Integer maxHeadCount;
     private String detail;
     private LocalDate date;
-    private String[] photos;
+    private List<String> photos;
 }

@@ -19,8 +19,8 @@ public class FindRoomResponse {
     private Integer price;
     private String type;
     private Integer minUsingTime;
-    private String[] photos;
+    private List<String> photos;
     private Map<String, Integer[]> canReserveDatetime;
-    private String[] conveniences;
+    private List<String> conveniences;
     private List<PaidConvenience> paidConveniences;
 }
