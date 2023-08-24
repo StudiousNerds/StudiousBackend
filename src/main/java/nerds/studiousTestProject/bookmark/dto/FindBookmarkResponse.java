@@ -3,6 +3,8 @@ package nerds.studiousTestProject.bookmark.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class FindBookmarkResponse {
@@ -15,5 +17,5 @@ public class FindBookmarkResponse {
     private String nearestStation;
     private Integer distance;
     private Double grade;
-    private String[] hashtags;
+    private List<String> hashtags;
 }

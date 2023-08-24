@@ -18,9 +18,9 @@ public class FindStudycafeResponse {
     private Integer accumResCnt;
     private Integer duration;
     private String nearestStation;
-    private String[] hashtags;
+    private List<String> hashtags;
     private String introduction;
-    private String[] conveniences;
+    private List<String> conveniences;
     private List<AnnouncementInResponse> announcement;
     private List<FindRoomResponse> rooms;
 }
