@@ -2,6 +2,7 @@ package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Grade.GradeBuilder;
+import nerds.studiousTestProject.review.entity.Review;
 
 public enum GradeFixture {
 
@@ -37,5 +38,12 @@ public enum GradeFixture {
                 .fixturesStatus(this.fixturesStatus)
                 .isRecommended(this.isRecommended)
                 .total(this.total);
+    }
+
+    public Grade 리뷰_생성(Review review, Long id) {
+        return 기본_정보_생성()
+                .id(id)
+                .review(review)
+                .build();
     }
 }
