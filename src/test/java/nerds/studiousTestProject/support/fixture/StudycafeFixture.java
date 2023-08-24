@@ -8,28 +8,17 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe.StudycafeBuilder;
 
 import java.time.LocalDateTime;
 
-import static nerds.studiousTestProject.support.fixture.AddressFixture.진접;
-import static nerds.studiousTestProject.support.fixture.AddressFixture.창동;
-
 public enum StudycafeFixture {
 
-    NERDS("Nerds", "031-571-2378", "사진 경로",  진접.생성(), null, 2.3, 0, "공간 소개글", LocalDateTime.now().minusDays(12)),
-    FIRST_STUDYCAFE("스프링카페", "031-571-2378", "사진 경로",  진접.생성(), null, 4.3, 0, "공간 소개글", LocalDateTime.now().minusDays(11)),
-    SECOND_STUDYCAFE("스프카페", "031-571-2378", "사진 경로",  진접.생성(), null, 3.5, 0, "공간 소개글", LocalDateTime.now().minusDays(10)),
-    THIRD_STUDYCAFE("스링카페", "031-571-2378", "사진 경로",  진접.생성(), null, 4.0, 0, "공간 소개글", LocalDateTime.now().minusDays(9)),
-    FOURTH_STUDYCAFE("스프후카페", "031-571-2378", "사진 경로",  진접.생성(), null, 3.7, 0, "공간 소개글", LocalDateTime.now().minusDays(8)),
-    FIFTH_STUDYCAFE("프링카페", "031-571-2378", "사진 경로",  진접.생성(), null, 4.5, 0, "공간 소개글", LocalDateTime.now().minusDays(7)),
-    SIXTH_STUDYCAFE("링카페", "031-571-2378", "사진 경로",  창동.생성(), null, 5.0, 0, "공간 소개글", LocalDateTime.now().minusDays(6)),
-    SEVENTH_STUDYCAFE("프카페", "031-571-2378", "사진 경로",  창동.생성(), null, 1.5, 0, "공간 소개글", LocalDateTime.now().minusDays(5)),
-    EIGHTH_STUDYCAFE("스투카페", "031-571-2378", "사진 경로",  창동.생성(), null, 1.3, 0, "공간 소개글", LocalDateTime.now().minusDays(4)),
-    NINETH_STUDYCAFE("프파카페", "031-571-2378", "사진 경로",  창동.생성(), null, 0.5, 0, "공간 소개글", LocalDateTime.now().minusDays(3)),
-    TENTH_STUDYCAFE("링파카페", "031-571-2378", "사진 경로",  창동.생성(), null, 2.5, 0, "공간 소개글", LocalDateTime.now().minusDays(3)),
-    ELEVENTH_STUDYCAFE("토비카페", "031-571-2378", "사진 경로",  창동.생성(), null, 2.0, 0, "공간 소개글", LocalDateTime.now().minusDays(1));
+    NERDS("Nerds", "031-571-2378", "사진 경로", null, 2.3, 0, "공간 소개글", LocalDateTime.now().minusDays(12)),
+    FIRST_STUDYCAFE("스프링카페", "031-571-2378", "사진 경로", null, 4.3, 0, "공간 소개글", LocalDateTime.now().minusDays(11)),
+    SECOND_STUDYCAFE("스프카페", "031-571-2378", "사진 경로", null, 3.5, 0, "공간 소개글", LocalDateTime.now().minusDays(10)),
+    THIRD_STUDYCAFE("스링카페", "031-571-2378", "사진 경로",  null, 4.0, 0, "공간 소개글", LocalDateTime.now().minusDays(9)),
+    FOURTH_STUDYCAFE("스프후카페", "031-571-2378", "사진 경로",  null, 3.7, 0, "공간 소개글", LocalDateTime.now().minusDays(8));
 
     private final String name;
     private final String tel;
     private final String photo;
-    private final Address address;
     private final NearestStationInfo nearestStationInfo;
     private final Double totalGrade;
     private final Integer accumReserveCount;
@@ -40,11 +29,10 @@ public enum StudycafeFixture {
         return name;
     }
 
-    StudycafeFixture(String name, String tel, String photo, Address address, NearestStationInfo nearestStationInfo, Double totalGrade, Integer accumReserveCount, String introduction, LocalDateTime createdDate) {
+    StudycafeFixture(String name, String tel, String photo, NearestStationInfo nearestStationInfo, Double totalGrade, Integer accumReserveCount, String introduction, LocalDateTime createdDate) {
         this.name = name;
         this.tel = tel;
         this.photo = photo;
-        this.address = address;
         this.nearestStationInfo = nearestStationInfo;
         this.totalGrade = totalGrade;
         this.accumReserveCount = accumReserveCount;
@@ -73,12 +61,20 @@ public enum StudycafeFixture {
                 .id(id)
                 .name(this.name)
                 .photo(this.photo)
-                .address(this.address)
+                .address(createAddress())
                 .nearestStationInfo(this.nearestStationInfo)
                 .totalGrade(this.totalGrade)
                 .accumReserveCount(this.accumReserveCount)
                 .tel(this.tel)
                 .introduction(this.introduction)
                 .createdDate(this.createdDate);
+    }
+
+    private Address createAddress() {
+        return Address.builder()
+                .addressBasic("경기도 남양주시 진접읍 금강로 1530-14")
+                .addressDetail("진접하우스토리 아파트 105동 1303호")
+                .addressZipcode("12010")
+                .build();
     }
 }
