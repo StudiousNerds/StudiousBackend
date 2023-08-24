@@ -2,14 +2,15 @@ package nerds.studiousTestProject.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.BookmarkReuqest;
-import nerds.studiousTestProject.bookmark.dto.FindBookmarkResponse;
+import nerds.studiousTestProject.bookmark.dto.request.BookmarkReuqest;
+import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.general.patch.PatchPasswordRequest;
 import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.service.MemberService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -64,8 +65,8 @@ public class MyPageMemberController {
     }
 
     @GetMapping("/bookmarks/{pageNumber}")
-    public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable("pageNumber") Integer pageNumber){
-        return bookmarkService.findBookmark(accessToken, pageNumber);
+    public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
+        return bookmarkService.findBookmark(accessToken, pageable);
     }
 
     @DeleteMapping("/bookmarks/{pageNumber}")
