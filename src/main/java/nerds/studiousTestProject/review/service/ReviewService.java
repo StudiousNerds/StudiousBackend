@@ -6,7 +6,7 @@ import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
-import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
+import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
@@ -43,7 +43,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.*;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVEIW;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+
 
 @RequiredArgsConstructor
 @Slf4j
@@ -54,7 +56,7 @@ public class ReviewService {
     private final SubPhotoService subPhotoService;
     private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
-    private final HashtagRecordRepository hashtagRecordRepository;
+    private final HashtagRecordService hashtagRecordService;
     private final TokenService tokenService;
     public final Double GRADE_COUNT = 3.0;
 
@@ -104,7 +106,7 @@ public class ReviewService {
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
-        hashtagRecordRepository.deleteAllByReviewId(reviewId);
+        hashtagRecordService.deleteAllByReviewId(reviewId);
         List<String> hashtags = modifyReviewRequest.getHashtags();
         for (String userHashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
@@ -132,7 +134,7 @@ public class ReviewService {
         Review review = findById(reviewId);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
 
-        hashtagRecordRepository.deleteAllByReviewId(reviewId);
+        hashtagRecordService.deleteAllByReviewId(reviewId);
         subPhotoService.removeAllPhotos(reviewId);
         reviewRepository.deleteById(reviewId);
 

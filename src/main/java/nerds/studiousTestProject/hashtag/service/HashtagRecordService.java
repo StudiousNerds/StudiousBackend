@@ -19,15 +19,19 @@ public class HashtagRecordService {
     private final HashtagRecordRepository hashtagRecordRepository;
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
-    public List<HashtagName> findStudycafeHashtag(Long studycafeId) {
+    public List<String> findStudycafeHashtag(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<HashtagName> hashtagNameList = new ArrayList<>();
+        List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i));
+            hashtagNameList.add(hashtagNames.get(i).toString());
         }
         return hashtagNameList;
+    }
+
+    public void deleteAllByReviewId(Long reviewId) {
+        hashtagRecordRepository.deleteAllByReviewId(reviewId);
     }
 }
