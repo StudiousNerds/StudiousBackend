@@ -123,7 +123,7 @@ public class StudycafeService {
         return FindStudycafeResponse.builder()
                 .cafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
-                .photos(subPhotoService.findCafePhotos(studycafeId))
+                .photos(subPhotoService.findStudycafePhotos(studycafeId))
                 .accumResCnt(getAccumResCnt(studycafeId))
                 .duration(getWalkingtime(studycafe))
                 .nearestStation(getNearestStation(studycafe))
