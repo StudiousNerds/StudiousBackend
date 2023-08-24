@@ -63,13 +63,12 @@ public class MemberService {
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
      * @param signUpRequest 회원 가입 폼에서 입력한 정보
-     *                      이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
+     * 이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
      * @return 회원가입한 정보로 만든 토큰 값
      */
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
-        MemberType type = MemberType.handle(signUpRequest.getType());
-        validate(signUpRequest, type);
+        validate(signUpRequest);
 
         String encodedPassword = getEncodedPassword(signUpRequest);
         Member member = signUpRequest.toEntity(encodedPassword);
@@ -253,18 +252,12 @@ public class MemberService {
         return memberRepository.findByProviderIdAndType(providerId, type);
     }
 
-    private void validate(SignUpRequest signUpRequest, MemberType type) {
+    private void validate(SignUpRequest signUpRequest) {
+        MemberType type = signUpRequest.getType();
         Long providerId = signUpRequest.getProviderId();
-        if (providerId == null && !type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PROVIDER_ID);
-        }
 
         if ((providerId != null && memberRepository.existsByProviderIdAndType(providerId, type))) {
             throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (signUpRequest.getPassword() == null && type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PASSWORD);
         }
 
         if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), type)) {
