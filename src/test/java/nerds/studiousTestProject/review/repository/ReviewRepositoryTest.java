@@ -77,7 +77,7 @@ class ReviewRepositoryTest {
     @DisplayName("리뷰 삭제 시, 해시태그와 등급이 같이 삭제되는지 테스트")
     void deleteById() {
         // given
-        HashtagRecord hashtag = hashtagRecordRepository.save(FIRST_HASHTAG.생성(1L));
+        HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.생성(1L));
         Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
@@ -96,7 +96,7 @@ class ReviewRepositoryTest {
     @DisplayName("제대로 review에 반영되어 저장되었는지 확인하는 테스트")
     void saveTest() {
         // given
-        HashtagRecord hashtag = hashtagRecordRepository.save(FIRST_HASHTAG.생성(1L));
+        HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.생성(1L));
         Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
