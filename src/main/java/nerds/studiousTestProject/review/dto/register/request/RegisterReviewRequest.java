@@ -21,7 +21,6 @@ public class RegisterReviewRequest {
     private Boolean isRecommend;
     @NotBlank(message = "해시태그는 필수입니다.")
     private List<String> hashtags;
-    private List<String> photos;
     @NotBlank(message = "리뷰는 필수입니다.")
     private String detail;
 
