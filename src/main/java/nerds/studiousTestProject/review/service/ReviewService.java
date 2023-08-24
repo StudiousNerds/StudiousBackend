@@ -8,7 +8,6 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +53,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SubPhotoService subPhotoService;
     private final ReservationRecordService reservationRecordService;
-    private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
     private final HashtagRecordRepository hashtagRecordRepository;
     private final TokenService tokenService;
@@ -184,8 +181,8 @@ public class ReviewService {
     }
 
     /**
-         * 리뷰 작성 가능한 내역을 조회하는 메소드
-         */
+     * 리뷰 작성 가능한 내역을 조회하는 메소드
+     */
     public List<AvailableReviewResponse> findAvailableReviews(String accessToken) {
         List<ReservationRecord> reservationRecordList = getReservationRecords(accessToken);
 
