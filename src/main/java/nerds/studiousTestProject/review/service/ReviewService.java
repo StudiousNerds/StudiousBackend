@@ -31,8 +31,6 @@ import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +44,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVEIW;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 
 @RequiredArgsConstructor
@@ -58,7 +55,6 @@ public class ReviewService {
     private final SubPhotoService subPhotoService;
     private final StorageService storageService;
     private final ReservationRecordService reservationRecordService;
-    private final StudycafeRepository studycafeRepository;
     private final HashtagRecordService hashtagRecordService;
     private final TokenService tokenService;
     public final Double GRADE_COUNT = 3.0;
