@@ -173,20 +173,7 @@ public class ReviewService {
         return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null &&
                         !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewResponse.builder()
-                        .reservationId(reservationRecord.getId())
-                        .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
-                        .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
-                        .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
-                        .roomName(reservationRecord.getRoom().getName())
-                        .paymentType(reservationRecord.getPayment().getMethod())
-                        .price(reservationRecord.getRoom().getPrice() * reservationRecord.getDuration())
-                        .date(reservationRecord.getDate())
-                        .startTime(reservationRecord.getStartTime())
-                        .endTime(reservationRecord.getEndTime())
-                        .duration(reservationRecord.getDuration())
-                        .validDate(reservationRecord.getDate().plusDays(7))
-                        .build())
+                .map(reservationRecord -> AvailableReviewResponse.of(reservationRecord))
                 .collect(Collectors.toList());
     }
 
