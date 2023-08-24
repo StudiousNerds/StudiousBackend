@@ -93,7 +93,6 @@ public class ReviewService {
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
 
-
     @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
         Review review = findById(reviewId);
@@ -137,25 +136,19 @@ public class ReviewService {
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
-
     /**
      * 모든 리뷰를 보여줄 메소드(정렬까지 포함)
      * pageable를 통해서 sort까지 지정할 수 있습니다! (쿼리 파라미터를 통해 입력하면 알아서 처리해줌)
      * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
      */
     public FindReviewSortedResponse findAllReviews(Long studycafeId, Pageable pageable) {
-        PageResponse pageResponse = PageResponse.builder()
-                .currentPage(pageable.getPageNumber())
-                .totalPage(getAllReviews(studycafeId).size() / pageable.getPageSize()).build();
-        TotalGradeInfo totalGrade = findTotalGrade(studycafeId);
-        List<FindReviewResponse> reviewResponses = getReviewInfo(getAllReviewsSorted(studycafeId, pageable));
+        Page<Review> reviews = getAllReviewsSorted(studycafeId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageResponse(pageResponse)
-                .totalGradeInfo(totalGrade)
-                .findReviewResponses(reviewResponses)
+                .pageResponse(PageResponse.of(reviews))
+                .totalGradeInfo(findTotalGrade(studycafeId))
+                .findReviewResponses(getReviewInfo(reviews))
                 .build();
     }
-
 
     /**
      * 룸 별, 리뷰를 보여줄 메소드(정렬까지 포함)
@@ -163,15 +156,11 @@ public class ReviewService {
      * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
      */
     public FindReviewSortedResponse findRoomReviews(Long studycafeId, Long roomId, Pageable pageable) {
-        PageResponse pageResponse = PageResponse.builder()
-                .currentPage(pageable.getPageNumber())
-                .totalPage(reservationRecordService.findAllByRoomId(roomId).size() / pageable.getPageSize()).build();
-        TotalGradeInfo totalGrade = findTotalGrade(studycafeId);
-        List<FindReviewResponse> reviewResponses = getReviewInfo(getRoomReviewsSorted(studycafeId, roomId, pageable));
+        Page<Review> reviews = getRoomReviewsSorted(studycafeId, roomId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageResponse(pageResponse)
-                .totalGradeInfo(totalGrade)
-                .findReviewResponses(reviewResponses)
+                .pageResponse(PageResponse.of(reviews))
+                .totalGradeInfo(findTotalGrade(studycafeId))
+                .findReviewResponses(getReviewInfo(reviews))
                 .build();
     }
 
@@ -314,7 +303,7 @@ public class ReviewService {
         subPhotoService.removeAllPhotos(reviewId);
     }
 
-    private List<ReservationRecord> findAllReservation(Long studycafeId){
+    private List<ReservationRecord> getAllReservation(Long studycafeId){
         return reservationRecordService.findAllByStudycafeId(studycafeId);
     }
 
@@ -324,8 +313,9 @@ public class ReviewService {
         return reservationRecordList;
     }
 
-    public List<FindReviewResponse> getReviewInfo(List<Review> reviewList) {
+    public List<FindReviewResponse> getReviewInfo(Page<Review> reviewList) {
         return reviewList.stream()
+                .filter(review -> review != null && reviewList.hasContent())
                 .map(review -> FindReviewResponse.builder()
                         .grade(review.getGrade().getTotal())
                         .nickname(getMember(review).getNickname())
@@ -348,7 +338,7 @@ public class ReviewService {
     }
 
     private List<Review> getAllReviews(Long studycafeId) {
-        List<ReservationRecord> recordList = findAllReservation(studycafeId);
+        List<ReservationRecord> recordList = getAllReservation(studycafeId);
         List<Long> reviewIds = new ArrayList<>();
         List<Review> reviewList = new ArrayList<>();
         for (ReservationRecord reservationRecord : recordList) {
@@ -363,35 +353,28 @@ public class ReviewService {
         return reviewList;
     }
 
-    private List<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
+    private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
         pageable = getPageable(pageable);
-        List<ReservationRecord> recordList = findAllReservation(studycafeId);
-        List<Review> reviewList = getReviewList(pageable, recordList);
+        List<ReservationRecord> recordList = getAllReservation(studycafeId);
+        Page<Review> reviewList = getReviewList(pageable, recordList);
         return reviewList;
     }
 
-    private List<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
+    private Page<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
         pageable = getPageable(pageable);
         List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
-        List<Review> reviewList = getReviewList(pageable, recordList);
+        Page<Review> reviewList = getReviewList(pageable, recordList);
         return reviewList;
     }
 
-    private List<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
+    private Page<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
         List<Long> reviewIds = new ArrayList<>();
-        List<Review> reviewList = new ArrayList<>();
 
         for (ReservationRecord reservationRecord : recordList) {
             reviewIds.add(reservationRecord.getReview().getId());
         }
 
-        Page<Review> reviews = reviewRepository.findAllByIdIn(reviewIds, pageable);
-
-        if(reviews != null && reviews.hasContent()) {
-            reviewList = reviews.getContent();
-        }
-
-        return reviewList;
+        return reviewRepository.findAllByIdIn(reviewIds, pageable);
     }
 
     private PageRequest getPageable(Pageable pageable) {
@@ -400,10 +383,5 @@ public class ReviewService {
 
     private Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
-    }
-
-    private Studycafe findByStudycafeId(Long studycafeId) {
-        return studycafeRepository.findById(studycafeId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 }
