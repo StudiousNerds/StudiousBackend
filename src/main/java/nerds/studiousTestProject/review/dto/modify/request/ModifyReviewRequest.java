@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Builder
 @Data
 public class ModifyReviewRequest {
@@ -17,8 +19,8 @@ public class ModifyReviewRequest {
     @NotBlank(message = "추천 여부는 필수입니다.")
     private Boolean isRecommend;
     @NotBlank(message = "해시태그는 필수입니다.")
-    private String[] hashtags;
-    private String[] photos;
+    private List<String> hashtags;
+    private List<String> photos;
     @NotBlank(message = "리뷰는 필수입니다.")
     private String detail;
 }

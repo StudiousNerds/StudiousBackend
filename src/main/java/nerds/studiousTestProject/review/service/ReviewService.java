@@ -62,13 +62,7 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse registerReview(RegisterReviewRequest registerReviewRequest){
-        Studycafe studycafe = findByStudycafeId(registerReviewRequest.getCafeId());
-
-        Grade grade = Grade.builder().cleanliness(registerReviewRequest.getCleanliness())
-                .deafening(registerReviewRequest.getDeafening())
-                .fixturesStatus(registerReviewRequest.getFixtureStatus())
-                .isRecommended(registerReviewRequest.getIsRecommend())
-                .build();
+        Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
@@ -81,7 +75,7 @@ public class ReviewService {
         ReservationRecord reservationRecord = reservationRecordService.findById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
 
-        List<String> hashtags = Arrays.stream(registerReviewRequest.getHashtags()).toList();
+        List<String> hashtags = registerReviewRequest.getHashtags();
         for (String userHashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
                     .review(review)
@@ -90,7 +84,7 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
         }
 
-        List<String> photos = Arrays.stream(registerReviewRequest.getPhotos()).toList();
+        List<String> photos = registerReviewRequest.getPhotos();
         for (String photo : photos) {
             SubPhoto subPhoto = SubPhoto.builder().review(review).path(photo).build();
             subPhotoService.savePhoto(subPhoto);
@@ -112,7 +106,7 @@ public class ReviewService {
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         hashtagRecordRepository.deleteAllByReviewId(reviewId);
-        List<String> hashtags = Arrays.stream(modifyReviewRequest.getHashtags()).toList();
+        List<String> hashtags = modifyReviewRequest.getHashtags();
         for (String userHashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
                     .review(review)
@@ -123,7 +117,7 @@ public class ReviewService {
 
         // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
         subPhotoService.removeAllPhotos(reviewId);
-        List<String> photos = Arrays.stream(modifyReviewRequest.getPhotos()).toList();
+        List<String> photos = modifyReviewRequest.getPhotos();
         for (String photo : photos) {
             SubPhoto subPhoto = SubPhoto.builder().review(review).path(photo).build();
             subPhotoService.savePhoto(subPhoto);
