@@ -292,7 +292,7 @@ public class ReviewService {
             sum += review.getGrade().getTotal();
             count++;
         }
-        return  sum/ count;
+        return Double.isNaN(sum/ count) ? 0.0 : sum/ count;
     }
 
     private void saveSubPhotos(Review review, List<MultipartFile> files) {
