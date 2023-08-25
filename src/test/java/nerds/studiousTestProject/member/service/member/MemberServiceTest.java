@@ -27,6 +27,13 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
+import static nerds.studiousTestProject.support.fixture.LogoutAccessTokenFixture.FIRST_LOGOUT_ACCESS_TOKEN;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
+import static nerds.studiousTestProject.support.fixture.RefreshTokenFixture.FIRST_REFRESH_TOKEN;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -50,6 +57,42 @@ class MemberServiceTest {
 
     @Mock
     PasswordEncoder passwordEncoder;
+
+    private Member defaultMember;
+    private Member socialMember;
+    private String accessToken;
+    private String resolvedAccessToken;
+    private RefreshToken refreshToken;
+    private LogoutAccessToken logoutAccessToken;
+    private JwtTokenResponse jwtTokenResponse;
+    private static ValidatorFactory validatorFactory;
+    private static Validator validator;
+
+    @BeforeAll
+    public static void init() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    @AfterAll
+    public static void close() {
+        validatorFactory.close();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        defaultMember = DEFAULT_USER.생성();
+        socialMember = KAKAO_USER.생성();
+        accessToken = "AccessToken";
+        resolvedAccessToken = "resolvedAccessToken";
+        refreshToken = FIRST_REFRESH_TOKEN.생성();
+        logoutAccessToken = FIRST_LOGOUT_ACCESS_TOKEN.생성();
+        jwtTokenResponse = JwtTokenResponse
+                .builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .build();
+    }
 
     @Test
     @DisplayName("일반 회원가입")
