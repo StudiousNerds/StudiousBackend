@@ -25,7 +25,7 @@ public class HashtagRecordService {
 
         List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).toString());
+            hashtagNameList.add(hashtagNames.get(i).name());
         }
         return hashtagNameList;
     }

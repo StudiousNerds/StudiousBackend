@@ -100,8 +100,7 @@ public class RoomService {
         Room room = findRoomById(roomId);
 
         return room.getConveniences().stream()
-                .map(Convenience::getName)
-                .map(ConvenienceName::toString)
+                .map(Convenience -> Convenience.getName().name())
                 .toList();
     }
 
