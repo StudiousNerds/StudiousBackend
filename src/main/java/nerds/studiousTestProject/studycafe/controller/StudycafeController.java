@@ -41,7 +41,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/studious")
 @Slf4j
-@Validated
 public class StudycafeController {
     private final StudycafeService studycafeService;
 
