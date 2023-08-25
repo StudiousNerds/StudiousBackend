@@ -10,6 +10,9 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.member.Role;
+import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedEmailCheck;
+import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedNicknameCheck;
+import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedPhoneNumberCheck;
 import nerds.studiousTestProject.member.validator.register.SignUpTypeCheck;
 
 import java.time.LocalDate;
@@ -17,6 +20,9 @@ import java.util.List;
 
 @Data
 @Builder
+@SignUpDuplicatedEmailCheck
+@SignUpDuplicatedNicknameCheck
+@SignUpDuplicatedPhoneNumberCheck
 @SignUpTypeCheck
 public class SignUpRequest {
 
