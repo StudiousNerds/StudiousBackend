@@ -52,6 +52,12 @@ class MemberServiceTest {
     LogoutAccessTokenService logoutAccessTokenService;
 
     @Mock
+    StorageService storageService;
+
+    @Mock
+    TokenService tokenService;
+
+    @Mock
     JwtTokenProvider jwtTokenProvider;
 
     @Mock
