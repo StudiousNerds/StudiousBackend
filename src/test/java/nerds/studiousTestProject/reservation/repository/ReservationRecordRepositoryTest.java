@@ -22,9 +22,9 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static nerds.studiousTestProject.support.fixture.MemberFixture.*;
-import static nerds.studiousTestProject.support.fixture.MemberFixture.BEAVER;
-import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.NAVER_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.IN_PROGRESS_RESERVATION;
@@ -65,7 +65,7 @@ class ReservationRecordRepositoryTest {
     @Test
     void findAllByMemberId() {
         // given
-        Member member = memberRepository.save(POTATO.생성(3L));
+        Member member = memberRepository.save(NAVER_USER.생성(3L));
         ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.멤버_생성(member, 7L));
         ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.멤버_생성(member, 8L));
         // when
@@ -94,8 +94,8 @@ class ReservationRecordRepositoryTest {
     @DisplayName(value = "회원이 주어졌을 때 해당 회원의 예약 목록을 페이징해 조회할 수 있다.")
     void 예약_목록_전체를_페이징하여_조회한다() {
 
-        Member member1 = 멤버_저장(BEAVER.생성(1L));
-        Member member2 = 멤버_저장(BURNED_POTATO.생성(2L));
+        Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
+        Member member2 = 멤버_저장(KAKAO_USER.생성(2L));
         Studycafe studycafe = 스터디카페_저장(NERDS.생성());
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
 
@@ -118,7 +118,7 @@ class ReservationRecordRepositoryTest {
     @Test
     void 예약_취소_탭을_페이징해_조회한다(){
 
-        Member member1 = 멤버_저장(BEAVER.생성(1L));
+        Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
         Studycafe studycafe = 스터디카페_저장(NERDS.생성());
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
 
