@@ -31,11 +31,11 @@ CREATE TABLE IF NOT EXISTS `member` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `resigned_date` DATE,
     `usable`        TINYINT(1)   NOT NULL,
-    `birthday`      DATE         NOT NULL,
+    `birthday`      DATE,
     `created_date`  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     `provider_id`   bigint,
     `email`         varchar(255) NOT NULL,
-    `name`          varchar(255) NOT NULL,
+    `name`          varchar(255),
     `nickname`      varchar(255) NOT NULL,
     `password`      varchar(255) NOT NULL,
     `phone_number`  varchar(255) NOT NULL,
@@ -168,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `review` (
     `created_date`          date         NOT NULL,
     `comment`               varchar(255), -- 사장님 댓글
     `detail`                varchar(255) NOT NULL,
+    `photo`                 varchar(255),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
