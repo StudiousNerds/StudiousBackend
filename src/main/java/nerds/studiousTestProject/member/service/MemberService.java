@@ -34,8 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
@@ -43,8 +41,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASS
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PROVIDER_ID;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
@@ -68,12 +64,8 @@ public class MemberService {
      */
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
-        validate(signUpRequest);
-
         String encodedPassword = getEncodedPassword(signUpRequest);
         Member member = signUpRequest.toEntity(encodedPassword);
-
-        log.info("created member = {}", member);
         memberRepository.save(member);
 
         return jwtTokenProvider.generateToken(member);
@@ -250,27 +242,6 @@ public class MemberService {
 
     public Optional<Member> findByProviderIdAndType(Long providerId, MemberType type) {
         return memberRepository.findByProviderIdAndType(providerId, type);
-    }
-
-    private void validate(SignUpRequest signUpRequest) {
-        MemberType type = signUpRequest.getType();
-        Long providerId = signUpRequest.getProviderId();
-
-        if ((providerId != null && memberRepository.existsByProviderIdAndType(providerId, type))) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), type)) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (memberRepository.existsByPhoneNumber(signUpRequest.getPhoneNumber())) {
-            throw new BadRequestException(ALREADY_EXIST_PHONE_NUMBER);
-        }
-
-        if (memberRepository.existsByNickname(signUpRequest.getNickname())) {
-            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
-        }
     }
 
     /**
