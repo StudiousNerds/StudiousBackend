@@ -41,8 +41,8 @@ public class ReservationRecord {
     @Column(name = "user_name",nullable = false)
     private String userName;
 
-    @Column(name = "phone_number",nullable = false)
-    private String phoneNumber;
+    @Column(name = "user_phone_number",nullable = false)
+    private String userPhoneNumber;
 
     @Column(name = "date",nullable = false)
     private LocalDate date;
