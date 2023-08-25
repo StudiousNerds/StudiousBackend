@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-// SecurityContextHolder.getContext() 테스트를 어떻게 할지 고민...
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
     @InjectMocks
