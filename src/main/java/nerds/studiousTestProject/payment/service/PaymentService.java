@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
@@ -29,6 +30,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAY
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 public class PaymentService {
 
@@ -56,6 +58,7 @@ public class PaymentService {
         ConfirmSuccessRequest request = ConfirmSuccessRequest.of(orderId,amount,paymentKey);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(request, CONFIRM_URI);
         Payment payment = paymentRepository.save(responseFromToss.toPayment());
+        log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         reservationRecordService.findByOrderId(orderId).completePay(payment);//결제 완료로 상태 변경
         return createPaymentConfirmResponse(responseFromToss);
     }
