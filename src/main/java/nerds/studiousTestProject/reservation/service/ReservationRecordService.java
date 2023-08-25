@@ -73,7 +73,7 @@ public class ReservationRecordService {
                         .endTime(reservation.getEndTime())
                         .headCount(reservation.getHeadCount())
                         .userName(user.getName())
-                        .phoneNumber(user.getPhoneNumber())
+                        .userPhoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(room)
                         .orderId(orderId)
