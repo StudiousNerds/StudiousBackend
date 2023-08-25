@@ -42,9 +42,9 @@ public class ReservationRecordController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reservations/studycafes/{cafeId}/rooms/{roomId}")
-    public ReserveResponse reserve(@PathVariable Long cafeId, @PathVariable Long roomId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return reservationRecordService.reserve(cafeId, roomId, accessToken);
+    @GetMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    public ReserveResponse reserve(@PathVariable Long studycafeId, @PathVariable Long roomId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return reservationRecordService.reserve(studycafeId, roomId, accessToken);
     }
 
     @GetMapping("/mypage/reservation-settings/{reservationId}/cancellations")
