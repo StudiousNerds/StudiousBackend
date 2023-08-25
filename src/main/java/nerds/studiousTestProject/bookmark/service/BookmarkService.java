@@ -74,6 +74,11 @@ public class BookmarkService {
     }
 
     private PageRequest getPageable(Pageable pageable) {
-        return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+        Integer page = Integer.valueOf(pageable.getPageNumber());
+        if(page == null || page < 1) {
+            return PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
+        }
+
+        return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
     }
 }

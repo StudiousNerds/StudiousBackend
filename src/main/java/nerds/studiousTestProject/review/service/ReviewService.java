@@ -270,18 +270,18 @@ public class ReviewService {
     private void saveSubPhotos(Review review, List<MultipartFile> files) {
         List<SubPhoto> photoList = new ArrayList<>();
 
-        for (int i = 0; i < files.size(); i++) {
-            String photoUrl = storageService.uploadFile(files.get(i));
+        for (MultipartFile file : files) {
+            String photoUrl = storageService.uploadFile(file);
             photoList.add(SubPhoto.builder().review(review).path(photoUrl).build());
         }
-
         subPhotoService.saveAllPhotos(photoList);
     }
 
     private void deleteAllPhotos(Long reviewId) {
         List<String> reviewPhotos = subPhotoService.findReviewPhotos(reviewId);
-        for (int i = 0; i < reviewPhotos.size(); i++) {
-            storageService.deleteFile(reviewPhotos.get(i));
+
+        for (String photoUrl : reviewPhotos) {
+            storageService.deleteFile(photoUrl);
         }
         subPhotoService.removeAllPhotos(reviewId);
     }
@@ -339,15 +339,13 @@ public class ReviewService {
     private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
         pageable = getPageable(pageable);
         List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        Page<Review> reviewList = getReviewList(pageable, recordList);
-        return reviewList;
+        return getReviewList(pageable, recordList);
     }
 
     private Page<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
         pageable = getPageable(pageable);
         List<ReservationRecord> recordList = reservationRecordService.findAllByRoomId(roomId);
-        Page<Review> reviewList = getReviewList(pageable, recordList);
-        return reviewList;
+        return getReviewList(pageable, recordList);
     }
 
     private Page<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
@@ -361,7 +359,12 @@ public class ReviewService {
     }
 
     private PageRequest getPageable(Pageable pageable) {
-        return PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+        Integer page = Integer.valueOf(pageable.getPageNumber());
+        if(page == null || page < 1) {
+            return PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
+        }
+
+        return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
     }
 
     private Review findById(Long reviewId) {
