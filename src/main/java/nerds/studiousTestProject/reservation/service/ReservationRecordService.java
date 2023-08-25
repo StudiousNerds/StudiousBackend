@@ -3,6 +3,8 @@ package nerds.studiousTestProject.reservation.service;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
@@ -50,6 +52,7 @@ public class ReservationRecordService {
     private final RoomRepository roomRepository;
     private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
+    private final ConvenienceRepository convenienceRepository;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
@@ -116,7 +119,8 @@ public class ReservationRecordService {
         Member member = memberService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
-        return ReserveResponse.of(member, room, studycafe);
+        List<Convenience> conveniences = convenienceRepository.findAllByRoomOrStudycafe(room, studycafe);
+        return ReserveResponse.of(member, room, studycafe, conveniences);
     }
 
     public List<ReservationRecord> findAllByMemberId(Long memberId) {
@@ -187,6 +191,7 @@ public class ReservationRecordService {
                 .studycafeName(studycafe.getName())
                 .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
+                .reservationId(reservationRecord.getId())
                 .reservationDate(reservationRecord.getDate())
                 .reservationStartTime(reservationRecord.getStartTime())
                 .reservationEndTime(reservationRecord.getEndTime())
