@@ -9,7 +9,6 @@ import java.util.List;
 @Builder
 public class FindBookmarkResponse {
     private PageInfo pageInfo;
-    private Integer totalRecord;
     private Long cafeId;
     private String cafeName;
     private String photo;
