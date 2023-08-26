@@ -70,8 +70,8 @@ public class MyPageMemberController {
         return bookmarkService.findBookmark(accessToken, pageable);
     }
 
-    @DeleteMapping("/bookmarks/{pageNumber}")
-    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest, @PathVariable("pageNumber") Integer pageNumber){
+    @DeleteMapping("/bookmarks")
+    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest){
         bookmarkService.deleteBookmark(accessToken, bookmarkReuqest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
     }
