@@ -22,10 +22,6 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "review_id", nullable = false)
-    private Review review;
-
     @Column(name = "cleanliness", nullable = false)
     private Integer cleanliness;
 
@@ -42,9 +38,8 @@ public class Grade {
     private Double total;
 
     @Builder
-    public Grade(Long id, Review review, Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total) {
+    public Grade(Long id, Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total) {
         this.id = id;
-        this.review = review;
         this.cleanliness = cleanliness;
         this.deafening = deafening;
         this.fixturesStatus = fixturesStatus;
@@ -54,10 +49,6 @@ public class Grade {
 
     public void updateTotal(Double total) {
         this.total = total;
-    }
-
-    public void setReview(Review review) {
-        this.review = review;
     }
 
     public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total){

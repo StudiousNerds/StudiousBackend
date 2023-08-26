@@ -83,7 +83,7 @@ class ReservationRecordRepositoryTest {
         Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
         ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
         ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
-        save1.addReview(review);
+//        save1.addReview(review);
         // when
         List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByStudycafeId(studycafe.getId());
         // then

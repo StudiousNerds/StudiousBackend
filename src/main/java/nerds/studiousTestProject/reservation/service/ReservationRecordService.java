@@ -34,7 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
@@ -50,15 +52,18 @@ public class ReservationRecordService {
 
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
-    private final MemberService memberService;
     private final StudycafeRepository studycafeRepository;
+    private final TokenService tokenService;
+
+    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
+
     private final ConvenienceRepository convenienceRepository;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
         saveReservationRecord(
-                memberService.getMemberFromAccessToken(accessToken),
+                tokenService.getMemberFromAccessToken(accessToken),
                 findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
@@ -83,6 +88,27 @@ public class ReservationRecordService {
                         .member(member)
                         .build()
         );
+    }
+
+    public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {
+        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        LocalTime openTime = studycafe.getOperationInfos().get(0).getStartTime();
+        LocalTime endTime = studycafe.getOperationInfos().get(1).getEndTime();
+
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
+        Integer minUsingTime = room.getMinUsingTime() / 60;
+
+        for (int i = openTime.getHour(); i <= endTime.getHour(); i += minUsingTime) {
+            reservationTimes.put(i, true);
+        }
+
+        List<Object[]> allReservedTime = reservationRecordRepository.findAllReservedTime(date, roomId);
+        for (Object[] localTimes : allReservedTime) {
+            for (int i = ((LocalTime) localTimes[0]).getHour(); i < ((LocalTime) localTimes[1]).getHour(); i++) {
+                reservationTimes.put(i, false);
+            }
+        }
+        return reservationTimes;
     }
 
     public ReservationRecord findByOrderId(String orderId) {
@@ -116,7 +142,7 @@ public class ReservationRecordService {
     }
 
     public ReserveResponse reserve(Long cafeId, Long roomId, String accessToken) {
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
         List<Convenience> conveniences = convenienceRepository.findAllByRoomOrStudycafe(room, studycafe);
@@ -134,7 +160,12 @@ public class ReservationRecordService {
     public List<ReservationRecord> findAllByStudycafeId(Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
-        
+
+    public ReservationRecord findByReviewId(Long reviewId) {
+        return reservationRecordRepository.findByReviewId(reviewId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
     public ReservationCancelResponse cancelInfo(Long reservationId) {
         ReservationRecord reservationRecord = findById(reservationId);
         Room room = reservationRecord.getRoom();
@@ -179,7 +210,7 @@ public class ReservationRecordService {
 
     public List<ReservationSettingsResponse> getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
         initCondition(tab, startDate, endDate);
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, memberService.getMemberFromAccessToken(accessToken), pageable);
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), pageable);
         return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
     }
 
@@ -191,7 +222,6 @@ public class ReservationRecordService {
                 .studycafeName(studycafe.getName())
                 .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
-                .reservationId(reservationRecord.getId())
                 .reservationDate(reservationRecord.getDate())
                 .reservationStartTime(reservationRecord.getStartTime())
                 .reservationEndTime(reservationRecord.getEndTime())

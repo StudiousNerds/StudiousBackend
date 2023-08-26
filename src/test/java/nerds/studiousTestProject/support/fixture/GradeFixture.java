@@ -2,6 +2,7 @@ package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Grade.GradeBuilder;
+import nerds.studiousTestProject.review.entity.Review;
 
 public enum GradeFixture {
 
@@ -22,6 +23,10 @@ public enum GradeFixture {
         this.fixturesStatus = fixturesStatus;
         this.isRecommended = isRecommended;
         this.total = total;
+    }
+
+    public Grade 생성() {
+        return 생성(null);
     }
 
     public Grade 생성(Long id) {
