@@ -84,7 +84,9 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
         }
 
-        saveSubPhotos(review, files);
+        if (!files.isEmpty()) {
+            saveSubPhotos(review, files);
+        }
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
@@ -272,7 +274,7 @@ public class ReviewService {
 
         for (MultipartFile file : files) {
             String photoUrl = storageService.uploadFile(file);
-            photoList.add(SubPhoto.builder().review(review).path(photoUrl).build());
+            photoList.add(SubPhoto.builder().review(review).type("REVIEW").path(photoUrl).build());
         }
         subPhotoService.saveAllPhotos(photoList);
     }
