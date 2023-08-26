@@ -58,13 +58,13 @@ public class MyPageMemberController {
         memberService.deactivate(accessToken, withdrawRequest);
     }
 
-    @PostMapping("/bookmarks/{pageNumber}")
-    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest, @PathVariable("pageNumber") Integer pageNumber){
+    @PostMapping("/bookmarks")
+    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest){
         bookmarkService.registerBookmark(accessToken, bookmarkReuqest);
         return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
     }
 
-    @GetMapping("/bookmarks/{pageNumber}")
+    @GetMapping("/bookmarks")
     public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
         return bookmarkService.findBookmark(accessToken, pageable);
     }
