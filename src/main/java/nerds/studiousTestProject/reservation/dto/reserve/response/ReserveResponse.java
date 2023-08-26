@@ -3,7 +3,7 @@ package nerds.studiousTestProject.reservation.dto.reserve.response;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceUsage;
+import nerds.studiousTestProject.convenience.entity.ConvenienceType;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.room.entity.Room;
@@ -51,7 +51,7 @@ public class ReserveResponse {
     }
 
     private static List<String> getRoomConvenienceList(List<Convenience> conveniences) {
-        List<String> roomConvenienceList = conveniences.stream().filter(convenience -> convenience.getUsage().equals(ConvenienceUsage.ROOM))
+        List<String> roomConvenienceList = conveniences.stream().filter(convenience -> convenience.getType().equals(ConvenienceType.ROOM))
                 .map(convenience -> convenience.getName().name()).toList();
         return roomConvenienceList;
     }
