@@ -3,6 +3,7 @@ package nerds.studiousTestProject.bookmark.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.request.BookmarkReuqest;
+import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.dto.response.PageInfo;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
@@ -44,19 +45,18 @@ public class BookmarkService {
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
     }
 
-    public List<FindBookmarkResponse> findBookmark(String accessToken, Pageable pageable){
+    public FindBookmarkResponse findBookmark(String accessToken, Pageable pageable){
         pageable = getPageable(pageable);
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
-            return Collections.emptyList();
+            return FindBookmarkResponse.builder().pageInfo(PageInfo.of(bookmarks)).bookmarkInfo(Collections.emptyList()).build();
         }
 
-        return bookmarks.stream()
+        List<BookmarkInfo> bookmarkInfos = bookmarks.stream()
                 .map(Bookmark::getStudycafe)
-                .map(studycafe -> FindBookmarkResponse.builder()
-                        .pageInfo(PageInfo.of(bookmarks))
+                .map(studycafe -> BookmarkInfo.builder()
                         .cafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
@@ -67,6 +67,8 @@ public class BookmarkService {
                         .hashtags(hashtagRecordService.findStudycafeHashtag(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
+
+        return FindBookmarkResponse.builder().pageInfo(PageInfo.of(bookmarks)).bookmarkInfo(bookmarkInfos).build();
     }
 
     @Transactional

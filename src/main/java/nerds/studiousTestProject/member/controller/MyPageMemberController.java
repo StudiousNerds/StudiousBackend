@@ -3,6 +3,7 @@ package nerds.studiousTestProject.member.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.request.BookmarkReuqest;
+import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.general.patch.PatchPasswordRequest;
@@ -65,7 +66,7 @@ public class MyPageMemberController {
     }
 
     @GetMapping("/bookmarks")
-    public List<FindBookmarkResponse> findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
+    public FindBookmarkResponse findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
         return bookmarkService.findBookmark(accessToken, pageable);
     }
 
