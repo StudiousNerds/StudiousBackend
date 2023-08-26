@@ -13,7 +13,7 @@ public class PageResponse {
 
     public static PageResponse of(Page<Review> reviews) {
         return PageResponse.builder()
-                .currentPage(reviews.getNumber())
+                .currentPage(reviews.getNumber() + 1)
                 .totalPage(reviews.getTotalPages())
                 .build();
     }

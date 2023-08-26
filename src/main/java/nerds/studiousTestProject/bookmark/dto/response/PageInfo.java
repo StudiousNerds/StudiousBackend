@@ -13,7 +13,7 @@ public class PageInfo {
 
     public static PageInfo of(Page<Bookmark> bookmarks) {
         return PageInfo.builder()
-                .currentPage(bookmarks.getNumber())
+                .currentPage(bookmarks.getNumber() + 1)
                 .totalPage(bookmarks.getTotalPages())
                 .build();
     }
