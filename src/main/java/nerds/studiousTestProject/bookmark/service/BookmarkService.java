@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,11 @@ public class BookmarkService {
         pageable = getPageable(pageable);
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
+
+        if (bookmarks == null || !bookmarks.hasContent()) {
+            return Collections.emptyList();
+        }
+
         return bookmarks.stream()
                 .map(Bookmark::getStudycafe)
                 .map(studycafe -> FindBookmarkResponse.builder()
