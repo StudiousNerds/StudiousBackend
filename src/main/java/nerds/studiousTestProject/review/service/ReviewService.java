@@ -18,10 +18,10 @@ import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
-import nerds.studiousTestProject.review.dto.find.response.FindReviewResponse;
+import nerds.studiousTestProject.review.dto.find.response.FindReviewInfo;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
-import nerds.studiousTestProject.review.dto.find.response.PageResponse;
+import nerds.studiousTestProject.review.dto.find.response.PageInfo;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.written.response.GradeInfo;
 import nerds.studiousTestProject.review.dto.written.response.ReviewInfo;
@@ -140,9 +140,9 @@ public class ReviewService {
     public FindReviewSortedResponse findAllReviews(Long studycafeId, Pageable pageable) {
         Page<Review> reviews = getAllReviewsSorted(studycafeId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageResponse(PageResponse.of(reviews))
+                .pageInfo(PageInfo.of(reviews))
                 .totalGradeInfo(findTotalGrade(studycafeId))
-                .findReviewResponses(getReviewInfo(reviews))
+                .findReviewInfo(getReviewInfo(reviews))
                 .build();
     }
 
@@ -154,9 +154,9 @@ public class ReviewService {
     public FindReviewSortedResponse findRoomReviews(Long studycafeId, Long roomId, Pageable pageable) {
         Page<Review> reviews = getRoomReviewsSorted(studycafeId, roomId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageResponse(PageResponse.of(reviews))
+                .pageInfo(PageInfo.of(reviews))
                 .totalGradeInfo(findTotalGrade(studycafeId))
-                .findReviewResponses(getReviewInfo(reviews))
+                .findReviewInfo(getReviewInfo(reviews))
                 .build();
     }
 
@@ -296,11 +296,10 @@ public class ReviewService {
         return reservationRecordList;
     }
 
-    public List<FindReviewResponse> getReviewInfo(Page<Review> reviewList) {
+    public List<FindReviewInfo> getReviewInfo(Page<Review> reviewList) {
         return reviewList.stream()
                 .filter(review -> review != null && reviewList.hasContent())
-                .map(review -> FindReviewResponse.builder()
-                        .grade(review.getGrade().getTotal())
+                .map(review -> FindReviewInfo.builder()
                         .nickname(getMember(review).getNickname())
                         .roomName(getRoom(review).getName())
                         .minHeadCount(getRoom(review).getMinHeadCount())

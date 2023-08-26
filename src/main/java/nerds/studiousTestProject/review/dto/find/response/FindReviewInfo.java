@@ -8,8 +8,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class FindReviewResponse {
-    private Double grade;
+public class FindReviewInfo {
     private String nickname;
     private String roomName;
     private Integer minHeadCount;
