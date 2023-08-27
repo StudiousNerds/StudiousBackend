@@ -96,8 +96,7 @@ class ReservationRecordRepositoryTest {
 
         Member member1 = 멤버_저장(BEAVER.생성(1L));
         Member member2 = 멤버_저장(BURNED_POTATO.생성(2L));
-        Studycafe studycafe = 스터디카페_저장(NERDS.생성());
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.생성())));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -119,8 +118,7 @@ class ReservationRecordRepositoryTest {
     void 예약_취소_탭을_페이징해_조회한다(){
 
         Member member1 = 멤버_저장(BEAVER.생성(1L));
-        Studycafe studycafe = 스터디카페_저장(NERDS.생성());
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
 
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
