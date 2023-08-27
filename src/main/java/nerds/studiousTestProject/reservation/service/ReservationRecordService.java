@@ -5,6 +5,8 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
+import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
@@ -58,21 +60,31 @@ public class ReservationRecordService {
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
     private final ConvenienceRepository convenienceRepository;
+    private final ConvenienceRecordRepository convenienceRecordRepository;
 
     @Transactional
     public String saveReservationRecordBeforePayment(PaymentRequest paymentRequest, Long roomId, String accessToken) {
         String orderId = String.valueOf(UUID.randomUUID());
-        saveReservationRecord(
+        ReservationRecord reservationRecord = saveReservationRecord(
                 tokenService.getMemberFromAccessToken(accessToken),
                 findRoomById(roomId),
                 paymentRequest.getReservation(),
                 paymentRequest.getUser(),
                 orderId);
+        savePaidConvenienceRecord(paymentRequest, reservationRecord);
         return orderId;
     }
 
-    private void saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
-        reservationRecordRepository.save(
+    private void savePaidConvenienceRecord(PaymentRequest paymentRequest, ReservationRecord reservationRecord) {
+        paymentRequest.getPaidConveniences().stream().map(paidConvenience -> convenienceRecordRepository.save(ConvenienceRecord.builder()
+                .reservationRecord(reservationRecord)
+                .convenienceName(paidConvenience.getConvenienceName())
+                .price(paidConvenience.getPrice())
+                .build()));
+    }
+
+    private ReservationRecord saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
+        return reservationRecordRepository.save(
                 ReservationRecord.builder()
                         .status(ReservationStatus.INPROGRESS)
                         .date(reservation.getReserveDate())
