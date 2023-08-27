@@ -21,7 +21,7 @@ public class PaymentController {
     @PostMapping("/studycafes/{cafeId}/rooms/{roomId}")
     public PaymentResponse payRequest(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
                                       @PathVariable Long roomId,
-                                      @RequestBody PaymentRequest paymentRequest) {
+                                      @RequestBody @Valid PaymentRequest paymentRequest) {
         String orderId = reservationRecordService.saveReservationRecordBeforePayment(paymentRequest, roomId, accessToken);
         return paymentService.createPaymentResponse(paymentRequest, orderId);
     }
