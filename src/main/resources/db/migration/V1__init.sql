@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS `announcement` (
 
 CREATE TABLE IF NOT EXISTS `operation_info` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
-    `is_all_day`   TINYINT(1)            DEFAULT '0',
-    `closed`       TINYINT(1)            DEFAULT '0',
+    `is_all_day`   TINYINT(1)   NOT NULL,
+    `closed`       TINYINT(1)   NOT NULL,
     `end_time`     TIME,
     `start_time`   TIME,
     `week`         varchar(255) NOT NULL,
@@ -154,9 +154,10 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `convenience_record` (
-    `id`                    bigint NOT NULL AUTO_INCREMENT,
-    `reservation_record_id` bigint NOT NULL,
-    `convenience_id`        bigint NOT NULL,
+    `id`                    bigint       NOT NULL AUTO_INCREMENT,
+    `reservation_record_id` bigint       NOT NULL,
+    `convenience_name`      varchar(255) NOT NULL,
+    `price`                 varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
