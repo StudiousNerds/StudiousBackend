@@ -39,7 +39,7 @@ public class PaymentService {
     private final PaymentGenerator paymentGenerator;
 
     private static final String REQUEST_SUCCESS_URI = "http://localhost:8080/studious/payments/success";
-    private static final String REQUEST_FAIL_URI = "http://localhost:8080/studious/payments/success";
+    private static final String REQUEST_FAIL_URI = "http://localhost:8080/studious/payments/fail";
     private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
 
