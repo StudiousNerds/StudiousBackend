@@ -5,13 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
-import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -20,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
@@ -36,7 +35,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 @Transactional(readOnly = true)
 public class RoomService {
     private final RoomRepository roomRepository;
-    private final SubPhotoService subPhotoService;
     private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
     private final OperationInfoRepository operationInfoRepository;
@@ -44,25 +42,22 @@ public class RoomService {
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId){
 
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-        List<FindRoomResponse> rooms = new ArrayList<>();
 
-        for (Room room : roomList) {
-            rooms.add(FindRoomResponse.builder()
-                    .id(room.getId())
-                    .name(room.getName())
-                    .minCount(room.getMinHeadCount())
-                    .maxCount(room.getMaxHeadCount())
-                    .price(room.getPrice())
-                    .type(room.getPriceType().toString())
-                    .minUsingTime(room.getMinUsingTime())
-                    .photos(subPhotoService.findRoomPhotos(room.getId()))
-                    .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
-                    .conveniences(getConveniences(room.getId()))
-                    .paidConveniences(getPaidConveniences(room.getId()))
-                    .build());
-        }
-
-        return rooms;
+        return roomList.stream()
+                .map(room -> FindRoomResponse.builder()
+                        .id(room.getId())
+                        .name(room.getName())
+                        .minCount(room.getMinHeadCount())
+                        .maxCount(room.getMaxHeadCount())
+                        .price(room.getPrice())
+                        .type(room.getPriceType().toString())
+                        .minUsingTime(room.getMinUsingTime())
+                        .photos(getPhotos(room))
+                        .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
+                        .conveniences(getConveniences(room.getId()))
+                        .paidConveniences(getPaidConveniences(room.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
@@ -101,14 +96,12 @@ public class RoomService {
         return reservationList;
     }
 
-    public String[] getConveniences(Long roomId) {
+    public List<String> getConveniences(Long roomId) {
         Room room = findRoomById(roomId);
 
-        List<ConvenienceName> convenienceList = room.getConveniences().stream().map(Convenience::getName).toList();
-        Integer arrSize = convenienceList.size();
-        String conveniences[] = convenienceList.toArray(new String[arrSize]);
-
-        return conveniences;
+        return room.getConveniences().stream()
+                .map(Convenience -> Convenience.getName().name())
+                .toList();
     }
 
     public List<PaidConvenience> getPaidConveniences(Long roomId) {
@@ -134,5 +127,9 @@ public class RoomService {
     public LocalTime findEndTimeByWeek(Week week) {
         return operationInfoRepository.findEndTime(week)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_END_TIME));
+    }
+
+    private List<String> getPhotos(Room room) {
+        return room.getSubPhotos().stream().map(SubPhoto::getPath).collect(Collectors.toList());
     }
 }

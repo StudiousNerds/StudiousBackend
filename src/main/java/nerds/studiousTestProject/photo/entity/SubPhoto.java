@@ -1,9 +1,7 @@
 package nerds.studiousTestProject.photo.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,15 +35,19 @@ public class SubPhoto {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @Column(name = "type", nullable = false)
+    private String type;
+
     @Column(name = "path", nullable = false)
     private String path;
 
     @Builder
-    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String path) {
+    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String type, String path) {
         this.id = id;
         this.room = room;
         this.studycafe = studycafe;
         this.review = review;
+        this.type = type;
         this.path = path;
     }
 

@@ -3,6 +3,8 @@ package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Builder
 @Data
 public class EventCafeResponse {
@@ -13,5 +15,5 @@ public class EventCafeResponse {
     private String nearestStation;
     private Integer distance;
     private Double grade;
-    private String[] hashtags;
+    private List<String> hashtags;
 }
