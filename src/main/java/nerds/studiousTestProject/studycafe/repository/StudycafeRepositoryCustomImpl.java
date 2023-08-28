@@ -250,7 +250,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             case REVIEW_ASC -> orderSpecifiers.add(review.count().asc());
         }
 
-        orderSpecifiers.add(studycafe.createdDate.asc());
+        orderSpecifiers.add(studycafe.name.asc());  // 두 번째 정렬조건 추가
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
 }

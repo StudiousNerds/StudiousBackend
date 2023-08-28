@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.member.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
@@ -29,7 +30,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public JwtTokenResponse signUp(@RequestBody SignUpRequest signUpRequest) {
+    public JwtTokenResponse signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         return memberService.register(signUpRequest);
     }
 
