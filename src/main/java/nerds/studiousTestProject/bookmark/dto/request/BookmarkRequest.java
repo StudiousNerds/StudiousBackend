@@ -3,6 +3,6 @@ package nerds.studiousTestProject.bookmark.dto.request;
 import lombok.Data;
 
 @Data
-public class BookmarkReuqest {
+public class BookmarkRequest {
     private Long studycafeId;
 }

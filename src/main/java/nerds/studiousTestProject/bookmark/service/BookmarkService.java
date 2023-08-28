@@ -2,7 +2,7 @@ package nerds.studiousTestProject.bookmark.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.request.BookmarkReuqest;
+import nerds.studiousTestProject.bookmark.dto.request.BookmarkRequest;
 import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.dto.response.PageInfo;
@@ -36,8 +36,8 @@ public class BookmarkService {
     private final TokenService tokenService;
 
     @Transactional
-    public void registerBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
-        Long studycafeId = bookmarkReuqest.getStudycafeId();
+    public void registerBookmark(String accessToken, BookmarkRequest bookmarkRequest){
+        Long studycafeId = bookmarkRequest.getStudycafeId();
 
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
@@ -72,13 +72,14 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(String accessToken, BookmarkReuqest bookmarkReuqest){
-        Long studycafeId = bookmarkReuqest.getStudycafeId();
+    public void deleteBookmark(String accessToken, BookmarkRequest bookmarkRequest){
+        Long studycafeId = bookmarkRequest.getStudycafeId();
 
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
         member.deleteBookmark(Bookmark.builder().studycafe(studyCafe).build());
+        bookmarkRepository.deleteById(studycafeId);
     }
 
     private PageRequest getPageable(Pageable pageable) {

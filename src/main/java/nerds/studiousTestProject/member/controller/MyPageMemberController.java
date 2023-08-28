@@ -2,7 +2,7 @@ package nerds.studiousTestProject.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.request.BookmarkReuqest;
+import nerds.studiousTestProject.bookmark.dto.request.BookmarkRequest;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.general.patch.PatchPasswordRequest;
@@ -56,8 +56,8 @@ public class MyPageMemberController {
     }
 
     @PostMapping("/bookmarks")
-    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest){
-        bookmarkService.registerBookmark(accessToken, bookmarkReuqest);
+    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkRequest bookmarkRequest){
+        bookmarkService.registerBookmark(accessToken, bookmarkRequest);
         return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
     }
 
@@ -67,8 +67,8 @@ public class MyPageMemberController {
     }
 
     @DeleteMapping("/bookmarks")
-    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkReuqest bookmarkReuqest){
-        bookmarkService.deleteBookmark(accessToken, bookmarkReuqest);
+    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkRequest bookmarkRequest){
+        bookmarkService.deleteBookmark(accessToken, bookmarkRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
     }
 }
