@@ -26,7 +26,7 @@ public class ConvenienceRecord {
     @JoinColumn(name = "reservation_record_id", nullable = false)
     private ReservationRecord reservationRecord;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "convenience_id", nullable = false)
-    private Convenience convenience;
+    private ConvenienceName convenienceName;
+
+    private Integer price;
 }
