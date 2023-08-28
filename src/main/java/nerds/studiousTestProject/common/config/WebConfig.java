@@ -2,6 +2,7 @@ package nerds.studiousTestProject.common.config;
 
 
 import nerds.studiousTestProject.common.util.StringToReservationSettingsStatusConverter;
+import nerds.studiousTestProject.studycafe.util.StringToSortTypeConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -29,5 +30,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToReservationSettingsStatusConverter());
+        registry.addConverter(new StringToSortTypeConverter());
     }
 }

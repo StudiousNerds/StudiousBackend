@@ -34,8 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
@@ -43,8 +41,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASS
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PROVIDER_ID;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
@@ -63,18 +59,13 @@ public class MemberService {
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
      * @param signUpRequest 회원 가입 폼에서 입력한 정보
-     *                      이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
+     * 이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
      * @return 회원가입한 정보로 만든 토큰 값
      */
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
-        MemberType type = MemberType.handle(signUpRequest.getType());
-        validate(signUpRequest, type);
-
         String encodedPassword = getEncodedPassword(signUpRequest);
         Member member = signUpRequest.toEntity(encodedPassword);
-
-        log.info("created member = {}", member);
         memberRepository.save(member);
 
         return jwtTokenProvider.generateToken(member);
@@ -251,33 +242,6 @@ public class MemberService {
 
     public Optional<Member> findByProviderIdAndType(Long providerId, MemberType type) {
         return memberRepository.findByProviderIdAndType(providerId, type);
-    }
-
-    private void validate(SignUpRequest signUpRequest, MemberType type) {
-        Long providerId = signUpRequest.getProviderId();
-        if (providerId == null && !type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PROVIDER_ID);
-        }
-
-        if ((providerId != null && memberRepository.existsByProviderIdAndType(providerId, type))) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (signUpRequest.getPassword() == null && type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PASSWORD);
-        }
-
-        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), type)) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (memberRepository.existsByPhoneNumber(signUpRequest.getPhoneNumber())) {
-            throw new BadRequestException(ALREADY_EXIST_PHONE_NUMBER);
-        }
-
-        if (memberRepository.existsByNickname(signUpRequest.getNickname())) {
-            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
-        }
     }
 
     /**

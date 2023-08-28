@@ -369,6 +369,6 @@ public class ReviewService {
     }
 
     private Review findById(Long reviewId) {
-        return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
+        return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
     }
 }

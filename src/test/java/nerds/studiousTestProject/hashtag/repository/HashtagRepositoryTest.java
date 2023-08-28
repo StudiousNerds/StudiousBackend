@@ -33,7 +33,7 @@ class HashtagRepositoryTest {
         // when
         save.getHashtagRecords().removeAll(save.getHashtagRecords());
         hashtagRecordRepository.deleteAllByReviewId(1L);
-        Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVEIW));
+        Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
         List<HashtagRecord> hashtagList = hashtagRecordRepository.findAll();
         // then
         Assertions.assertThat(hashtagList.size()).isEqualTo(0);
