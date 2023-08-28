@@ -56,12 +56,6 @@ public class Review {
         hashtagRecord.setReview(this);
     }
 
-    public void addGrade(Grade grade) {
-        if (grade != null) {
-            this.grade = grade;
-        }
-    }
-
     @Builder
     public Review(Long id, Grade grade, LocalDate createdDate, String detail, String photo, String comment) {
         this.id = id;

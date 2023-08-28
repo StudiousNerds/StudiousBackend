@@ -1,13 +1,13 @@
-package nerds.studiousTestProject.bookmark.dto;
+package nerds.studiousTestProject.bookmark.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 
-@Data
+import java.util.List;
+
 @Builder
-public class FindBookmarkResponse {
-    private Integer pageNumber;
-    private Integer totalRecord;
+@Data
+public class BookmarkInfo {
     private Long cafeId;
     private String cafeName;
     private String photo;
@@ -15,5 +15,5 @@ public class FindBookmarkResponse {
     private String nearestStation;
     private Integer distance;
     private Double grade;
-    private String[] hashtags;
+    private List<String> hashtags;
 }
