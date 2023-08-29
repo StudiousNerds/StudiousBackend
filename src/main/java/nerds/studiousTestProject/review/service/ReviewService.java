@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVEIW;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
 
 
 @RequiredArgsConstructor

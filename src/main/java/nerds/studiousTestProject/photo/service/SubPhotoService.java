@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVEIW;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +26,7 @@ public class SubPhotoService {
 
     public List<String> findReviewPhotos(Long reviewId){
         List<SubPhoto> photoList = subPhotoRepository.findAllByReviewId(reviewId);
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVEIW));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
         List<String> reviewPhotos = new ArrayList<>();
         reviewPhotos.add(review.getPhoto());
         List<String> reviewSubPhoto = photoList.stream().map(SubPhoto::getPath).collect(Collectors.toList());
