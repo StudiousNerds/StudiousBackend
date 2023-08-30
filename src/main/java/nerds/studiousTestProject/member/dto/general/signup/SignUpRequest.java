@@ -10,26 +10,17 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.member.Role;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedEmailCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedNicknameCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedPhoneNumberCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpTypeCheck;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @Builder
-@SignUpDuplicatedEmailCheck
-@SignUpDuplicatedNicknameCheck
-@SignUpDuplicatedPhoneNumberCheck
-@SignUpTypeCheck
 public class SignUpRequest {
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
-    @NotBlank(message = "비밀번호는 공백일 수 없습니다.")
     private String password;
 
     @NotBlank(message = "이름은 공백일 수 없습니다.")
