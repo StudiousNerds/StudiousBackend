@@ -35,17 +35,17 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public JwtTokenResponse login(@RequestBody LoginRequest loginRequest) {
+    public JwtTokenResponse login(@RequestBody @Valid LoginRequest loginRequest) {
         return memberService.issueToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
     @PostMapping("/email")
-    public FindEmailResponse findEmail(@RequestBody FindEmailRequest findEmailRequest) {
+    public FindEmailResponse findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
         return memberService.findEmailFromPhoneNumber(findEmailRequest);
     }
 
     @PostMapping("/password")
-    public FindPasswordResponse findPassword(@RequestBody FindPasswordRequest findPasswordRequest) {
+    public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
         log.info("email = {}", findPasswordRequest.getEmail());
         log.info("phoneNumber = {}", findPasswordRequest.getPhoneNumber());
         return memberService.issueTemporaryPassword(findPasswordRequest);
