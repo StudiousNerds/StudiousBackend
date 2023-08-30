@@ -7,15 +7,14 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -23,53 +22,25 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 @Transactional(readOnly = true)
 public class SubPhotoService {
     private final SubPhotoRepository subPhotoRepository;
-    private final StudycafeRepository studycafeRepository;
     private final ReviewRepository reviewRepository;
 
-    public String[] findReviewPhotos(Long reviewId){
+    public List<String> findReviewPhotos(Long reviewId){
         List<SubPhoto> photoList = subPhotoRepository.findAllByReviewId(reviewId);
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
-        Integer arrSize = photoList.size();
-        String reviewPhotos[] = new String[arrSize];
-        reviewPhotos[0] = review.getPhoto();
-
-        for (int i = 1; i < arrSize; i++){
-            reviewPhotos[i] = photoList.get(i).getPath();
-        }
+        List<String> reviewPhotos = new ArrayList<>();
+        reviewPhotos.add(review.getPhoto());
+        List<String> reviewSubPhoto = photoList.stream().map(SubPhoto::getPath).collect(Collectors.toList());
+        reviewPhotos.addAll(reviewSubPhoto);
 
         return reviewPhotos;
     }
 
-    public String[] findCafePhotos(Long studycafeId){
-        List<SubPhoto> photoList = subPhotoRepository.findAllByStudycafeId(studycafeId);
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        Integer arrSize = photoList.size();
-        String cafePhotos[] = new String[arrSize];
-        cafePhotos[0] = studycafe.getPhoto();
-
-        for (int i = 1; i < arrSize; i++){
-            cafePhotos[i] = photoList.get(i).getPath();
-        }
-
-        return cafePhotos;
+    @Transactional
+    public void saveAllPhotos(List<SubPhoto> photos) {
+        subPhotoRepository.saveAll(photos);
     }
 
-    public String[] findRoomPhotos(Long roomId){
-        List<SubPhoto> photoList = subPhotoRepository.findAllByRoomId(roomId);
-        Integer arrSize = photoList.size();
-        String roomPhotos[] = new String[arrSize];
-
-        for (int i = 0; i < arrSize; i++){
-            roomPhotos[i] = photoList.get(i).getPath();
-        }
-
-        return roomPhotos;
-    }
-
-    public void savePhoto(SubPhoto photo) {
-        subPhotoRepository.save(photo);
-    }
-
+    @Transactional
     public void removeAllPhotos(Long reviewId) {
         subPhotoRepository.deleteAllByReviewId(reviewId);
     }

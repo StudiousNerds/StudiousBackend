@@ -19,7 +19,7 @@ public class SignUpDuplicatedEmailCheckValidator implements ConstraintValidator<
     @Override
     public boolean isValid(SignUpRequest signUpRequest, ConstraintValidatorContext context) {
         Long providerId = signUpRequest.getProviderId();
-        MemberType type = signUpRequest.getType();
+        MemberType type = MemberType.handle(signUpRequest.getType());
 
         if (providerId != null && memberRepository.existsByProviderIdAndType(providerId, type)) {
             return false;
