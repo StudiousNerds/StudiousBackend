@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
@@ -246,10 +245,6 @@ public class MemberService {
 //        String password = passwordEncoder.encode(member.getPassword());
 
         return jwtTokenProvider.generateToken(member);
-    }
-
-    public Optional<Member> findByProviderIdAndType(Long providerId, MemberType type) {
-        return memberRepository.findByProviderIdAndType(providerId, type);
     }
 
     private void validate(SignUpRequest signUpRequest) {
