@@ -34,8 +34,8 @@ class SubPhotoRepositoryTest {
     void findAllByReviewId() {
         // given
         Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
-        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.리뷰_생성(review, 1L));
-        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.리뷰_생성(review, 2L));
+        SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 2L));
         // when
         List<SubPhoto> reviewPhotoList = subPhotoRepository.findAllByReviewId(review.getId());
         // then
@@ -46,8 +46,8 @@ class SubPhotoRepositoryTest {
     void findAllByStudycafeId() {
         // given
         Studycafe studycafe = studycafeRepository.save(FIRST_STUDYCAFE.생성(1L));
-        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.스터디카페_생성(studycafe, 1L));
-        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.스터디카페_생성(studycafe, 2L));
+        SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.스터디카페_생성(studycafe, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.스터디카페_생성(studycafe, 2L));
         // when
         List<SubPhoto> studycafePhotoList = subPhotoRepository.findAllByStudycafeId(1L);
         // then
@@ -58,8 +58,8 @@ class SubPhotoRepositoryTest {
     void findAllByRoomId() {
         // given
         Room room = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
-        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.룸_생성(room, 1L));
-        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.룸_생성(room, 2L));
+        SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 2L));
         // when
         List<SubPhoto> studycafeRoomList = subPhotoRepository.findAllByRoomId(room.getId());
         // then
@@ -70,8 +70,8 @@ class SubPhotoRepositoryTest {
     void deleteAllByReviewId() {
         // given
         Review review = reviewRepository.save(FIRST_REVIEW.생성(1L));
-        SubPhoto subPhoto = subPhotoRepository.save(FIRST_PHOTO.리뷰_생성(review, 1L));
-        SubPhoto subPhoto1 = subPhotoRepository.save(SECOND_PHOTO.리뷰_생성(review, 2L));
+        SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 1L));
+        SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 2L));
         // when
         subPhotoRepository.deleteAllByReviewId(review.getId());
         List<SubPhoto> photoList = subPhotoRepository.findAll();
