@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.general.signup;
+package nerds.studiousTestProject.member.dto.oauth.signup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,26 +10,15 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.member.Role;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedEmailCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedNicknameCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpDuplicatedPhoneNumberCheck;
-import nerds.studiousTestProject.member.validator.register.SignUpTypeCheck;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
 @Builder
-@SignUpDuplicatedEmailCheck
-@SignUpDuplicatedNicknameCheck
-@SignUpDuplicatedPhoneNumberCheck
-@SignUpTypeCheck
-public class SignUpRequest {
-
+@Data
+public class OAuth2SignUpRequest {
     @Email(message = "올바른 이메일 형식이 아닙니다.")
-    private String email;
-
-    private String password;
+    protected String email;
 
     @NotBlank(message = "이름은 공백일 수 없습니다.")
     private String name;
@@ -37,8 +26,10 @@ public class SignUpRequest {
     @NotBlank(message = "닉네임은 공백일 수 없습니다.")
     private String nickname;
 
+    @NotNull(message = "providerId는 필수입니다.")
     private Long providerId;
 
+    @NotNull(message = "소셜 유형은 필수입니다.")
     private MemberType type;
 
     @NotNull(message = "생일은 필수입니다.")
@@ -51,10 +42,9 @@ public class SignUpRequest {
     @Size(min = 1, message = "권한은 최소 1개 이상이여야 합니다.")
     private List<String> roles;
 
-    public Member toEntity(String encodedPassword) {
+    public Member toEntity() {
         Member member = Member.builder()
                 .email(email)
-                .password(encodedPassword)
                 .providerId(providerId)
                 .name(name)
                 .nickname(nickname)

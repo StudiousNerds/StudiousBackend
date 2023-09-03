@@ -102,12 +102,12 @@ public class StudycafeService {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return FindStudycafeResponse.builder()
-                .cafeId(studycafe.getId())
+                .studycafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
                 .photos(getPhotos(studycafe))
                 .accumResCnt(getAccumResCnt(studycafeId))
-                .duration(getWalkingtime(studycafe))
-                .nearestStation(getNearestStation(studycafe))
+                .walkingTime(studycafe.getWalkingTime())
+                .nearestStation(studycafe.getNearestStation())
                 .hashtags(getHashtagRecords(studycafe.getId()))
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(studycafeId))
@@ -136,12 +136,12 @@ public class StudycafeService {
 
         return topTenCafeList.stream()
                 .map(studycafe -> RecommendCafeResponse.builder()
-                        .cafeId(studycafe.getId())
+                        .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                        .distance(getWalkingtime(studycafe))
-                        .nearestStation(getNearestStation(studycafe))
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
                         .hashtags(getHashtagRecords(studycafe.getId()))
                         .build())
@@ -153,12 +153,12 @@ public class StudycafeService {
 
         return topTenCafeList.stream()
                 .map(studycafe -> EventCafeResponse.builder()
-                        .cafeId(studycafe.getId())
+                        .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                        .distance(getWalkingtime(studycafe))
-                        .nearestStation(getNearestStation(studycafe))
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
                         .hashtags(getHashtagRecords(studycafe.getId()))
                         .build())
@@ -182,22 +182,6 @@ public class StudycafeService {
                 .map(Convenience::getName)
                 .map(ConvenienceName::toString)
                 .toList();
-    }
-
-    public Integer getWalkingtime(Studycafe studycafe) {
-        try {
-            return studycafe.getNearestStationInfo().getWalkingTime();
-        } catch (Exception exception) {
-            return 0;
-        }
-    }
-
-    public String getNearestStation(Studycafe studycafe) {
-        try {
-            return studycafe.getNearestStationInfo().getNearestStation();
-        } catch (Exception exception) {
-            return " ";
-        }
     }
 
     public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
@@ -265,7 +249,8 @@ public class StudycafeService {
                 .totalGrade(0.0)
                 .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
-                .nearestStationInfo(nearestStationInfoResponse.toEmbedded())
+                .walkingTime(nearestStationInfoResponse.getWalkingTime())
+                .nearestStation(nearestStationInfoResponse.getNearestStation())
                 .introduction(cafeInfo.getIntroduction())
                 .build();
 

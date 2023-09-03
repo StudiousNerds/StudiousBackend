@@ -30,11 +30,8 @@ import static nerds.studiousTestProject.support.EntitySaveProvider.운영_정보
 import static nerds.studiousTestProject.support.EntitySaveProvider.편의시설_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.해시테그_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장;
-import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.ELEVATOR_CONVENIENCE;
-import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.HDMI_CONVENIENCE;
-import static nerds.studiousTestProject.support.fixture.GradeFixture.FIRST_GRADE;
-import static nerds.studiousTestProject.support.fixture.GradeFixture.SECOND_GRADE;
-import static nerds.studiousTestProject.support.fixture.GradeFixture.THIRD_GRADE;
+import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.STUDYCAFE_ELEVATOR_FREE;
+import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.ROOM_HDMI_FREE;
 import static nerds.studiousTestProject.support.fixture.HashtagFixture.COST_EFFECTIVE_HASHTAG;
 import static nerds.studiousTestProject.support.fixture.HashtagFixture.ACCESS_HASHTAG;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
@@ -255,13 +252,13 @@ class StudycafeRepositoryCustomImplTest {
         Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
 
-        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()));
+        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, review1));
 
         Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
 
-        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_생성(THIRD_GRADE.생성()));
+        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, review2));
 
         List<Studycafe> responses = studycafeRepository.getSearchResult(request, pageable()).getContent();
@@ -283,13 +280,13 @@ class StudycafeRepositoryCustomImplTest {
         // when
         Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
-        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()));
+        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, review1));
         해시테그_저장(COST_EFFECTIVE_HASHTAG.리뷰_생성(review1));
 
         Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
-        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_생성(THIRD_GRADE.생성()));
+        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2));
         해시테그_저장(ACCESS_HASHTAG.리뷰_생성(review2));
 
@@ -313,8 +310,8 @@ class StudycafeRepositoryCustomImplTest {
         // when
         Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
-        편의시설_저장(ELEVATOR_CONVENIENCE.스터디카페_생성(studycafe1, null));
-        편의시설_저장(HDMI_CONVENIENCE.룸_생성(room1, null));
+        편의시설_저장(STUDYCAFE_ELEVATOR_FREE.스터디카페_생성(studycafe1, null));
+        편의시설_저장(ROOM_HDMI_FREE.룸_생성(room1, null));
 
         룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(admin))));
 
@@ -381,19 +378,19 @@ class StudycafeRepositoryCustomImplTest {
         Studycafe studycafe1 = 스터디카페_저장(FIRST_STUDYCAFE.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
 
-        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()));
+        Review review1 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, review1));
 
         Studycafe studycafe2 = 스터디카페_저장(SECOND_STUDYCAFE.멤버_생성(admin));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
 
-        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_생성(SECOND_GRADE.생성()));
+        Review review2 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(3, 3, 3, 3.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, review2));
 
         Studycafe studycafe3 = 스터디카페_저장(THIRD_STUDYCAFE.멤버_생성(admin));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe3));
 
-        Review review3 = 리뷰_저장(FIRST_REVIEW.평점_생성(THIRD_GRADE.생성()));
+        Review review3 = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room3, review3));
 
         List<Studycafe> responses = studycafeRepository.getSearchResult(request, pageable()).getContent();
@@ -417,16 +414,16 @@ class StudycafeRepositoryCustomImplTest {
 
         // when
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(FIRST_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(SECOND_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(THIRD_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room3, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room3, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         List<Studycafe> responses = studycafeRepository.getSearchResult(searchRequest, pageable()).getContent();
 
@@ -448,16 +445,16 @@ class StudycafeRepositoryCustomImplTest {
 
         // when
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(FIRST_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room1, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(SECOND_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room2, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(THIRD_STUDYCAFE.멤버_생성(admin))));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room3, 리뷰_저장(FIRST_REVIEW.평점_생성(FIRST_GRADE.생성()))));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.MIN, LocalTime.MAX, reservation, room3, 리뷰_저장(FIRST_REVIEW.평점_정보_생성(5, 5, 5, 5.0))));
 
         List<Studycafe> responses = studycafeRepository.getSearchResult(searchRequest, pageable()).getContent();
 
