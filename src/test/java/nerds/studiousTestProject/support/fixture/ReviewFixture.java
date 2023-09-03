@@ -30,6 +30,16 @@ public enum ReviewFixture {
                 .build();
     }
 
+    public Review 평점_정보_생성(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total) {
+        return 평점_정보_생성(null, cleanliness, deafening, fixturesStatus, total);
+    }
+
+    public Review 평점_정보_생성(Long id, Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total) {
+        return 기본_정보_생성()
+                .grade(createGrade(cleanliness, deafening, fixturesStatus, total))
+                .build();
+    }
+
     public Review 평점_생성(Grade grade) {
         return 평점_생성(grade, null);
     }
@@ -38,6 +48,15 @@ public enum ReviewFixture {
         return 기본_정보_생성()
                 .id(id)
                 .grade(grade)
+                .build();
+    }
+
+    public Grade createGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total) {
+        return Grade.builder()
+                .cleanliness(cleanliness)
+                .deafening(deafening)
+                .fixturesStatus(fixturesStatus)
+                .total(total)
                 .build();
     }
 
