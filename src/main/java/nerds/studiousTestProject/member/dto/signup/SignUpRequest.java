@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.general.signup;
+package nerds.studiousTestProject.member.dto.signup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -29,10 +29,6 @@ public class SignUpRequest {
     @NotBlank(message = "닉네임은 공백일 수 없습니다.")
     private String nickname;
 
-    private Long providerId;
-
-    private MemberType type;
-
     @NotNull(message = "생일은 필수입니다.")
     private LocalDate birthday;
 
@@ -47,10 +43,9 @@ public class SignUpRequest {
         Member member = Member.builder()
                 .email(email)
                 .password(encodedPassword)
-                .providerId(providerId)
                 .name(name)
                 .nickname(nickname)
-                .type(MemberType.handle(type))
+                .type(MemberType.DEFAULT)
                 .birthday(birthday)
                 .phoneNumber(phoneNumber)
                 .createdDate(LocalDate.now())

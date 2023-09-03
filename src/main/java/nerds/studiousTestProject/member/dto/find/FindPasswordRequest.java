@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.general.find;
+package nerds.studiousTestProject.member.dto.find;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
