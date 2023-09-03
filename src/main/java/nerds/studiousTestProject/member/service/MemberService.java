@@ -37,14 +37,11 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_MEMBER_TYPE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASSWORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PROVIDER_ID;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
@@ -74,7 +71,6 @@ public class MemberService {
         Member member = signUpRequest.toEntity(encodedPassword);
 
         memberRepository.save(member);
-
         return jwtTokenProvider.generateToken(member);
     }
 
@@ -248,25 +244,7 @@ public class MemberService {
     }
 
     private void validate(SignUpRequest signUpRequest) {
-        MemberType type = MemberType.handle(signUpRequest.getType());
-        Long providerId = signUpRequest.getProviderId();
-        if (providerId == null && !type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PROVIDER_ID);
-        }
-
-        if (providerId != null && type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(INVALID_MEMBER_TYPE);
-        }
-
-        if (providerId != null && memberRepository.existsByProviderIdAndType(providerId, type)) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (signUpRequest.getPassword() == null && type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PASSWORD);
-        }
-
-        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), type)) {
+        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), MemberType.DEFAULT)) {
             throw new BadRequestException(ALREADY_EXIST_USER);
         }
 
