@@ -4,17 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import nerds.studiousTestProject.common.util.MultiValueMapConverter;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
-import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenRequest;
-import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
-import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfo;
-import nerds.studiousTestProject.member.dto.oauth.userinfo.OAuth2UserInfoFactory;
+import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2SignUpRequest;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenRequest;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenResponse;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.userinfo.OAuth2UserInfo;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.userinfo.OAuth2UserInfoFactory;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.service.MemberService;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class OAuth2Service {
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final WebClient webClient;
 
@@ -145,7 +146,7 @@ public class OAuth2Service {
         // providerId를 통해 MemberRepository 확인
         Long providerId = oAuth2UserInfo.getProviderId();
         MemberType type = MemberType.valueOf(oAuth2UserInfo.getProvider());
-        Optional<Member> memberOptional = memberService.findByProviderIdAndType(providerId, type);
+        Optional<Member> memberOptional = memberRepository.findByProviderIdAndType(providerId, type);
 
         boolean exist = memberOptional.isPresent(); // 기존 회원인지 여부
         JwtTokenResponse jwtTokenResponse = null;
