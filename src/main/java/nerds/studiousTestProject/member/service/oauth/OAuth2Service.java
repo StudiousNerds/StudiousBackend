@@ -29,6 +29,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 import java.util.Optional;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -69,6 +73,15 @@ public class OAuth2Service {
 
         // 응답 Body에 담을 객체 생성
         return getOAuth2AuthenticateResponse(oAuth2UserInfo);
+    }
+
+    @Transactional
+    public JwtTokenResponse register(OAuth2SignUpRequest oAuth2SignUpRequest) {
+        validate(oAuth2SignUpRequest);
+
+        Member member = oAuth2SignUpRequest.toEntity();
+        memberRepository.save(member);
+        return jwtTokenProvider.generateToken(member);
     }
 
     /**
@@ -173,5 +186,25 @@ public class OAuth2Service {
                 .jwtTokenResponse(jwtTokenResponse)
                 .userInfo(userInfo)
                 .build();
+    }
+
+    private void validate(OAuth2SignUpRequest oAuth2SignUpRequest) {
+        Long providerId = oAuth2SignUpRequest.getProviderId();
+        MemberType type = oAuth2SignUpRequest.getType();
+        if (providerId != null && memberRepository.existsByProviderIdAndType(providerId, type)) {
+            throw new BadRequestException(ALREADY_EXIST_USER);
+        }
+
+        if (memberRepository.existsByEmailAndType(oAuth2SignUpRequest.getEmail(), type)) {
+            throw new BadRequestException(ALREADY_EXIST_USER);
+        }
+
+        if (memberRepository.existsByPhoneNumber(oAuth2SignUpRequest.getPhoneNumber())) {
+            throw new BadRequestException(ALREADY_EXIST_PHONE_NUMBER);
+        }
+
+        if (memberRepository.existsByNickname(oAuth2SignUpRequest.getNickname())) {
+            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
+        }
     }
 }
