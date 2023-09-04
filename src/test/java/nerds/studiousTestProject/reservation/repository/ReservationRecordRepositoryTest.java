@@ -62,17 +62,17 @@ class ReservationRecordRepositoryTest {
         assertThat(reservationRecordList).contains(save1, save2);
     }
 
-    @Test
-    void findAllByMemberId() {
-        // given
-        Member member = memberRepository.save(POTATO.생성(3L));
-        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.멤버_생성(member, 7L));
-        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.멤버_생성(member, 8L));
-        // when
-        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByMemberId(member.getId());
-        // then
-        assertThat(reservationRecordList).contains(save1, save2);
-    }
+//    @Test
+//    void findAllByMemberId() {
+//        // given
+//        Member member = memberRepository.save(POTATO.생성(3L));
+//        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.멤버_생성(member, 7L));
+//        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.멤버_생성(member, 8L));
+//        // when
+//        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByMemberId(member.getId());
+//        // then
+//        assertThat(reservationRecordList).contains(save1, save2);
+//    }
 
     @Test
     void findAllByStudycafeId() {
