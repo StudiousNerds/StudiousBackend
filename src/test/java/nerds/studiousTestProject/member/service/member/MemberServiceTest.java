@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.member.service.member;
 
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
@@ -44,6 +45,9 @@ class MemberServiceTest {
 
     @Mock
     LogoutAccessTokenService logoutAccessTokenService;
+
+    @Mock
+    TokenService tokenService;
 
     @Mock
     JwtTokenProvider jwtTokenProvider;
@@ -148,12 +152,9 @@ class MemberServiceTest {
 
         // given
         String accessToken = accessToken();
-        String resolvedAccessToken = resolvedAccessToken();
         Member member = defaultMember();
 
-        doReturn(resolvedAccessToken).when(jwtTokenProvider).resolveToken(accessToken);
-        doReturn(member.getId()).when(jwtTokenProvider).parseToken(resolvedAccessToken);
-        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
+        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
 
         // when
         PatchNicknameRequest patchNicknameRequest = new PatchNicknameRequest();
@@ -171,15 +172,12 @@ class MemberServiceTest {
 
         // given
         String accessToken = accessToken();
-        String resolvedAccessToken = resolvedAccessToken();
         Member member = defaultMember();
         String password = member.getPassword();
         WithdrawRequest withdrawRequest = new WithdrawRequest();
         withdrawRequest.setPassword(password);
 
-        doReturn(resolvedAccessToken).when(jwtTokenProvider).resolveToken(accessToken);
-        doReturn(member.getId()).when(jwtTokenProvider).parseToken(resolvedAccessToken);
-        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
+        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
         doReturn(true).when(passwordEncoder).matches(any(), any());
 
         // when
@@ -220,9 +218,7 @@ class MemberServiceTest {
     }
 
     private SignUpRequest defaultSignUpRequest() {
-        SignUpRequest signUpRequest = signUpRequest();
-        signUpRequest.setType(MemberType.DEFAULT);
-        return signUpRequest;
+        return signUpRequest();
     }
 
     private SignUpRequest signUpRequest() {
