@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.request.request;
+package nerds.studiousTestProject.reservation.dto.reserve.request;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class PaymentRequest {
+public class ReserveRequest {
 
     @NotNull
     private ReserveUser user;

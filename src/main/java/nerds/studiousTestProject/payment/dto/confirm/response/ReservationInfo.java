@@ -22,7 +22,7 @@ public class ReservationInfo {
     private LocalTime endTime;
     private int usingTime;
 
-    public static ReservationInfo of(ReservationRecord reservationRecord) {
+    public static ReservationInfo from(ReservationRecord reservationRecord) {
         return ReservationInfo.builder()
                 .reserveDate(reservationRecord.getDate())
                 .roomName(reservationRecord.getRoom().getName())

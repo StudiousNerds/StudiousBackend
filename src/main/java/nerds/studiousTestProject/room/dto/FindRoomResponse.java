@@ -2,10 +2,7 @@ package nerds.studiousTestProject.room.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
-
-import java.time.LocalDate;
+import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
 import java.util.List;
 import java.util.Map;
 

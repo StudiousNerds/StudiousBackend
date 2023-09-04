@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto.reserve.response;
+package nerds.studiousTestProject.reservation.dto.show.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,8 +8,6 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
