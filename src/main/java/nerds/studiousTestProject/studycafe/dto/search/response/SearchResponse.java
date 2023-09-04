@@ -32,8 +32,8 @@ public class SearchResponse {
                 .photo(studycafe.getPhoto())
                 .grade(studycafe.getTotalGrade())
                 .accumRevCnt(studycafe.getAccumReserveCount())
-                .walkingTime(studycafe.getNearestStationInfo() != null ? studycafe.getNearestStationInfo().getWalkingTime() : null)
-                .nearestStation(studycafe.getNearestStationInfo() != null ? studycafe.getNearestStationInfo().getNearestStation() : null)
+                .walkingTime(studycafe.getWalkingTime())
+                .nearestStation(studycafe.getNearestStation())
                 .build();
     }
 }

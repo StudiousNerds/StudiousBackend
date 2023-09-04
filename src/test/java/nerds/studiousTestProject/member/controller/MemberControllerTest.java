@@ -1,7 +1,6 @@
 package nerds.studiousTestProject.member.controller;
 
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
-import nerds.studiousTestProject.member.entity.member.MemberType;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,10 +49,8 @@ class MemberControllerTest {
                 .name("김민우")
                 .nickname("킹민우")
                 .roles(Collections.singletonList("USER"))
-                .type(MemberType.DEFAULT)
                 .phoneNumber("01090432652")
                 .birthday(LocalDate.of(1999, 12, 18))
-                .providerId(null)
                 .build();
     }
 }

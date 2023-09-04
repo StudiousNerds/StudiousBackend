@@ -142,24 +142,19 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private BooleanExpression dateAndTimeCanReserve(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        BooleanExpression inOperation = inOperation(date, startTime, endTime);
-        // inOperation이 false면 실행안하도록 하면 안되나...? isOperation이 false 여도 쿼리가 나감...
+        if (date == null) {
+            return null;
+        }
 
-        System.out.println(inOperation);
-        // inOperation 과 접목시키면 오류난다,,, 왜일까??
-        return inOperation != null ? inOperation.and(dateAndTimeNotReserved(date, startTime, endTime)) : null;
+        BooleanExpression inOperation = inOperation(startTime, endTime);
+        return inOperation != null ? inOperation.and(dateAndTimeNotReserved(date, startTime, endTime)) : dateAndTimeNotReserved(date, startTime, endTime);
     }
 
-    private BooleanExpression inOperation(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        BooleanExpression closed = closed(date, startTime, endTime);
+    private BooleanExpression inOperation(LocalTime startTime, LocalTime endTime) {
         BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
         BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
 
-        return closed != null ? closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe) : null;
-    }
-
-    private BooleanExpression closed(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        return (date != null || startTime != null || endTime != null) ? operationInfo.closed : null;
+        return operationInfo.isAllDay.isTrue().or(operationInfo.closed != null ? operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe) : null);
     }
 
     private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
