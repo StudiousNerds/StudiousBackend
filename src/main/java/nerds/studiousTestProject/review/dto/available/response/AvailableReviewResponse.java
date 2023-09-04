@@ -31,11 +31,11 @@ public class AvailableReviewResponse {
                 .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
                 .roomName(reservationRecord.getRoom().getName())
                 .paymentType(reservationRecord.getPayment().getMethod())
-                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getDuration())
+                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getUsingTime())
                 .date(reservationRecord.getDate())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())
-                .duration(reservationRecord.getDuration())
+                .duration(reservationRecord.getUsingTime())
                 .validDate(reservationRecord.getDate().plusDays(7))
                 .build();
     }
