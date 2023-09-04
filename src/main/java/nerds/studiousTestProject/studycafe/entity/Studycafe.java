@@ -53,8 +53,11 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<OperationInfo> operationInfos = new ArrayList<>();
 
-    @Embedded
-    private NearestStationInfo nearestStationInfo;
+    @Column(name = "walking_time", nullable = true)
+    private Integer walkingTime;
+
+    @Column(name = "nearest_station", nullable = true)
+    private String nearestStation;
 
     @Column(name = "accum_reserve_count", nullable = true)
     private Integer accumReserveCount;
@@ -165,14 +168,15 @@ public class Studycafe {
     }
 
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, NearestStationInfo nearestStationInfo, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade) {
         this.id = id;
         this.member = member;
         this.name = name;
         this.address = address;
         this.photo = photo;
         this.tel = tel;
-        this.nearestStationInfo = nearestStationInfo;
+        this.walkingTime = walkingTime;
+        this.nearestStation = nearestStation;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
         this.createdDate = createdDate;
