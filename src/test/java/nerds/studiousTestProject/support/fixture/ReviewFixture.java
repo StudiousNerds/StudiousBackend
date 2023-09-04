@@ -22,13 +22,12 @@ public enum ReviewFixture {
         this.isRecommended = isRecommended;
     }
 
-    public Review 생성() {
-        return 생성(null);
+    public Review 기본_정보_생성() {
+        return 기본_정보_생성(null);
     }
 
-    public Review 생성(Long id) {
-        return 기본_정보_생성()
-                .id(id)
+    public Review 기본_정보_생성(Long id) {
+        return 기본_정보_빌더_생성(id)
                 .build();
     }
 
@@ -37,7 +36,7 @@ public enum ReviewFixture {
     }
 
     public Review 평점_정보_생성(Long id, Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total) {
-        return 기본_정보_생성()
+        return 기본_정보_빌더_생성(id)
                 .grade(createGrade(cleanliness, deafening, fixturesStatus, total))
                 .build();
     }
@@ -47,7 +46,7 @@ public enum ReviewFixture {
     }
 
     public Review 평점_생성(Grade grade, Long id) {
-        return 기본_정보_생성()
+        return 기본_정보_빌더_생성(id)
                 .id(id)
                 .grade(grade)
                 .build();
@@ -62,8 +61,9 @@ public enum ReviewFixture {
                 .build();
     }
 
-    public ReviewBuilder 기본_정보_생성() {
+    public ReviewBuilder 기본_정보_빌더_생성(Long id) {
         return Review.builder()
+                .id(id)
                 .createdDate(this.createdDate)
                 .detail(this.detail)
                 .isRecommended(this.isRecommended);
