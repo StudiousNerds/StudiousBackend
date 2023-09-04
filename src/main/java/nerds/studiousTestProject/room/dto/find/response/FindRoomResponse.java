@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.room.dto;
+package nerds.studiousTestProject.room.dto.find.response;
 
 import lombok.Builder;
 import lombok.Data;
