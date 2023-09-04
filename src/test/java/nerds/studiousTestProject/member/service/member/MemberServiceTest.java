@@ -71,27 +71,6 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입")
-    public void 소셜_회원가입() throws Exception {
-
-        // given
-        SignUpRequest signUpRequest = socialSignUpRequest();
-        Member member = socialMember();
-
-        doReturn(false).when(memberRepository).existsByProviderIdAndType(signUpRequest.getProviderId(), MemberType.KAKAO);
-        doReturn(false).when(memberRepository).existsByPhoneNumber(signUpRequest.getPhoneNumber());
-        doReturn("password").when(passwordEncoder).encode(signUpRequest.getPassword());
-        doReturn(Optional.of(member)).when(memberRepository).findByEmailAndType(signUpRequest.getEmail(), MemberType.KAKAO);
-
-        // when
-        memberService.register(signUpRequest);
-
-        // then
-        String email = memberRepository.findByEmailAndType(signUpRequest.getEmail(), MemberType.KAKAO).orElseThrow(() -> new RuntimeException("소셜 회원 찾기 실패")).getEmail();
-        Assertions.assertThat(email).isEqualTo(signUpRequest.getEmail());
-    }
-
-    @Test
     @DisplayName("일반 로그인")
     public void 로그인() throws Exception {
 
@@ -238,13 +217,6 @@ class MemberServiceTest {
                 .phoneNumber("01090432652")
                 .usable(true)
                 .build();
-    }
-
-    private SignUpRequest socialSignUpRequest() {
-        SignUpRequest signUpRequest = signUpRequest();
-        signUpRequest.setProviderId(123456L);
-        signUpRequest.setType(MemberType.KAKAO);
-        return signUpRequest;
     }
 
     private SignUpRequest defaultSignUpRequest() {
