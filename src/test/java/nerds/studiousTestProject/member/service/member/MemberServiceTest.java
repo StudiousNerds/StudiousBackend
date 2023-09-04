@@ -1,10 +1,10 @@
 package nerds.studiousTestProject.member.service.member;
 
-import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
-import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
-import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
+import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
+import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.token.LogoutAccessToken;

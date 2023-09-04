@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.oauth.logout;
+package nerds.studiousTestProject.member.dto.oauth.token;
 
 import lombok.Data;
 
