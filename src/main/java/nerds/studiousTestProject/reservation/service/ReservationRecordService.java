@@ -145,8 +145,8 @@ public class ReservationRecordService {
         return ReserveResponse.of(member, room, studycafe);
     }
 
-    public List<ReservationRecord> findAllByMemberId(Long memberId) {
-        return reservationRecordRepository.findAllByMemberId(memberId);
+    public Page<ReservationRecord> findAllByMemberId(Long memberId, Pageable pageable) {
+        return reservationRecordRepository.findAllByMemberId(memberId, pageable);
     }
 
     public List<ReservationRecord> findAllByRoomId(Long roomId) {
