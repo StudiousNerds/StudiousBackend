@@ -132,6 +132,26 @@ class ReservationRecordRepositoryTest {
         );
     }
 
+    @Test
+    @DisplayName("지난 예약 탭을 페이징 해 조회할 수 있다.")
+    public void 지난_예약_탭_조회() {
+        Member member1 = 멤버_저장(BEAVER.생성(1L));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+
+        예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10,0), LocalTime.now(), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().minusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().plusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
+        ReservationRecord reservation = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(2), member1, room));
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.BEFORE_USING, null, null, null, member1, pageable);
+
+        assertAll(
+                ()->assertThat(page.getTotalPages()).isEqualTo(1),
+                ()->assertThat(page.getContent()).containsExactly(reservation)
+        );
+    }
+
+
     private Room 룸_저장(Room room) {
         return roomRepository.save(room);
     }
