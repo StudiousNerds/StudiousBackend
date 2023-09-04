@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `grade` (
     `cleanliness`     int          NOT NULL,
     `deafening`       int          NOT NULL,
     `fixtures_status` int          NOT NULL,
-    `is_recommended`  TINYINT(1)   NOT NULL,
     `total`           decimal(3,2) NOT NULL,
     `review_id`       bigint       NOT NULL,
     PRIMARY KEY (`id`)
@@ -134,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `refund_policy` (
 CREATE TABLE IF NOT EXISTS `reservation_record` (
     `id`                bigint       NOT NULL AUTO_INCREMENT,
     `date`              date         NOT NULL,
-    `duration`          int          NOT NULL, -- 시간 단위
+    `using_time`        int          NOT NULL, -- 시간 단위
     `start_time`        time         NOT NULL,
     `end_time`          time         NOT NULL,
     `head_count`        int          NOT NULL,
@@ -170,6 +169,7 @@ CREATE TABLE IF NOT EXISTS `review` (
     `comment`               varchar(255), -- 사장님 댓글
     `detail`                varchar(255) NOT NULL,
     `photo`                 varchar(255),
+    `is_recommended`        TINYINT(1)   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -250,4 +250,4 @@ alter table grade add constraint grade_review_unique_key unique (review_id);
 
 alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
 
-alter table review add constraint review_reservation_record_unique_key unique (reservation_record_id);
+alter table reservation_record add constraint review_reservation_record_unique_key unique (review_id);
