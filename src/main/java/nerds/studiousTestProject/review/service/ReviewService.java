@@ -100,7 +100,7 @@ public class ReviewService {
         grade.updateGrade(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-                modifyReviewRequest.getIsRecommend(),
+//                modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
