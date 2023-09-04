@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 
 @Data
 @Builder

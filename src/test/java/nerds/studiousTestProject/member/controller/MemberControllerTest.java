@@ -1,6 +1,6 @@
 package nerds.studiousTestProject.member.controller;
 
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
