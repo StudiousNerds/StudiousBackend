@@ -10,16 +10,17 @@ import java.time.LocalDateTime;
 
 public enum StudycafeFixture {
 
-    NERDS("Nerds", "031-571-2378", "사진 경로", null, 2.3, 0, "공간 소개글", LocalDateTime.now().minusDays(12)),
-    FIRST_STUDYCAFE("스프링카페", "031-571-2378", "사진 경로", null, 4.3, 0, "공간 소개글", LocalDateTime.now().minusDays(11)),
-    SECOND_STUDYCAFE("스프카페", "031-571-2378", "사진 경로", null, 3.5, 0, "공간 소개글", LocalDateTime.now().minusDays(10)),
-    THIRD_STUDYCAFE("스링카페", "031-571-2378", "사진 경로",  null, 4.0, 0, "공간 소개글", LocalDateTime.now().minusDays(9)),
-    FOURTH_STUDYCAFE("스프후카페", "031-571-2378", "사진 경로",  null, 3.7, 0, "공간 소개글", LocalDateTime.now().minusDays(8));
+    NERDS("Nerds", "031-571-2378", "사진 경로", null, null, 2.3, 0, "공간 소개글", LocalDateTime.now().minusDays(12)),
+    FIRST_STUDYCAFE("스프링카페", "031-571-2378", "사진 경로", null, null, 4.3, 0, "공간 소개글", LocalDateTime.now().minusDays(11)),
+    SECOND_STUDYCAFE("스프카페", "031-571-2378", "사진 경로", null, null, 3.5, 0, "공간 소개글", LocalDateTime.now().minusDays(10)),
+    THIRD_STUDYCAFE("스링카페", "031-571-2378", "사진 경로",  null, null, 4.0, 0, "공간 소개글", LocalDateTime.now().minusDays(9)),
+    FOURTH_STUDYCAFE("스프후카페", "031-571-2378", "사진 경로",  null, null, 3.7, 0, "공간 소개글", LocalDateTime.now().minusDays(8));
 
     private final String name;
     private final String tel;
     private final String photo;
-    private final NearestStationInfo nearestStationInfo;
+    private final String nearestStation;
+    private final Integer walkingTime;
     private final Double totalGrade;
     private final Integer accumReserveCount;
     private final String introduction;
@@ -29,11 +30,12 @@ public enum StudycafeFixture {
         return name;
     }
 
-    StudycafeFixture(String name, String tel, String photo, NearestStationInfo nearestStationInfo, Double totalGrade, Integer accumReserveCount, String introduction, LocalDateTime createdDate) {
+    StudycafeFixture(String name, String tel, String photo, String nearestStation, Integer walkingTime, Double totalGrade, Integer accumReserveCount, String introduction, LocalDateTime createdDate) {
         this.name = name;
         this.tel = tel;
         this.photo = photo;
-        this.nearestStationInfo = nearestStationInfo;
+        this.nearestStation = nearestStation;
+        this.walkingTime = walkingTime;
         this.totalGrade = totalGrade;
         this.accumReserveCount = accumReserveCount;
         this.introduction = introduction;
@@ -62,7 +64,8 @@ public enum StudycafeFixture {
                 .name(this.name)
                 .photo(this.photo)
                 .address(createAddress())
-                .nearestStationInfo(this.nearestStationInfo)
+                .nearestStation(this.nearestStation)
+                .walkingTime(this.walkingTime)
                 .totalGrade(this.totalGrade)
                 .accumReserveCount(this.accumReserveCount)
                 .tel(this.tel)

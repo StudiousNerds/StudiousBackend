@@ -6,16 +6,16 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.general.logout.LogoutResponse;
-import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.general.patch.PatchPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
-import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
+import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.token.LogoutAccessToken;
@@ -30,10 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
@@ -64,10 +65,12 @@ public class MemberService {
      */
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
+        validate(signUpRequest);
+
         String encodedPassword = getEncodedPassword(signUpRequest);
         Member member = signUpRequest.toEntity(encodedPassword);
-        memberRepository.save(member);
 
+        memberRepository.save(member);
         return jwtTokenProvider.generateToken(member);
     }
 
@@ -240,8 +243,18 @@ public class MemberService {
         return jwtTokenProvider.generateToken(member);
     }
 
-    public Optional<Member> findByProviderIdAndType(Long providerId, MemberType type) {
-        return memberRepository.findByProviderIdAndType(providerId, type);
+    private void validate(SignUpRequest signUpRequest) {
+        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), MemberType.DEFAULT)) {
+            throw new BadRequestException(ALREADY_EXIST_USER);
+        }
+
+        if (memberRepository.existsByPhoneNumber(signUpRequest.getPhoneNumber())) {
+            throw new BadRequestException(ALREADY_EXIST_PHONE_NUMBER);
+        }
+
+        if (memberRepository.existsByNickname(signUpRequest.getNickname())) {
+            throw new BadRequestException(ALREADY_EXIST_NICKNAME);
+        }
     }
 
     /**
