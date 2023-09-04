@@ -51,7 +51,7 @@ public enum ReservationRecordFixture {
                 .date(reserveDate)
                 .startTime(startTime)
                 .endTime(endTime)
-                .duration(endTime.getHour() - startTime.getHour())
+                .usingTime(endTime.getHour() - startTime.getHour())
                 .member(member)
                 .room(room)
                 .build();
@@ -66,7 +66,7 @@ public enum ReservationRecordFixture {
                 .date(reserveDate)
                 .startTime(startTime)
                 .endTime(endTime)
-                .duration(endTime.getHour() - startTime.getHour())
+                .usingTime(endTime.getHour() - startTime.getHour())
                 .member(member)
                 .room(room)
                 .review(review)

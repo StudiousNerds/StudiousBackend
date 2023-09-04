@@ -100,7 +100,7 @@ public class ReviewService {
         grade.updateGrade(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-                modifyReviewRequest.getIsRecommend(),
+//                modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
@@ -246,7 +246,7 @@ public class ReviewService {
         Integer recommend = 0, count = 0;
 
         for (Review review : reviewList){
-            if(review.getGrade().getIsRecommended()){
+            if(review.getIsRecommended()){
                 recommend++;
             }
             count++;

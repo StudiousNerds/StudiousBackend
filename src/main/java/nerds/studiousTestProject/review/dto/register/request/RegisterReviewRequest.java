@@ -31,7 +31,6 @@ public class RegisterReviewRequest {
                 .deafening(registerReviewRequest.getDeafening())
                 .cleanliness(registerReviewRequest.getCleanliness())
                 .fixturesStatus(registerReviewRequest.getFixtureStatus())
-                .isRecommended(registerReviewRequest.getIsRecommend())
                 .build();
     }
 }

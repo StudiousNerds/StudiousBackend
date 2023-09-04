@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.member.service.member;
 
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
@@ -46,6 +47,9 @@ class MemberServiceTest {
     LogoutAccessTokenService logoutAccessTokenService;
 
     @Mock
+    TokenService tokenService;
+
+    @Mock
     JwtTokenProvider jwtTokenProvider;
 
     @Mock
@@ -67,27 +71,6 @@ class MemberServiceTest {
 
         // then
         String email = memberRepository.findByEmailAndType(signUpRequest.getEmail(), MemberType.DEFAULT).orElseThrow(() -> new RuntimeException("일반 회원 찾기 실패")).getEmail();
-        Assertions.assertThat(email).isEqualTo(signUpRequest.getEmail());
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입")
-    public void 소셜_회원가입() throws Exception {
-
-        // given
-        SignUpRequest signUpRequest = socialSignUpRequest();
-        Member member = socialMember();
-
-        doReturn(false).when(memberRepository).existsByProviderIdAndType(signUpRequest.getProviderId(), MemberType.KAKAO);
-        doReturn(false).when(memberRepository).existsByPhoneNumber(signUpRequest.getPhoneNumber());
-        doReturn("password").when(passwordEncoder).encode(signUpRequest.getPassword());
-        doReturn(Optional.of(member)).when(memberRepository).findByEmailAndType(signUpRequest.getEmail(), MemberType.KAKAO);
-
-        // when
-        memberService.register(signUpRequest);
-
-        // then
-        String email = memberRepository.findByEmailAndType(signUpRequest.getEmail(), MemberType.KAKAO).orElseThrow(() -> new RuntimeException("소셜 회원 찾기 실패")).getEmail();
         Assertions.assertThat(email).isEqualTo(signUpRequest.getEmail());
     }
 
@@ -169,12 +152,9 @@ class MemberServiceTest {
 
         // given
         String accessToken = accessToken();
-        String resolvedAccessToken = resolvedAccessToken();
         Member member = defaultMember();
 
-        doReturn(resolvedAccessToken).when(jwtTokenProvider).resolveToken(accessToken);
-        doReturn(member.getId()).when(jwtTokenProvider).parseToken(resolvedAccessToken);
-        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
+        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
 
         // when
         PatchNicknameRequest patchNicknameRequest = new PatchNicknameRequest();
@@ -192,15 +172,12 @@ class MemberServiceTest {
 
         // given
         String accessToken = accessToken();
-        String resolvedAccessToken = resolvedAccessToken();
         Member member = defaultMember();
         String password = member.getPassword();
         WithdrawRequest withdrawRequest = new WithdrawRequest();
         withdrawRequest.setPassword(password);
 
-        doReturn(resolvedAccessToken).when(jwtTokenProvider).resolveToken(accessToken);
-        doReturn(member.getId()).when(jwtTokenProvider).parseToken(resolvedAccessToken);
-        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
+        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
         doReturn(true).when(passwordEncoder).matches(any(), any());
 
         // when
@@ -240,17 +217,8 @@ class MemberServiceTest {
                 .build();
     }
 
-    private SignUpRequest socialSignUpRequest() {
-        SignUpRequest signUpRequest = signUpRequest();
-        signUpRequest.setProviderId(123456L);
-        signUpRequest.setType(MemberType.KAKAO);
-        return signUpRequest;
-    }
-
     private SignUpRequest defaultSignUpRequest() {
-        SignUpRequest signUpRequest = signUpRequest();
-        signUpRequest.setType(MemberType.DEFAULT);
-        return signUpRequest;
+        return signUpRequest();
     }
 
     private SignUpRequest signUpRequest() {

@@ -29,7 +29,7 @@ public class ReservationInfo {
                 .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())
-                .usingTime(reservationRecord.getDuration())
+                .usingTime(reservationRecord.getUsingTime())
                 .build();
     }
 
