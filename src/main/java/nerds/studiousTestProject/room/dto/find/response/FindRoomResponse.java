@@ -11,11 +11,11 @@ import java.util.Map;
 @Data
 public class FindRoomResponse {
     private Long id;
-    private String name;
-    private Integer minCount;
-    private Integer maxCount;
+    private String roomName;
+    private Integer minHeadCount;
+    private Integer maxHeadCount;
     private Integer price;
-    private String type;
+    private String priceType;
     private Integer minUsingTime;
     private List<String> photos;
     private Map<String, Integer[]> canReserveDatetime;

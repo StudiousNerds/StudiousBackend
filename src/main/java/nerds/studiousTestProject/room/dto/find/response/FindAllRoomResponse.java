@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class FindAllRoomResponse {
     private List<BasicRoomInfo> roomInfos;
-    private String name;
+    private String roomName;
     private Integer minCount;
     private Integer maxCount;
     private Integer price;

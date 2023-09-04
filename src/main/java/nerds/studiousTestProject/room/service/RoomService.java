@@ -47,11 +47,11 @@ public class RoomService {
         return roomList.stream()
                 .map(room -> FindRoomResponse.builder()
                         .id(room.getId())
-                        .name(room.getName())
-                        .minCount(room.getMinHeadCount())
-                        .maxCount(room.getMaxHeadCount())
+                        .roomName(room.getName())
+                        .minHeadCount(room.getMinHeadCount())
+                        .maxHeadCount(room.getMaxHeadCount())
                         .price(room.getPrice())
-                        .type(room.getPriceType().name())
+                        .priceType(room.getPriceType().name())
                         .minUsingTime(room.getMinUsingTime())
                         .photos(getPhotos(room))
                         .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
@@ -67,7 +67,7 @@ public class RoomService {
 
         return FindAllRoomResponse.builder()
                 .roomInfos(getBasicInfo(roomList))
-                .name(room.getName())
+                .roomName(room.getName())
                 .minCount(room.getMinHeadCount())
                 .maxCount(room.getMaxHeadCount())
                 .price(room.getPrice())
@@ -78,6 +78,8 @@ public class RoomService {
                 .paidConveniences(getPaidConveniences(room.getId()))
                 .build();
     }
+
+    public
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
 
