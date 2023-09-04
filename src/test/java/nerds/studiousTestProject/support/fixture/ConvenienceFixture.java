@@ -7,8 +7,8 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 public enum ConvenienceFixture {
-    STUDYCAFE_ELEVATOR_FREE(ConvenienceName.ELEVATOR, 0),
-    ROOM_HDMI_FREE(ConvenienceName.HDMI, 0);
+    ELEVATOR_CONVENIENCE(ConvenienceName.ELEVATOR, 0),
+    HDMI_CONVENIENCE(ConvenienceName.HDMI, 0);
 
     private final ConvenienceName name;
     private final int price;

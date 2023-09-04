@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.token;
+package nerds.studiousTestProject.member.dto.general.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

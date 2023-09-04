@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import java.util.Arrays;
 import java.util.List;
 
+import static nerds.studiousTestProject.support.fixture.GradeFixture.*;
 import static nerds.studiousTestProject.support.fixture.HashtagFixture.*;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.*;
 import static nerds.studiousTestProject.support.fixture.ReviewFixture.*;
@@ -54,9 +55,9 @@ class ReviewRepositoryTest {
     @DisplayName("예약 id가 여러개 주어졌을 때 그에 해당하는 리뷰들을 모두 다 가져오는지 테스트")
     void findAllByReservationRecordIdIn() {
         // given
-        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.생성(1L));
-        Grade secondGrade = gradeRepository.save(RECOMMENDED_TOTAL_THREE_GRADE.생성(2L));
-        Grade thirdGrade = gradeRepository.save(RECOMMENDED_TOTAL_ONE_GRADE.생성(3L));
+        Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
+        Grade secondGrade = gradeRepository.save(SECOND_GRADE.생성(2L));
+        Grade thirdGrade = gradeRepository.save(THIRD_GRADE.생성(3L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         Review secondReview = reviewRepository.save(SECOND_REVIEW.평점_생성(secondGrade, 2L));
         Review thirdReview = reviewRepository.save(THIRD_REVIEW.평점_생성(thirdGrade, 3L));
@@ -77,7 +78,7 @@ class ReviewRepositoryTest {
     void deleteById() {
         // given
         HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.생성(1L));
-        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.생성(1L));
+        Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
         // when
@@ -96,7 +97,7 @@ class ReviewRepositoryTest {
     void saveTest() {
         // given
         HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.생성(1L));
-        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.생성(1L));
+        Grade firstGrade = gradeRepository.save(FIRST_GRADE.생성(1L));
         Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
         firstReview.addHashtagRecord(hashtag);
         // when

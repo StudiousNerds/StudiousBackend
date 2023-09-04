@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.logout;
+package nerds.studiousTestProject.member.dto.general.logout;
 
 import lombok.Builder;
 import lombok.Data;

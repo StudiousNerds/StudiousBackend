@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.patch;
+package nerds.studiousTestProject.member.dto.general.patch;
 
 import lombok.Data;
 

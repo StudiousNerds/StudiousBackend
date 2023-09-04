@@ -8,12 +8,12 @@ import java.util.List;
 @Builder
 @Data
 public class EventCafeResponse {
-    private Long studycafeId;
+    private Long cafeId;
     private String cafeName;
     private String photo;
     private Integer accumRevCnt;
     private String nearestStation;
-    private Integer walkingTime;
+    private Integer distance;
     private Double grade;
     private List<String> hashtags;
 }

@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.find;
+package nerds.studiousTestProject.member.dto.general.find;
 
 import lombok.Builder;
 import lombok.Data;

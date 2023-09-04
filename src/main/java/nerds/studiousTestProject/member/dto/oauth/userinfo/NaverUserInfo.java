@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.oauth.authenticate.userinfo;
+package nerds.studiousTestProject.member.dto.oauth.userinfo;
 
 import java.util.Map;
 

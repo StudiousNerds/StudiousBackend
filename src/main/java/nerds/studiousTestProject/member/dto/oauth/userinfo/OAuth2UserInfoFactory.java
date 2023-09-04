@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.oauth.authenticate.userinfo;
+package nerds.studiousTestProject.member.dto.oauth.userinfo;
 
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
