@@ -60,9 +60,8 @@ public class Review {
     }
 
     @Builder
-    public Review(Long id, List<HashtagRecord> hashtagRecords, Grade grade, LocalDate createdDate, String detail, String photo, String comment, Boolean isRecommended) {
+    public Review(Long id, Grade grade, LocalDate createdDate, String detail, String photo, String comment, Boolean isRecommended) {
         this.id = id;
-        this.hashtagRecords = hashtagRecords;
         this.grade = grade;
         this.createdDate = createdDate;
         this.detail = detail;
