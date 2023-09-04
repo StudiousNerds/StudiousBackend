@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class EventCafeResponse {
     private Long cafeId;
-    private String cafeName;
+    private String studycafeName;
     private String photo;
     private Integer accumRevCnt;
     private String nearestStation;

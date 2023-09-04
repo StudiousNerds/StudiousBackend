@@ -10,9 +10,7 @@ import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
-import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.service.ReviewService;
@@ -137,7 +135,7 @@ public class StudycafeService {
         return topTenCafeList.stream()
                 .map(studycafe -> RecommendCafeResponse.builder()
                         .cafeId(studycafe.getId())
-                        .cafeName(studycafe.getName())
+                        .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
                         .distance(getWalkingtime(studycafe))
@@ -154,7 +152,7 @@ public class StudycafeService {
         return topTenCafeList.stream()
                 .map(studycafe -> EventCafeResponse.builder()
                         .cafeId(studycafe.getId())
-                        .cafeName(studycafe.getName())
+                        .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
                         .distance(getWalkingtime(studycafe))
