@@ -151,10 +151,18 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private BooleanExpression inOperation(LocalTime startTime, LocalTime endTime) {
+        return isAllDay().or(NotClosedAndBetweenOperationTime(startTime, endTime));
+    }
+
+    private BooleanExpression isAllDay() {
+        return operationInfo.isAllDay;
+    }
+
+    private BooleanExpression NotClosedAndBetweenOperationTime(LocalTime startTime, LocalTime endTime) {
         BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
         BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
 
-        return operationInfo.isAllDay.isTrue().or(operationInfo.closed != null ? operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe) : null);
+        return operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe);
     }
 
     private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
