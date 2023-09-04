@@ -51,19 +51,24 @@ public class Review {
     @Column(name = "comment", nullable = true)
     private String comment;
 
+    @Column(name = "is_recommended", nullable = false)
+    private Boolean isRecommended;
+
     public void addHashtagRecord(HashtagRecord hashtagRecord) {
         hashtagRecords.add(hashtagRecord);
         hashtagRecord.setReview(this);
     }
 
     @Builder
-    public Review(Long id, Grade grade, LocalDate createdDate, String detail, String photo, String comment) {
+    public Review(Long id, List<HashtagRecord> hashtagRecords, Grade grade, LocalDate createdDate, String detail, String photo, String comment, Boolean isRecommended) {
         this.id = id;
+        this.hashtagRecords = hashtagRecords;
         this.grade = grade;
         this.createdDate = createdDate;
         this.detail = detail;
         this.photo = photo;
         this.comment = comment;
+        this.isRecommended = isRecommended;
     }
 
     public void updateDetail(String detail) {
