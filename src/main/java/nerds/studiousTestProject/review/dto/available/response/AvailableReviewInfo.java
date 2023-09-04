@@ -20,7 +20,7 @@ public class AvailableReviewInfo {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private Integer duration;
+    private Integer usingTime;
     private LocalDate validDate;
 
     public static AvailableReviewInfo of(ReservationRecord reservationRecord) {
@@ -31,11 +31,11 @@ public class AvailableReviewInfo {
                 .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
                 .roomName(reservationRecord.getRoom().getName())
                 .paymentType(reservationRecord.getPayment().getMethod())
-                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getDuration())
+                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getUsingTime())
                 .date(reservationRecord.getDate())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())
-                .duration(reservationRecord.getDuration())
+                .usingTime(reservationRecord.getUsingTime())
                 .validDate(reservationRecord.getDate().plusDays(7))
                 .build();
     }
