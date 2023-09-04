@@ -53,8 +53,8 @@ public class ReservationRecord {
     @Column(name = "end_time",nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "duration",nullable = false)
-    private Integer duration;
+    @Column(name = "using_time",nullable = false)
+    private Integer usingTime;
 
     @Column(name = "head_count",nullable = false)
     private Integer headCount;
