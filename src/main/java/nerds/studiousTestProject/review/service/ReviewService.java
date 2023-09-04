@@ -246,7 +246,7 @@ public class ReviewService {
         Integer recommend = 0, count = 0;
 
         for (Review review : reviewList){
-            if(review.getGrade().getIsRecommended()){
+            if(review.getIsRecommended()){
                 recommend++;
             }
             count++;
