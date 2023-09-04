@@ -1,8 +1,8 @@
 package nerds.studiousTestProject.member.service.oauth;
 
-import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
-import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenResponse;
+import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.service.MemberService;
