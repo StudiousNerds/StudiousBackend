@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
-import nerds.studiousTestProject.room.dto.FindRoomResponse;
+import nerds.studiousTestProject.room.dto.find.response.BasicRoomInfo;
+import nerds.studiousTestProject.room.dto.find.response.FindAllRoomResponse;
+import nerds.studiousTestProject.room.dto.find.response.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Week;
@@ -50,7 +51,7 @@ public class RoomService {
                         .minCount(room.getMinHeadCount())
                         .maxCount(room.getMaxHeadCount())
                         .price(room.getPrice())
-                        .type(room.getPriceType().toString())
+                        .type(room.getPriceType().name())
                         .minUsingTime(room.getMinUsingTime())
                         .photos(getPhotos(room))
                         .canReserveDatetime(getCanReserveDatetime(date, studycafeId, room.getId()))
@@ -58,6 +59,24 @@ public class RoomService {
                         .paidConveniences(getPaidConveniences(room.getId()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public FindAllRoomResponse getAllRooms(Long studycafeId, Long roomId) {
+        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+        Room room = findRoomById(roomId);
+
+        return FindAllRoomResponse.builder()
+                .roomInfos(getBasicInfo(roomList))
+                .name(room.getName())
+                .minCount(room.getMinHeadCount())
+                .maxCount(room.getMaxHeadCount())
+                .price(room.getPrice())
+                .type(room.getPriceType().name())
+                .minUsingTime(room.getMinUsingTime())
+                .photos(getPhotos(room))
+                .conveniences(getConveniences(room.getId()))
+                .paidConveniences(getPaidConveniences(room.getId()))
+                .build();
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
@@ -131,5 +150,11 @@ public class RoomService {
 
     private List<String> getPhotos(Room room) {
         return room.getSubPhotos().stream().map(SubPhoto::getPath).collect(Collectors.toList());
+    }
+
+    private List<BasicRoomInfo> getBasicInfo(List<Room> roomList) {
+        return roomList.stream()
+                .map(room -> BasicRoomInfo.of(room))
+                .collect(Collectors.toList());
     }
 }
