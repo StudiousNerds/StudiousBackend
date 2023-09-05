@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 @Data
 public class FindReviewSortedResponse {
-    private PageResponse pageResponse;
+    private PageInfo pageInfo;
     private TotalGradeInfo totalGradeInfo;
-    private List<FindReviewResponse> findReviewResponses;
+    private List<FindReviewInfo> findReviewInfo;
 }

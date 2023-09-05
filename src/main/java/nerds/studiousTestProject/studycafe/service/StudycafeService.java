@@ -2,10 +2,10 @@ package nerds.studiousTestProject.studycafe.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
@@ -18,27 +18,25 @@ import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
-
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
+import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
-
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RefundPolicyRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
@@ -68,10 +66,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_DATE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.START_DATE_AFTER_THAN_END_DATE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
@@ -82,7 +76,6 @@ public class StudycafeService {
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
     private final RoomService roomService;
-    private final SubPhotoService subPhotoService;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final TokenService tokenService;
@@ -97,21 +90,9 @@ public class StudycafeService {
      * @return 검색 결과
      */
     public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
-
-        // 이 부분도 추가 Validator 도입 예정
+        // 이 부분 Converter 도입 예정
         if (searchRequest.getSortType() == null) {
             searchRequest.setSortType(SortType.GRADE_DESC);
-        }
-
-        // 날짜 선택이 안되었는데 시간을 선택한 경우
-        if (searchRequest.getDate() == null && (searchRequest.getStartTime() != null || searchRequest.getEndTime() != null)) {
-            throw new BadRequestException(NOT_FOUND_DATE);
-        }
-
-        // 시작 시간이 끝 시간보다 이후인 경우
-        if (searchRequest.getStartTime() != null && searchRequest.getEndTime() != null &&
-                !searchRequest.getStartTime().isBefore(searchRequest.getEndTime())) {
-            throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
         }
 
         return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
@@ -121,12 +102,12 @@ public class StudycafeService {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return FindStudycafeResponse.builder()
-                .cafeId(studycafe.getId())
+                .studycafeId(studycafe.getId())
                 .cafeName(studycafe.getName())
-                .photos(subPhotoService.findCafePhotos(studycafeId))
+                .photos(getPhotos(studycafe))
                 .accumResCnt(getAccumResCnt(studycafeId))
-                .duration(getWalkingtime(studycafe))
-                .nearestStation(getNearestStation(studycafe))
+                .walkingTime(studycafe.getWalkingTime())
+                .nearestStation(studycafe.getNearestStation())
                 .hashtags(getHashtagRecords(studycafe.getId()))
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(studycafeId))
@@ -152,42 +133,36 @@ public class StudycafeService {
 
     public List<RecommendCafeResponse> getRecommendStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
-        List<RecommendCafeResponse> recommedStudycafeList = new ArrayList<>();
 
-        for (Studycafe studycafe : topTenCafeList) {
-            RecommendCafeResponse foundStudycafe = RecommendCafeResponse.builder()
-                    .cafeId(studycafe.getId())
-                    .cafeName(studycafe.getName())
-                    .photo(studycafe.getPhoto())
-                    .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                    .distance(getWalkingtime(studycafe))
-                    .nearestStation(getNearestStation(studycafe))
-                    .grade(getTotalGrade(studycafe.getId()))
-                    .hashtags(getHashtagRecords(studycafe.getId()))
-                    .build();
-            recommedStudycafeList.add(foundStudycafe);
-        }
-        return recommedStudycafeList;
+        return topTenCafeList.stream()
+                .map(studycafe -> RecommendCafeResponse.builder()
+                        .studycafeId(studycafe.getId())
+                        .cafeName(studycafe.getName())
+                        .photo(studycafe.getPhoto())
+                        .accumRevCnt(getAccumResCnt(studycafe.getId()))
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
+                        .grade(getTotalGrade(studycafe.getId()))
+                        .hashtags(getHashtagRecords(studycafe.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public List<EventCafeResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
-        List<EventCafeResponse> eventStudycafeList = new ArrayList<>();
 
-        for (Studycafe studycafe : topTenCafeList) {
-            EventCafeResponse foundStudycafe = EventCafeResponse.builder()
-                    .cafeId(studycafe.getId())
-                    .cafeName(studycafe.getName())
-                    .photo(studycafe.getPhoto())
-                    .accumRevCnt(getAccumResCnt(studycafe.getId()))
-                    .distance(getWalkingtime(studycafe))
-                    .nearestStation(getNearestStation(studycafe))
-                    .grade(getTotalGrade(studycafe.getId()))
-                    .hashtags(getHashtagRecords(studycafe.getId()))
-                    .build();
-            eventStudycafeList.add(foundStudycafe);
-        }
-        return eventStudycafeList;
+        return topTenCafeList.stream()
+                .map(studycafe -> EventCafeResponse.builder()
+                        .studycafeId(studycafe.getId())
+                        .cafeName(studycafe.getName())
+                        .photo(studycafe.getPhoto())
+                        .accumRevCnt(getAccumResCnt(studycafe.getId()))
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
+                        .grade(getTotalGrade(studycafe.getId()))
+                        .hashtags(getHashtagRecords(studycafe.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Studycafe getStudyCafe(Long studycafeId) {
@@ -200,30 +175,13 @@ public class StudycafeService {
         return studycafe.getNotices().stream().map(Notice::getDetail).toList();
     }
 
-    public String[] getConveniences(Long studycafeId) {
+    public List<String> getConveniences(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
-        List<ConvenienceName> convenienceList = studycafe.getConveniences().stream().map(Convenience::getName).toList();
-        Integer arrSize = convenienceList.size();
-        String conveniences[] = convenienceList.toArray(new String[arrSize]);
-
-        return conveniences;
-    }
-
-    public Integer getWalkingtime(Studycafe studycafe) {
-        try {
-            return studycafe.getNearestStationInfo().getWalkingTime();
-        } catch (Exception exception) {
-            return 0;
-        }
-    }
-
-    public String getNearestStation(Studycafe studycafe) {
-        try {
-            return studycafe.getNearestStationInfo().getNearestStation();
-        } catch (Exception exception) {
-            return " ";
-        }
+        return studycafe.getConveniences().stream()
+                .map(Convenience::getName)
+                .map(ConvenienceName::toString)
+                .toList();
     }
 
     public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
@@ -242,8 +200,8 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public String[] getHashtagRecords(Long studycafeId) {
-        return hashtagRecordService.findStudycafeHashtag(studycafeId).stream().map(Enum::name).toArray(String[]::new);
+    public List<String> getHashtagRecords(Long studycafeId) {
+        return hashtagRecordService.findStudycafeHashtag(studycafeId);
     }
 
     public Integer getAccumResCnt(Long studycafeId) {
@@ -272,9 +230,6 @@ public class StudycafeService {
         // 현재 로그인된 유저 정보를 가져온다.
         Member member = tokenService.getMemberFromAccessToken(accessToken);
 
-        // 룸 정보 추가 검증
-        validateRoomInfo(registerRequest);
-
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
         String latitude = cafeInfo.getAddressInfo().getLatitude();
@@ -294,7 +249,8 @@ public class StudycafeService {
                 .totalGrade(0.0)
                 .createdDate(LocalDateTime.now())
                 .accumReserveCount(0)
-                .nearestStationInfo(nearestStationInfoResponse.toEmbedded())
+                .walkingTime(nearestStationInfoResponse.getWalkingTime())
+                .nearestStation(nearestStationInfoResponse.getNearestStation())
                 .introduction(cafeInfo.getIntroduction())
                 .build();
 
@@ -368,25 +324,6 @@ public class StudycafeService {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
-    }
-
-    /**
-     * 스터디카페 등록 시 룸 정보에 대한 검증을 하는 메소드 (검증 실패 시 예외 발생)
-     * @param registerRequest 스터디카페 등록 시 요청값
-     */
-    private void validateRoomInfo(RegisterRequest registerRequest) {
-        List<RoomInfoRequest> roomInfoRequests = registerRequest.getRoomInfos();
-        for (RoomInfoRequest roomInfoRequest : roomInfoRequests) {
-            Integer minHeadCount = roomInfoRequest.getMinHeadCount();
-            Integer maxHeadCount = roomInfoRequest.getMaxHeadCount();
-
-            // 밑의 코드는 추후 Validator 를 도입 예정
-
-            // 최대 인원 수가 최대 인원 수 보다 작은 경우
-            if (maxHeadCount < minHeadCount) {
-                throw new BadRequestException(INVALID_BETWEEN_MAX_HEADCOUNT_AND_MIN_HEADCOUNT);
-            }
-        }
     }
 
     /**
@@ -500,11 +437,6 @@ public class StudycafeService {
     public void insertAnnouncements(String accessToken, Long studycafeId, AnnouncementRequest announcementRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-
-        // 공지 노출 시작 날짜가 끝 날짜보다 이후로 설정된 경우 (이도 마찬가지로 Validator 적용 예정)
-        if (announcementRequest.getStartDate().isAfter(announcementRequest.getEndDate())) {
-            throw new BadRequestException(START_DATE_AFTER_THAN_END_DATE);
-        }
 
         studycafe.addAnnouncement(announcementRequest.toEntity());
     }

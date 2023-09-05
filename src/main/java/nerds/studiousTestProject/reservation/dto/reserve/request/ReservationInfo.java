@@ -19,7 +19,7 @@ public class ReservationInfo {
     @NotNull(message = "예약 종료 시간은 필수입니다.")
     private LocalTime endTime;
     @NotNull(message = "예약 이용 시간은 필수입니다.")
-    private Integer duration;
+    private Integer usingTime;
     @NotNull(message = "예약 인원수는 필수입니다.")
     private Integer headCount;
     @NotNull(message = "예약 가격은 필수입니다.")

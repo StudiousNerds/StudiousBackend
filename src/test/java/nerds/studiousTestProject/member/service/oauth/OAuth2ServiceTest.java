@@ -1,11 +1,11 @@
 package nerds.studiousTestProject.member.service.oauth;
 
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
-import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.service.MemberService;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +56,7 @@ class OAuth2ServiceTest {
     @Mock
     private InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     @Mock
-    private MemberService memberService;
+    private MemberRepository memberRepository;
     @Mock
     private JwtTokenProvider jwtTokenProvider;
     @Mock
@@ -186,7 +186,7 @@ class OAuth2ServiceTest {
         Long providerId = providerId();
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
 
-        doReturn(Optional.empty()).when(memberService).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.empty()).when(memberRepository).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();
@@ -214,7 +214,7 @@ class OAuth2ServiceTest {
         Long providerId = providerId();
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
 
-        doReturn(Optional.of(member)).when(memberService).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.of(member)).when(memberRepository).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();

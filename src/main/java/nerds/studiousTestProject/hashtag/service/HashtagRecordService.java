@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,15 +18,20 @@ public class HashtagRecordService {
     private final HashtagRecordRepository hashtagRecordRepository;
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
-    public List<HashtagName> findStudycafeHashtag(Long studycafeId) {
+    public List<String> findStudycafeHashtag(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<HashtagName> hashtagNameList = new ArrayList<>();
+        List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i));
+            hashtagNameList.add(hashtagNames.get(i).name());
         }
         return hashtagNameList;
+    }
+
+    @Transactional
+    public void deleteAllByReviewId(Long reviewId) {
+        hashtagRecordRepository.deleteAllByReviewId(reviewId);
     }
 }
