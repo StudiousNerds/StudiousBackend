@@ -26,7 +26,7 @@ class HashtagRepositoryTest {
     void deleteAllByReviewId() {
         // given
         HashtagRecord hashtag = hashtagRecordRepository.save(HashtagFixture.COST_EFFECTIVE_HASHTAG.생성(1L));
-        Review save = reviewRepository.save(ReviewFixture.FIRST_REVIEW.생성(1L));
+        Review save = reviewRepository.save(ReviewFixture.FIRST_REVIEW.기본_정보_생성(1L));
         save.addHashtagRecord(hashtag);
         List<Long> reviewId = new ArrayList<>();
         reviewId.add(1L);

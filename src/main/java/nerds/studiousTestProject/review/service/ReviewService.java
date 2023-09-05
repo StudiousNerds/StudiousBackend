@@ -10,6 +10,7 @@ import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
+import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
@@ -99,7 +100,7 @@ public class ReviewService {
         grade.updateGrade(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-                modifyReviewRequest.getIsRecommend(),
+//                modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
@@ -245,7 +246,7 @@ public class ReviewService {
         Integer recommend = 0, count = 0;
 
         for (Review review : reviewList){
-            if(review.getGrade().getIsRecommended()){
+            if(review.getIsRecommended()){
                 recommend++;
             }
             count++;
@@ -274,7 +275,7 @@ public class ReviewService {
 
         for (MultipartFile file : files) {
             String photoUrl = storageService.uploadFile(file);
-            photoList.add(SubPhoto.builder().review(review).type("REVIEW").path(photoUrl).build());
+            photoList.add(SubPhoto.builder().review(review).type(SubPhotoType.REVIEW).path(photoUrl).build());
         }
         subPhotoService.saveAllPhotos(photoList);
     }

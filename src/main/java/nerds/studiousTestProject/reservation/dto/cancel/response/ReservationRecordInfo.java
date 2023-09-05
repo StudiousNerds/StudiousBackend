@@ -20,7 +20,7 @@ public class ReservationRecordInfo {
     private LocalDate reservationDate;
     private LocalTime reservationStartTime;
     private LocalTime reservationEndTime;
-    private int reservationDuration;
+    private int reservationUsingTime;
 
     public static ReservationRecordInfo of(Studycafe studycafe, Room room, ReservationRecord reservationRecord) {
         return ReservationRecordInfo.builder()
@@ -30,7 +30,7 @@ public class ReservationRecordInfo {
                 .reservationDate(reservationRecord.getDate())
                 .reservationStartTime(reservationRecord.getStartTime())
                 .reservationEndTime(reservationRecord.getEndTime())
-                .reservationDuration(reservationRecord.getDuration())
+                .reservationUsingTime(reservationRecord.getUsingTime())
                 .build();
     }
 

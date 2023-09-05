@@ -31,19 +31,15 @@ public class Grade {
     @Column(name = "fixtures_status", nullable = false)
     private Integer fixturesStatus;
 
-    @Column(name = "is_recommended", nullable = false)
-    private Boolean isRecommended;
-
     @Column(name = "total", nullable = false)
     private Double total;
 
     @Builder
-    public Grade(Long id, Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total) {
+    public Grade(Long id, Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total) {
         this.id = id;
         this.cleanliness = cleanliness;
         this.deafening = deafening;
         this.fixturesStatus = fixturesStatus;
-        this.isRecommended = isRecommended;
         this.total = total;
     }
 
@@ -51,11 +47,10 @@ public class Grade {
         this.total = total;
     }
 
-    public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Boolean isRecommended, Double total){
+    public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total){
         this.cleanliness = cleanliness;
         this.deafening = deafening;
         this.fixturesStatus = fixturesStatus;
-        this.isRecommended = isRecommended;
         this.total = total;
     }
 }
