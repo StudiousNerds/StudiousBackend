@@ -2,7 +2,6 @@ package nerds.studiousTestProject.room.dto.modify.request;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
 import nerds.studiousTestProject.room.entity.PriceType;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -18,8 +17,7 @@ public class ModifyRoomRequest {
     private Integer price;
     private String type;
     private Integer minUsingTime;
-    private List<String> conveniences;
-    private List<PaidConvenience> paidConveniences;
+    private List<ModifyConvenienceRequest> conveniences;
 
     public static Room toEntity(Studycafe studycafe, Long roomId, ModifyRoomRequest modifyRoomRequest) {
         return Room.builder()
