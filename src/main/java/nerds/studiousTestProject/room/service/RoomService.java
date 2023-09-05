@@ -3,23 +3,33 @@ package nerds.studiousTestProject.room.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
+import nerds.studiousTestProject.convenience.service.ConvenienceService;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
+import nerds.studiousTestProject.photo.entity.SubPhotoType;
+import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.find.response.BasicRoomInfo;
 import nerds.studiousTestProject.room.dto.find.response.FindAllRoomResponse;
 import nerds.studiousTestProject.room.dto.find.response.FindRoomResponse;
+import nerds.studiousTestProject.room.dto.modify.request.ModifyConvenienceRequest;
+import nerds.studiousTestProject.room.dto.modify.request.ModifyRoomRequest;
+import nerds.studiousTestProject.room.dto.modify.response.ModifyRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,8 +49,11 @@ public class RoomService {
     private final ReservationRecordService reservationRecordService;
     private final StudycafeRepository studycafeRepository;
     private final OperationInfoRepository operationInfoRepository;
+    private final StorageService storageService;
+    private final SubPhotoService subPhotoService;
+    private final ConvenienceService convenienceService;
 
-    public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId){
+    public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
 
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
 
@@ -79,9 +92,20 @@ public class RoomService {
                 .build();
     }
 
-    public
+    @Transactional
+    public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRoomRequest, List<MultipartFile> photos) {
+        Studycafe studycafe = getStudycafeById(studycafeId);
+        Room room = findRoomById(roomId);
+        Room updatedRoom = ModifyRoomRequest.toEntity(studycafe, roomId, modifyRoomRequest);
 
-    public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId){
+        room.update(updatedRoom);
+        updateRoomPhotos(room, photos);
+        updateConveniences(roomId, modifyRoomRequest.getConveniences());
+
+        return ModifyRoomResponse.builder().roomId(roomId).modifiedAt(LocalDate.now()).build();
+    }
+
+    public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId) {
 
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
         studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
@@ -101,6 +125,7 @@ public class RoomService {
 
         return timeList;
     }
+
 
     public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId){
         Integer oneMonth = date.lengthOfMonth();
@@ -135,7 +160,7 @@ public class RoomService {
                 .toList();
     }
 
-    public Room findRoomById(Long roomId){
+    public Room findRoomById(Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
     }
@@ -152,6 +177,42 @@ public class RoomService {
 
     private List<String> getPhotos(Room room) {
         return room.getSubPhotos().stream().map(SubPhoto::getPath).collect(Collectors.toList());
+    }
+
+    private Studycafe getStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    }
+
+    private void updateRoomPhotos(Room room, List<MultipartFile> photos) {
+        if (photos != null) {
+            List<SubPhoto> updatedPhotos = new ArrayList<>();
+
+            for (SubPhoto photo : room.getSubPhotos()) {
+                storageService.deleteFile(photo.getPath());
+                room.getSubPhotos().remove(photo.getPath());
+            }
+            subPhotoService.removeAllRoomPhotos(room.getId());
+
+            for (MultipartFile file : photos) {
+                String photoUrl = storageService.uploadFile(file);
+                updatedPhotos.add(SubPhoto.builder().room(room).type(SubPhotoType.ROOM).path(photoUrl).build());
+            }
+            subPhotoService.saveAllPhotos(updatedPhotos);
+            room.updateSubPhotos(updatedPhotos);
+        }
+    }
+
+    private void updateConveniences(Long roomId, List<ModifyConvenienceRequest> conveniences) {
+        Room room = findRoomById(roomId);
+        convenienceService.deleteRoomConveniences(roomId);
+        List<Convenience> convenienceList = new ArrayList<>();
+        for (ModifyConvenienceRequest convenienceInfo : conveniences) {
+            Convenience convenience = convenienceInfo.toEntity();
+            convenience.setRoom(room);
+            convenienceList.add(convenience);
+        }
+        convenienceService.saveRoomConveniences(convenienceList);
+        room.updateConveniences(convenienceList);
     }
 
     private List<BasicRoomInfo> getBasicInfo(List<Room> roomList) {
