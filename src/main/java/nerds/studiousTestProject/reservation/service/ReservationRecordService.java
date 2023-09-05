@@ -110,14 +110,14 @@ public class ReservationRecordService {
 
     private double validCalculateUsingTime(ReservationInfo reservationInfo) {
         double calculatedDuration = Duration.between(reservationInfo.getStartTime(), reservationInfo.getEndTime()).getSeconds() * SECOND_PER_HOUR;
-        if (calculatedDuration != reservationInfo.getDuration()) { // 계산했을 때 duration과 같지 않을 때
+        if (calculatedDuration != reservationInfo.getUsingTime()) { // 계산했을 때 duration과 같지 않을 때
             throw new BadRequestException(MISCALCULATED_USING_TIME);
         }
         return calculatedDuration;
     }
 
     private void validMinUsingTime(ReservationInfo reservationInfo, Room room) {
-        if (reservationInfo.getDuration() < room.getMinUsingTime()){ // 최소 이용시간 보다 작을 때
+        if (reservationInfo.getUsingTime() < room.getMinUsingTime()){ // 최소 이용시간 보다 작을 때
             throw new BadRequestException(INVALID_USING_TIME);
         }
     }
