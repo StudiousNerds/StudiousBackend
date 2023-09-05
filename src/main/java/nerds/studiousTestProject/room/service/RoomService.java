@@ -100,9 +100,17 @@ public class RoomService {
 
         room.update(updatedRoom);
         updateRoomPhotos(room, photos);
-        updateConveniences(roomId, modifyRoomRequest.getConveniences());
+        updateConveniences(room, modifyRoomRequest.getConveniences());
 
         return ModifyRoomResponse.builder().roomId(roomId).modifiedAt(LocalDate.now()).build();
+    }
+
+    @Transactional
+    public void deleteRoom(Long roomId) {
+        Room room = findRoomById(roomId);
+        deletePhotos(room);
+        deleteConveniences(room);
+        roomRepository.deleteById(roomId);
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId) {
@@ -185,34 +193,34 @@ public class RoomService {
 
     private void updateRoomPhotos(Room room, List<MultipartFile> photos) {
         if (photos != null) {
-            List<SubPhoto> updatedPhotos = new ArrayList<>();
-
-            for (SubPhoto photo : room.getSubPhotos()) {
-                storageService.deleteFile(photo.getPath());
-                room.getSubPhotos().remove(photo.getPath());
-            }
-            subPhotoService.removeAllRoomPhotos(room.getId());
-
+            deletePhotos(room);
             for (MultipartFile file : photos) {
                 String photoUrl = storageService.uploadFile(file);
-                updatedPhotos.add(SubPhoto.builder().room(room).type(SubPhotoType.ROOM).path(photoUrl).build());
+                room.addSubPhoto(SubPhoto.builder().room(room).type(SubPhotoType.ROOM).path(photoUrl).build());
             }
-            subPhotoService.saveAllPhotos(updatedPhotos);
-            room.updateSubPhotos(updatedPhotos);
         }
     }
 
-    private void updateConveniences(Long roomId, List<ModifyConvenienceRequest> conveniences) {
-        Room room = findRoomById(roomId);
-        convenienceService.deleteRoomConveniences(roomId);
-        List<Convenience> convenienceList = new ArrayList<>();
-        for (ModifyConvenienceRequest convenienceInfo : conveniences) {
-            Convenience convenience = convenienceInfo.toEntity();
-            convenience.setRoom(room);
-            convenienceList.add(convenience);
+    private void updateConveniences(Room room, List<ModifyConvenienceRequest> conveniences) {
+        if (conveniences != null) {
+            deleteConveniences(room);
+            for (ModifyConvenienceRequest convenienceInfo : conveniences) {
+                room.addConvenience(convenienceInfo.toEntity());
+            }
         }
-        convenienceService.saveRoomConveniences(convenienceList);
-        room.updateConveniences(convenienceList);
+    }
+
+    private void deletePhotos(Room room) {
+        for (SubPhoto photo : room.getSubPhotos()) {
+            storageService.deleteFile(photo.getPath());
+            room.getSubPhotos().remove(photo.getPath());
+        }
+        subPhotoService.removeAllRoomPhotos(room.getId());
+    }
+
+    private void deleteConveniences(Room room) {
+        room.deleteConveniences();
+        convenienceService.deleteRoomConveniences(room.getId());
     }
 
     private List<BasicRoomInfo> getBasicInfo(List<Room> roomList) {
