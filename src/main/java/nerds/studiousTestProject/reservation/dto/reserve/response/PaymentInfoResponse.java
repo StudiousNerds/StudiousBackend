@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
 @Builder
@@ -24,11 +25,11 @@ public class PaymentInfoResponse {
 
     private static final String REQUEST_SUCCESS_URI = "http://localhost:8080/studious/payments/success";
     private static final String REQUEST_FAIL_URI = "http://localhost:8080/studious/payments/fail";
-    public static PaymentInfoResponse of(ReserveRequest reserveRequest, String orderId) {
+    public static PaymentInfoResponse of(ReserveRequest reserveRequest, ReservationRecord reservationRecord) {
         return PaymentInfoResponse.builder()
                 .amount(reserveRequest.getReservation().getPrice())
-                .orderId(orderId)
-                .orderName(reserveRequest.getUser().getName())
+                .orderId(reservationRecord.getOrderId())
+                .orderName(reservationRecord.getUserName())
                 .successUrl(REQUEST_SUCCESS_URI)
                 .failUrl(REQUEST_FAIL_URI)
                 .build();
