@@ -20,6 +20,7 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCanc
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
@@ -72,17 +73,13 @@ public class ReservationRecordService {
     @Transactional
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
         Room room = findRoomById(roomId);
-
-        validReservationInfo(reservationInfo, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
-        String orderId = String.valueOf(UUID.randomUUID());
+        validReservationInfo(reserveRequest.getReservation(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
         ReservationRecord reservationRecord = saveReservationRecord(
                 tokenService.getMemberFromAccessToken(accessToken),
                 room,
-                reservationInfo,
-                reserveRequest.getUser(),
-                orderId);
+                reserveRequest);
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
-        return orderId;
+        return PaymentInfoResponse.of(reserveRequest, reservationRecord);
     }
 
     private void validReservationInfo(ReservationInfo reservationInfo, Room room) {
@@ -148,7 +145,7 @@ public class ReservationRecordService {
                         .userPhoneNumber(user.getPhoneNumber())
                         .request(user.getRequest())
                         .room(room)
-                        .orderId(orderId)
+                        .orderId(UUID.randomUUID().toString())
                         .member(member)
                         .build()
         );
