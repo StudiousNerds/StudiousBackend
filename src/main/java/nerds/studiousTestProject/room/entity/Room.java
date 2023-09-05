@@ -96,4 +96,49 @@ public class Room {
             this.studycafe = studycafe;
         }
     }
+
+    public void updateRoomName(String roomName) {
+        if (roomName != null) {
+            this.name = roomName;
+        }
+    }
+
+    public void updateMinHeadCount(Integer minHeadCount) {
+        if (minHeadCount != null) {
+            this.minHeadCount = minHeadCount;
+        }
+    }
+
+    public void updateMaxHeadCount(Integer maxHeadCount) {
+        if (maxHeadCount != null) {
+            this.maxHeadCount = maxHeadCount;
+        }
+    }
+
+    public void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    public void updateType(PriceType type) {
+        if (type != null) {
+            this.priceType = type;
+        }
+    }
+
+    public void updateMinUsingTime(Integer minUsingTime) {
+        if (minUsingTime != null) {
+            this.minUsingTime = minUsingTime;
+        }
+    }
+
+    public void update(Room room) {
+        updateRoomName(room.getName());
+        updateMinHeadCount(room.getMinHeadCount());
+        updateMaxHeadCount(room.getMaxHeadCount());
+        updatePrice(room.getPrice());
+        updateType(room.getPriceType());
+        updateMinUsingTime(room.getMinUsingTime());
+    }
 }
