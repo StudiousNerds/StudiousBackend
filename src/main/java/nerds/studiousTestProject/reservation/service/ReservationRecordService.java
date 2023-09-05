@@ -133,7 +133,9 @@ public class ReservationRecordService {
                 .build()));
     }
 
-    private ReservationRecord saveReservationRecord(Member member, Room room, ReservationInfo reservation, ReserveUser user, String orderId) {
+    private ReservationRecord saveReservationRecord(Member member, Room room, ReserveRequest reserveRequest) {
+        ReserveUser user = reserveRequest.getUser();
+        ReservationInfo reservation = reserveRequest.getReservation();
         return reservationRecordRepository.save(
                 ReservationRecord.builder()
                         .status(ReservationStatus.INPROGRESS)
