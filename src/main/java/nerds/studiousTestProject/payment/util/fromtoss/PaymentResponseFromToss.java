@@ -9,6 +9,7 @@ import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @NoArgsConstructor
@@ -65,12 +66,13 @@ public class PaymentResponseFromToss {
     @Nullable
     private Discount discount;
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
     public Payment toPayment(){
         return Payment.builder()
                 .paymentKey(paymentKey)
                 .orderId(orderId)
                 .price(totalAmount)
-                .completeTime(LocalDateTime.parse(approvedAt))
+                .completeTime(LocalDateTime.parse(approvedAt, DateTimeFormatter.ofPattern(DATE_FORMAT)))
                 .method(method)
                 .status(PaymentStatus.valueOf(status))
                 .build();

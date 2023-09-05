@@ -2,8 +2,7 @@ package nerds.studiousTestProject.room.dto.find.response;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
-
+import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
 import java.util.List;
 import java.util.Map;
 

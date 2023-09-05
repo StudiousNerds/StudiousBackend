@@ -36,13 +36,13 @@ public class SubPhoto {
     private Review review;
 
     @Column(name = "type", nullable = false)
-    private String type;
+    private SubPhotoType type;
 
     @Column(name = "path", nullable = false)
     private String path;
 
     @Builder
-    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, String type, String path) {
+    public SubPhoto(Long id, Room room, Studycafe studycafe, Review review, SubPhotoType type, String path) {
         this.id = id;
         this.room = room;
         this.studycafe = studycafe;

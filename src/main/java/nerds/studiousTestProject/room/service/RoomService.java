@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaidConvenience;
+import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.find.response.BasicRoomInfo;
 import nerds.studiousTestProject.room.dto.find.response.FindAllRoomResponse;

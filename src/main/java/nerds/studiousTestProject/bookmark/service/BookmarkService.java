@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.request.BookmarkRequest;
 import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
-import nerds.studiousTestProject.bookmark.dto.response.PageInfo;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.service.TokenService;
@@ -51,24 +50,26 @@ public class BookmarkService {
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
-            return FindBookmarkResponse.builder().pageInfo(PageInfo.of(bookmarks)).bookmarkInfo(Collections.emptyList()).build();
+            return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
+                    .bookmarkInfo(Collections.emptyList()).build();
         }
 
         List<BookmarkInfo> bookmarkInfos = bookmarks.stream()
                 .map(Bookmark::getStudycafe)
                 .map(studycafe -> BookmarkInfo.builder()
-                        .cafeId(studycafe.getId())
+                        .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(reservationRecordService.findAllByStudycafeId(studycafe.getId()).size())
-                        .distance(studycafeService.getWalkingtime(studycafe))
-                        .nearestStation(studycafeService.getNearestStation(studycafe))
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
                         .grade(studycafe.getTotalGrade())
                         .hashtags(hashtagRecordService.findStudycafeHashtag(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
 
-        return FindBookmarkResponse.builder().pageInfo(PageInfo.of(bookmarks)).bookmarkInfo(bookmarkInfos).build();
+        return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
+                .bookmarkInfo(bookmarkInfos).build();
     }
 
     @Transactional
