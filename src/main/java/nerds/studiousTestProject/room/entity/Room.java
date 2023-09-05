@@ -97,6 +97,18 @@ public class Room {
         }
     }
 
+    public void updateSubPhotos(List<SubPhoto> photos) {
+        if (photos != null) {
+            this.subPhotos = photos;
+        }
+    }
+
+    public void updateConveniences(List<Convenience> conveniences) {
+        if (conveniences != null) {
+            this.conveniences = conveniences;
+        }
+    }
+
     public void updateRoomName(String roomName) {
         if (roomName != null) {
             this.name = roomName;
