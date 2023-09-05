@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ConvenienceRepository extends JpaRepository<Convenience, Long> {
     List<Convenience> findAllByRoomOrStudycafe(Room room, Studycafe studycafe);
+    void deleteAllByRoomId(Long roomId);
 }
