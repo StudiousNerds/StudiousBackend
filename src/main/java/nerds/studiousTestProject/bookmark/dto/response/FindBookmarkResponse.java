@@ -8,6 +8,7 @@ import java.util.List;
 @Builder
 @Data
 public class FindBookmarkResponse {
-    private PageInfo pageInfo;
+    private Integer totalPage;
+    private Integer currentPage;
     private List<BookmarkInfo> bookmarkInfo;
 }
