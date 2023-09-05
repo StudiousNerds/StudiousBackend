@@ -286,7 +286,7 @@ public class ReviewService {
         for (String photoUrl : reviewPhotos) {
             storageService.deleteFile(photoUrl);
         }
-        subPhotoService.removeAllPhotos(reviewId);
+        subPhotoService.removeAllReviewPhotos(reviewId);
     }
 
     private List<ReservationRecord> getAllReservation(Long studycafeId){
