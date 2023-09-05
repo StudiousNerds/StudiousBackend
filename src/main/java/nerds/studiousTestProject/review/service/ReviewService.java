@@ -23,7 +23,6 @@ import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse
 import nerds.studiousTestProject.review.dto.find.response.FindReviewInfo;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
-import nerds.studiousTestProject.review.dto.find.response.PageInfo;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.written.response.GradeInfo;
 import nerds.studiousTestProject.review.dto.written.response.ReviewInfo;
@@ -103,8 +102,9 @@ public class ReviewService {
         grade.updateGrade(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-//                modifyReviewRequest.getIsRecommend(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+
+        // 추천 여부 수정 만들어야 함
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         hashtagRecordService.deleteAllByReviewId(reviewId);
@@ -146,7 +146,8 @@ public class ReviewService {
     public FindReviewSortedResponse findAllReviews(Long studycafeId, Pageable pageable) {
         Page<Review> reviews = getAllReviewsSorted(studycafeId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageInfo(PageInfo.of(reviews))
+                .totalPage(reviews.getTotalPages())
+                .currentPage(reviews.getNumber() + 1)
                 .totalGradeInfo(findTotalGrade(studycafeId))
                 .findReviewInfo(getReviewInfo(reviews))
                 .build();
@@ -160,7 +161,8 @@ public class ReviewService {
     public FindReviewSortedResponse findRoomReviews(Long studycafeId, Long roomId, Pageable pageable) {
         Page<Review> reviews = getRoomReviewsSorted(studycafeId, roomId, pageable);
         return FindReviewSortedResponse.builder()
-                .pageInfo(PageInfo.of(reviews))
+                .totalPage(reviews.getTotalPages())
+                .currentPage(reviews.getNumber() + 1)
                 .totalGradeInfo(findTotalGrade(studycafeId))
                 .findReviewInfo(getReviewInfo(reviews))
                 .build();
@@ -170,7 +172,8 @@ public class ReviewService {
         Page<ReservationRecord> reservationRecords = getReservationRecords(accessToken, pageable);
 
         return AvailableReviewResponse.builder()
-                .pageInfo(PageInfo.getPageInfo(reservationRecords))
+                .totalPage(reservationRecords.getTotalPages())
+                .currentPage(reservationRecords.getNumber() + 1)
                 .availableReviewInfo(getAvailableReviews(reservationRecords))
                 .build();
     }
@@ -179,11 +182,11 @@ public class ReviewService {
         Page<ReservationRecord> reservationRecords = getReservationRecords(accessToken, pageable);
 
         return WrittenReviewResponse.builder()
-                .pageInfo(PageInfo.getPageInfo(reservationRecords))
+                .totalPage(reservationRecords.getTotalPages())
+                .currentPage(reservationRecords.getNumber() + 1)
                 .writtenReviewInfos(getWrittenReviews(reservationRecords, startDate, endDate))
                 .build();
     }
-
 
     public TotalGradeInfo findTotalGrade(Long studycafeId) {
         return TotalGradeInfo.builder()
