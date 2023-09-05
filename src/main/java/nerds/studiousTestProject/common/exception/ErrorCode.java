@@ -43,7 +43,8 @@ public enum ErrorCode {
     NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다."),
     INVALID_RESERVATION_CANCEL_DATE("이미 지난 예약입니다."),
     PAYMENT_NOT_CANCELED("결제가 취소되지 않았습니다."),
-    CANT_CONVERT_TO_RESERVATION_SETTING_STATUS("해당하는 탭이 없습니다.");
+    CANT_CONVERT_TO_RESERVATION_SETTING_STATUS("해당하는 탭이 없습니다."),
+    MISMATCH_MEMBER_AND_STUDYCAFE("회원 정보와 일치하는 스터디카페를 찾을 수 없습니다");
 
     private final String message;
     ErrorCode(String message) {
