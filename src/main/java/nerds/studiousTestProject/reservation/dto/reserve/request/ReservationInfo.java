@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.payment.dto.request.request;
+package nerds.studiousTestProject.reservation.dto.reserve.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
