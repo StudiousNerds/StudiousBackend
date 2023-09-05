@@ -63,4 +63,8 @@ public class StorageService {
     private String getFileExtension(String originalFileName) {
         return originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
     }
+
+    private String getFileNameFromUrl(String url) {
+        return url.split("/")[3];
+    }
 }
