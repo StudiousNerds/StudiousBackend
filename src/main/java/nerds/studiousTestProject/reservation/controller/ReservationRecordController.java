@@ -1,12 +1,15 @@
 package nerds.studiousTestProject.reservation.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
-import nerds.studiousTestProject.reservation.dto.reserve.response.ReserveResponse;
+import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -42,9 +45,16 @@ public class ReservationRecordController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reservations/studycafes/{cafeId}/rooms/{roomId}")
-    public ReserveResponse reserve(@PathVariable Long cafeId, @PathVariable Long roomId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return reservationRecordService.reserve(cafeId, roomId, accessToken);
+    @GetMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    public ReserveResponse showReservationInfo(@PathVariable Long studycafeId, @PathVariable Long roomId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return reservationRecordService.reserve(studycafeId, roomId, accessToken);
+    }
+
+    @PostMapping("/rooms/{roomId}")
+    public PaymentInfoResponse reserve(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
+                                       @PathVariable Long roomId,
+                                       @RequestBody @Valid ReserveRequest reserveRequest) {
+        return reservationRecordService.reserve(reserveRequest, roomId, accessToken);
     }
 
     @GetMapping("/mypage/reservation-settings/{reservationId}/cancellations")

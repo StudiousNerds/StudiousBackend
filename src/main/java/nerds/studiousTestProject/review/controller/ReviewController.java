@@ -3,13 +3,13 @@ package nerds.studiousTestProject.review.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.review.dto.manage.inquire.ReviewInfoResponse;
 import nerds.studiousTestProject.review.dto.manage.modify.ModifyCommentRequest;
 import nerds.studiousTestProject.review.dto.manage.register.RegisterCommentRequest;
 import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
-import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
@@ -65,15 +65,16 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews/available")
-    public List<AvailableReviewResponse> InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return reviewService.findAvailableReviews(accessToken);
+    public AvailableReviewResponse InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
+        return reviewService.findAvailableReviews(accessToken, PageRequestConverter.of(page, 5));
     }
 
     @GetMapping("/reviews")
-    public List<WrittenReviewResponse> InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-                                                            @RequestParam("startDate") LocalDate startDate,
-                                                            @RequestParam("endDate") LocalDate endDate) {
-        return reviewService.findWrittenReviews(accessToken, startDate, endDate);
+    public WrittenReviewResponse InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
+                                                      @RequestParam("startDate") LocalDate startDate,
+                                                      @RequestParam("endDate") LocalDate endDate,
+                                                      @RequestParam Integer page) {
+        return reviewService.findWrittenReviews(accessToken, startDate, endDate, PageRequestConverter.of(page, 5));
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews")

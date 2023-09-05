@@ -43,7 +43,7 @@ public class Payment {
     @Column(name = "price", nullable = false)
     private Integer price;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "payment_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 

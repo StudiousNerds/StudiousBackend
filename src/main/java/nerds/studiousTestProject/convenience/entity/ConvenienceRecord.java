@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.convenience.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +27,9 @@ public class ConvenienceRecord {
     @JoinColumn(name = "reservation_record_id", nullable = false)
     private ReservationRecord reservationRecord;
 
-    private ConvenienceName convenienceName;
+    @Column(name = "convenience_name", nullable = false)
+    private String convenienceName;
 
+    @Column(name = "price", nullable = false)
     private Integer price;
 }
