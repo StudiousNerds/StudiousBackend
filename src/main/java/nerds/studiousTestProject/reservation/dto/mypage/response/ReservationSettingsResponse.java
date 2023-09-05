@@ -16,6 +16,7 @@ public class ReservationSettingsResponse {
     private String studycafeName;
     private String studycafePhoto;
     private String roomName;
+    private Long reservationId;
     private LocalDate reservationDate;
     private LocalTime reservationStartTime;
     private LocalTime reservationEndTime;

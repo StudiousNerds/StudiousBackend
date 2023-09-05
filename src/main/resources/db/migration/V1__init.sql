@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `grade` (
     `cleanliness`     int          NOT NULL,
     `deafening`       int          NOT NULL,
     `fixtures_status` int          NOT NULL,
-    `is_recommended`  TINYINT(1)   NOT NULL,
     `total`           decimal(3,2) NOT NULL,
     `review_id`       bigint       NOT NULL,
     PRIMARY KEY (`id`)
@@ -31,11 +30,11 @@ CREATE TABLE IF NOT EXISTS `member` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `resigned_date` DATE,
     `usable`        TINYINT(1)   NOT NULL,
-    `birthday`      DATE         NOT NULL,
+    `birthday`      DATE,
     `created_date`  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     `provider_id`   bigint,
     `email`         varchar(255) NOT NULL,
-    `name`          varchar(255) NOT NULL,
+    `name`          varchar(255),
     `nickname`      varchar(255) NOT NULL,
     `password`      varchar(255) NOT NULL,
     `phone_number`  varchar(255) NOT NULL,
@@ -91,8 +90,8 @@ CREATE TABLE IF NOT EXISTS `announcement` (
 
 CREATE TABLE IF NOT EXISTS `operation_info` (
     `id`           bigint       NOT NULL AUTO_INCREMENT,
-    `is_all_day`   TINYINT(1)            DEFAULT '0',
-    `closed`       TINYINT(1)            DEFAULT '0',
+    `is_all_day`   TINYINT(1)   NOT NULL,
+    `closed`       TINYINT(1)   NOT NULL,
     `end_time`     TIME,
     `start_time`   TIME,
     `week`         varchar(255) NOT NULL,
@@ -134,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `refund_policy` (
 CREATE TABLE IF NOT EXISTS `reservation_record` (
     `id`                bigint       NOT NULL AUTO_INCREMENT,
     `date`              date         NOT NULL,
-    `duration`          int          NOT NULL, -- 시간 단위
+    `using_time`        int          NOT NULL, -- 시간 단위
     `start_time`        time         NOT NULL,
     `end_time`          time         NOT NULL,
     `head_count`        int          NOT NULL,
@@ -154,9 +153,10 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `convenience_record` (
-    `id`                    bigint NOT NULL AUTO_INCREMENT,
-    `reservation_record_id` bigint NOT NULL,
-    `convenience_id`        bigint NOT NULL,
+    `id`                    bigint       NOT NULL AUTO_INCREMENT,
+    `reservation_record_id` bigint       NOT NULL,
+    `convenience_name`      varchar(255) NOT NULL,
+    `price`                 varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -168,6 +168,8 @@ CREATE TABLE IF NOT EXISTS `review` (
     `created_date`          date         NOT NULL,
     `comment`               varchar(255), -- 사장님 댓글
     `detail`                varchar(255) NOT NULL,
+    `photo`                 varchar(255),
+    `is_recommended`        TINYINT(1)   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -248,4 +250,4 @@ alter table grade add constraint grade_review_unique_key unique (review_id);
 
 alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
 
-alter table review add constraint review_reservation_record_unique_key unique (reservation_record_id);
+alter table reservation_record add constraint review_reservation_record_unique_key unique (review_id);
