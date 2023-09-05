@@ -70,8 +70,7 @@ public class ReservationRecordService {
     private static final double SECOND_PER_HOUR = 0.000277778;
 
     @Transactional
-    public String reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
-        ReservationInfo reservationInfo = reserveRequest.getReservation();
+    public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
         Room room = findRoomById(roomId);
 
         validReservationInfo(reservationInfo, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
