@@ -60,7 +60,7 @@ public class StorageService {
         return convertedFile;
     }
 
-    private static String getFileExtension(String originalFileName) {
+    private String getFileExtension(String originalFileName) {
         return originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
     }
 }
