@@ -54,8 +54,7 @@ public class ReservationRecordController {
     public PaymentInfoResponse reserve(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
                                        @PathVariable Long roomId,
                                        @RequestBody @Valid ReserveRequest reserveRequest) {
-        String orderId = reservationRecordService.reserve(reserveRequest, roomId, accessToken);
-        return PaymentInfoResponse.of(reserveRequest, orderId);
+        return reservationRecordService.reserve(reserveRequest, roomId, accessToken);
     }
 
     @GetMapping("/mypage/reservation-settings/{reservationId}/cancellations")
