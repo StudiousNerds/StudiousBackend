@@ -1,13 +1,13 @@
 package nerds.studiousTestProject.member.service.oauth;
 
-import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
-import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenResponse;
+import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.repository.MemberRepository;
+import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 @RunWith(MockitoJUnitRunner.class)
@@ -56,7 +57,7 @@ class OAuth2ServiceTest {
     @Mock
     private InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     @Mock
-    private MemberRepository memberRepository;
+    private MemberService memberService;
     @Mock
     private JwtTokenProvider jwtTokenProvider;
     @Mock
@@ -74,6 +75,20 @@ class OAuth2ServiceTest {
     @Mock
     private Mono<Map<String, Object>> monoUserInfo;
 
+    private Long providerId;
+    private String accessToken;
+    private JwtTokenResponse jwtTokenResponse;
+
+    @BeforeEach
+    public void beforeEach() {
+        providerId = (long) "providerId".hashCode();
+        accessToken = "accessToken";
+        jwtTokenResponse = JwtTokenResponse.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .build();
+    }
+
     @Test
     @DisplayName("카카오 소셜 신규 회원")
     public void 카카오_소셜_인증_신규회원() throws Exception {
@@ -85,11 +100,11 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_KAKAO, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isFalse();
-        Assertions.assertThat(response.getJwtTokenResponse()).isNull();
-        Assertions.assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId());
-        Assertions.assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
-        Assertions.assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.KAKAO);
+        assertThat(response.isExist()).isFalse();
+        assertThat(response.getJwtTokenResponse()).isNull();
+        assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId);
+        assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
+        assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.KAKAO);
     }
 
     @Test
@@ -103,11 +118,11 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_NAVER, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isFalse();
-        Assertions.assertThat(response.getJwtTokenResponse()).isNull();
-        Assertions.assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId());
-        Assertions.assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
-        Assertions.assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.NAVER);
+        assertThat(response.isExist()).isFalse();
+        assertThat(response.getJwtTokenResponse()).isNull();
+        assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId);
+        assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
+        assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.NAVER);
     }
 
     @Test
@@ -121,11 +136,11 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_GOOGLE, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isFalse();
-        Assertions.assertThat(response.getJwtTokenResponse()).isNull();
-        Assertions.assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId());
-        Assertions.assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
-        Assertions.assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.GOOGLE);
+        assertThat(response.isExist()).isFalse();
+        assertThat(response.getJwtTokenResponse()).isNull();
+        assertThat(response.getUserInfo().getProviderId()).isEqualTo(providerId);
+        assertThat(response.getUserInfo().getEmail()).isEqualTo("test@test.com");
+        assertThat(response.getUserInfo().getType()).isEqualTo(MemberType.GOOGLE);
     }
 
     @Test
@@ -139,10 +154,10 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_KAKAO, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isTrue();
-        Assertions.assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse().getGrantType());
-        Assertions.assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse().getAccessToken());
-        Assertions.assertThat(response.getUserInfo()).isNull();
+        assertThat(response.isExist()).isTrue();
+        assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
+        assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(response.getUserInfo()).isNull();
     }
 
     @Test
@@ -156,10 +171,10 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_NAVER, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isTrue();
-        Assertions.assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse().getGrantType());
-        Assertions.assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse().getAccessToken());
-        Assertions.assertThat(response.getUserInfo()).isNull();
+        assertThat(response.isExist()).isTrue();
+        assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
+        assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(response.getUserInfo()).isNull();
     }
 
     @Test
@@ -173,20 +188,19 @@ class OAuth2ServiceTest {
         OAuth2AuthenticateResponse response = oAuth2Service.authenticate(REGISTRATION_ID_GOOGLE, code());
 
         // then
-        Assertions.assertThat(response.isExist()).isTrue();
-        Assertions.assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse().getGrantType());
-        Assertions.assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse().getAccessToken());
-        Assertions.assertThat(response.getUserInfo()).isNull();
+        assertThat(response.isExist()).isTrue();
+        assertThat(response.getJwtTokenResponse().getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
+        assertThat(response.getJwtTokenResponse().getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(response.getUserInfo()).isNull();
     }
 
     private void givenNewMember(String registrationId, Map<String, Object> attributes, MemberType type) {
         ClientRegistration provider = clientRegistration(registrationId);
         OAuth2TokenResponse oAuth2TokenResponse = oAuth2TokenResponse();
 
-        Long providerId = providerId();
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
 
-        doReturn(Optional.empty()).when(memberRepository).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.empty()).when(memberService).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();
@@ -209,12 +223,9 @@ class OAuth2ServiceTest {
         ClientRegistration provider = clientRegistration(registrationId);
         OAuth2TokenResponse oAuth2TokenResponse = oAuth2TokenResponse();
         Member member = member(registrationId);
-        JwtTokenResponse jwtTokenResponse = jwtTokenResponse();
 
-        Long providerId = providerId();
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
-
-        doReturn(Optional.of(member)).when(memberRepository).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.of(member)).when(memberService).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();
@@ -260,10 +271,6 @@ class OAuth2ServiceTest {
                  .build();
     }
 
-    private Long providerId() {
-        return (long) "providerId".hashCode();
-    }
-
     private Map<String, Object> kakaoAttributes() {
         Map<String, Object> profile = new HashMap<>();
         profile.put("nickname", "테스터");
@@ -273,7 +280,7 @@ class OAuth2ServiceTest {
         kakaoAccount.put("profile", profile);
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("id", providerId());
+        attributes.put("id", providerId);
         attributes.put("kakao_account", kakaoAccount);
 
         return attributes;
@@ -281,7 +288,7 @@ class OAuth2ServiceTest {
 
     private Map<String, Object> naverAttributes() {
         Map<String, Object> response = new HashMap<>();
-        response.put("id", providerId());
+        response.put("id", providerId);
         response.put("email", "test@test.com");
         response.put("name", "테스터");
 
@@ -293,7 +300,7 @@ class OAuth2ServiceTest {
 
     private Map<String, Object> googleAttributes() {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", providerId());
+        params.put("id", providerId);
         params.put("email", "test@test.com");
         params.put("name", "테스터");
         return params;
@@ -307,12 +314,5 @@ class OAuth2ServiceTest {
                 .phoneNumber("01090432652")
                 .usable(true)
                 .build();
-    }
-
-    private JwtTokenResponse jwtTokenResponse() {
-        JwtTokenResponse jwtTokenResponse = new JwtTokenResponse();
-        jwtTokenResponse.setGrantType("Bearer");
-        jwtTokenResponse.setAccessToken("Test");
-        return jwtTokenResponse;
     }
 }

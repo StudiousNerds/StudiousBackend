@@ -34,7 +34,7 @@ import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.STUDY
 import static nerds.studiousTestProject.support.fixture.ConvenienceFixture.ROOM_HDMI_FREE;
 import static nerds.studiousTestProject.support.fixture.HashtagFixture.COST_EFFECTIVE_HASHTAG;
 import static nerds.studiousTestProject.support.fixture.HashtagFixture.ACCESS_HASHTAG;
-import static nerds.studiousTestProject.support.fixture.MemberFixture.BURNED_POTATO;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
 import static nerds.studiousTestProject.support.fixture.OperationInfoFixture.FRI_NINE_TO_NINE;
 import static nerds.studiousTestProject.support.fixture.OperationInfoFixture.HOL_NINE_TO_NINE;
 import static nerds.studiousTestProject.support.fixture.OperationInfoFixture.MON_NINE_TO_NINE;
@@ -72,10 +72,10 @@ class StudycafeRepositoryCustomImplTest {
      */
     @BeforeEach
     public void init() {
-        admin = 회원_저장(BURNED_POTATO.생성());
+        admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
 
-        reservation = 회원_저장(BURNED_POTATO.생성());
+        reservation = 회원_저장(KAKAO_USER.생성());
         권한_저장(USER.멤버_생성(reservation));
     }
 
