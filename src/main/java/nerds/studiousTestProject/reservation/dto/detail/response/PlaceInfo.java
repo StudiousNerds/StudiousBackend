@@ -15,7 +15,7 @@ public class PlaceInfo {
 
     private String studycafeName;
     private String roomName;
-    private LocalDate date
+    private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private String address;
