@@ -82,7 +82,7 @@ class AdminReviewServiceTest {
 
         // when
         assertThrows(NotFoundException.class, () -> {
-            adminReviewService.getWrittenReviews(studycafeId, accessToken, null);
+            adminReviewService.getWrittenReviews(studycafeId, accessToken, null, null);
         });
 
         // then
@@ -106,10 +106,10 @@ class AdminReviewServiceTest {
 
         doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
         doReturn(true).when(studycafeRepository).existsByIdAndMember(studycafeId, member);
-        doReturn(pages).when(reviewRepository).findAllByStudycafeId(studycafeId, null);
+        doReturn(pages).when(reviewRepository).getPagedReviewsByStudycafeId(studycafeId, null, null);
 
         // when
-        List<ReviewInfoResponse> responses = adminReviewService.getWrittenReviews(studycafeId, accessToken, null);
+        List<ReviewInfoResponse> responses = adminReviewService.getWrittenReviews(studycafeId, accessToken, null, null);
 
         // then
         assertThat(responses.size()).isEqualTo(30);
