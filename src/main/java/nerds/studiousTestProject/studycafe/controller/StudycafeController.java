@@ -44,9 +44,11 @@ import java.util.List;
 public class StudycafeController {
     private final StudycafeService studycafeService;
 
+    private static final int STUDYCAFE_SEARCH_SIZE = 8;
+
     @GetMapping("/search")
     public List<SearchResponse> search(@RequestParam Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
-        return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, 8));
+        return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}")

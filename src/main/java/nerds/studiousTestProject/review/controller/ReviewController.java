@@ -49,6 +49,8 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final AdminReviewService adminReviewService;
 
+    private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
+
     @PostMapping("/reviews")
     public RegisterReviewResponse registerReview(@RequestPart("registerReviewRequest") @Valid RegisterReviewRequest registerReviewRequest,
                                                  @RequestPart(value = "file", required = false) List<MultipartFile> files) {
