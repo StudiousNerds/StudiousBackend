@@ -29,13 +29,13 @@ public class AdminReviewService {
     private final SubPhotoRepository subPhotoRepository;
     private final TokenService tokenService;
 
-    public List<ReviewInfoResponse> getWrittenReviews(Long studycafeId, String accessToken, Pageable pageable) {
+    public List<ReviewInfoResponse> getWrittenReviews(Long studycafeId, String accessToken, AdminReviewType reviewType, Pageable pageable) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         if (!matchStudycafeAndMember(studycafeId, member)) {
             throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
         }
 
-        List<Review> reviews = reviewRepository.findAllByStudycafeId(studycafeId, pageable).getContent();
+        List<Review> reviews = reviewRepository.getPagedReviewsByStudycafeId(studycafeId, reviewType, pageable).getContent();
         return reviews.stream().map(r -> ReviewInfoResponse.from(r, subPhotoRepository.findAllByReviewId(r.getId()))).toList();
     }
 
