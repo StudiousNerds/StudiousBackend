@@ -25,6 +25,10 @@ public enum ReviewFixture {
         this.comment = comment;
     }
 
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
     public Review 기본_정보_생성() {
         return 기본_정보_생성(null);
     }
