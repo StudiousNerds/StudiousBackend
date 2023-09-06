@@ -8,9 +8,10 @@ import java.time.LocalDate;
 
 public enum ReviewFixture {
 
-    FIRST_REVIEW(LocalDate.now(), "나는 여기 좋아요", true, "이용해주셔서 감사합니다"),
-    SECOND_REVIEW(LocalDate.now().minusDays(1), "여긴 좀 별로..", true, "이용해주셔서 감사합니다"),
-    THIRD_REVIEW(LocalDate.now().minusDays(5), "최악임...", true, "이용해주셔서 감사합니다");
+    TODAY_COMMENTED_REVIEW(LocalDate.now(), "나는 여기 좋아요", true, "이용해주셔서 감사합니다"),
+    TODAY_NO_COMMENTED_REVIEW(LocalDate.now(), "나는 여기 좋아요", true, null),
+    YESTERDAY_COMMENTED_REVIEW(LocalDate.now().minusDays(1), "여긴 좀 별로..", true, "이용해주셔서 감사합니다"),
+    TWO_DAYS_AGO_COMMENTED_REVIEW(LocalDate.now().minusDays(2), "최악임...", true, "이용해주셔서 감사합니다");
 
     private final String detail;
     private final LocalDate createdDate;
