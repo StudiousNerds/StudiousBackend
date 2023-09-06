@@ -33,7 +33,7 @@ class SubPhotoRepositoryTest {
     @Test
     void findAllByReviewId() {
         // given
-        Review review = reviewRepository.save(FIRST_REVIEW.기본_정보_생성(1L));
+        Review review = reviewRepository.save(TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
         SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 1L));
         SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 2L));
         // when
@@ -69,7 +69,7 @@ class SubPhotoRepositoryTest {
     @Test
     void deleteAllByReviewId() {
         // given
-        Review review = reviewRepository.save(FIRST_REVIEW.기본_정보_생성(1L));
+        Review review = reviewRepository.save(TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
         SubPhoto subPhoto = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 1L));
         SubPhoto subPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.리뷰_생성(review, 2L));
         // when

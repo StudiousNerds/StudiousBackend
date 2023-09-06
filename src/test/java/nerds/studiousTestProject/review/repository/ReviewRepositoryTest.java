@@ -43,9 +43,9 @@ class ReviewRepositoryTest {
 //    @DisplayName("예약 id가 주어졌을 때 생성날짜를 기준으로 내림차순 정렬하여 그에 해당하는 리뷰들을 모두 다 가져오는지 테스트")
 //    void findAllByReservationRecordIdInOrderByCreatedDatedDesc() {
 //        // given
-//        Review firstReview = reviewRepository.save(FIRST_REVIEW.기본_정보_생성(1L));
-//        Review secondReview = reviewRepository.save(SECOND_REVIEW.기본_정보_생성(2L));
-//        Review thirdReview = reviewRepository.save(THIRD_REVIEW.기본_정보_생성(3L));
+//        Review firstReview = reviewRepository.save(TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
+//        Review secondReview = reviewRepository.save(YESTERDAY_COMMENTED_REVIEW.기본_정보_생성(2L));
+//        Review thirdReview = reviewRepository.save(TWO_DAYS_AGO_COMMENTED_REVIEW.기본_정보_생성(3L));
 //        reservationRecordRepository.save(CONFIRM_RESERVATION.기본_정보_생성(1L)).addReview(firstReview);
 //        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.기본_정보_생성(2L)).addReview(secondReview);
 //        reservationRecordRepository.save(CANCELED_RESERVATION.기본_정보_생성(3L)).addReview(thirdReview);
@@ -63,9 +63,9 @@ class ReviewRepositoryTest {
 //        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.기본_정보_생성(1L));
 //        Grade secondGrade = gradeRepository.save(RECOMMENDED_TOTAL_THREE_GRADE.기본_정보_생성(2L));
 //        Grade thirdGrade = gradeRepository.save(RECOMMENDED_TOTAL_ONE_GRADE.기본_정보_생성(3L));
-//        Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
-//        Review secondReview = reviewRepository.save(SECOND_REVIEW.평점_생성(secondGrade, 2L));
-//        Review thirdReview = reviewRepository.save(THIRD_REVIEW.평점_생성(thirdGrade, 3L));
+//        Review firstReview = reviewRepository.save(TODAY_COMMENTED_REVIEW.평점_생성(firstGrade, 1L));
+//        Review secondReview = reviewRepository.save(YESTERDAY_COMMENTED_REVIEW.평점_생성(secondGrade, 2L));
+//        Review thirdReview = reviewRepository.save(TWO_DAYS_AGO_COMMENTED_REVIEW.평점_생성(thirdGrade, 3L));
 //        reservationRecordRepository.save(CONFIRM_RESERVATION.기본_정보_생성(1L)).addReview(firstReview);
 //        reservationRecordRepository.save(IN_PROGRESS_RESERVATION.기본_정보_생성(2L)).addReview(secondReview);
 //        reservationRecordRepository.save(CANCELED_RESERVATION.기본_정보_생성(3L)).addReview(thirdReview);
@@ -84,7 +84,7 @@ class ReviewRepositoryTest {
 //        // given
 //        HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.기본_정보_생성(1L));
 //        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.기본_정보_생성(1L));
-//        Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
+//        Review firstReview = reviewRepository.save(TODAY_COMMENTED_REVIEW.평점_생성(firstGrade, 1L));
 //        firstReview.addHashtagRecord(hashtag);
 //        // when
 //        reviewRepository.deleteById(firstReview.getId());
@@ -103,7 +103,7 @@ class ReviewRepositoryTest {
 //        // given
 //        HashtagRecord hashtag = hashtagRecordRepository.save(COST_EFFECTIVE_HASHTAG.기본_정보_생성(1L));
 //        Grade firstGrade = gradeRepository.save(NOT_RECOMMENDED_TOTAL_FIVE_GRADE.기본_정보_생성(1L));
-//        Review firstReview = reviewRepository.save(FIRST_REVIEW.평점_생성(firstGrade, 1L));
+//        Review firstReview = reviewRepository.save(TODAY_COMMENTED_REVIEW.평점_생성(firstGrade, 1L));
 //        firstReview.addHashtagRecord(hashtag);
 //        // when
 //        List<Review> reviewList = reviewRepository.findAll();
@@ -136,17 +136,17 @@ class ReviewRepositoryTest {
         LocalTime endTime1 = LocalTime.of(19, 0);
 
         for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room1, review));
         }
 
         for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room2, review));
         }
 
         for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
         }
 
@@ -160,17 +160,17 @@ class ReviewRepositoryTest {
         LocalTime endTime2 = LocalTime.of(19, 0);
 
         for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room4, review));
         }
 
         for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room5, review));
         }
 
         for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
             예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room6, review));
         }
 

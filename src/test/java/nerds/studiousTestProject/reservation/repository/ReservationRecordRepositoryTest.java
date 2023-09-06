@@ -78,7 +78,7 @@ class ReservationRecordRepositoryTest {
         Studycafe studycafe = studycafeRepository.save(FIRST_STUDYCAFE.생성(1L));
         Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
         studycafe.addRoom(room1);
-        Review review = reviewRepository.save(FIRST_REVIEW.기본_정보_생성(1L));
+        Review review = reviewRepository.save(TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
         ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
         ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
 //        save1.addReview(review);

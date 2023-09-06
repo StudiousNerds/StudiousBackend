@@ -100,7 +100,7 @@ class AdminReviewServiceTest {
 
         List<Review> reviews = new ArrayList<>();
         for (int i = 1; i <= 30; i++) {
-            reviews.add(ReviewFixture.FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+            reviews.add(ReviewFixture.TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         }
         Page<Review> pages = new PageImpl<>(reviews);
 
@@ -141,7 +141,7 @@ class AdminReviewServiceTest {
         request.setComment("관리자 댓글 등록 테스트");
 
         Long reviewId = 1L;
-        Review review = ReviewFixture.FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
+        Review review = ReviewFixture.TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
 
         doReturn(Optional.of(review)).when(reviewRepository).findById(reviewId);
 
@@ -178,7 +178,7 @@ class AdminReviewServiceTest {
         request.setComment("관리자 댓글 등록 테스트");
 
         Long reviewId = 1L;
-        Review review = ReviewFixture.FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
+        Review review = ReviewFixture.TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
 
         doReturn(Optional.of(review)).when(reviewRepository).findById(reviewId);
 
@@ -195,7 +195,7 @@ class AdminReviewServiceTest {
 
         // given
         Long reviewId = 1L;
-        Review review = ReviewFixture.FIRST_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
+        Review review = ReviewFixture.TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0);
 
         doReturn(Optional.of(review)).when(reviewRepository).findById(reviewId);
 
