@@ -16,20 +16,10 @@ public class ModifyConvenienceRequest {
     private Integer price;
 
     public Convenience toEntity() {
-        if (price == 0) {
-            return Convenience.builder()
-                    .name(name)
-                    .price(price)
-                    .isFree(price == 0)
-                    .build();
-        }
-        if (price != 0) {
-            return Convenience.builder()
-                    .name(name)
-                    .price(price)
-                    .isFree(price != 0)
-                    .build();
-        }
-        return null;
+        return Convenience.builder()
+                .name(name)
+                .price(price)
+                .isFree(price == 0)
+                .build();
     }
 }
