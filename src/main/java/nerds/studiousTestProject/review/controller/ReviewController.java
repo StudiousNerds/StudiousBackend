@@ -93,8 +93,14 @@ public class ReviewController {
 
     @GetMapping("/studycafes/{studycafeId}/reviews/managements")
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<ReviewInfoResponse> inquireStudycafeReviews(@PathVariable("studycafeId") Long studycafeId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
-        return adminReviewService.getWrittenReviews(studycafeId, accessToken, PageRequestConverter.of(page, 3));
+    public List<ReviewInfoResponse> inquireStudycafeReviews(
+            @PathVariable("studycafeId") Long studycafeId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
+            @RequestParam Integer page,
+            @RequestParam(required = false, defaultValue = AdminReviewSortType.Names.CREATED_DATE_DESC) AdminReviewSortType sortType,
+            @RequestParam(required = false) AdminReviewType reviewType
+            ) {
+        return adminReviewService.getWrittenReviews(studycafeId, accessToken, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
     }
 
     @PostMapping("/reviews/managements/{reviewId}")
