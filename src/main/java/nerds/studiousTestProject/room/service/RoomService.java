@@ -2,10 +2,13 @@ package nerds.studiousTestProject.room.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageService;
+import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.service.ConvenienceService;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.service.SubPhotoService;
@@ -29,12 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_AUTHORIZE_ACCESS;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_START_TIME;
@@ -52,6 +55,7 @@ public class RoomService {
     private final StorageService storageService;
     private final SubPhotoService subPhotoService;
     private final ConvenienceService convenienceService;
+    private final TokenService tokenService;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
 
@@ -74,22 +78,29 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
-    public FindAllRoomResponse getAllRooms(Long studycafeId, Long roomId) {
-        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-        Room room = findRoomById(roomId);
+    public FindAllRoomResponse getAllRooms(String accessToken, Long studycafeId, Long roomId) {
+        Member memberFromAccessToken = tokenService.getMemberFromAccessToken(accessToken);
+        Studycafe studycafe = getStudycafeById(studycafeId);
 
-        return FindAllRoomResponse.builder()
-                .roomInfos(getBasicInfo(roomList))
-                .roomName(room.getName())
-                .minCount(room.getMinHeadCount())
-                .maxCount(room.getMaxHeadCount())
-                .price(room.getPrice())
-                .type(room.getPriceType().name())
-                .minUsingTime(room.getMinUsingTime())
-                .photos(getPhotos(room))
-                .conveniences(getConveniences(room.getId()))
-                .paidConveniences(getPaidConveniences(room.getId()))
-                .build();
+        if (memberFromAccessToken.equals(studycafe.getMember())) {
+            List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+            Room room = findRoomById(roomId);
+
+            return FindAllRoomResponse.builder()
+                    .roomInfos(getBasicInfo(roomList))
+                    .roomName(room.getName())
+                    .minCount(room.getMinHeadCount())
+                    .maxCount(room.getMaxHeadCount())
+                    .price(room.getPrice())
+                    .type(room.getPriceType().name())
+                    .minUsingTime(room.getMinUsingTime())
+                    .photos(getPhotos(room))
+                    .conveniences(getConveniences(room.getId()))
+                    .paidConveniences(getPaidConveniences(room.getId()))
+                    .build();
+        } else {
+            throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
+        }
     }
 
     @Transactional
@@ -133,7 +144,6 @@ public class RoomService {
 
         return timeList;
     }
-
 
     public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId){
         Integer oneMonth = date.lengthOfMonth();
