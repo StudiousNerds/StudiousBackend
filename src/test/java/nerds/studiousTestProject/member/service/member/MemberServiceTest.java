@@ -1,21 +1,17 @@
 package nerds.studiousTestProject.member.service.member;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.ErrorCode;
 import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
-import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
@@ -26,8 +22,6 @@ import nerds.studiousTestProject.member.service.MemberService;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
 import static nerds.studiousTestProject.support.fixture.LogoutAccessTokenFixture.FIRST_LOGOUT_ACCESS_TOKEN;
@@ -88,19 +81,6 @@ class MemberServiceTest {
     private RefreshToken refreshToken;
     private LogoutAccessToken logoutAccessToken;
     private JwtTokenResponse jwtTokenResponse;
-    private static ValidatorFactory validatorFactory;
-    private static Validator validator;
-
-    @BeforeAll
-    public static void init() {
-        validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-    }
-
-    @AfterAll
-    public static void close() {
-        validatorFactory.close();
-    }
 
     @BeforeEach
     public void beforeEach() {
@@ -125,7 +105,6 @@ class MemberServiceTest {
         SignUpRequest request = SignUpRequest.builder()
                 .email(defaultMember.getEmail())
                 .password(defaultMember.getPassword())
-                .type(defaultMember.getType())
                 .roles(List.of(MemberRole.USER.name()))
                 .build();
 
@@ -139,88 +118,6 @@ class MemberServiceTest {
         // then
         String email = memberRepository.findByEmailAndType(request.getEmail(), MemberType.DEFAULT).orElseThrow(() -> new RuntimeException("일반 회원 찾기 실패")).getEmail();
         assertThat(email).isEqualTo(request.getEmail());
-    }
-
-    @Test
-    @DisplayName("일반 회원가입에서 providerId는 있으면 검증에 실패")
-    public void 일반_회원가입_소셜_ID_있는_경우() throws Exception {
-
-        // given
-        SignUpRequest request = SignUpRequest.builder()
-                .type(MemberType.DEFAULT)
-                .providerId(1234L)
-                .build();
-
-        // when
-        Set<ConstraintViolation<SignUpRequest>> violations = validator.validate(request);
-
-        // then
-        assertThat(violations.stream().anyMatch(
-                error -> error.getMessage().equals("일반/소셜 회원가입에 필요한 파라미터가 잘못되었습니다.")
-        )).isTrue();
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입")
-    public void 소셜_회원가입() throws Exception {
-
-        // given
-        SignUpRequest request = SignUpRequest.builder()
-                .email(socialMember.getEmail())
-                .password(socialMember.getPassword())
-                .type(socialMember.getType())
-                .providerId(1234L)
-                .roles(List.of(MemberRole.USER.name()))
-                .build();
-
-        doReturn(false).when(memberRepository).existsByProviderIdAndType(request.getProviderId(), request.getType());
-        doReturn(false).when(memberRepository).existsByPhoneNumber(request.getPhoneNumber());
-        doReturn(socialMember.getPassword()).when(passwordEncoder).encode(request.getPassword());
-        doReturn(Optional.of(socialMember)).when(memberRepository).findByEmailAndType(request.getEmail(), request.getType());
-
-        // when
-        memberService.register(request);
-
-        // then
-        String email = memberRepository.findByEmailAndType(request.getEmail(), MemberType.KAKAO).orElseThrow(() -> new RuntimeException("소셜 회원 찾기 실패")).getEmail();
-        assertThat(email).isEqualTo(request.getEmail());
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입에서 providerId가 없으면 검증에 실패")
-    public void 소셜_회원가입_소셜_ID_없는_경우() throws Exception {
-
-        // given
-        SignUpRequest request = SignUpRequest.builder()
-                .type(MemberType.KAKAO)
-                .build();
-
-        // when
-        Set<ConstraintViolation<SignUpRequest>> violations = validator.validate(request);
-
-        // then
-        assertThat(violations.stream().anyMatch(
-                error -> error.getMessage().equals("일반/소셜 회원가입에 필요한 파라미터가 잘못되었습니다.")
-        )).isTrue();
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입에서 providerId가 없으면 검증에 실패")
-    public void 소셜_회원가입_비밀번호_있는_경우() throws Exception {
-
-        // given
-        SignUpRequest request = SignUpRequest.builder()
-                .type(MemberType.KAKAO)
-                .password(socialMember.getPassword())
-                .build();
-
-        // when
-        Set<ConstraintViolation<SignUpRequest>> violations = validator.validate(request);
-
-        // then
-        assertThat(violations.stream().anyMatch(
-                error -> error.getMessage().equals("일반/소셜 회원가입에 필요한 파라미터가 잘못되었습니다.")
-        )).isTrue();
     }
 
     @Test
@@ -282,9 +179,8 @@ class MemberServiceTest {
 
         // given
         String phoneNumber = defaultMember.getPhoneNumber();
-        FindEmailRequest request = FindEmailRequest.builder()
-                .phoneNumber(phoneNumber)
-                .build();
+        FindEmailRequest request = new FindEmailRequest();
+        request.setPhoneNumber(phoneNumber);
 
         doReturn(Optional.of(defaultMember)).when(memberRepository).findByPhoneNumber(phoneNumber);
 
@@ -301,9 +197,8 @@ class MemberServiceTest {
 
         // given
         String phoneNumber = socialMember.getPhoneNumber();
-        FindEmailRequest request = FindEmailRequest.builder()
-                .phoneNumber(phoneNumber)
-                .build();
+        FindEmailRequest request = new FindEmailRequest();
+        request.setPhoneNumber(phoneNumber);
 
         doReturn(Optional.of(socialMember)).when(memberRepository).findByPhoneNumber(phoneNumber);
 
@@ -321,10 +216,10 @@ class MemberServiceTest {
     public void 일반_회원_임시_비밀번호_발급() throws Exception {
 
         // given
-        FindPasswordRequest request = FindPasswordRequest.builder()
-                .email(defaultMember.getEmail())
-                .phoneNumber(defaultMember.getPhoneNumber())
-                .build();
+
+        FindPasswordRequest request = new FindPasswordRequest();
+        request.setEmail(defaultMember.getEmail());
+        request.setPhoneNumber(defaultMember.getPhoneNumber());
 
         String encode = "encode";
         doReturn(List.of(defaultMember)).when(memberRepository).findByEmail(defaultMember.getEmail());
@@ -342,10 +237,9 @@ class MemberServiceTest {
     public void 소셜_회원_임시_비밀번호_발급() throws Exception {
 
         // given
-        FindPasswordRequest request = FindPasswordRequest.builder()
-                .email(socialMember.getEmail())
-                .phoneNumber(socialMember.getPhoneNumber())
-                .build();
+        FindPasswordRequest request = new FindPasswordRequest();
+        request.setEmail(socialMember.getEmail());
+        request.setPhoneNumber(socialMember.getPhoneNumber());
 
         doReturn(List.of(socialMember)).when(memberRepository).findByEmail(socialMember.getEmail());
 

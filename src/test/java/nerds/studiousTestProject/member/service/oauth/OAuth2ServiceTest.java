@@ -1,12 +1,20 @@
 package nerds.studiousTestProject.member.service.oauth;
 
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import nerds.studiousTestProject.member.dto.oauth.authenticate.OAuth2TokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
-import nerds.studiousTestProject.member.dto.oauth.token.OAuth2TokenResponse;
+import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2SignUpRequest;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.entity.member.MemberType;
-import nerds.studiousTestProject.member.service.MemberService;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,12 +36,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -57,7 +67,7 @@ class OAuth2ServiceTest {
     @Mock
     private InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     @Mock
-    private MemberService memberService;
+    private MemberRepository memberRepository;
     @Mock
     private JwtTokenProvider jwtTokenProvider;
     @Mock
@@ -78,6 +88,21 @@ class OAuth2ServiceTest {
     private Long providerId;
     private String accessToken;
     private JwtTokenResponse jwtTokenResponse;
+    private Member socialMember;
+
+    private static ValidatorFactory validatorFactory;
+    private static Validator validator;
+
+    @BeforeAll
+    public static void init() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    @AfterAll
+    public static void close() {
+        validatorFactory.close();
+    }
 
     @BeforeEach
     public void beforeEach() {
@@ -87,6 +112,7 @@ class OAuth2ServiceTest {
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .build();
+        socialMember = KAKAO_USER.생성();
     }
 
     @Test
@@ -194,13 +220,55 @@ class OAuth2ServiceTest {
         assertThat(response.getUserInfo()).isNull();
     }
 
+    @Test
+    @DisplayName("소셜 회원가입")
+    public void 소셜_회원가입() throws Exception {
+
+        // given
+        OAuth2SignUpRequest request = OAuth2SignUpRequest.builder()
+                .email(socialMember.getEmail())
+                .type(socialMember.getType())
+                .providerId(1234L)
+                .roles(List.of(MemberRole.USER.name()))
+                .build();
+
+        doReturn(false).when(memberRepository).existsByProviderIdAndType(request.getProviderId(), request.getType());
+        doReturn(false).when(memberRepository).existsByPhoneNumber(request.getPhoneNumber());
+        doReturn(Optional.of(socialMember)).when(memberRepository).findByEmailAndType(request.getEmail(), request.getType());
+
+        // when
+        oAuth2Service.register(request);
+
+        // then
+        String email = memberRepository.findByEmailAndType(request.getEmail(), MemberType.KAKAO).orElseThrow(() -> new RuntimeException("소셜 회원 찾기 실패")).getEmail();
+        assertThat(email).isEqualTo(request.getEmail());
+    }
+
+    @Test
+    @DisplayName("소셜 회원가입에서 providerId가 없으면 검증에 실패")
+    public void 소셜_회원가입_소셜_ID_없는_경우() throws Exception {
+
+        // given
+        OAuth2SignUpRequest request = OAuth2SignUpRequest.builder()
+                .type(MemberType.KAKAO)
+                .build();
+
+        // when
+        Set<ConstraintViolation<OAuth2SignUpRequest>> violations = validator.validate(request);
+
+        // then
+        assertThat(violations.stream().anyMatch(
+                error -> error.getMessage().equals("providerId는 필수입니다.")
+        )).isTrue();
+    }
+
     private void givenNewMember(String registrationId, Map<String, Object> attributes, MemberType type) {
         ClientRegistration provider = clientRegistration(registrationId);
         OAuth2TokenResponse oAuth2TokenResponse = oAuth2TokenResponse();
 
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
 
-        doReturn(Optional.empty()).when(memberService).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.empty()).when(memberRepository).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();
@@ -225,7 +293,7 @@ class OAuth2ServiceTest {
         Member member = member(registrationId);
 
         doReturn(provider).when(inMemoryClientRegistrationRepository).findByRegistrationId(registrationId);
-        doReturn(Optional.of(member)).when(memberService).findByProviderIdAndType(providerId, type);
+        doReturn(Optional.of(member)).when(memberRepository).findByProviderIdAndType(providerId, type);
 
         doReturn(requestBodyUriSpec).when(webClient).post();
         doReturn(requestBodyUriSpec).when(webClient).get();

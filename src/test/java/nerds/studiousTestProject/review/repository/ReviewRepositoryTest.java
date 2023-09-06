@@ -120,10 +120,10 @@ class ReviewRepositoryTest {
     public void 특정_스터디카페_모든_리뷰_조회() throws Exception {
 
         // given
-        Member admin = 회원_저장(BEAVER.생성());
+        Member admin = 회원_저장(DEFAULT_USER.생성());
         ADMIN.멤버_생성(admin);
 
-        Member member = 회원_저장(BEAVER.생성());
+        Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
         Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
