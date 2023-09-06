@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.review.dto.manage.inquire;
+package nerds.studiousTestProject.review.dto.manage.inquire.response;
 
 import lombok.Builder;
 import lombok.Data;
