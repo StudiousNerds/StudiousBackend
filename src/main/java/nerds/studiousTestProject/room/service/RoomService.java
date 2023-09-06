@@ -125,9 +125,9 @@ public class RoomService {
     }
 
     public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId) {
-
+        getStudycafeById(studycafeId);
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
-        studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+
         int start = findStartTimeByWeek(Week.of(date)).getHour();
         int end = findEndTimeByWeek(Week.of(date)).getHour();
         int size = end - start;
