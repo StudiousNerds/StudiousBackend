@@ -20,7 +20,7 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;

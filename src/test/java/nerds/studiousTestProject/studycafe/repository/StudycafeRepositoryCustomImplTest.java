@@ -7,7 +7,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.support.RepositoryTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
