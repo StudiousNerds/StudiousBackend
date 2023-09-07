@@ -7,14 +7,16 @@ import nerds.studiousTestProject.member.entity.member.MemberType;
 import java.time.LocalDate;
 
 import static nerds.studiousTestProject.member.entity.member.MemberType.DEFAULT;
+import static nerds.studiousTestProject.member.entity.member.MemberType.GOOGLE;
 import static nerds.studiousTestProject.member.entity.member.MemberType.KAKAO;
 import static nerds.studiousTestProject.member.entity.member.MemberType.NAVER;
 
 public enum MemberFixture {
 
-    BEAVER("길가은", "비버", "rlfrkdms@naver.com", "rlfrkdms", DEFAULT, LocalDate.of(1999, 12, 18), "01012345678"),
-    BURNED_POTATO("김민우", "탄감자", "rlaalsdn@naver.com", "rlaalsdn", KAKAO, LocalDate.of(1999, 12, 18), "01012345678"),
-    POTATO("최보현", "말감", "chlqhgus@naver.com", "chlqhgus", NAVER, LocalDate.of(1999, 12, 18), "01012345678");
+    DEFAULT_USER("길가은", "비버", "rlfrkdms@naver.com", "rlfrkdms", DEFAULT, LocalDate.of(1999, 12, 18), "01012345678"),
+    KAKAO_USER("김민우", "탄감자", "rlaalsdn@naver.com", "rlaalsdn", KAKAO, LocalDate.of(1999, 12, 18), "01012345678"),
+    NAVER_USER("최보현", "말감", "chlqhgus@naver.com", "chlqhgus", NAVER, LocalDate.of(1999, 12, 18), "01012345678"),
+    GOOGLE_USER("이민희", "곰", "dlalsgml@naver.com", "dlalsgml", GOOGLE, LocalDate.of(1999, 12, 18), "01012345678");
 
     private final String name;
     private final String nickname;
