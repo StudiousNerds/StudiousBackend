@@ -8,18 +8,25 @@ import java.time.LocalDate;
 
 public enum ReviewFixture {
 
-    FIRST_REVIEW(LocalDate.now(), "나는 여기 좋아요", true),
-    SECOND_REVIEW(LocalDate.now().minusDays(1), "여긴 좀 별로..", true),
-    THIRD_REVIEW(LocalDate.now().minusDays(5), "최악임...", true);
+    TODAY_COMMENTED_REVIEW(LocalDate.now(), "나는 여기 좋아요", true, "이용해주셔서 감사합니다"),
+    TODAY_NO_COMMENTED_REVIEW(LocalDate.now(), "나는 여기 좋아요", true, null),
+    YESTERDAY_COMMENTED_REVIEW(LocalDate.now().minusDays(1), "여긴 좀 별로..", true, "이용해주셔서 감사합니다"),
+    TWO_DAYS_AGO_COMMENTED_REVIEW(LocalDate.now().minusDays(2), "최악임...", true, "이용해주셔서 감사합니다");
 
     private final String detail;
     private final LocalDate createdDate;
     private final boolean isRecommended;
+    private final String comment;
 
-    ReviewFixture(LocalDate createdDate, String detail, boolean isRecommended) {
+    ReviewFixture(LocalDate createdDate, String detail,  boolean isRecommended, String comment) {
         this.createdDate = createdDate;
         this.detail = detail;
         this.isRecommended = isRecommended;
+        this.comment = comment;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
     }
 
     public Review 기본_정보_생성() {
@@ -66,6 +73,7 @@ public enum ReviewFixture {
                 .id(id)
                 .createdDate(this.createdDate)
                 .detail(this.detail)
-                .isRecommended(this.isRecommended);
+                .isRecommended(this.isRecommended)
+                .comment(this.comment);
     }
 }
