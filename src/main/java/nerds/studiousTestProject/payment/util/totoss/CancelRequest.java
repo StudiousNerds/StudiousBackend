@@ -15,4 +15,6 @@ public class CancelRequest extends RequestToToss {
     @NotBlank(message = "예약 취소 사유는 필수입니다.")
     private String cancelReason;
     private Integer cancelAmount;
+    private RefundReceiveAccount refundReceiveAccount;
+
 }
