@@ -75,6 +75,10 @@ public class PaymentResponseFromToss {
                 .completeTime(LocalDateTime.parse(approvedAt, DateTimeFormatter.ofPattern(DATE_FORMAT)))
                 .method(method)
                 .status(PaymentStatus.valueOf(status))
+                .dueDate(LocalDateTime.parse(virtualAccount.getDueDate(), DateTimeFormatter.ofPattern(DATE_FORMAT)))
+                .bankCode(virtualAccount.getBankCode())
+                .virtualAccount(virtualAccount.getAccountNumber())
+                .secret(secret)
                 .build();
     }
 }
