@@ -45,19 +45,20 @@ public class AdminReviewService {
 
     @Transactional
     public void registerComment(Long reviewId, RegisterCommentRequest registerCommentRequest) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
-        review.updateComment(registerCommentRequest.getComment());
+        getReview(reviewId).updateComment(registerCommentRequest.getComment());
     }
 
     @Transactional
     public void modifyComment(Long reviewId, ModifyCommentRequest modifyCommentRequest) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
-        review.updateComment(modifyCommentRequest.getComment());
+        getReview(reviewId).updateComment(modifyCommentRequest.getComment());
     }
 
     @Transactional
     public void deleteComment(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
-        review.deleteComment();
+        getReview(reviewId).deleteComment();
+    }
+
+    private Review getReview(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
     }
 }
