@@ -88,6 +88,10 @@ public class ReservationRecord {
         }
     }
 
+    public void completeDeposit(){
+        this.status = ReservationStatus.CONFIRMED;
+    }
+
     public void canceled() {
         this.status = ReservationStatus.CANCELED;
     }
