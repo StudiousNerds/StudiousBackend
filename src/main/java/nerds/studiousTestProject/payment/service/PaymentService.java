@@ -94,6 +94,12 @@ public class PaymentService {
         return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
+    private void validPaymentSecret(DepositCallbackRequest depositCallbackRequest, Payment payment) {
+        if (!payment.getSecret().equals(depositCallbackRequest.getSecret())) {
+            throw new BadRequestException(INVALID_PAYMENT_SECRET);
+        }
+    }
+
     public Payment findByOrderId(String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
