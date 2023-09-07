@@ -96,6 +96,10 @@ public class ReservationRecord {
         this.status = ReservationStatus.CANCELED;
     }
 
+   public void depositError() {
+        this.status = ReservationStatus.INPROGRESS;
+    }
+
     public void addReview(Review review) {
         if (review != null) {
             this.review = review;
