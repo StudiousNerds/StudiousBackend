@@ -107,7 +107,7 @@ public class RoomService {
     public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRoomRequest, List<MultipartFile> photos) {
         Studycafe studycafe = getStudycafeById(studycafeId);
         Room room = findRoomById(roomId);
-        Room updatedRoom = ModifyRoomRequest.toEntity(studycafe, roomId, modifyRoomRequest);
+        Room updatedRoom = ModifyRoomRequest.toRoom(studycafe, roomId, modifyRoomRequest);
 
         room.update(updatedRoom);
         updateRoomPhotos(room, photos);
@@ -215,7 +215,7 @@ public class RoomService {
         if (conveniences != null) {
             deleteConveniences(room);
             for (ModifyConvenienceRequest convenienceInfo : conveniences) {
-                room.addConvenience(convenienceInfo.toEntity());
+                room.addConvenience(convenienceInfo.toConvenience());
             }
         }
     }

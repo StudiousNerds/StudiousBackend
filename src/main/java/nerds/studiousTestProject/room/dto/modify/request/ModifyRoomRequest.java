@@ -19,7 +19,7 @@ public class ModifyRoomRequest {
     private Integer minUsingTime;
     private List<ModifyConvenienceRequest> conveniences;
 
-    public static Room toEntity(Studycafe studycafe, Long roomId, ModifyRoomRequest modifyRoomRequest) {
+    public static Room toRoom(Studycafe studycafe, Long roomId, ModifyRoomRequest modifyRoomRequest) {
         return Room.builder()
                 .id(roomId)
                 .name(modifyRoomRequest.getRoomName())
