@@ -46,6 +46,17 @@ public class PaymentService {
         return ConfirmSuccessResponse.from(reservationRecord);
     }
 
+    @Transactional
+    public VirtualAccountInfoResponse virtualAccount(String orderId, String paymentKey, Integer amount) {
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId, amount, paymentKey), CONFIRM_URI);
+        Payment payment = paymentRepository.save(responseFromToss.toPayment());
+        log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
+        if (!payment.getMethod().equals(가상계좌.name())) {
+            throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
+        }
+        return VirtualAccountInfoResponse.from(payment);
+    }
+
     private ReservationRecord findReservationRecordByOrderId(String orderId) {
         return reservationRecordRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
