@@ -76,23 +76,13 @@ public class PaymentService {
     @Transactional
     public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = findReservationById(reservationId);
-        requestCancelToToss(cancelRequest, reservationRecord.getPayment().getPaymentKey());
-        reservationRecord.canceled(); //결제 취소 상태로 변경
-    }
-
-    private List<CancelResponse> requestCancelToToss(CancelRequest cancelRequest, String paymentKey){
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, paymentKey));
-        List<CancelResponse> cancelResponses = responseFromToss.getCancels().stream().map(CancelResponse::of).toList();
-        cancelPayment(responseFromToss);
-        return cancelResponses;
-    }
-
-    private void cancelPayment(PaymentResponseFromToss responseFromToss) {
-        Payment payment = paymentRepository.findByPaymentKeyAndOrderId(
-                        responseFromToss.getPaymentKey(),
-                        responseFromToss.getOrderId())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+        Payment payment = reservationRecord.getPayment();
+        if (payment.getMethod().equals(가상계좌)) {
+            cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
+        }
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
         payment.canceled(responseFromToss);
+        reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
     private ReservationRecord findReservationById(Long reservationId) {
