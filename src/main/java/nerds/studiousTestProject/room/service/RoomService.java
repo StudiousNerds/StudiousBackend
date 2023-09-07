@@ -82,25 +82,25 @@ public class RoomService {
         Member memberFromAccessToken = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = getStudycafeById(studycafeId);
 
-        if (memberFromAccessToken.equals(studycafe.getMember())) {
-            List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-            Room room = findRoomById(roomId);
-
-            return FindAllRoomResponse.builder()
-                    .roomInfos(getBasicInfo(roomList))
-                    .roomName(room.getName())
-                    .minCount(room.getMinHeadCount())
-                    .maxCount(room.getMaxHeadCount())
-                    .price(room.getPrice())
-                    .type(room.getPriceType().name())
-                    .minUsingTime(room.getMinUsingTime())
-                    .photos(getPhotos(room))
-                    .conveniences(getConveniences(room.getId()))
-                    .paidConveniences(getPaidConveniences(room.getId()))
-                    .build();
-        } else {
+        if (!memberFromAccessToken.equals(studycafe.getMember())) {
             throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
         }
+
+        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+        Room room = findRoomById(roomId);
+
+        return FindAllRoomResponse.builder()
+                .roomInfos(getBasicInfo(roomList))
+                .roomName(room.getName())
+                .minCount(room.getMinHeadCount())
+                .maxCount(room.getMaxHeadCount())
+                .price(room.getPrice())
+                .type(room.getPriceType().name())
+                .minUsingTime(room.getMinUsingTime())
+                .photos(getPhotos(room))
+                .conveniences(getConveniences(room.getId()))
+                .paidConveniences(getPaidConveniences(room.getId()))
+                .build();
     }
 
     @Transactional
@@ -124,20 +124,20 @@ public class RoomService {
         roomRepository.deleteById(roomId);
     }
 
-    public Integer[] getCanReserveTime(LocalDate date,Long studycafeId, Long roomId) {
+    public Integer[] getCanReserveTime(LocalDate date, Long studycafeId, Long roomId) {
         getStudycafeById(studycafeId);
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
 
         int start = findStartTimeByWeek(Week.of(date)).getHour();
         int end = findEndTimeByWeek(Week.of(date)).getHour();
         int size = end - start;
-        Integer timeList[] = new Integer[size+1];
+        Integer timeList[] = new Integer[size + 1];
 
         List<Boolean> values = reservationTimes.values().stream().toList();
         List<Integer> timeZone = reservationTimes.keySet().stream().toList();
 
         for (int i = 0; i < values.size(); i++) {
-            if(values.get(i) == true){
+            if (values.get(i) == true) {
                 timeList[i] = timeZone.get(i);
             }
         }
@@ -145,12 +145,12 @@ public class RoomService {
         return timeList;
     }
 
-    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId){
+    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId) {
         Integer oneMonth = date.lengthOfMonth();
         int today = date.getDayOfMonth();
         Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
 
-        for (int i = today; i <= oneMonth; i++){
+        for (int i = today; i <= oneMonth; i++) {
             log.info("반복문 확인", i);
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
             reservationList.put(date.toString(), canReserveTime);
@@ -180,7 +180,7 @@ public class RoomService {
 
     public Room findRoomById(Long roomId) {
         return roomRepository.findById(roomId)
-                .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
     public LocalTime findStartTimeByWeek(Week week) {
