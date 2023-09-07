@@ -83,7 +83,9 @@ public class ReservationRecord {
 
     public void completePay(Payment payment) {
         this.status = ReservationStatus.CONFIRMED;
-        this.payment = payment;
+        if(payment != null){
+            this.payment = payment;
+        }
     }
 
     public void canceled() {
