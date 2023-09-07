@@ -89,4 +89,9 @@ public class PaymentService {
         return reservationRecordRepository.findById(reservationId).orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
+
+    public ReservationRecord findReservationRecordByPayment(Payment payment) {
+        return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
 }
