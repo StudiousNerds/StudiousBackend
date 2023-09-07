@@ -94,4 +94,8 @@ public class PaymentService {
         return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
+    public Payment findByOrderId(String orderId) {
+        return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    }
+
 }
