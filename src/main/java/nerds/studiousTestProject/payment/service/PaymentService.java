@@ -94,6 +94,10 @@ public class PaymentService {
         return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
+    private boolean isDepositError(Payment payment, String status) {
+        return status.equals(WAITING_FOR_DEPOSIT.name()) && payment.getStatus().equals(DONE);
+    }
+
     private void validPaymentSecret(DepositCallbackRequest depositCallbackRequest, Payment payment) {
         if (!payment.getSecret().equals(depositCallbackRequest.getSecret())) {
             throw new BadRequestException(INVALID_PAYMENT_SECRET);
