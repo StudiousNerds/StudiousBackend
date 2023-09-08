@@ -13,7 +13,6 @@ public class MemberInfoResponse {
     private String email;
     private MemberType type;
     private String photo;
-    private int passwordLength;
     private String phoneNumber;
 
     public static MemberInfoResponse of(Member member) {
@@ -23,7 +22,6 @@ public class MemberInfoResponse {
                 .email(member.getEmail())
                 .type(member.getType())
                 .photo(member.getPhoto())
-                .passwordLength(member.getPassword().length())
                 .phoneNumber(member.getPhoneNumber())
                 .build();
     }
