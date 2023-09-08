@@ -22,8 +22,6 @@ import java.util.List;
 @SearchDateTimeCheck
 @SearchTimeCheck
 public class SearchRequest {
-    @Length(min = 2, message = "키워드를 2글자 이상 입력해주세요.")
-    @NotNull(message = "키워드를 2글자 이상 입력해주세요.")
     private String keyword;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
