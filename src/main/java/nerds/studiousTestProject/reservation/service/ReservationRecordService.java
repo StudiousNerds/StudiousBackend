@@ -9,6 +9,7 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveUser;
@@ -309,4 +310,14 @@ public class ReservationRecordService {
         if(startDate == null) startDate = LocalDate.now().minusYears(1);
         if(endDate == null) endDate = LocalDate.now();
     }
+
+    public ReservationDetailResponse showDetail(Long reservationRecordId) {
+        ReservationRecord reservationRecord = findById(reservationRecordId);
+        Room room = reservationRecord.getRoom();
+        Studycafe studycafe = room.getStudycafe();
+        Payment payment = reservationRecord.getPayment();
+        return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
+    }
+
+
 }

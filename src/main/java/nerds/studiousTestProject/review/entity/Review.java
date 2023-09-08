@@ -73,4 +73,14 @@ public class Review {
     public void updateDetail(String detail) {
         this.detail = detail;
     }
+
+    public void updateComment(String comment) {
+        if (comment != null) {
+            this.comment = comment;
+        }
+    }
+
+    public void deleteComment() {
+        this.comment = null;
+    }
 }

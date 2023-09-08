@@ -20,7 +20,7 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,9 +44,11 @@ import java.util.List;
 public class StudycafeController {
     private final StudycafeService studycafeService;
 
+    private static final int STUDYCAFE_SEARCH_SIZE = 8;
+
     @GetMapping("/search")
     public List<SearchResponse> search(@RequestParam Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
-        return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, 8));
+        return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}")

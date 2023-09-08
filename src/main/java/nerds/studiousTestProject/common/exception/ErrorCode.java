@@ -48,7 +48,8 @@ public enum ErrorCode {
     INVALID_USING_TIME("유효하지 않은 예약 이용 시간입니다."),
     MISCALCULATED_USING_TIME("잘못 계산된 이용 시간입니다."),
     USING_TIME_NOT_PER_HOUR("이용시간은 시간단위여야 합니다."),
-    START_TIME_AFTER_THAN_END_TIME("시작 날짜는 끝나는 날짜보다 항상 이전이어야합니다.");
+    START_TIME_AFTER_THAN_END_TIME("시작 날짜는 끝나는 날짜보다 항상 이전이어야합니다."),
+    MISMATCH_MEMBER_AND_STUDYCAFE("회원 정보와 일치하는 스터디카페를 찾을 수 없습니다");
 
     private final String message;
     ErrorCode(String message) {

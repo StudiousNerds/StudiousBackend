@@ -4,6 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
+import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
+import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewSortType;
+import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.manage.modify.request.ModifyCommentRequest;
+import nerds.studiousTestProject.review.dto.manage.register.request.RegisterCommentRequest;
 import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
@@ -11,16 +17,19 @@ import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedRespon
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.written.response.WrittenReviewResponse;
+import nerds.studiousTestProject.review.service.AdminReviewService;
 import nerds.studiousTestProject.review.service.ReviewService;
-import nerds.studiousTestProject.studycafe.util.PageRequestConverter;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +47,9 @@ import java.util.List;
 @Validated
 public class ReviewController {
     private final ReviewService reviewService;
+    private final AdminReviewService adminReviewService;
+
+    private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
     @PostMapping("/reviews")
     public RegisterReviewResponse registerReview(@RequestPart("registerReviewRequest") @Valid RegisterReviewRequest registerReviewRequest,
@@ -77,5 +89,35 @@ public class ReviewController {
     @GetMapping("/studycafes/{studycafeId}/rooms/{roomId}/reviews")
     public FindReviewSortedResponse findRoomReviews(@PathVariable("studycafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
         return reviewService.findRoomReviews(studycafeId, roomId, pageable);
+    }
+
+    @GetMapping("/studycafes/{studycafeId}/reviews/managements")
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public List<ReviewInfoResponse> inquireStudycafeReviews(
+            @PathVariable("studycafeId") Long studycafeId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
+            @RequestParam Integer page,
+            @RequestParam(required = false, defaultValue = AdminReviewSortType.Names.CREATED_DATE_DESC) AdminReviewSortType sortType,
+            @RequestParam(required = false) AdminReviewType reviewType
+            ) {
+        return adminReviewService.getWrittenReviews(studycafeId, accessToken, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
+    }
+
+    @PostMapping("/reviews/managements/{reviewId}")
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public void registerComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid RegisterCommentRequest registerCommentRequest) {
+        adminReviewService.registerComment(reviewId, registerCommentRequest);
+    }
+
+    @PatchMapping("/reviews/managements/{reviewId}")
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public void modifyComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ModifyCommentRequest modifyCommentRequest) {
+        adminReviewService.modifyComment(reviewId, modifyCommentRequest);
+    }
+
+    @DeleteMapping("/reviews/managements/{reviewId}")
+    @Secured(value = MemberRole.ROLES.ADMIN)
+    public void deleteComment(@PathVariable("reviewId") Long reviewId) {
+        adminReviewService.deleteComment(reviewId);
     }
 }
