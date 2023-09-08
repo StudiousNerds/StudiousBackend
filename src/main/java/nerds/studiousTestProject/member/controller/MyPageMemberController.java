@@ -36,13 +36,13 @@ public class MyPageMemberController {
     private final BookmarkService bookmarkService;
 
     @GetMapping("/members")
-    @Secured(value = MemberRole.ROLES.USER)
+    @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
     public MemberInfoResponse inquireMember(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return memberService.findMemberInfoFromAccessToken(accessToken);
     }
 
     @PostMapping("/members/photo")
-    @Secured(value = MemberRole.ROLES.USER)
+    @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
     public void addProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam MultipartFile file) {
         log.info("file = {}", file);
         memberService.addPhoto(accessToken, file);
