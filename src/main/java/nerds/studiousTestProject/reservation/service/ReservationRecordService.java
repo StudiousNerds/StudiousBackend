@@ -205,7 +205,8 @@ public class ReservationRecordService {
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
         List<Convenience> conveniences = convenienceRepository.findAllByRoomOrStudycafe(room, studycafe);
-        return ReserveResponse.of(member, room, studycafe, conveniences);
+        List<RefundPolicy> refundPolicyList = refundPolicyRepository.findAllByStudycafe(studycafe);
+        return ReserveResponse.of(member, room, studycafe, conveniences, refundPolicyList);
     }
 
     public Page<ReservationRecord> findAllByMemberId(Long memberId, Pageable pageable) {
