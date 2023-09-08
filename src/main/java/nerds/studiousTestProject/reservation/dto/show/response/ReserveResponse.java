@@ -40,8 +40,9 @@ public class ReserveResponse {
                 .build();
     }
 
-    private static List<RefundPolicyInResponse> getRefundPolicyInResponses(Studycafe studycafe) {
-        return studycafe.getRefundPolicies().stream()
+    private static List<RefundPolicyInResponse> getRefundPolicyInResponses(List<RefundPolicy> refundPolicyList) {
+        return refundPolicyList.stream()
+                .sorted(Comparator.comparing((RefundPolicy refundPolicy) -> refundPolicy.getRemaining().getRemain()).reversed())
                 .map(RefundPolicyInResponse::from)
                 .collect(Collectors.toList());
     }
