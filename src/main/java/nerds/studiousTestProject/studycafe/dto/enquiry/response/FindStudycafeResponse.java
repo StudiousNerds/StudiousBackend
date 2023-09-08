@@ -2,7 +2,7 @@ package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.room.dto.FindRoomResponse;
+import nerds.studiousTestProject.room.dto.find.response.FindRoomResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInResponse;
 
 import java.util.List;
