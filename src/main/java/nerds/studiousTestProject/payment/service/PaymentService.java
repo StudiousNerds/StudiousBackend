@@ -2,11 +2,13 @@ package nerds.studiousTestProject.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
-import nerds.studiousTestProject.payment.dto.cancel.response.CancelResponse;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
@@ -17,9 +19,15 @@ import nerds.studiousTestProject.reservation.repository.ReservationRecordReposit
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAYMENT_SECRET;
+import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PAYMENT_METHOD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
+import static nerds.studiousTestProject.payment.entity.PaymentMethod.가상계좌;
+import static nerds.studiousTestProject.payment.entity.PaymentStatus.CANCELED;
+import static nerds.studiousTestProject.payment.entity.PaymentStatus.DONE;
+import static nerds.studiousTestProject.payment.entity.PaymentStatus.WAITING_FOR_DEPOSIT;
 
 
 @RequiredArgsConstructor
@@ -89,9 +97,23 @@ public class PaymentService {
         return reservationRecordRepository.findById(reservationId).orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-
-    public ReservationRecord findReservationRecordByPayment(Payment payment) {
-        return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    public void processDepositByStatus(DepositCallbackRequest depositCallbackRequest) {
+        Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
+        String status = depositCallbackRequest.getStatus();
+        ReservationRecord reservationRecord = findReservationRecordByPayment(payment);
+        if(isDepositError(payment, status)){ // 입금 오류
+            //입금 오류에 관한 알림 전송
+            reservationRecord.depositError();
+        }
+        if (status.equals(DONE.name())) { // 입금 완료
+            validPaymentSecret(depositCallbackRequest, payment);
+            reservationRecord.completeDeposit();
+            payment.updateCompleteTime(depositCallbackRequest.getCreatedAt());
+        }
+        if (status.equals(CANCELED.name())) { // 입금 전 취소 & 결제 취소
+            reservationRecord.canceled();
+        }
+        payment.updateStatus(status);
     }
 
     private boolean isDepositError(Payment payment, String status) {
