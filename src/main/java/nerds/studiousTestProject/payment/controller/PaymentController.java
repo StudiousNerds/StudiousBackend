@@ -2,7 +2,9 @@ package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +31,15 @@ public class PaymentController {
                                               @RequestParam String orderId) {
         return paymentService.confirmFail(message, orderId);
     }
+
+    @GetMapping("/virtual/success")
+    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
+                                                            @RequestParam Integer amount,
+                                                            @RequestParam String paymentKey) {
+        return paymentService.virtualAccount(orderId, paymentKey, amount);
+    }
+
+
+
 
 }
