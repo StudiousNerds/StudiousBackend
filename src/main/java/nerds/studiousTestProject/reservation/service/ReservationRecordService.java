@@ -87,7 +87,7 @@ public class ReservationRecordService {
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
         double calculateUsingTime = validCalculateUsingTime(reservationInfo);
-        validUsingTimePerHour(reservationInfo, calculateUsingTime);
+        validUsingTimePerHour(calculateUsingTime);
         validMinUsingTime(reservationInfo, room);
     }
 
@@ -103,7 +103,7 @@ public class ReservationRecordService {
         }
     }
 
-    private void validUsingTimePerHour(ReservationInfo reservationInfo, double calculatedDuration) {
+    private void validUsingTimePerHour(double calculatedDuration) {
         if (calculatedDuration != (int) calculatedDuration) { //시간 단위가 아닐 때
             throw new BadRequestException(USING_TIME_NOT_PER_HOUR);
         }
