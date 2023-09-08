@@ -128,27 +128,6 @@ public class ReservationRecordService {
                 .build()));
     }
 
-    private ReservationRecord saveReservationRecord(Member member, Room room, ReserveRequest reserveRequest) {
-        ReserveUser user = reserveRequest.getUser();
-        ReservationInfo reservation = reserveRequest.getReservation();
-        return reservationRecordRepository.save(
-                ReservationRecord.builder()
-                        .status(ReservationStatus.INPROGRESS)
-                        .date(reservation.getReserveDate())
-                        .usingTime(reservation.getUsingTime())
-                        .startTime(reservation.getStartTime())
-                        .endTime(reservation.getEndTime())
-                        .headCount(reservation.getHeadCount())
-                        .userName(user.getName())
-                        .userPhoneNumber(user.getPhoneNumber())
-                        .request(user.getRequest())
-                        .room(room)
-                        .orderId(UUID.randomUUID().toString())
-                        .member(member)
-                        .build()
-        );
-    }
-
     public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {
         Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
         LocalTime openTime = studycafe.getOperationInfos().get(0).getStartTime();
