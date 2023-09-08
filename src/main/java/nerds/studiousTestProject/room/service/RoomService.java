@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_AUTHORIZE_ACCESS;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
@@ -80,10 +81,9 @@ public class RoomService {
 
     public FindAllRoomResponse getAllRooms(String accessToken, Long studycafeId, Long roomId) {
         Member memberFromAccessToken = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = getStudycafeById(studycafeId);
 
-        if (!memberFromAccessToken.equals(studycafe.getMember())) {
-            throw new NotAuthorizedException(NOT_AUTHORIZE_ACCESS);
+        if (!matchStudycafeAndMember(studycafeId, memberFromAccessToken)) {
+            throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
         }
 
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
@@ -237,5 +237,9 @@ public class RoomService {
         return roomList.stream()
                 .map(room -> BasicRoomInfo.of(room))
                 .collect(Collectors.toList());
+    }
+
+    private boolean matchStudycafeAndMember(Long studycafeId, Member member) {
+        return studycafeRepository.existsByIdAndMember(studycafeId, member);
     }
 }
