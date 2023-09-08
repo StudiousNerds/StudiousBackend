@@ -2,6 +2,7 @@ package nerds.studiousTestProject.reservation.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -70,5 +71,10 @@ public class ReservationRecordController {
                                                                          @PageableDefault(size = RESERVATION_SETTINGS_PAGE_SIZE) Pageable pageable,
                                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return reservationRecordService.getAll(tab, studycafeName, startDate, endDate, pageable, accessToken);
+    }
+
+    @GetMapping("/mypage/reservation-settings/{reservationRecordId}")
+    public ReservationDetailResponse showDetail(@PathVariable Long reservationRecordId) {
+        return reservationRecordService.showDetail(reservationRecordId);
     }
 }
