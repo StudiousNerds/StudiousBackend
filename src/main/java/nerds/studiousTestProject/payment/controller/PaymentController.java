@@ -40,6 +40,10 @@ public class PaymentController {
     }
 
 
-
+    @PostMapping("/deposit-callback")
+    public ResponseEntity<Void> depositCallback(@RequestBody DepositCallbackRequest depositCallbackRequest) {
+        paymentService.processDepositByStatus(depositCallbackRequest);
+        return ResponseEntity.ok().build();
+    }
 
 }
