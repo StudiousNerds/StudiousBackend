@@ -75,10 +75,7 @@ public class ReservationRecordService {
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
         Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest.getReservation(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
-        ReservationRecord reservationRecord = saveReservationRecord(
-                tokenService.getMemberFromAccessToken(accessToken),
-                room,
-                reserveRequest);
+        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
         return PaymentInfoResponse.of(reserveRequest, reservationRecord);
     }
