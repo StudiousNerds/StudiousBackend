@@ -203,7 +203,7 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public ReserveResponse reserve(Long cafeId, Long roomId, String accessToken) {
+    public ReserveResponse show(Long cafeId, Long roomId, String accessToken) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
