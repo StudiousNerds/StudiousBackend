@@ -5,9 +5,12 @@ import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceType;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +27,7 @@ public class ReserveResponse {
     private String userPhoneNumber;
     private List<RefundPolicyInResponse> refundPolicy;
 
-    public static ReserveResponse of(Member member, Room room, Studycafe studycafe, List<Convenience> conveniences) {
+    public static ReserveResponse of(Member member, Room room, Studycafe studycafe, List<Convenience> conveniences, List<RefundPolicy> refundPolicyList) {
         return ReserveResponse.builder()
                 .conveniences(getRoomConvenienceList(conveniences))
                 .paidConveniences(getPaidConvenienceList(conveniences))
@@ -33,7 +36,7 @@ public class ReserveResponse {
                 .studycafePhoto(studycafe.getPhoto())
                 .username(member.getName())
                 .userPhoneNumber(member.getPhoneNumber())
-                .refundPolicy(getRefundPolicyInResponses(studycafe))
+                .refundPolicy(getRefundPolicyInResponses(refundPolicyList))
                 .build();
     }
 

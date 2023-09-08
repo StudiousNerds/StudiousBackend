@@ -278,19 +278,7 @@ public class ReservationRecordService {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         Payment payment = reservationRecord.getPayment();
-        return ReservationSettingsResponse.builder()
-                .studycafeName(studycafe.getName())
-                .studycafePhoto(studycafe.getPhoto())
-                .roomName(room.getName())
-                .reservationDate(reservationRecord.getDate())
-                .reservationStartTime(reservationRecord.getStartTime())
-                .reservationEndTime(reservationRecord.getEndTime())
-                .usingTime(reservationRecord.getUsingTime())
-                .price(payment.getPrice())
-                .paymentMethod(payment.getMethod())
-                .cancelReason(payment.getCancelReason())
-                .reservationStatus(getReservationSettingsResponse(reservationRecord.getStatus(), reservationRecord.getDate(), reservationRecord.getStartTime(), reservationRecord.getEndTime()).getStatusMessage())
-                .build();
+        return ReservationRecordInfo.of(studycafe, room, reservationRecord, payment);
     }
 
     public ReservationSettingsStatus getReservationSettingsResponse(ReservationStatus reservationStatus, LocalDate reservationDate,
