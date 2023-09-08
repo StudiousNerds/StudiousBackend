@@ -274,27 +274,16 @@ public class ReservationRecordService {
         return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
     }
 
-    public ReservationSettingsResponse createReservationSettingsResponse(ReservationRecord reservationRecord) {
+    private int validPageAndAssign(Integer page) {
+        if(page < 1 || page == null) throw new BadRequestException(INVALID_PAGE_NUMBER);
+        return page - 1;
+    }
+
+    public ReservationRecordInfo createReservationSettingsResponse(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         Payment payment = reservationRecord.getPayment();
         return ReservationRecordInfo.of(studycafe, room, reservationRecord, payment);
-    }
-
-    public ReservationSettingsStatus getReservationSettingsResponse(ReservationStatus reservationStatus, LocalDate reservationDate,
-                                                                    LocalTime startTime, LocalTime endTime) {
-        if (reservationStatus == ReservationStatus.CANCELED) return CANCELED;
-        LocalDate nowDate = LocalDate.now();
-        LocalTime nowTime = LocalTime.now();
-        if (reservationDate.isBefore(nowDate) || (reservationDate == nowDate && startTime.isAfter(nowTime))) return BEFORE_USING;
-        if (reservationDate.isAfter(nowDate) || (reservationDate == nowDate && endTime.isBefore(nowTime))) return AFTER_USING;
-        return USING;
-    }
-
-    private void initCondition(ReservationSettingsStatus tab, LocalDate startDate, LocalDate endDate) {
-        if(tab == null) tab = ALL;
-        if(startDate == null) startDate = LocalDate.now().minusYears(1);
-        if(endDate == null) endDate = LocalDate.now();
     }
 
     public ReservationDetailResponse showDetail(Long reservationRecordId) {
