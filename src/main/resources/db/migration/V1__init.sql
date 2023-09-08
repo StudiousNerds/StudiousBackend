@@ -18,13 +18,11 @@ CREATE TABLE IF NOT EXISTS `grade` (
     `deafening`       int          NOT NULL,
     `fixtures_status` int          NOT NULL,
     `total`           decimal(3,2) NOT NULL,
-    `review_id`       bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
-
 
 CREATE TABLE IF NOT EXISTS `member` (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
@@ -36,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `member` (
     `email`         varchar(255) NOT NULL,
     `name`          varchar(255),
     `nickname`      varchar(255) NOT NULL,
-    `password`      varchar(255) NOT NULL,
+    `password`      varchar(255),
     `phone_number`  varchar(255) NOT NULL,
     `photo`         varchar(255),
     `type`          varchar(255) NOT NULL,
@@ -170,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `review` (
     `detail`                varchar(255) NOT NULL,
     `photo`                 varchar(255),
     `is_recommended`        TINYINT(1)   NOT NULL,
+    `grade_id`              bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -246,7 +245,7 @@ CREATE TABLE IF NOT EXISTS `sub_photo` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
-alter table grade add constraint grade_review_unique_key unique (review_id);
+alter table review add constraint grade_review_unique_key unique (grade_id);
 
 alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
 
