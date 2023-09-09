@@ -9,14 +9,14 @@ import java.util.List;
 @Getter
 @Builder
 public class MypageReservationResponse {
-    private List<ReservationRecordInfo> reservationRecordInfoList;
+    private List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList;
     private Integer pageNumber;
     private Integer totalPage;
 
-    public static MypageReservationResponse of(List<ReservationRecordInfo> reservationRecordInfoList, Page<ReservationRecord> reservationRecordPage) {
+    public static MypageReservationResponse of(List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList, Page<ReservationRecord> reservationRecordPage) {
         if(reservationRecordPage.isEmpty()) return null;
         return MypageReservationResponse.builder()
-                .reservationRecordInfoList(reservationRecordInfoList)
+                .reservationRecordInfoWithStatusList(reservationRecordInfoWithStatusList)
                 .pageNumber(reservationRecordPage.getNumber() + 1)
                 .totalPage(reservationRecordPage.getTotalPages())
                 .build();
