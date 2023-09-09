@@ -46,7 +46,7 @@ public class ReservationRecordController {
         return reservationRecordService.show(studycafeId, roomId, accessToken);
     }
 
-    @PostMapping("/rooms/{roomId}")
+    @PostMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
     public PaymentInfoResponse reserve(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
                                        @PathVariable Long roomId,
                                        @RequestBody @Valid ReserveRequest reserveRequest) {
