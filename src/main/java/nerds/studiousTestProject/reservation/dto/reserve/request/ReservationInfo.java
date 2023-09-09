@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class ReservationInfo {
 
     @NotNull(message = "예약날짜는 필수입니다.")
-    private LocalDate reserveDate;
+    private LocalDate date;
     @NotNull(message = "예약 시작 시간은 필수입니다.")
     private LocalTime startTime;
     @NotNull(message = "예약 종료 시간은 필수입니다.")
