@@ -100,8 +100,8 @@ public class ReservationRecordService {
         }
     }
 
-    private void validUsingTimePerHour(double calculatedDuration) {
-        if (calculatedDuration != (int) calculatedDuration) { //시간 단위가 아닐 때
+    private void validUsingTimePerHour(ReservationInfo reservationInfo) {
+        if (reservationInfo.getStartTime().getMinute() != 0 || reservationInfo.getEndTime().getMinute() != 0) { //시간 단위가 아닐 때
             throw new BadRequestException(USING_TIME_NOT_PER_HOUR);
         }
     }
