@@ -158,7 +158,7 @@ public class ReservationRecordService {
         LocalTime endTime = studycafe.getOperationInfos().get(1).getEndTime() != null ? studycafe.getOperationInfos().get(1).getEndTime() : LocalTime.MAX;
 
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
-        Integer minUsingTime = room.getMinUsingTime() / 60;
+        Integer minUsingTime = room.getMinUsingTime();
 
         for (int i = openTime.getHour(); i <= endTime.getHour(); i += minUsingTime) {
             reservationTimes.put(i, true);
