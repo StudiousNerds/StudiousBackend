@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +63,9 @@ public class Payment {
 
     @Column(name = "secret")
     private String secret;
+
+    @Column(name = "canceler")
+    private MemberRole canceler;
 
     @Builder
     public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, String bankCode, LocalDateTime dueDate, String secret) {
