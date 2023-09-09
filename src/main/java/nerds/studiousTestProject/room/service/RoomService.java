@@ -10,6 +10,7 @@ import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.FindRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
+import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
@@ -23,9 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_OPERATION_INFO;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_START_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
 @RequiredArgsConstructor
@@ -63,8 +63,12 @@ public class RoomService {
 
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
         studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        int start = findStartTimeByWeek(Week.of(date)).getHour();
-        int end = findEndTimeByWeek(Week.of(date)).getHour();
+
+        OperationInfo operationInfo = operationInfoRepository.findByStudycafeAndWeek(studycafeId, Week.of(date))
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_OPERATION_INFO));
+
+        int start = operationInfo.getIsAllDay() ? LocalTime.MIN.getHour() : operationInfo.getStartTime().getHour();
+        int end = operationInfo.getIsAllDay() ? LocalTime.MAX.getHour() : operationInfo.getEndTime().getHour();
         int size = end - start;
         Integer timeList[] = new Integer[size+1];
 
@@ -72,7 +76,7 @@ public class RoomService {
         List<Integer> timeZone = reservationTimes.keySet().stream().toList();
 
         for (int i = 0; i < values.size(); i++) {
-            if(values.get(i) == true){
+            if(values.get(i)){
                 timeList[i] = timeZone.get(i);
             }
         }
@@ -116,16 +120,6 @@ public class RoomService {
     public Room findRoomById(Long roomId){
         return roomRepository.findById(roomId)
                 .orElseThrow(()->new NotFoundException(NOT_FOUND_ROOM));
-    }
-
-    public LocalTime findStartTimeByWeek(Week week) {
-        return operationInfoRepository.findStartTime(week)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_START_TIME));
-    }
-
-    public LocalTime findEndTimeByWeek(Week week) {
-        return operationInfoRepository.findEndTime(week)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_END_TIME));
     }
 
     private List<String> getPhotos(Room room) {
