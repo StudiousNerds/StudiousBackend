@@ -45,13 +45,12 @@ public class PaymentService {
 
 
     @Transactional
-    public ConfirmSuccessResponse confirmPayToToss(String orderId, String paymentKey, Integer amount) {
+    public void confirmPayToToss(String orderId, String paymentKey, Integer amount) {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId,amount,paymentKey), CONFIRM_URI);
         Payment payment = paymentRepository.save(responseFromToss.toPayment());
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         ReservationRecord reservationRecord = findReservationRecordByOrderId(orderId);
         reservationRecord.completePay(payment);//결제 완료로 상태 변경
-        return ConfirmSuccessResponse.from(reservationRecord);
     }
 
     @Transactional
