@@ -17,24 +17,24 @@ import java.util.UUID;
 public class ReserveRequest {
 
     @NotNull
-    private ReserveUser user;
+    private ReserveUser reserveUser;
 
     @NotNull
-    private ReservationInfo reservation;
+    private ReservationInfo reservationInfo;
 
     @Nullable
     private List<PaidConvenience> paidConveniences;
 
     public ReservationRecord toReservationRecord(Room room, Member member) {
         return ReservationRecord.builder()
-                .userName(user.getName())
-                .userPhoneNumber(user.getPhoneNumber())
-                .date(reservation.getReserveDate())
-                .startTime(reservation.getStartTime())
-                .endTime(reservation.getEndTime())
-                .request(user.getRequest())
-                .headCount(reservation.getHeadCount())
-                .usingTime(reservation.getUsingTime())
+                .userName(reserveUser.getName())
+                .userPhoneNumber(reserveUser.getPhoneNumber())
+                .date(reservationInfo.getDate())
+                .startTime(reservationInfo.getStartTime())
+                .endTime(reservationInfo.getEndTime())
+                .request(reserveUser.getRequest())
+                .headCount(reservationInfo.getHeadCount())
+                .usingTime(reservationInfo.getUsingTime())
                 .status(ReservationStatus.INPROGRESS)
                 .room(room)
                 .orderId(UUID.randomUUID().toString())
