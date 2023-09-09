@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.reservation.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.TokenService;
@@ -9,41 +10,40 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
+import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
+import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveUser;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
-import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
-import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsResponse;
+import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAGE_NUMBER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVE_DATE;
@@ -53,10 +53,10 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROO
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.USING_TIME_NOT_PER_HOUR;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.*;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 public class ReservationRecordService {
 
@@ -64,17 +64,17 @@ public class ReservationRecordService {
     private final RoomRepository roomRepository;
     private final StudycafeRepository studycafeRepository;
     private final TokenService tokenService;
-
+    private final RefundPolicyRepository refundPolicyRepository;
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
-    private static final double SECOND_PER_HOUR = 0.000277778;
+    private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
 
     @Transactional
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
         Room room = findRoomById(roomId);
-        validReservationInfo(reserveRequest.getReservation(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
+        validReservationInfo(reserveRequest.getReservationInfo(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
         ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
         return PaymentInfoResponse.of(reserveRequest, reservationRecord);
@@ -83,13 +83,13 @@ public class ReservationRecordService {
     private void validReservationInfo(ReservationInfo reservationInfo, Room room) {
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
-        double calculateUsingTime = validCalculateUsingTime(reservationInfo);
-        validUsingTimePerHour(calculateUsingTime);
+        validCalculateUsingTime(reservationInfo);
+        validUsingTimePerHour(reservationInfo);
         validMinUsingTime(reservationInfo, room);
     }
 
     private void validCorrectDate(ReservationInfo reservationInfo) {
-        if (reservationInfo.getReserveDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
+        if (reservationInfo.getDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
             throw new BadRequestException(INVALID_RESERVE_DATE);
         }
     }
@@ -110,7 +110,6 @@ public class ReservationRecordService {
         if (reservationInfo.getEndTime().getHour() - reservationInfo.getStartTime().getHour() != reservationInfo.getUsingTime()) {
             throw new BadRequestException(MISCALCULATED_USING_TIME);
         }
-        return calculatedDuration;
     }
 
     private void validMinUsingTime(ReservationInfo reservationInfo, Room room) {
@@ -146,21 +145,6 @@ public class ReservationRecordService {
             }
         }
         return reservationTimes;
-    }
-
-    public ReservationRecord findByOrderId(String orderId) {
-        return reservationRecordRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
-    @Transactional
-    public void deleteByOrderId(String orderId){
-        reservationRecordRepository.delete(findByOrderId(orderId));
-    }
-
-    @Transactional
-    public void cancel(Long reservationRecordId){
-        findById(reservationRecordId).canceled();
     }
 
     public ReservationRecord findById(Long reservationRecordId) {
@@ -249,8 +233,8 @@ public class ReservationRecordService {
     public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, String accessToken){
         page = validPageAndAssign(page);
         Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
-        List<ReservationRecordInfo> reservationRecordInfoList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
-        return MypageReservationResponse.of(reservationRecordInfoList, reservationRecordPage);
+        List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
+        return MypageReservationResponse.of(reservationRecordInfoWithStatusList, reservationRecordPage);
     }
 
     private int validPageAndAssign(Integer page) {
@@ -258,11 +242,11 @@ public class ReservationRecordService {
         return page - 1;
     }
 
-    public ReservationRecordInfo createReservationSettingsResponse(ReservationRecord reservationRecord) {
+    public ReservationRecordInfoWithStatus createReservationSettingsResponse(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         Payment payment = reservationRecord.getPayment();
-        return ReservationRecordInfo.of(studycafe, room, reservationRecord, payment);
+        return ReservationRecordInfoWithStatus.of(studycafe, room, reservationRecord, payment);
     }
 
     public ReservationDetailResponse showDetail(Long reservationRecordId) {
