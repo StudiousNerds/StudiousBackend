@@ -247,10 +247,11 @@ public class ReservationRecordService {
         return remainDate > 8 ? 8 : remainDate;
     }
 
-    public List<ReservationSettingsResponse> getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Pageable pageable, String accessToken){
-        initCondition(tab, startDate, endDate);
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), pageable);
-        return reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
+    public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, String accessToken){
+        page = validPageAndAssign(page);
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
+        List<ReservationRecordInfo> reservationRecordInfoList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
+        return MypageReservationResponse.of(reservationRecordInfoList, reservationRecordPage);
     }
 
     private int validPageAndAssign(Integer page) {
