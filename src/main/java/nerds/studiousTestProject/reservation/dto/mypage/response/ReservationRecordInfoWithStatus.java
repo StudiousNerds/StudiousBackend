@@ -21,7 +21,7 @@ import static nerds.studiousTestProject.reservation.dto.mypage.response.Reservat
 @Getter
 @AllArgsConstructor
 @Builder
-public class ReservationRecordInfo {
+public class ReservationRecordInfoWithStatus {
 
     private String studycafeName;
     private String studycafePhoto;
@@ -36,8 +36,8 @@ public class ReservationRecordInfo {
     private String reservationStatus; //이용전, 이용중,
     private String cancelReason;
 
-    public static ReservationRecordInfo of(Studycafe studycafe, Room room, ReservationRecord reservationRecord, Payment payment) {
-        return ReservationRecordInfo.builder()
+    public static ReservationRecordInfoWithStatus of(Studycafe studycafe, Room room, ReservationRecord reservationRecord, Payment payment) {
+        return ReservationRecordInfoWithStatus.builder()
                 .studycafeName(studycafe.getName())
                 .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
@@ -58,9 +58,9 @@ public class ReservationRecordInfo {
         LocalDate nowDate = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
         if (reserveDate.isBefore(nowDate) || (reserveDate == nowDate && reservationRecord.getStartTime().isAfter(nowTime)))
-            return BEFORE_USING;
-        if (reserveDate.isAfter(nowDate) || (reserveDate == nowDate && reservationRecord.getEndTime().isBefore(nowTime)))
             return AFTER_USING;
+        if (reserveDate.isAfter(nowDate) || (reserveDate == nowDate && reservationRecord.getEndTime().isBefore(nowTime)))
+            return BEFORE_USING;
         return USING;
     }
 
