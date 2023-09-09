@@ -93,7 +93,7 @@ public class RoomService {
             log.info("반복문 확인", i);
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
             reservationList.put(date.toString(), canReserveTime);
-            date.plusDays(1);
+            date = date.plusDays(1);
         }
 
         return reservationList;
