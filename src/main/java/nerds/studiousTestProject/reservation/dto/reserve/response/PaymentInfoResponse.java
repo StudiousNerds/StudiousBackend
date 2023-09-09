@@ -27,7 +27,7 @@ public class PaymentInfoResponse {
     private static final String REQUEST_FAIL_URI = "http://localhost:8080/studious/payments/fail";
     public static PaymentInfoResponse of(ReserveRequest reserveRequest, ReservationRecord reservationRecord) {
         return PaymentInfoResponse.builder()
-                .amount(reserveRequest.getReservation().getPrice())
+                .amount(reserveRequest.getReservationInfo().getPrice())
                 .orderId(reservationRecord.getOrderId())
                 .orderName(reservationRecord.getUserName())
                 .successUrl(REQUEST_SUCCESS_URI)
