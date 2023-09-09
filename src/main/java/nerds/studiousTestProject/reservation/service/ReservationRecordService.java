@@ -106,9 +106,8 @@ public class ReservationRecordService {
         }
     }
 
-    private double validCalculateUsingTime(ReservationInfo reservationInfo) {
-        double calculatedDuration = Duration.between(reservationInfo.getStartTime(), reservationInfo.getEndTime()).getSeconds() * SECOND_PER_HOUR;
-        if (calculatedDuration != reservationInfo.getUsingTime()) { // 계산했을 때 duration과 같지 않을 때
+    private void validCalculateUsingTime(ReservationInfo reservationInfo) {
+        if (reservationInfo.getEndTime().getHour() - reservationInfo.getStartTime().getHour() != reservationInfo.getUsingTime()) {
             throw new BadRequestException(MISCALCULATED_USING_TIME);
         }
         return calculatedDuration;
