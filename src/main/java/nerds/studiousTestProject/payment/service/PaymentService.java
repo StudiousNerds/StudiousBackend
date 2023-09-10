@@ -10,7 +10,6 @@ import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
-import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmSuccessResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
@@ -47,10 +46,11 @@ public class PaymentService {
     @Transactional
     public void confirmPayToToss(String orderId, String paymentKey, Integer amount) {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId,amount,paymentKey), CONFIRM_URI);
-        Payment payment = paymentRepository.save(responseFromToss.toPayment());
+        Payment payment = findByOrderId(orderId);
+        payment.complete(responseFromToss.toPayment());
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         ReservationRecord reservationRecord = findReservationRecordByOrderId(orderId);
-        reservationRecord.completePay(payment);//결제 완료로 상태 변경
+        reservationRecord.completePay();//결제 완료로 상태 변경
     }
 
     @Transactional
@@ -83,13 +83,21 @@ public class PaymentService {
     @Transactional
     public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = findReservationById(reservationId);
-        Payment payment = reservationRecord.getPayment();
-        if (payment.getMethod().equals(가상계좌)) {
-            cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
-        }
+        Payment payment = findByReservationRecord(reservationRecord);
+        validPaymentMethod(cancelRequest, payment);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
         payment.canceled(responseFromToss);
         reservationRecord.canceled(); //결제 취소 상태로 변경
+    }
+
+    private void validPaymentMethod(CancelRequest cancelRequest, Payment payment) {
+        if (payment.getMethod().equals(가상계좌)) {
+            cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
+        }
+    }
+
+    private Payment findByReservationRecord(ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private ReservationRecord findReservationById(Long reservationId) {
