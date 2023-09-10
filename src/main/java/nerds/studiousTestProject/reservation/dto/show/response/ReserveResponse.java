@@ -6,7 +6,7 @@ import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceType;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
@@ -25,7 +25,7 @@ public class ReserveResponse {
     private List<PaidConvenience> paidConveniences;
     private String username;
     private String userPhoneNumber;
-    private List<RefundPolicyInResponse> refundPolicy;
+    private List<RefundPolicyInfo> refundPolicy;
 
     public static ReserveResponse of(Member member, Room room, Studycafe studycafe, List<Convenience> conveniences, List<RefundPolicy> refundPolicyList) {
         return ReserveResponse.builder()
@@ -36,14 +36,14 @@ public class ReserveResponse {
                 .studycafePhoto(studycafe.getPhoto())
                 .username(member.getName())
                 .userPhoneNumber(member.getPhoneNumber())
-                .refundPolicy(getRefundPolicyInResponses(refundPolicyList))
+                .refundPolicy(getRefundPolicyInfo(refundPolicyList))
                 .build();
     }
 
-    private static List<RefundPolicyInResponse> getRefundPolicyInResponses(List<RefundPolicy> refundPolicyList) {
+    private static List<RefundPolicyInfo> getRefundPolicyInfo(List<RefundPolicy> refundPolicyList) {
         return refundPolicyList.stream()
                 .sorted(Comparator.comparing((RefundPolicy refundPolicy) -> refundPolicy.getRemaining().getRemain()).reversed())
-                .map(RefundPolicyInResponse::from)
+                .map(RefundPolicyInfo::from)
                 .collect(Collectors.toList());
     }
 
@@ -53,8 +53,7 @@ public class ReserveResponse {
     }
 
     private static List<String> getRoomConvenienceList(List<Convenience> conveniences) {
-        List<String> roomConvenienceList = conveniences.stream().filter(convenience -> convenience.getType().equals(ConvenienceType.ROOM))
-                .map(convenience -> convenience.getName().name()).toList();
+        List<String> roomConvenienceList = conveniences.stream().map(convenience -> convenience.getName().name()).toList();
         return roomConvenienceList;
     }
 

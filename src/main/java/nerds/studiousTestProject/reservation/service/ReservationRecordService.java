@@ -11,6 +11,7 @@ import nerds.studiousTestProject.convenience.repository.ConvenienceRecordReposit
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
+import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
@@ -19,7 +20,6 @@ import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfo;
-import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
@@ -166,7 +166,7 @@ public class ReservationRecordService {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
-        List<Convenience> conveniences = convenienceRepository.findAllByRoomOrStudycafe(room, studycafe);
+        List<Convenience> conveniences = convenienceRepository.findAllByRoom(room);
         List<RefundPolicy> refundPolicyList = refundPolicyRepository.findAllByStudycafe(studycafe);
         return ReserveResponse.of(member, room, studycafe, conveniences, refundPolicyList);
     }
@@ -188,7 +188,7 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    public ReservationCancelResponse cancelInfo(Long reservationId) {
+    public ReservationCancelResponse getCancelInfo(Long reservationId) {
         ReservationRecord reservationRecord = findById(reservationId);
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
@@ -201,7 +201,7 @@ public class ReservationRecordService {
         return ReservationCancelResponse.builder()
                 .reservationInfo(ReservationRecordInfo.of(studycafe, room, reservationRecord))
                 .paymentInfo(calculateRefundMoney(payment, refundPolicyOnDay))
-                .refundPolicyInfo(RefundPolicyInfo.of(refundPolicies, refundPolicyOnDay))
+                .refundPolicyInfo(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
                 .build();
 
     }
