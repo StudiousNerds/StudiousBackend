@@ -76,8 +76,19 @@ public class ReservationRecordService {
         Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest.getReservationInfo(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
         ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
+        Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
+        String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
-        return PaymentInfoResponse.of(reserveRequest, reservationRecord);
+        return PaymentInfoResponse.of(payment, orderName);
+    }
+
+    private Payment createInProgressPayment(ReservationRecord reservationRecord, ReserveRequest reserveRequest) {
+        return Payment.builder()
+                .reservationRecord(reservationRecord)
+                .status(PaymentStatus.IN_PROGRESS)
+                .price(reserveRequest.getReservationInfo().getPrice())
+                .orderId(UUID.randomUUID().toString())
+                .build();
     }
 
     private void validReservationInfo(ReservationInfo reservationInfo, Room room) {
