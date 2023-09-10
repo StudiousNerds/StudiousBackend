@@ -94,6 +94,10 @@ public class ReservationRecordService {
         }
     }
 
+    private void validOverMaxHeadCount(ReservationInfo reservationInfo, Room room) {
+        if(room.getMaxHeadCount() < reservationInfo.getHeadCount()) throw new BadRequestException(OVER_MAX_HEADCOUNT);
+    }
+
     private void validCorrectTime(ReservationInfo reservationInfo) {
         if (reservationInfo.getStartTime().isAfter(reservationInfo.getEndTime())) { // 예약 끝 시간은 시작 시간보다 뒤여야함
             throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
