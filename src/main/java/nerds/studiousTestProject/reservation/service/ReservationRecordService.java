@@ -65,8 +65,7 @@ public class ReservationRecordService {
     private final StudycafeRepository studycafeRepository;
     private final TokenService tokenService;
     private final RefundPolicyRepository refundPolicyRepository;
-    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
-
+    private final PaymentRepository paymentRepository;
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
@@ -208,7 +207,7 @@ public class ReservationRecordService {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         List<RefundPolicy> refundPolicies = studycafe.getRefundPolicies();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
@@ -260,7 +259,7 @@ public class ReservationRecordService {
     public ReservationRecordInfoWithStatus createReservationSettingsResponse(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationRecordInfoWithStatus.of(studycafe, room, reservationRecord, payment);
     }
 
@@ -268,7 +267,7 @@ public class ReservationRecordService {
         ReservationRecord reservationRecord = findById(reservationRecordId);
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
     }
 
