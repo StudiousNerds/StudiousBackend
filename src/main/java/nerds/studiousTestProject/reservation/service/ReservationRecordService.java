@@ -10,11 +10,14 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
+import nerds.studiousTestProject.reservation.dto.reserve.request.PaidConvenience;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
 import nerds.studiousTestProject.payment.entity.Payment;
@@ -27,6 +30,7 @@ import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoRes
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.room.entity.PriceType;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -40,6 +44,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -47,10 +52,13 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAGE_
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVE_DATE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISCALCULATED_USING_TIME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.OVER_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.USING_TIME_NOT_PER_HOUR;
 
@@ -68,12 +76,14 @@ public class ReservationRecordService {
     private final PaymentRepository paymentRepository;
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
+    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
+    private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
 
     @Transactional
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
         Room room = findRoomById(roomId);
-        validReservationInfo(reserveRequest.getReservationInfo(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
+        validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
         ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
         Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
         String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
@@ -90,13 +100,34 @@ public class ReservationRecordService {
                 .build();
     }
 
-    private void validReservationInfo(ReservationInfo reservationInfo, Room room) {
+    private void validReservationInfo(ReserveRequest reserveRequest, Room room) {
+        ReservationInfo reservationInfo = reserveRequest.getReservationInfo();
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
         validCalculateUsingTime(reservationInfo);
         validUsingTimePerHour(reservationInfo);
         validMinUsingTime(reservationInfo, room);
+        validOverMaxHeadCount(reservationInfo, room);
+        int conveniencePrice = reserveRequest.getPaidConveniences().stream().mapToInt(PaidConvenience::getPrice).sum();
+        if (room.getPriceType() == PriceType.PER_HOUR) {
+            if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getUsingTime() + conveniencePrice){
+                throw new BadRequestException(MISCALCULATED_PRICE);
+            }
+        }
+        if (room.getPriceType() == PriceType.PER_PERSON) {
+            if (reservationInfo.getHeadCount() < room.getMinHeadCount()) {
+                if (reservationInfo.getPrice() != room.getPrice() * room.getMinHeadCount() * reservationInfo.getUsingTime() + conveniencePrice) {
+                    throw new BadRequestException(MISCALCULATED_PRICE);
+                }
+            }
+            if (reservationInfo.getHeadCount() >= room.getMinHeadCount()){
+                if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getHeadCount() * reservationInfo.getUsingTime() + conveniencePrice) {
+                    throw new BadRequestException(MISCALCULATED_PRICE);
+                }
+            }
+        }
     }
+
 
     private void validCorrectDate(ReservationInfo reservationInfo) {
         if (reservationInfo.getDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
