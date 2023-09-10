@@ -9,6 +9,6 @@ import lombok.Getter;
 @Getter
 public class ReservationCancelResponse {
     private ReservationRecordInfo reservationInfo;
-    private PaymentInfo paymentInfo;
+    private PaymentInfoWithRefund paymentInfoWithRefund;
     private RefundPolicyInfoWithOnDay refundPolicyInfo;
 }
