@@ -272,5 +272,10 @@ public class ReservationRecordService {
         return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
     }
 
+    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    }
+
 
 }
