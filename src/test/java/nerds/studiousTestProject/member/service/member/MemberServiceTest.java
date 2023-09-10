@@ -8,6 +8,7 @@ import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
 import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
@@ -254,8 +255,25 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("마이페이지 계정 관리")
+    public void 계정_관리() throws Exception {
+
+        // given
+        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+
+        // when
+        MemberInfoResponse response = memberService.findMemberInfoFromAccessToken(accessToken);
+
+        // then
+        assertThat(response.getName()).isEqualTo(defaultMember.getName());
+        assertThat(response.getNickname()).isEqualTo(defaultMember.getNickname());
+        assertThat(response.getEmail()).isEqualTo(defaultMember.getEmail());
+        assertThat(response.getPhoto()).isEqualTo(defaultMember.getPhoto());
+        assertThat(response.getPhoneNumber()).isEqualTo(defaultMember.getPhoneNumber());
+    }
+
+    @Test
     @DisplayName("프로필 사진 수정")
-    @WithMockUser
     public void 프로필_사진_수정() throws Exception {
 
         // given
@@ -273,7 +291,6 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("닉네임 수정")
-    @WithMockUser
     public void 닉네임_수정() throws Exception {
 
         // given
@@ -293,7 +310,6 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("회원 탈퇴")
-    @WithMockUser
     public void 회원_탈퇴() throws Exception {
 
         // given

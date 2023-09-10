@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.request.BookmarkRequest;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
+import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
@@ -33,8 +34,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class MyPageMemberController {
     private final MemberService memberService;
 
-    @PostMapping("/photo")
-    @Secured(value = MemberRole.ROLES.USER)
+    @GetMapping("/members")
+    @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
+    public MemberInfoResponse inquireMember(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return memberService.findMemberInfoFromAccessToken(accessToken);
+    }
+
+    @PostMapping("/members/photo")
+    @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
     public void addProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam MultipartFile file) {
         log.info("file = {}", file);
         memberService.addPhoto(accessToken, file);
