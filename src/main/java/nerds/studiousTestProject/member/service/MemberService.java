@@ -10,6 +10,7 @@ import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
 import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
@@ -117,6 +118,11 @@ public class MemberService {
         return LogoutResponse.builder()
                 .memberId(memberId)
                 .build();
+    }
+
+    public MemberInfoResponse findMemberInfoFromAccessToken(String accessToken) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        return MemberInfoResponse.of(member);
     }
 
     @Transactional
