@@ -29,46 +29,28 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/mypage")
+@RequestMapping("/studious/mypage/members")
 public class MyPageMemberController {
     private final MemberService memberService;
-    private final BookmarkService bookmarkService;
 
-    @PostMapping("/members/photo")
+    @PostMapping("/photo")
     @Secured(value = MemberRole.ROLES.USER)
     public void addProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam MultipartFile file) {
         log.info("file = {}", file);
         memberService.addPhoto(accessToken, file);
     }
 
-    @PatchMapping("/members/nickname")
+    @PatchMapping("/nickname")
     public void patchNickname(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchNicknameRequest patchNicknameRequest) {
         memberService.replaceNickname(accessToken, patchNicknameRequest);
     }
 
-    @PatchMapping("/members/password")
+    @PatchMapping("/password")
     public void patchPassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchPasswordRequest patchPasswordRequest) {
         memberService.replacePassword(accessToken, patchPasswordRequest);
     }
-    @PostMapping("/members/withdraw")
+    @PostMapping("/withdraw")
     public void withdraw(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody WithdrawRequest withdrawRequest) {
         memberService.deactivate(accessToken, withdrawRequest);
-    }
-
-    @PostMapping("/bookmarks")
-    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkRequest bookmarkRequest){
-        bookmarkService.registerBookmark(accessToken, bookmarkRequest);
-        return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
-    }
-
-    @GetMapping("/bookmarks")
-    public FindBookmarkResponse findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
-        return bookmarkService.findBookmark(accessToken, pageable);
-    }
-
-    @DeleteMapping("/bookmarks")
-    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody BookmarkRequest bookmarkRequest){
-        bookmarkService.deleteBookmark(accessToken, bookmarkRequest);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
     }
 }
