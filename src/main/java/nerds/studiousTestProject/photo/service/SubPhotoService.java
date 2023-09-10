@@ -41,7 +41,12 @@ public class SubPhotoService {
     }
 
     @Transactional
-    public void removeAllPhotos(Long reviewId) {
+    public void removeAllReviewPhotos(Long reviewId) {
         subPhotoRepository.deleteAllByReviewId(reviewId);
+    }
+
+    @Transactional
+    public void removeAllRoomPhotos(Long roomId) {
+        subPhotoRepository.deleteAllByRoomId(roomId);
     }
 }
