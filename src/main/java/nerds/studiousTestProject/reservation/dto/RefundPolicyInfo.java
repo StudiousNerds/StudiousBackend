@@ -6,12 +6,12 @@ import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 
 @Builder
 @Getter
-public class RefundPolicyInResponse {
+public class RefundPolicyInfo {
     private String day;
     private Integer rate;
 
-    public static RefundPolicyInResponse from(RefundPolicy refundPolicy) {
-        return RefundPolicyInResponse.builder()
+    public static RefundPolicyInfo from(RefundPolicy refundPolicy) {
+        return RefundPolicyInfo.builder()
                 .day(refundPolicy.getRemaining().getMessage())
                 .rate(refundPolicy.getRate())
                 .build();

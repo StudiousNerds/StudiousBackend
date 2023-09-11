@@ -6,14 +6,14 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @Getter
 @Builder
-public class ReserveInfo {
+public class ReserveUserInfo {
 
-    private String username;
+    private String name;
     private String phoneNumber;
 
-    public static ReserveInfo from(ReservationRecord reservationRecord) {
-        return ReserveInfo.builder()
-                .username(reservationRecord.getUserName())
+    public static ReserveUserInfo from(ReservationRecord reservationRecord) {
+        return ReserveUserInfo.builder()
+                .name(reservationRecord.getUserName())
                 .phoneNumber(reservationRecord.getUserPhoneNumber())
                 .build();
     }
