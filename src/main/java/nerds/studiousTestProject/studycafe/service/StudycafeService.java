@@ -59,6 +59,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class StudycafeService {
         return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
     }
 
-    public FindStudycafeResponse findByDate(Long studycafeId, FindStudycafeRequest findStudycafeRequest){
+    public FindStudycafeResponse findByDate(Long studycafeId, LocalDate date){
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return FindStudycafeResponse.builder()
@@ -110,7 +111,7 @@ public class StudycafeService {
                 .introduction(studycafe.getIntroduction())
                 .conveniences(getConveniences(studycafeId))
                 .announcement(getAnnouncement(studycafeId))
-                .rooms(roomService.getRooms(findStudycafeRequest.getDate(), studycafeId))
+                .rooms(roomService.getRooms(date, studycafeId))
                 .build();
     }
 
@@ -446,7 +447,7 @@ public class StudycafeService {
      */
     @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void deleteStudycafe(String accessToken, Long studycafeId) {
+    public void delete(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
