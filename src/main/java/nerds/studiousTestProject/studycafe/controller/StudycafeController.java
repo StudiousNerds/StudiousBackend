@@ -1,17 +1,18 @@
 package nerds.studiousTestProject.studycafe.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.FutureOrPresent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
-import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
@@ -20,8 +21,8 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.http.HttpHeaders;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,12 +35,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/studious")
 @Slf4j
+@Validated
 public class StudycafeController {
     private final StudycafeService studycafeService;
 
@@ -51,8 +54,10 @@ public class StudycafeController {
     }
 
     @GetMapping("/studycafes/{studycafeId}")
-    public FindStudycafeResponse findStudycafeInfo(@PathVariable("studycafeId") Long studycafeId, @RequestBody FindStudycafeRequest findStudycafeRequest) {
-        return studycafeService.findByDate(studycafeId, findStudycafeRequest);
+    public FindStudycafeResponse findStudycafeInfo(
+            @PathVariable("studycafeId") Long studycafeId,
+            @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") @FutureOrPresent LocalDate date) {
+        return studycafeService.findByDate(studycafeId, date);
     }
 
     @GetMapping("/studycafes/{studycafeId}/refundPolicy")
@@ -113,6 +118,6 @@ public class StudycafeController {
 
     @DeleteMapping("/studycafes/managements/{studycafeId}")
     public void delete(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId) {
-        studycafeService.deleteStudycafe(accessToken, studycafeId);
+        studycafeService.delete(accessToken, studycafeId);
     }
 }

@@ -2,7 +2,6 @@ package nerds.studiousTestProject.room.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
@@ -22,6 +21,7 @@ import nerds.studiousTestProject.room.dto.modify.request.ModifyRoomRequest;
 import nerds.studiousTestProject.room.dto.modify.response.ModifyRoomResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
+import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
@@ -31,19 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_AUTHORIZE_ACCESS;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_END_TIME;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_OPERATION_INFO;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_START_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
+// develop에 있는거 가져오기
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -128,8 +126,10 @@ public class RoomService {
         getStudycafeById(studycafeId);
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
 
-        int start = findStartTimeByWeek(Week.of(date)).getHour();
-        int end = findEndTimeByWeek(Week.of(date)).getHour();
+        OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, Week.of(date));
+
+        int start = operationInfo.getStartTime().getHour();
+        int end = operationInfo.getEndTime().getHour();
         int size = end - start;
         Integer timeList[] = new Integer[size + 1];
 
@@ -154,7 +154,7 @@ public class RoomService {
             log.info("반복문 확인", i);
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
             reservationList.put(date.toString(), canReserveTime);
-            date.plusDays(1);
+            date = date.plusDays(1);
         }
 
         return reservationList;
@@ -183,14 +183,10 @@ public class RoomService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
-    public LocalTime findStartTimeByWeek(Week week) {
-        return operationInfoRepository.findStartTime(week)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_START_TIME));
-    }
-
-    public LocalTime findEndTimeByWeek(Week week) {
-        return operationInfoRepository.findEndTime(week)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_END_TIME));
+    public OperationInfo findOperationInfoByStudycafeIdAndWeek(Long studycafeId, Week week) {
+        return operationInfoRepository.findByStudycafeAndWeek(studycafeId, week).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_OPERATION_INFO)
+        );
     }
 
     private List<String> getPhotos(Room room) {

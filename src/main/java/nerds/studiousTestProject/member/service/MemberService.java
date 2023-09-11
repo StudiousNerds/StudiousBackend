@@ -14,6 +14,7 @@ import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
@@ -176,6 +177,14 @@ public class MemberService {
         return FindPasswordResponse.builder()
                 .tempPassword(temporaryPassword)
                 .build();
+    }
+
+    @Transactional
+    public void replacePhoneNumber(String accessToken, PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
+
+        member.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional

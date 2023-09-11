@@ -7,6 +7,7 @@ import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
@@ -52,10 +53,16 @@ public class MyPageMemberController {
         memberService.replaceNickname(accessToken, patchNicknameRequest);
     }
 
+    @PatchMapping("/phoneNumber")
+    public void patchPhoneNumber(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        memberService.replacePhoneNumber(accessToken, patchPhoneNumberRequest);
+    }
+    
     @PatchMapping("/password")
     public void patchPassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchPasswordRequest patchPasswordRequest) {
         memberService.replacePassword(accessToken, patchPasswordRequest);
     }
+
     @PostMapping("/withdraw")
     public void withdraw(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody WithdrawRequest withdrawRequest) {
         memberService.deactivate(accessToken, withdrawRequest);
