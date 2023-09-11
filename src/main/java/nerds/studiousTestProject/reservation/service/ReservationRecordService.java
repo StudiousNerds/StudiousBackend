@@ -256,6 +256,4 @@ public class ReservationRecordService {
         Payment payment = reservationRecord.getPayment();
         return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
     }
-
-
 }
