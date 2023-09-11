@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class PaymentInfo {
+public class PaymentInfoWithRefund {
     private String paymentMethod;
     private int price;
     private int refundPrice;
