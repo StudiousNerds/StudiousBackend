@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .requestMatchers("/studious/mypage/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN") // 닉네임, 비밀번호 수정 및 회원 탈퇴
                 .requestMatchers("/studious/search/**").permitAll()
                 .requestMatchers("/studious/valid/**").permitAll()   // 임시 허용
+                .requestMatchers("/studious/studycafes/{studycafeId}/notice", "/studious/studycafes/{studycafeId}/refundPolicy", "/studious/studycafes/{studycafeId}/reviews").permitAll()
+                .requestMatchers("/studious/studycafes/{studycafeId}", "studious/studycafes/{studycafeId}/rooms/{roomId}/reviews").permitAll()
                 .requestMatchers("/studious/studycafes/registrations").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
                 .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
