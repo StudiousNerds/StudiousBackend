@@ -52,6 +52,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
                 .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
                 .requestMatchers("/studious/members/test").hasRole("USER")      // 테스트 용
+                .requestMatchers("/payment/**").permitAll()//결제 테스트
+                .requestMatchers("/studious/payments/**").permitAll()//결제 테스트
                 .anyRequest().authenticated()
                 .and()
                 .cors()

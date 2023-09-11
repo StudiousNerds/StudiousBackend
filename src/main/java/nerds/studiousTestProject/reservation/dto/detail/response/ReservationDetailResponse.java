@@ -13,13 +13,13 @@ public class ReservationDetailResponse {
 
     private PlaceInfo placeInfo;
     private PaymentInfo paymentInfo;
-    private ReserveInfo reserveInfo;
+    private ReserveUserInfo reserveUserInfo;
 
     public static ReservationDetailResponse of(ReservationRecord reservationRecord, Studycafe studycafe, Room room, Payment payment) {
         return ReservationDetailResponse.builder()
                 .placeInfo(PlaceInfo.of(studycafe, room, reservationRecord))
                 .paymentInfo(PaymentInfo.from(payment))
-                .reserveInfo(ReserveInfo.from(reservationRecord))
+                .reserveUserInfo(ReserveUserInfo.from(reservationRecord))
                 .build();
     }
 }

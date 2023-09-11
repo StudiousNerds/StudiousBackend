@@ -49,7 +49,11 @@ public enum ErrorCode {
     MISCALCULATED_USING_TIME("잘못 계산된 이용 시간입니다."),
     USING_TIME_NOT_PER_HOUR("이용시간은 시간단위여야 합니다."),
     START_TIME_AFTER_THAN_END_TIME("시작 날짜는 끝나는 날짜보다 항상 이전이어야합니다."),
-    MISMATCH_MEMBER_AND_STUDYCAFE("회원 정보와 일치하는 스터디카페를 찾을 수 없습니다");
+    MISMATCH_PAYMENT_METHOD("결제 수단이 일치하지 않습니다."),
+    INVALID_PAYMENT_SECRET("올바른 시크릿 값이 아닙니다."),
+    INVALID_REFUND_RECEIVE_ACCOUNT_INFO("가상계좌 환불 시 환불 계좌는 필수입니다."),
+    MISMATCH_MEMBER_AND_STUDYCAFE("회원 정보와 일치하는 스터디카페를 찾을 수 없습니다"),
+    INVALID_PAGE_NUMBER("잘못된 페이지 번호입니다.");
 
     private final String message;
     ErrorCode(String message) {
