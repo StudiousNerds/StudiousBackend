@@ -7,6 +7,7 @@ import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
@@ -51,6 +52,11 @@ public class MyPageMemberController {
     @PatchMapping("/members/nickname")
     public void patchNickname(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchNicknameRequest patchNicknameRequest) {
         memberService.replaceNickname(accessToken, patchNicknameRequest);
+    }
+
+    @PatchMapping("/members/phoneNumber")
+    public void patchPhoneNumber(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        memberService.replacePhoneNumber(accessToken, patchPhoneNumberRequest);
     }
 
     @PatchMapping("/members/password")
