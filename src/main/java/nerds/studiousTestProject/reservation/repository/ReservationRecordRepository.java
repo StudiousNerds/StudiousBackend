@@ -2,6 +2,7 @@ package nerds.studiousTestProject.reservation.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,5 +31,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     Optional<ReservationRecord> findByReviewId(Long reviewId);
 
     Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
+
+    Optional<ReservationRecord> findByPayment(Payment payment);
 
 }

@@ -3,7 +3,7 @@ package nerds.studiousTestProject.studycafe.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.request.FindStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
@@ -22,7 +22,6 @@ import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.http.HttpHeaders;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -57,7 +56,7 @@ public class StudycafeController {
     }
 
     @GetMapping("/studycafes/{studycafeId}/refundPolicy")
-    public List<RefundPolicyInResponse> findStudycafeRefundPolicy(@PathVariable("studycafeId") Long studycafeId) {
+    public List<RefundPolicyInfo> findStudycafeRefundPolicy(@PathVariable("studycafeId") Long studycafeId) {
         return studycafeService.findRefundPolicy(studycafeId);
     }
 

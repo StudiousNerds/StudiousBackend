@@ -83,11 +83,21 @@ public class ReservationRecord {
 
     public void completePay(Payment payment) {
         this.status = ReservationStatus.CONFIRMED;
-        this.payment = payment;
+        if(payment != null){
+            this.payment = payment;
+        }
+    }
+
+    public void completeDeposit(){
+        this.status = ReservationStatus.CONFIRMED;
     }
 
     public void canceled() {
         this.status = ReservationStatus.CANCELED;
+    }
+
+   public void depositError() {
+        this.status = ReservationStatus.INPROGRESS;
     }
 
     public void addReview(Review review) {

@@ -16,4 +16,13 @@ public enum ReservationSettingsStatus {
     public String getStatusMessage() {
         return this.statusMessage;
     }
+
+    public static class TAB_NAME {
+        public static final String ALL = "ALL";
+        public static final String USING = "USING";
+        public static final String BEFORE_USING = "BEFORE_USING";
+        public static final String AFTER_USING = "AFTER_USING";
+        public static final String CANCELED = "CANCELED";
+
+    }
 }

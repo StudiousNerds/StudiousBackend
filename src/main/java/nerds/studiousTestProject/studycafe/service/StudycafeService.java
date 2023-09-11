@@ -10,10 +10,8 @@ import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 
-import nerds.studiousTestProject.photo.service.SubPhotoService;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInResponse;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
@@ -116,7 +114,7 @@ public class StudycafeService {
                 .build();
     }
 
-    public List<RefundPolicyInResponse> findRefundPolicy(Long studycafeId) {
+    public List<RefundPolicyInfo> findRefundPolicy(Long studycafeId) {
         return getRefundPolicy(studycafeId);
     }
 
@@ -137,7 +135,7 @@ public class StudycafeService {
         return topTenCafeList.stream()
                 .map(studycafe -> RecommendCafeResponse.builder()
                         .studycafeId(studycafe.getId())
-                        .cafeName(studycafe.getName())
+                        .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
                         .walkingTime(studycafe.getWalkingTime())
@@ -154,7 +152,7 @@ public class StudycafeService {
         return topTenCafeList.stream()
                 .map(studycafe -> EventCafeResponse.builder()
                         .studycafeId(studycafe.getId())
-                        .cafeName(studycafe.getName())
+                        .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
                         .accumRevCnt(getAccumResCnt(studycafe.getId()))
                         .walkingTime(studycafe.getWalkingTime())
@@ -184,11 +182,11 @@ public class StudycafeService {
                 .toList();
     }
 
-    public List<RefundPolicyInResponse> getRefundPolicy(Long studycafeId) {
+    public List<RefundPolicyInfo> getRefundPolicy(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getRefundPolicies().stream()
-                .map(RefundPolicyInResponse::from)
+                .map(RefundPolicyInfo::from)
                 .collect(Collectors.toList());
     }
 
