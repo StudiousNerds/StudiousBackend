@@ -2,15 +2,16 @@ package nerds.studiousTestProject.room.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.service.ConvenienceService;
+import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
-import nerds.studiousTestProject.photo.service.SubPhotoService;
+import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import nerds.studiousTestProject.room.dto.find.response.BasicRoomInfo;
@@ -41,19 +42,18 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_OPE
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
 
-// develop에 있는거 가져오기
 @RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 public class RoomService {
+    private final ConvenienceRepository convenienceRepository;
+    private final OperationInfoRepository operationInfoRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordService reservationRecordService;
-    private final StudycafeRepository studycafeRepository;
-    private final OperationInfoRepository operationInfoRepository;
     private final StorageService storageService;
-    private final SubPhotoService subPhotoService;
-    private final ConvenienceService convenienceService;
+    private final StudycafeRepository studycafeRepository;
+    private final SubPhotoRepository subPhotoRepository;
     private final TokenService tokenService;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
@@ -221,12 +221,12 @@ public class RoomService {
             storageService.deleteFile(photo.getPath());
             room.getSubPhotos().remove(photo.getPath());
         }
-        subPhotoService.removeAllRoomPhotos(room.getId());
+        removeAllRoomPhotos(room.getId());
     }
 
     private void deleteConveniences(Room room) {
         room.deleteConveniences();
-        convenienceService.deleteRoomConveniences(room.getId());
+        deleteRoomConveniences(room.getId());
     }
 
     private List<BasicRoomInfo> getBasicInfo(List<Room> roomList) {
@@ -237,5 +237,13 @@ public class RoomService {
 
     private boolean matchStudycafeAndMember(Long studycafeId, Member member) {
         return studycafeRepository.existsByIdAndMember(studycafeId, member);
+    }
+
+    private void deleteRoomConveniences(Long roomId) {
+        convenienceRepository.deleteAllByRoomId(roomId);
+    }
+
+    private void removeAllRoomPhotos(Long roomId) {
+        subPhotoRepository.deleteAllByRoomId(roomId);
     }
 }
