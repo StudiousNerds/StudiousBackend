@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -127,9 +128,9 @@ public class RoomService {
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
 
         OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, Week.of(date));
+        int start = operationInfo.getStartTime() != null ? operationInfo.getStartTime().getHour() : LocalTime.MIN.getHour();
+        int end = operationInfo.getEndTime() != null ? operationInfo.getEndTime().getHour() : LocalTime.MAX.getHour();
 
-        int start = operationInfo.getStartTime().getHour();
-        int end = operationInfo.getEndTime().getHour();
         int size = end - start;
         Integer timeList[] = new Integer[size + 1];
 
