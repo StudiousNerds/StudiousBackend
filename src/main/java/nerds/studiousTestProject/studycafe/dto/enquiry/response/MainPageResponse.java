@@ -8,6 +8,6 @@ import java.util.List;
 @Builder
 @Data
 public class MainPageResponse {
-    private List<RecommendCafeResponse>  recommend;
-    private List<EventCafeResponse>  event;
+    private List<RecommendCafeInfo>  recommend;
+    private List<EventCafeInfo>  event;
 }
