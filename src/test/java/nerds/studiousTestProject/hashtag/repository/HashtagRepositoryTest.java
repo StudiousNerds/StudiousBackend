@@ -25,15 +25,15 @@ class HashtagRepositoryTest {
     @Test
     void deleteAllByReviewId() {
         // given
-        HashtagRecord hashtag = hashtagRecordRepository.save(HashtagFixture.FIRST_HASHTAG.생성(1L));
-        Review save = reviewRepository.save(ReviewFixture.FIRST_REVIEW.생성(1L));
+        HashtagRecord hashtag = hashtagRecordRepository.save(HashtagFixture.COST_EFFECTIVE_HASHTAG.생성(1L));
+        Review save = reviewRepository.save(ReviewFixture.TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
         save.addHashtagRecord(hashtag);
         List<Long> reviewId = new ArrayList<>();
         reviewId.add(1L);
         // when
         save.getHashtagRecords().removeAll(save.getHashtagRecords());
         hashtagRecordRepository.deleteAllByReviewId(1L);
-        Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVEIW));
+        Review review = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
         List<HashtagRecord> hashtagList = hashtagRecordRepository.findAll();
         // then
         Assertions.assertThat(hashtagList.size()).isEqualTo(0);

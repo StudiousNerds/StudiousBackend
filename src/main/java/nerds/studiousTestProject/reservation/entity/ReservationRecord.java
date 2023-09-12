@@ -53,8 +53,8 @@ public class ReservationRecord {
     @Column(name = "end_time",nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "duration",nullable = false)
-    private Integer duration;
+    @Column(name = "using_time",nullable = false)
+    private Integer usingTime;
 
     @Column(name = "head_count",nullable = false)
     private Integer headCount;
@@ -83,17 +83,31 @@ public class ReservationRecord {
 
     public void completePay(Payment payment) {
         this.status = ReservationStatus.CONFIRMED;
-        this.payment = payment;
+        if(payment != null){
+            this.payment = payment;
+        }
+    }
+
+    public void completeDeposit(){
+        this.status = ReservationStatus.CONFIRMED;
     }
 
     public void canceled() {
         this.status = ReservationStatus.CANCELED;
     }
 
+   public void depositError() {
+        this.status = ReservationStatus.INPROGRESS;
+    }
+
     public void addReview(Review review) {
         if (review != null) {
             this.review = review;
         }
+    }
+
+    public void deleteReview() {
+        this.review = null;
     }
 
     public void setRoom(Room room) {

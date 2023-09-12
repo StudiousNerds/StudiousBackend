@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
+import nerds.studiousTestProject.studycafe.validator.search.SearchDateTimeCheck;
+import nerds.studiousTestProject.studycafe.validator.search.SearchTimeCheck;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,9 +19,9 @@ import java.util.List;
 
 @Builder
 @Data
+@SearchDateTimeCheck
+@SearchTimeCheck
 public class SearchRequest {
-    @Length(min = 2, message = "키워드를 2글자 이상 입력해주세요.")
-    @NotNull(message = "키워드를 2글자 이상 입력해주세요.")
     private String keyword;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

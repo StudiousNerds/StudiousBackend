@@ -66,11 +66,11 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
     }
 
     private BooleanExpression afterReservationStartDate(LocalDate startDate) {
-        return startDate == null ? null : reservationRecord.date.after(startDate);
+        return startDate == null ? null : reservationRecord.date.goe(startDate);
     }
 
     private BooleanExpression beforeReservationEndDate(LocalDate endDate) {
-        return endDate == null ? null : reservationRecord.date.before(endDate);
+        return endDate == null ? null : reservationRecord.date.loe(endDate);
     }
 
     private BooleanExpression handleTab(ReservationSettingsStatus tab) {

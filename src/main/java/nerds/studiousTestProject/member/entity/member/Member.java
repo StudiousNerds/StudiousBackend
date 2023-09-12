@@ -41,7 +41,7 @@ public class Member implements UserDetails {
     @Column(updatable = false, nullable = false)
     private String email;   // 타입이 다르면 중복 가능
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -121,6 +121,13 @@ public class Member implements UserDetails {
             this.nickname = nickname;
         }
     }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
+    }
+
     public void updatePassword(String encodedPassword) {
         if (encodedPassword != null && !encodedPassword.isEmpty()) {
             this.password = encodedPassword;

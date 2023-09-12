@@ -6,16 +6,18 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageService;
 import nerds.studiousTestProject.common.service.TokenService;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.general.logout.LogoutResponse;
-import nerds.studiousTestProject.member.dto.general.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.general.patch.PatchPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
-import nerds.studiousTestProject.member.dto.general.withdraw.WithdrawRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
+import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
+import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberType;
 import nerds.studiousTestProject.member.entity.token.LogoutAccessToken;
@@ -30,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
@@ -43,8 +44,6 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASS
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_EXIST_PROVIDER_ID;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
@@ -63,20 +62,17 @@ public class MemberService {
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
      * @param signUpRequest 회원 가입 폼에서 입력한 정보
-     *                      이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
+     * 이 때, MemberType은 프론트에서 이전에 백으로 부터 전달받은 값 (없다면 null)
      * @return 회원가입한 정보로 만든 토큰 값
      */
     @Transactional
     public JwtTokenResponse register(SignUpRequest signUpRequest) {
-        MemberType type = MemberType.handle(signUpRequest.getType());
-        validate(signUpRequest, type);
+        validate(signUpRequest);
 
         String encodedPassword = getEncodedPassword(signUpRequest);
         Member member = signUpRequest.toEntity(encodedPassword);
 
-        log.info("created member = {}", member);
         memberRepository.save(member);
-
         return jwtTokenProvider.generateToken(member);
     }
 
@@ -123,6 +119,11 @@ public class MemberService {
         return LogoutResponse.builder()
                 .memberId(memberId)
                 .build();
+    }
+
+    public MemberInfoResponse findMemberInfoFromAccessToken(String accessToken) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        return MemberInfoResponse.of(member);
     }
 
     @Transactional
@@ -176,6 +177,14 @@ public class MemberService {
         return FindPasswordResponse.builder()
                 .tempPassword(temporaryPassword)
                 .build();
+    }
+
+    @Transactional
+    public void replacePhoneNumber(String accessToken, PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
+
+        member.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional
@@ -249,25 +258,8 @@ public class MemberService {
         return jwtTokenProvider.generateToken(member);
     }
 
-    public Optional<Member> findByProviderIdAndType(Long providerId, MemberType type) {
-        return memberRepository.findByProviderIdAndType(providerId, type);
-    }
-
-    private void validate(SignUpRequest signUpRequest, MemberType type) {
-        Long providerId = signUpRequest.getProviderId();
-        if (providerId == null && !type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PROVIDER_ID);
-        }
-
-        if ((providerId != null && memberRepository.existsByProviderIdAndType(providerId, type))) {
-            throw new BadRequestException(ALREADY_EXIST_USER);
-        }
-
-        if (signUpRequest.getPassword() == null && type.equals(MemberType.DEFAULT)) {
-            throw new BadRequestException(NOT_EXIST_PASSWORD);
-        }
-
-        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), type)) {
+    private void validate(SignUpRequest signUpRequest) {
+        if (memberRepository.existsByEmailAndType(signUpRequest.getEmail(), MemberType.DEFAULT)) {
             throw new BadRequestException(ALREADY_EXIST_USER);
         }
 

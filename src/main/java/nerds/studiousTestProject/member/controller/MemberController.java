@@ -1,15 +1,16 @@
 package nerds.studiousTestProject.member.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.general.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.general.login.LoginRequest;
-import nerds.studiousTestProject.member.dto.general.logout.LogoutResponse;
-import nerds.studiousTestProject.member.dto.general.signup.SignUpRequest;
-import nerds.studiousTestProject.member.dto.general.token.JwtTokenResponse;
+import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.login.LoginRequest;
+import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
+import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
+import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -29,22 +30,22 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public JwtTokenResponse signUp(@RequestBody SignUpRequest signUpRequest) {
+    public JwtTokenResponse signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         return memberService.register(signUpRequest);
     }
 
     @PostMapping("/login")
-    public JwtTokenResponse login(@RequestBody LoginRequest loginRequest) {
+    public JwtTokenResponse login(@RequestBody @Valid LoginRequest loginRequest) {
         return memberService.issueToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
     @PostMapping("/email")
-    public FindEmailResponse findEmail(@RequestBody FindEmailRequest findEmailRequest) {
+    public FindEmailResponse findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
         return memberService.findEmailFromPhoneNumber(findEmailRequest);
     }
 
     @PostMapping("/password")
-    public FindPasswordResponse findPassword(@RequestBody FindPasswordRequest findPasswordRequest) {
+    public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
         log.info("email = {}", findPasswordRequest.getEmail());
         log.info("phoneNumber = {}", findPasswordRequest.getPhoneNumber());
         return memberService.issueTemporaryPassword(findPasswordRequest);

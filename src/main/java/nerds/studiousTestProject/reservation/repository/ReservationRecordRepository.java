@@ -2,6 +2,7 @@ package nerds.studiousTestProject.reservation.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
 
     List<ReservationRecord> findAllByRoomId(Long roomId);
     Optional<ReservationRecord> findByOrderId(String orderId);
-    List<ReservationRecord> findAllByMemberId(Long memberId);
+    Page<ReservationRecord> findAllByMemberId(Long memberId, Pageable pageable);
 
     @Query(value = "select r from ReservationRecord r " +
             "where r.room.id in (select ro.id from Room ro where ro.studycafe.id = :studycafeId) " +
@@ -30,5 +31,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     Optional<ReservationRecord> findByReviewId(Long reviewId);
 
     Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
+
+    Optional<ReservationRecord> findByPayment(Payment payment);
 
 }

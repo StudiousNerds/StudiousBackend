@@ -1,30 +1,21 @@
 package nerds.studiousTestProject.payment.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
-import nerds.studiousTestProject.payment.dto.request.request.PaymentRequest;
-import nerds.studiousTestProject.payment.dto.request.response.PaymentResponse;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
-import nerds.studiousTestProject.reservation.service.ReservationRecordService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/studious/payments")
 public class PaymentController {
 
-    private final ReservationRecordService reservationRecordService;
     private final PaymentService paymentService;
-
-    @PostMapping("/studycafes/{cafeId}/rooms/{roomId}")
-    public PaymentResponse payRequest(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-                                      @PathVariable Long roomId,
-                                      @RequestBody PaymentRequest paymentRequest) {
-        String orderId = reservationRecordService.saveReservationRecordBeforePayment(paymentRequest, roomId, accessToken);
-        return paymentService.createPaymentResponse(paymentRequest, orderId);
-    }
 
     @GetMapping("/success")
     public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
@@ -39,6 +30,20 @@ public class PaymentController {
                                               @RequestParam String message,
                                               @RequestParam String orderId) {
         return paymentService.confirmFail(message, orderId);
+    }
+
+    @GetMapping("/virtual/success")
+    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
+                                                            @RequestParam Integer amount,
+                                                            @RequestParam String paymentKey) {
+        return paymentService.virtualAccount(orderId, paymentKey, amount);
+    }
+
+
+    @PostMapping("/deposit-callback")
+    public ResponseEntity<Void> depositCallback(@RequestBody DepositCallbackRequest depositCallbackRequest) {
+        paymentService.processDepositByStatus(depositCallbackRequest);
+        return ResponseEntity.ok().build();
     }
 
 }
