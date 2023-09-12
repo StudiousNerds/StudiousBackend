@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class EventCafeResponse {
+public class RecommendCafeInfo {
     private Long studycafeId;
     private String studycafeName;
     private String photo;

@@ -80,6 +80,12 @@ public class Review {
         }
     }
 
+    public void addPhoto(String photo) {
+        if(photo != null) {
+            this.photo = photo;
+        }
+    }
+
     public void deleteComment() {
         this.comment = null;
     }
