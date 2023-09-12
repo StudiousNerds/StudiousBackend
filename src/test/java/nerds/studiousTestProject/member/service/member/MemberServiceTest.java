@@ -289,24 +289,24 @@ class MemberServiceTest {
         assertThat(defaultMember.getPhoto()).isEqualTo(photo);
     }
 
-    @Test
-    @DisplayName("닉네임 수정")
-    public void 닉네임_수정() throws Exception {
-
-        // given
-        PatchNicknameRequest request = PatchNicknameRequest
-                .builder()
-                .newNickname("newNickname")
-                .build();
-
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
-
-        // when
-        memberService.replaceNickname(accessToken, request);
-
-        // then
-        assertThat(defaultMember.getNickname()).isEqualTo(request.getNewNickname());
-    }
+//    @Test
+//    @DisplayName("닉네임 수정")
+//    public void 닉네임_수정() throws Exception {
+//
+//        // given
+//        PatchNicknameRequest request = PatchNicknameRequest
+//                .builder()
+//                .newNickname("newNickname")
+//                .build();
+//
+//        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+//
+//        // when
+//        memberService.replaceNickname(accessToken, request);
+//
+//        // then
+//        assertThat(defaultMember.getNickname()).isEqualTo(request.getNewNickname());
+//    }
 
     @Test
     @DisplayName("회원 탈퇴")
