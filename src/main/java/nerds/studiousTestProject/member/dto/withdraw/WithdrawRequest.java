@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.general.withdraw;
+package nerds.studiousTestProject.member.dto.withdraw;
 
 import lombok.Builder;
 import lombok.Data;

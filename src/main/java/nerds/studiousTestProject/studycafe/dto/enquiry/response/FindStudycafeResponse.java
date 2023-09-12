@@ -10,11 +10,11 @@ import java.util.List;
 @Builder
 @Data
 public class FindStudycafeResponse {
-    private Long cafeId;
+    private Long studycafeId;
     private String cafeName;
     private List<String> photos;
     private Integer accumResCnt;
-    private Integer duration;
+    private Integer walkingTime;
     private String nearestStation;
     private List<String> hashtags;
     private String introduction;
