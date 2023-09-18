@@ -169,4 +169,15 @@ public class GlobalExceptionAdvice {
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), NOT_PARSING_BODY.name(), NOT_PARSING_BODY.getMessage());
         return ResponseEntity.status(BAD_REQUEST).body(ExceptionResponse.from(NOT_PARSING_BODY));
     }
+
+    /**
+     * 잘못된 URL 요청시 호출되는 예외를 핸들링
+     * @param e NoHandlerFoundException
+     * @return 예외 메시지, 상태 코드를 담은 응답
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), NOT_FOUND_PAGE.name(), NOT_FOUND_PAGE.getMessage());
+        return ResponseEntity.status(NOT_FOUND).body(ExceptionResponse.from(NOT_FOUND_PAGE));
+    }
 }
