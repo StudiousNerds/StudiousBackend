@@ -3,12 +3,11 @@ package nerds.studiousTestProject.common.config;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.CustomAccessDeniedHandler;
 import nerds.studiousTestProject.common.exception.CustomAuthenticationEntryPoint;
-import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
 import nerds.studiousTestProject.common.filter.JwtAuthenticationFilter;
+import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,21 +41,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight request에 대해, 인증을 하지 않고 모든 요청을 허용
-                .requestMatchers("studious/oauth/**", "/studious/members/signup", "/studious/members/login").permitAll()    // 일반, 소셜 회원가입 및 로그인
-                .requestMatchers("/studious/studycafes/{cafeId}", "/studious/main").permitAll()
-                .requestMatchers("/studious/members/logout", "/studious/members/reissue").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")  // 로그아웃, 토큰 재발급
-                .requestMatchers("/studious/mypage/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN") // 닉네임, 비밀번호 수정 및 회원 탈퇴
-                .requestMatchers("/studious/search/**").permitAll()
-                .requestMatchers("/studious/valid/**").permitAll()   // 임시 허용
-                .requestMatchers("/studious/studycafes/{studycafeId}/notice", "/studious/studycafes/{studycafeId}/refundPolicy", "/studious/studycafes/{studycafeId}/reviews").permitAll()
-                .requestMatchers("/studious/studycafes/{studycafeId}", "studious/studycafes/{studycafeId}/rooms/{roomId}/reviews").permitAll()
-                .requestMatchers("/studious/studycafes/registrations").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
-                .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
-                .requestMatchers("/studious/members/test").hasRole("USER")      // 테스트 용
-                .requestMatchers("/payment/**").permitAll()//결제 테스트
-                .requestMatchers("/studious/payments/**").permitAll()//결제 테스트
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .cors()
                 .and()
