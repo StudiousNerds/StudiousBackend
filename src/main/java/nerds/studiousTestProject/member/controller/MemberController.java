@@ -3,6 +3,7 @@ package nerds.studiousTestProject.member.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.RoleType;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
@@ -60,8 +61,8 @@ public class MemberController {
     }
 
     @PostMapping("/reissue")
-    public JwtTokenResponse reissue(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @CookieValue("refresh_token") String refreshToken) {
-        return memberService.reissueToken(accessToken, refreshToken);
+    public JwtTokenResponse reissue(@LoggedInMember Long memberId, @CookieValue("refresh_token") String refreshToken) {
+        return memberService.reissueToken(memberId, refreshToken);
     }
 
     /**

@@ -3,26 +3,26 @@ package nerds.studiousTestProject.review.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.util.LoggedInMember;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.common.util.RoleType;
-import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
-import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
+import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
+import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
+import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewSortType;
 import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
 import nerds.studiousTestProject.review.dto.manage.modify.request.ModifyCommentRequest;
 import nerds.studiousTestProject.review.dto.manage.register.request.RegisterCommentRequest;
 import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
-import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
-import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
-import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
+import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.written.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.service.AdminReviewService;
 import nerds.studiousTestProject.review.service.ReviewService;
-import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -51,6 +50,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final AdminReviewService adminReviewService;
 
+    private static final int REVIEW_INQUIRE_SIZE = 5;
     private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
     @PostMapping("/mypage/reviews")
@@ -71,16 +71,17 @@ public class ReviewController {
     }
 
     @GetMapping("/mypage/reviews/available")
-    public AvailableReviewResponse InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
-        return reviewService.findAvailableReviews(accessToken, PageRequestConverter.of(page, 5));
+    public AvailableReviewResponse InquireAvailableReview(@LoggedInMember Long memberId, @RequestParam Integer page) {
+        return reviewService.findAvailableReviews(memberId, PageRequestConverter.of(page, REVIEW_INQUIRE_SIZE));
     }
 
     @GetMapping("/mypage/reviews")
-    public WrittenReviewResponse InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-                                                      @RequestParam("startDate") LocalDate startDate,
-                                                      @RequestParam("endDate") LocalDate endDate,
-                                                      @RequestParam Integer page) {
-        return reviewService.findWrittenReviews(accessToken, startDate, endDate, PageRequestConverter.of(page, 5));
+    public WrittenReviewResponse InquireWrittenReview(
+            @LoggedInMember Long memberId,
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate,
+            @RequestParam Integer page) {
+        return reviewService.findWrittenReviews(memberId, startDate, endDate, PageRequestConverter.of(page, REVIEW_INQUIRE_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews")
@@ -96,13 +97,13 @@ public class ReviewController {
     @GetMapping("/studycafes/{studycafeId}/reviews/managements")
     @Secured(value = MemberRole.ROLES.ADMIN)
     public List<ReviewInfoResponse> inquireStudycafeReviews(
+            @LoggedInMember Long memberId,
             @PathVariable("studycafeId") Long studycafeId,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
             @RequestParam Integer page,
             @RequestParam(required = false, defaultValue = AdminReviewSortType.Names.CREATED_DATE_DESC) AdminReviewSortType sortType,
             @RequestParam(required = false) AdminReviewType reviewType
             ) {
-        return adminReviewService.getWrittenReviews(studycafeId, accessToken, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
+        return adminReviewService.getWrittenReviews(studycafeId, memberId, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
     }
 
     @PostMapping("/reviews/managements/{reviewId}")
