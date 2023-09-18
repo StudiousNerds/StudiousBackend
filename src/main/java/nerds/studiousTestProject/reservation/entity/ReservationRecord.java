@@ -71,14 +71,11 @@ public class ReservationRecord {
     private Room room;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = true)
+    @JoinColumn(name = "review_id")
     private Review review;
 
-    public void completePay(Payment payment) {
+    public void completePay() {
         this.status = ReservationStatus.CONFIRMED;
-        if(payment != null){
-            this.payment = payment;
-        }
     }
 
     public void completeDeposit(){
