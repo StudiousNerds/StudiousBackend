@@ -9,10 +9,10 @@ import nerds.studiousTestProject.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@Slf4j
 @RestController
 @RequestMapping("/studious/payments")
+@RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
