@@ -28,13 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class MyPageMemberController {
     private final MemberService memberService;
 
-    @GetMapping("/members")
+    @GetMapping
     @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
     public MemberInfoResponse inquireMember(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         return memberService.findMemberInfoFromAccessToken(accessToken);
     }
 
-    @PostMapping("/members/photo")
+    @PostMapping("/photo")
     @Secured(value = {MemberRole.ROLES.USER, MemberRole.ROLES.ADMIN, MemberRole.ROLES.SUPER_ADMIN})
     public void addProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam MultipartFile file) {
         log.info("file = {}", file);
