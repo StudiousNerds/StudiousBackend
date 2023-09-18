@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
+import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
+import nerds.studiousTestProject.payment.entity.PaymentStatus;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -15,12 +18,14 @@ import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAYMENT_SECRET;
+import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_ORDER_ID;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PAYMENT_METHOD;
+import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PRICE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_CONVENIENCE_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.payment.entity.PaymentMethod.가상계좌;
@@ -38,6 +43,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentGenerator paymentGenerator;
     private final ReservationRecordRepository reservationRecordRepository;
+    private final ConvenienceRecordRepository convenienceRecordRepository;
 
     private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
@@ -47,20 +53,19 @@ public class PaymentService {
     public void confirmPayToToss(String orderId, String paymentKey, Integer amount) {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId,amount,paymentKey), CONFIRM_URI);
         Payment payment = findByOrderId(orderId);
+        validPayment(responseFromToss, payment);
         payment.complete(responseFromToss.toPayment());
-        log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
-        ReservationRecord reservationRecord = findReservationRecordByOrderId(orderId);
-        reservationRecord.completePay();//결제 완료로 상태 변경
+        payment.getReservationRecord().completePay();
     }
 
     @Transactional
     public VirtualAccountInfoResponse virtualAccount(String orderId, String paymentKey, Integer amount) {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId, amount, paymentKey), CONFIRM_URI);
-        Payment payment = paymentRepository.save(responseFromToss.toVitualAccountPayment());
+        Payment payment = findByOrderId(orderId);
+        validPaymentMethod(responseFromToss);
+        validPayment(responseFromToss, payment);
+        payment.complete(responseFromToss.toVitualAccountPayment());
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
-        if (!payment.getMethod().equals(가상계좌.name())) {
-            throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
-        }
         return VirtualAccountInfoResponse.from(payment);
     }
 
@@ -86,9 +91,6 @@ public class PaymentService {
         }
     }
 
-    /*
-     실패시 저장되었던 예약내역 삭제, 실패 정보 반환
-     */
     @Transactional
     public ConfirmFailResponse confirmFail(String message, String orderId){
         Payment payment = findByOrderId(orderId);
@@ -131,7 +133,7 @@ public class PaymentService {
     public void processDepositByStatus(DepositCallbackRequest depositCallbackRequest) {
         Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
         String status = depositCallbackRequest.getStatus();
-        ReservationRecord reservationRecord = findReservationRecordByPayment(payment);
+        ReservationRecord reservationRecord = payment.getReservationRecord();
         if(isDepositError(payment, status)){ // 입금 오류
             //입금 오류에 관한 알림 전송
             reservationRecord.depositError();
