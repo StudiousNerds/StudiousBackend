@@ -1,15 +1,11 @@
 package nerds.studiousTestProject.studycafe.dto.search.request;
 
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.studycafe.validator.search.SearchDateTimeCheck;
-import nerds.studiousTestProject.studycafe.validator.search.SearchTimeCheck;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -19,8 +15,6 @@ import java.util.List;
 
 @Builder
 @Data
-@SearchDateTimeCheck
-@SearchTimeCheck
 public class SearchRequest {
     private String keyword;
 
@@ -28,8 +22,10 @@ public class SearchRequest {
     @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.")
     private LocalDate date;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalTime startTime;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalTime endTime;
 
     @Positive(message = "인원 수는 최소 1명 이상이여야 합니다.")
