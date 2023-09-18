@@ -133,10 +133,6 @@ public class PaymentService {
         }
     }
 
-    private ReservationRecord findReservationRecordByPayment(Payment payment) {
-        return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
     private Payment findByOrderId(String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
