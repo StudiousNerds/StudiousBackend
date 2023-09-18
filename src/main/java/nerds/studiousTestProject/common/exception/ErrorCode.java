@@ -56,7 +56,9 @@ public enum ErrorCode {
     INVALID_PAGE_NUMBER("잘못된 페이지 번호입니다."),
     OVER_MAX_HEADCOUNT("예약 인원은 룸의 최대 인원을 넘을 수 없습니다."),
     MISCALCULATED_PRICE("잘못 계산된 최종 금액입니다."),
-    NOT_FOUND_CONVENIENCE_RECORD("편의시설 기록을 찾을 수 없습니다.");
+    NOT_FOUND_CONVENIENCE_RECORD("편의시설 기록을 찾을 수 없습니다."),
+    MISMATCH_ORDER_ID("주문 번호가 일치하지 않는 결제입니다."),
+    MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다.");
 
     private final String message;
     ErrorCode(String message) {
