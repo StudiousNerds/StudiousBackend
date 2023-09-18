@@ -64,8 +64,26 @@ public class PaymentService {
         return VirtualAccountInfoResponse.from(payment);
     }
 
-    private ReservationRecord findReservationRecordByOrderId(String orderId) {
-        return reservationRecordRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    private void validPayment(PaymentResponseFromToss responseFromToss, Payment payment) {
+        validOrderId(responseFromToss.getOrderId(), payment);
+        validPrice(responseFromToss.getTotalAmount(), payment);
+    }
+
+    private void validOrderId(String orderId, Payment payment) {
+        if (!payment.getOrderId().equals(orderId)) {
+            throw new BadRequestException(MISMATCH_ORDER_ID);
+        }
+    }
+
+    private void validPrice(Integer price, Payment payment) {
+        if (payment.getPrice() != price) {
+            throw new BadRequestException(MISMATCH_PRICE);
+        }
+    }
+    private void validPaymentMethod(PaymentResponseFromToss responseFromToss) {
+        if (!responseFromToss.getMethod().equals(가상계좌.name())) {
+            throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
+        }
     }
 
     /*
