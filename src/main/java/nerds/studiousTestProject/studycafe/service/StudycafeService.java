@@ -237,7 +237,6 @@ public class StudycafeService {
     }
 
     @Transactional
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public RegisterResponse register(String accessToken, RegisterRequest registerRequest) {
         // 현재 로그인된 유저 정보를 가져온다.
         Member member = tokenService.getMemberFromAccessToken(accessToken);
@@ -344,7 +343,6 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
@@ -382,7 +380,6 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @param cafeInfoEditRequest 수정된 데이터
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
     public void edit(String accessToken, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
@@ -430,7 +427,6 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public List<AnnouncementResponse> inquireAnnouncements(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
@@ -444,7 +440,6 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @param announcementRequest 공지사항 요청 값
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
     public void insertAnnouncements(String accessToken, Long studycafeId, AnnouncementRequest announcementRequest) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
@@ -458,7 +453,6 @@ public class StudycafeService {
      * @param accessToken 사용자 엑세스 토큰
      * @param studycafeId 스터디카페 PK
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
     public void delete(String accessToken, Long studycafeId) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
