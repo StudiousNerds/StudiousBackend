@@ -108,6 +108,10 @@ public class ReservationRecordService {
         validUsingTimePerHour(reservationInfo);
         validMinUsingTime(reservationInfo, room);
         validOverMaxHeadCount(reservationInfo, room);
+        validCalculatePrice(reserveRequest, room, reservationInfo);
+    }
+
+    private void validCalculatePrice(ReserveRequest reserveRequest, Room room, ReservationInfo reservationInfo) {
         int conveniencePrice = reserveRequest.getPaidConveniences().stream().mapToInt(PaidConvenience::getPrice).sum();
         if (room.getPriceType() == PriceType.PER_HOUR) {
             if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getUsingTime() + conveniencePrice){
