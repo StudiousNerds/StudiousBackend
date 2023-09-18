@@ -4,25 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
+import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
+import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
+import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
-import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
-import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
+import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -44,13 +45,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAGE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVE_DATE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISCALCULATED_USING_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.ErrorCode.USING_TIME_NOT_PER_HOUR;
 
@@ -59,11 +61,10 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.USING_TIME_NO
 @Slf4j
 @Transactional(readOnly = true)
 public class ReservationRecordService {
-
+    private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
     private final StudycafeRepository studycafeRepository;
-    private final TokenService tokenService;
     private final RefundPolicyRepository refundPolicyRepository;
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
 
@@ -72,10 +73,12 @@ public class ReservationRecordService {
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
 
     @Transactional
-    public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, String accessToken) {
+    public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, Long memberId) {
         Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest.getReservationInfo(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
-        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, member));
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
         return PaymentInfoResponse.of(reserveRequest, reservationRecord);
     }
@@ -162,8 +165,9 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public ReserveResponse show(Long cafeId, Long roomId, String accessToken) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public ReserveResponse show(Long cafeId, Long roomId, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
         List<Convenience> conveniences = convenienceRepository.findAllByRoom(room);
@@ -230,9 +234,11 @@ public class ReservationRecordService {
         return remainDate > 8 ? 8 : remainDate;
     }
 
-    public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, String accessToken){
+    public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, Long memberId){
         page = validPageAndAssign(page);
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, tokenService.getMemberFromAccessToken(accessToken), PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
         List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
         return MypageReservationResponse.of(reservationRecordInfoWithStatusList, reservationRecordPage);
     }

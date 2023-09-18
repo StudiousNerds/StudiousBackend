@@ -56,7 +56,6 @@ public class MemberService {
     private final LogoutAccessTokenService logoutAccessTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
     private final StorageService storageService;
 
     /**
@@ -121,14 +120,16 @@ public class MemberService {
                 .build();
     }
 
-    public MemberInfoResponse findMemberInfoFromAccessToken(String accessToken) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public MemberInfoResponse findMemberInfoFromMemberId(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         return MemberInfoResponse.of(member);
     }
 
     @Transactional
-    public void addPhoto(String accessToken, MultipartFile file) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public void addPhoto(Long memberId, MultipartFile file) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         String photoUrl = storageService.uploadFile(file);
         member.updatePhoto(photoUrl);
     }
@@ -180,19 +181,21 @@ public class MemberService {
     }
 
     @Transactional
-    public void replacePhoneNumber(String accessToken, PatchPhoneNumberRequest patchPhoneNumberRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public void replacePhoneNumber(Long memberId, PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
 
         member.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional
-    public void replacePassword(String accessToken, PatchPasswordRequest patchPasswordRequest) {
+    public void replacePassword(Long memberId, PatchPasswordRequest patchPasswordRequest) {
         String oldPassword = patchPasswordRequest.getOldPassword();
         String newPassword = patchPasswordRequest.getNewPassword();
 
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
@@ -203,8 +206,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void replaceNickname(String accessToken, PatchNicknameRequest patchNicknameRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public void replaceNickname(Long memberId, PatchNicknameRequest patchNicknameRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         String newNickname = patchNicknameRequest.getNewNickname();
 
         if (memberRepository.existsByPhoneNumber(newNickname)) {
@@ -215,29 +219,30 @@ public class MemberService {
     }
 
     @Transactional
-    public void deactivate(String accessToken, WithdrawRequest withdrawRequest) {
+    public void deactivate(Long memberId, WithdrawRequest withdrawRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         String password = withdrawRequest.getPassword();
 
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
 
         member.withdraw();
-        expireToken(accessToken);
     }
 
     /**
      * 사용자가 만료된 accessToken 과 만료되지 않은 refreshToken을 넘길 때 새로운 accessToken을 만들어 주는 메소드
      * RefreshToken의 유효기간을 확인 후, 토큰을 재발급해주는 메소드
      *
-     * @param accessToken
+     * @param memberId 사용자 pk
      * @param refreshToken 사용자로부터 넘겨 받은 refreshToken
      * @return 새로운 accessToken 이 담긴 JwtTokenResponse 객체
      */
     @Transactional
-    public JwtTokenResponse reissueToken(String accessToken, String refreshToken) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public JwtTokenResponse reissueToken(Long memberId, String refreshToken) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         RefreshToken redisRefreshToken = refreshTokenService.findByMemberId(member.getId());
         if (redisRefreshToken == null) {
             throw new NotFoundException(EXPIRED_TOKEN_VALID_TIME);

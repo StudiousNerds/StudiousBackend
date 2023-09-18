@@ -2,11 +2,11 @@ package nerds.studiousTestProject.review.service;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
-import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
 import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
 import nerds.studiousTestProject.review.dto.manage.modify.request.ModifyCommentRequest;
 import nerds.studiousTestProject.review.dto.manage.register.request.RegisterCommentRequest;
 import nerds.studiousTestProject.review.entity.Review;
@@ -20,17 +20,20 @@ import java.util.List;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service
 public class AdminReviewService {
+    private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final StudycafeRepository studycafeRepository;
     private final SubPhotoRepository subPhotoRepository;
-    private final TokenService tokenService;
 
-    public List<ReviewInfoResponse> getWrittenReviews(Long studycafeId, String accessToken, AdminReviewType reviewType, Pageable pageable) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public List<ReviewInfoResponse> getWrittenReviews(Long studycafeId, Long memberId, AdminReviewType reviewType, Pageable pageable) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+
         if (!matchStudycafeAndMember(studycafeId, member)) {
             throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
         }

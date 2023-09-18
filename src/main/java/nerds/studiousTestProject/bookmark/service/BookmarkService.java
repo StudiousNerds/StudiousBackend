@@ -6,9 +6,10 @@ import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -23,28 +24,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
-    private final StudycafeService studycafeService;
     private final HashtagRecordService hashtagRecordService;
+    private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
-    private final TokenService tokenService;
+    private final StudycafeService studycafeService;
 
     @Transactional
-    public void registerBookmark(String accessToken, Long studycafeId){
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public void registerBookmark(Long memberId, Long studycafeId){
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
     }
 
-    public FindBookmarkResponse findBookmark(String accessToken, Pageable pageable){
+    public FindBookmarkResponse findBookmark(Long memberId, Pageable pageable){
         pageable = getPageable(pageable);
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
@@ -71,8 +76,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(String accessToken, Long studycafeId){
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public void deleteBookmark(Long memberId, Long studycafeId){
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
         member.deleteBookmark(Bookmark.builder().studycafe(studyCafe).build());
