@@ -55,7 +55,8 @@ public enum ErrorCode {
     MISMATCH_MEMBER_AND_STUDYCAFE("회원 정보와 일치하는 스터디카페를 찾을 수 없습니다"),
     INVALID_PAGE_NUMBER("잘못된 페이지 번호입니다."),
     OVER_MAX_HEADCOUNT("예약 인원은 룸의 최대 인원을 넘을 수 없습니다."),
-    MISCALCULATED_PRICE("잘못 계산된 최종 금액입니다.");
+    MISCALCULATED_PRICE("잘못 계산된 최종 금액입니다."),
+    NOT_FOUND_CONVENIENCE_RECORD("편의시설 기록을 찾을 수 없습니다.");
 
     private final String message;
     ErrorCode(String message) {
