@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum ParamErrorCode {
-    NOT_EXIST_PAGE("page", "페이지가 없습니다."),
     NOT_EXIST_CAFE_ID("cafeId", "카페 id가 없습니다."),
+    INVALID_DATE("date", "날짜가 잘못되었습니다."),
     // 공지사항 조회에서 사용되는 값들
     INVALID_START_DATE("startDate", "시작 날짜가 잘못되었습니다."),
     INVALID_END_DATE("endDate", "마감 날짜가 잘못되었습니다.");
