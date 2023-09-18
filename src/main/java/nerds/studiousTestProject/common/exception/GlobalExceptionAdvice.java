@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.common.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_REQUEST_BODY_TYPE;
+import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAGE;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_PARSING_BODY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
@@ -51,27 +54,27 @@ public class GlobalExceptionAdvice {
                 .body(ExceptionResponse.from(message, code));
     }
 
-    /*
     /**
-     * 엔티티 제약 조건을 위반한 경우 발생하는 예외 핸들링
+     * @RequestParam의 @NotNull, @Size 등 기본 어노테이션 검증에 실패한 경우 발생하는 예외 핸들링
      * ConstraintViolationException 예외인 경우 예외 메시지를 직접 파싱하여 파라미터 이름을 찾아야 함... => 이 방법은 추후 리펙토링 예정
      * @param e ConstraintViolationException
      * @return 예외 메시지, 상태 코드를 담은 응답
-
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException e) {
         String param = e.getMessage().split(" ")[0].split("\\.")[1].replace(":", "");
+        String message = e.getMessage().split(":")[1].trim();
+
+        log.info(e.getMessage());
 
         ParamErrorCode paramErrorCode = ParamErrorCode.of(param);
         String code = paramErrorCode.name();
-        String message = paramErrorCode.getMessage();
 
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.from(message, code));
     }
-    */
 
     /**
      * @RequestHeader 값이 누락된 경우 발생하는 예외 핸들링
@@ -107,7 +110,7 @@ public class GlobalExceptionAdvice {
      * @return 예외 메시지, 상태 코드를 담은 응답
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> MethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 //        StringBuilder stringBuilder = new StringBuilder();
 //        stringBuilder.append(e.getClass().getSimpleName()).append(INVALID_REQUEST_BODY_TYPE.getMessage()).append(e.getMessage());
 //        log.info(stringBuilder.toString());
