@@ -205,6 +205,10 @@ public class ReviewService {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
+        if (reviewList.isEmpty()) {
+            return 0;
+        }
+
         for (Review review : reviewList){
             sum += review.getGrade().getCleanliness();
             count++;
@@ -216,6 +220,10 @@ public class ReviewService {
     public Integer getAvgDeafening(Long studycafeId) {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
+
+        if (reviewList.isEmpty()) {
+            return 0;
+        }
 
         for (Review review : reviewList){
             sum += review.getGrade().getDeafening();
@@ -229,6 +237,10 @@ public class ReviewService {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
+        if (reviewList.isEmpty()) {
+            return 0;
+        }
+
         for (Review review : reviewList){
             sum += review.getGrade().getFixturesStatus();
             count++;
@@ -240,6 +252,10 @@ public class ReviewService {
     public Integer getAvgRecommendation(Long studycafeId) {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer recommend = 0, count = 0;
+
+        if (reviewList.isEmpty()) {
+            return 0;
+        }
 
         for (Review review : reviewList){
             if(review.getIsRecommended()){
@@ -258,6 +274,10 @@ public class ReviewService {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0;
         Double sum = 0.0;
+
+        if (reviewList.isEmpty()) {
+            return 0.0;
+        }
 
         for (Review review : reviewList){
             sum += review.getGrade().getTotal();
