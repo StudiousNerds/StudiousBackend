@@ -120,7 +120,7 @@ public class PaymentService {
         if (status.equals(CANCELED.name())) { // 입금 전 취소 & 결제 취소
             reservationRecord.canceled();
         }
-        payment.updateStatus(status);
+        payment.updateStatus(PaymentStatus.valueOf(status));
     }
 
     private boolean isDepositError(Payment payment, String status) {
