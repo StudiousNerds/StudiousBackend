@@ -18,7 +18,6 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -114,5 +113,73 @@ public class Payment {
         if (completeTime != null) {
             this.completeTime = LocalDateTime.parse(completeTime, DateTimeFormatter.ofPattern(DATE_FORMAT));
         }
+    }
+
+    private void updatePaymentKey(String paymentKey) {
+        if (paymentKey != null) {
+            this.paymentKey = paymentKey;
+        }
+    }
+
+    private void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    private void updateMethod(String method) {
+        if (method != null) {
+            this.method = method;
+        }
+    }
+
+    private void updateOrderId(String orderId) {
+        if (orderId != null) {
+            this.orderId = orderId;
+        }
+    }
+
+    private void updateCompleteTime(LocalDateTime completeTime) {
+        if (completeTime != null) {
+            this.completeTime = completeTime;
+        }
+    }
+
+    private void updateDueDate(LocalDateTime dueDate) {
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        }
+    }
+
+    private void updateBankCode(String bankCode) {
+        if (bankCode != null) {
+            this.bankCode = bankCode;
+        }
+    }
+
+    private void updateVirtualAccount(String virtualAccount) {
+        if (virtualAccount != null) {
+            this.virtualAccount = virtualAccount;
+        }
+    }
+
+    private void updateSecret(String secret) {
+        if (secret != null) {
+            this.secret = secret;
+        }
+    }
+
+
+    public void complete(Payment payment) {
+        updateStatus(payment.getStatus());
+        updatePaymentKey(payment.getPaymentKey());
+        updatePrice(payment.getPrice());
+        updateOrderId(payment.getOrderId());
+        updateCompleteTime(payment.getCompleteTime());
+        updateMethod(payment.getMethod());
+        updateDueDate(payment.getDueDate());
+        updateBankCode(payment.getBankCode());
+        updateSecret(payment.getSecret());
+        updateVirtualAccount(payment.getVirtualAccount());
     }
 }
