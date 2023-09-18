@@ -102,9 +102,9 @@ public class Payment {
         this.status = CANCELED;
     }
 
-    public void updateStatus(String paymentStatus) {
+    public void updateStatus(PaymentStatus paymentStatus) {
         if (paymentStatus != null) {
-            this.status = PaymentStatus.valueOf(paymentStatus);
+            this.status = paymentStatus;
         }
     }
 
