@@ -3,6 +3,7 @@ package nerds.studiousTestProject.review.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.util.RoleType;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
@@ -43,6 +44,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/studious")
+@Secured(value = {RoleType.USER, RoleType.ADMIN, RoleType.SUPER_ADMIN})
 @Slf4j
 @Validated
 public class ReviewController {

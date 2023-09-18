@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Secured(value = {RoleType.USER, RoleType.ADMIN, RoleType.SUPER_ADMIN})
 @Slf4j
 @RestController
 @RequiredArgsConstructor

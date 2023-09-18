@@ -3,7 +3,7 @@ package nerds.studiousTestProject.room.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.member.entity.member.MemberRole;
+import nerds.studiousTestProject.common.util.RoleType;
 import nerds.studiousTestProject.room.dto.find.response.FindAllRoomResponse;
 import nerds.studiousTestProject.room.dto.modify.request.ModifyRoomRequest;
 import nerds.studiousTestProject.room.dto.modify.response.ModifyRoomResponse;
@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/studious")
-@Secured(value = MemberRole.ROLES.ADMIN)
+@Secured(value = RoleType.ADMIN)
 @Slf4j
 public class RoomController {
 
