@@ -91,11 +91,17 @@ public class PaymentService {
      */
     @Transactional
     public ConfirmFailResponse confirmFail(String message, String orderId){
-        reservationRecordRepository.delete(findReservationRecordByOrderId(orderId));
-        return ConfirmFailResponse.builder()
-                .message(message)
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build();
+        Payment payment = findByOrderId(orderId);
+        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ConvenienceRecord convenienceRecord = findConvenienceRecordByReservationRecord(reservationRecord);
+        convenienceRecordRepository.delete(convenienceRecord);
+        reservationRecordRepository.delete(reservationRecord);
+        paymentRepository.delete(payment);
+        return ConfirmFailResponse.of(message);
+    }
+
+    private ConvenienceRecord findConvenienceRecordByReservationRecord(ReservationRecord reservationRecord) {
+        return convenienceRecordRepository.findByReservationRecord(reservationRecord).orElseThrow(()-> new NotFoundException(NOT_FOUND_CONVENIENCE_RECORD));
     }
 
     @Transactional
