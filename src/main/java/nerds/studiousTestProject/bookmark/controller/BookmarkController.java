@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.common.util.LoggedInMember;
-import nerds.studiousTestProject.common.util.RoleType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

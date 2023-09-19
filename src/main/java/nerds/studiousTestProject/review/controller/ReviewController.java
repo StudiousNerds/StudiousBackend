@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
-import nerds.studiousTestProject.common.util.RoleType;
-import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
@@ -23,7 +21,6 @@ import nerds.studiousTestProject.review.dto.written.response.WrittenReviewRespon
 import nerds.studiousTestProject.review.service.AdminReviewService;
 import nerds.studiousTestProject.review.service.ReviewService;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
