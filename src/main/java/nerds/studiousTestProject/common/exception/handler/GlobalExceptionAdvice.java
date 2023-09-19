@@ -73,8 +73,6 @@ public class GlobalExceptionAdvice {
         String param = e.getMessage().split(" ")[0].split("\\.")[1].replace(":", "");
         String message = e.getMessage().split(":")[1].trim();
 
-        log.info(e.getMessage());
-
         ParamErrorCode paramErrorCode = ParamErrorCode.of(param);
         String code = paramErrorCode.name();
 
@@ -113,20 +111,13 @@ public class GlobalExceptionAdvice {
     }
 
     /**
-     * &#064;ModelAttribute 에서 객체 바인딩 또는 @ModelAttribute, @RequestBody 에서 @Valid 검증 실패 시 호출되는 예외 핸들링 메소드
+     * &#064;ModelAttribute 에서 객체 바인딩(Formatter) 또는 @ModelAttribute, @RequestBody 에서 @Valid 검증 실패 시 호출되는 예외 핸들링 메소드
      * @param e MethodArgumentNotValidException
      * @return 예외 메시지, 상태 코드를 담은 응답
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append(e.getClass().getSimpleName()).append(INVALID_REQUEST_BODY_TYPE.getMessage()).append(e.getMessage());
-//        log.info(stringBuilder.toString());
-//        stringBuilder.setLength(0); //stringBuilder 초기화
-
         String message = String.join(", ", e.getBindingResult().getAllErrors().stream().map(ObjectError::getDefaultMessage).toArray(String[]::new));
-
-//        e.getBindingResult().getAllErrors().forEach((objectError -> stringBuilder.append(objectError.getDefaultMessage()).append(System.lineSeparator())));
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), INVALID_REQUEST_BODY_TYPE.name(), message);
 
         return ResponseEntity.badRequest()
@@ -169,6 +160,8 @@ public class GlobalExceptionAdvice {
 
     /**
      * &#064;RequestBody 에서 (타입 오류 등의 이유로 Json Parser가) 바인딩 실패 시 호출되는 예외를 핸들링
+     * &#064;RequestBody는 객체 단위로 바인딩을 하므로 어떤 필드가 바인딩에 실패했는지 알 수 없다 (@ModelAttribute 와의 차이점)
+     * 따라서, 바인딩에 실패했다는 메시지만 출력함...
      * @param e HttpMessageNotReadableException
      * @return 예외 메시지, 상태 코드를 담은 응답
      */
