@@ -1,7 +1,15 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.handler;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.common.exception.NotAuthorizedException;
+import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.HeaderErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.MethodErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ParamErrorCode;
+import nerds.studiousTestProject.common.exception.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,9 +24,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_REQUEST_BODY_TYPE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAGE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_PARSING_BODY;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_REQUEST_BODY_TYPE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_PARSING_BODY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
