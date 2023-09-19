@@ -117,7 +117,7 @@ public class PaymentService {
     }
 
     private void validPaymentMethod(CancelRequest cancelRequest, Payment payment) {
-        if (payment.getMethod().equals(가상계좌)) {
+        if (payment.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
         }
     }
