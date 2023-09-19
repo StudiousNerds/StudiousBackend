@@ -16,8 +16,11 @@ import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailRespons
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
+import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.room.entity.Room;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,12 +53,20 @@ public class PaymentService {
 
 
     @Transactional
-    public void confirmPayToToss(String orderId, String paymentKey, Integer amount) {
+    public ReservationDetailResponse confirmSuccess(String orderId, String paymentKey, Integer amount) {
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId,amount,paymentKey), CONFIRM_URI);
         Payment payment = findByOrderId(orderId);
         validPayment(responseFromToss, payment);
         payment.complete(responseFromToss.toPayment());
-        payment.getReservationRecord().completePay();
+        ReservationRecord reservationRecord = payment.getReservationRecord();
+        reservationRecord.completePay();
+        return createReservationDetailResponse(payment, reservationRecord);
+    }
+
+    private ReservationDetailResponse createReservationDetailResponse(Payment payment, ReservationRecord reservationRecord) {
+        Room room = reservationRecord.getRoom();
+        Studycafe studycafe = room.getStudycafe();
+        return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
     }
 
     @Transactional
