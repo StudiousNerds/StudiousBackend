@@ -20,8 +20,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/success")
-    public ReservationDetailResponse payConfirmSuccess(@ModelAttribute ConfirmSuccessRequest confirmSuccessRequest) {
-        return paymentService.confirmSuccess(confirmSuccessRequest);
+    public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
+                                                       @RequestParam String paymentKey,
+                                                       @RequestParam Integer amount) {
+        return paymentService.confirmSuccess(orderId, paymentKey, amount);
     }
 
     @GetMapping("/fail")
@@ -32,8 +34,10 @@ public class PaymentController {
     }
 
     @GetMapping("/virtual/success")
-    public VirtualAccountInfoResponse confirmVirtualAccount(@ModelAttribute ConfirmSuccessRequest confirmSuccessRequest) {
-        return paymentService.virtualAccount(confirmSuccessRequest);
+    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
+                                                            @RequestParam String paymentKey,
+                                                            @RequestParam Integer amount) {
+        return paymentService.virtualAccount(orderId, paymentKey, amount);
     }
 
 

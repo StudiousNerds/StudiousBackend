@@ -53,19 +53,19 @@ public class PaymentService {
 
 
     @Transactional
-    public ReservationDetailResponse confirmSuccess(ConfirmSuccessRequest confirmSuccessRequest) {
-        Payment payment = findByOrderId(confirmSuccessRequest.getOrderId());
-        validConfirmRequest(confirmSuccessRequest, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(confirmSuccessRequest, CONFIRM_URI);
+    public ReservationDetailResponse confirmSuccess(String orderId, String paymentKey, Integer amount) {
+        Payment payment = findByOrderId(orderId);
+        validConfirmRequest(orderId, amount, payment);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = payment.getReservationRecord();
         reservationRecord.completePay();
         return createReservationDetailResponse(payment, reservationRecord);
     }
 
-    private void validConfirmRequest(ConfirmSuccessRequest confirmSuccessRequest, Payment payment){
-        if(!confirmSuccessRequest.getAmount().equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
-        if(!confirmSuccessRequest.getOrderId().equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
+    private void validConfirmRequest(String orderId, Integer amount, Payment payment){
+        if(!amount.equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
+        if(!orderId.equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
     }
 
     private ReservationDetailResponse createReservationDetailResponse(Payment payment, ReservationRecord reservationRecord) {
@@ -75,10 +75,10 @@ public class PaymentService {
     }
 
     @Transactional
-    public VirtualAccountInfoResponse virtualAccount(ConfirmSuccessRequest confirmSuccessRequest) {
-        Payment payment = findByOrderId(confirmSuccessRequest.getOrderId());
-        validConfirmRequest(confirmSuccessRequest, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(confirmSuccessRequest, CONFIRM_URI);
+    public VirtualAccountInfoResponse virtualAccount(String orderId, String paymentKey, Integer amount) {
+        Payment payment = findByOrderId(orderId);
+        validConfirmRequest(orderId, amount, payment);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment());
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
