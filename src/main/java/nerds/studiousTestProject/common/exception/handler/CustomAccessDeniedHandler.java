@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

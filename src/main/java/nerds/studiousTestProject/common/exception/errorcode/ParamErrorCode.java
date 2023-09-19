@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.errorcode;
 
 import java.util.Collections;
 import java.util.Map;
@@ -6,11 +6,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum ParamErrorCode {
-    NOT_EXIST_PAGE("page", "페이지가 없습니다."),
-    NOT_EXIST_CAFE_ID("cafeId", "카페 id가 없습니다."),
+    INVALID_CAFE_ID("studycafeId", "카페 id가 잘못되었습니다."),
+    INVALID_DATE("date", "날짜가 잘못되었습니다."),
     // 공지사항 조회에서 사용되는 값들
     INVALID_START_DATE("startDate", "시작 날짜가 잘못되었습니다."),
-    INVALID_END_DATE("endDate", "마감 날짜가 잘못되었습니다.");
+    INVALID_END_DATE("endDate", "마감 날짜가 잘못되었습니다."),
+    INVALID_START_TIME("starTime", "시작 시간이 잘못되었습니다."),
+    INVALID_END_TIME("endTime", "마감 시간이 잘못되었습니다."),
+    INVALID_SORT_TYPE("searchSortType", "정렬 기준이 잘못되었습니다."),
+    INVALID_REVIEW_TYPE("reviewType", "리뷰 필터 조건이 잘못되었습니다.");
 
     private static final Map<String, String> ENUM_MAP = Collections.unmodifiableMap(
             Stream.of(values()).collect(Collectors.toMap(ParamErrorCode::getParamName, ParamErrorCode::name))

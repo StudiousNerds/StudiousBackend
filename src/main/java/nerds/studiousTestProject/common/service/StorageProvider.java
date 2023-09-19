@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StorageService {
+public class StorageProvider {
     private final AmazonS3 s3Client;
 
     @Value("${application.bucket.name}")

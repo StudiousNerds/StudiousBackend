@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.errorcode;
 
 import java.util.Collections;
 import java.util.Map;

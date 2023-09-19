@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 
 @Builder
