@@ -4,7 +4,7 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
 import org.springframework.core.convert.converter.Converter;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.CANT_CONVERT_TO_RESERVATION_SETTING_STATUS;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.CANT_CONVERT_TO_RESERVATION_SETTING_STATUS;
 
 public class StringToReservationSettingsStatusConverter implements Converter<String, ReservationSettingsStatus> {
     @Override
