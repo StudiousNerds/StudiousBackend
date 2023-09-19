@@ -6,6 +6,7 @@ import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackReq
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
+import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,8 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/success")
-    public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
-                                                       @RequestParam Integer amount,
-                                                       @RequestParam String paymentKey) {
-        return paymentService.confirmSuccess(orderId, paymentKey, amount);
+    public ReservationDetailResponse payConfirmSuccess(@ModelAttribute ConfirmSuccessRequest confirmSuccessRequest) {
+        return paymentService.confirmSuccess(confirmSuccessRequest);
     }
 
     @GetMapping("/fail")
@@ -33,10 +32,8 @@ public class PaymentController {
     }
 
     @GetMapping("/virtual/success")
-    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
-                                                            @RequestParam Integer amount,
-                                                            @RequestParam String paymentKey) {
-        return paymentService.virtualAccount(orderId, paymentKey, amount);
+    public VirtualAccountInfoResponse confirmVirtualAccount(@ModelAttribute ConfirmSuccessRequest confirmSuccessRequest) {
+        return paymentService.virtualAccount(confirmSuccessRequest);
     }
 
 
