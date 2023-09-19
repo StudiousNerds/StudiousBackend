@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -71,9 +72,6 @@ public class ReviewService {
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
         ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
-        if (LocalDate.now().isBefore(reservationRecord.getDate().plusDays(7))) {
-            throw new BadRequestException(EXPIRED_VALID_DATE);
-        }
 
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
@@ -116,8 +114,6 @@ public class ReviewService {
                 modifyReviewRequest.getFixtureStatus(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
-        // 추천 여부 수정 만들어야 함
-
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         deleteAllHashtagRecordByReviewId(reviewId);
         List<String> hashtags = modifyReviewRequest.getHashtags();
@@ -129,7 +125,6 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
         }
 
-        // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
         deleteAllPhotos(reviewId);
         saveSubPhotos(review, files);
 
