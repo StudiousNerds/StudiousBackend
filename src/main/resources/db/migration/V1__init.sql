@@ -251,6 +251,4 @@ CREATE TABLE IF NOT EXISTS `sub_photo` (
 
 alter table review add constraint grade_review_unique_key unique (grade_id);
 
-alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
-
 alter table reservation_record add constraint review_reservation_record_unique_key unique (review_id);
