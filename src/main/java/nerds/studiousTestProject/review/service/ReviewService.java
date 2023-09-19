@@ -325,7 +325,7 @@ public class ReviewService {
     /**
      * 리뷰 작성한 내역을 조회하는 메소드
      */
-    public List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservationRecords, LocalDate startDate, LocalDate endDate) {
+    private List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservationRecords, LocalDate startDate, LocalDate endDate) {
         List<ReservationRecord> reservationRecordList = reservationRecords.getContent();
 
         return reservationRecordList.stream()
@@ -343,10 +343,10 @@ public class ReviewService {
     private Page<ReservationRecord> getReservationRecords(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
-        return findAllReservationRecordByMemberId(member.getId(), pageable);
+        return findAllReservationRecordByMember(member, pageable);
     }
 
-    public List<FindReviewInfo> getReviewInfo(Page<Review> reviewList) {
+    private List<FindReviewInfo> getReviewInfo(Page<Review> reviewList) {
         return reviewList.stream()
                 .filter(review -> review != null && reviewList.hasContent())
                 .map(review -> FindReviewInfo.builder()
@@ -373,42 +373,20 @@ public class ReviewService {
 
     private List<Review> getAllReviews(Long studycafeId) {
         List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        List<Long> reviewIds = new ArrayList<>();
-        List<Review> reviewList = new ArrayList<>();
-        for (ReservationRecord reservationRecord : recordList) {
-            reviewIds.add(reservationRecord.getReview().getId());
-        }
-
-        List<Review> reviews = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
-
-        for (int i = 0; i < reviews.size(); i++) {
-            reviewList.add(reviews.get(i));
-        }
-        return reviewList;
+        List<Long> reviewIds = recordList.stream()
+                .map(reservationRecord -> reservationRecord.getReview().getId())
+                .collect(Collectors.toList());
+        return reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
     }
 
     private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
         pageable = getPageable(pageable);
-        List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        return getReviewList(pageable, recordList);
+        return findAllByStudycafeId(studycafeId, pageable);
     }
 
     private Page<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
         pageable = getPageable(pageable);
-        List<ReservationRecord> recordList = findAllReservationRecordByRoomId(roomId);
-        return getReviewList(pageable, recordList);
-    }
-
-    private Page<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
-        List<Long> reviewIds = new ArrayList<>();
-
-        for (ReservationRecord reservationRecord : recordList) {
-            if(reservationRecord.getReview() != null) {
-                reviewIds.add(reservationRecord.getReview().getId());
-            }
-        }
-
-        return reviewRepository.findAllByIdIn(reviewIds, pageable);
+        return findAllByRoomId(roomId, pageable);
     }
 
     private PageRequest getPageable(Pageable pageable) {
@@ -422,6 +400,14 @@ public class ReviewService {
 
     private Review findReviewById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
+    }
+
+    private Page<Review> findAllByStudycafeId(Long studycafeId, Pageable pageable) {
+        return reviewRepository.findAllByStudycafeId(studycafeId, pageable);
+    }
+
+    private Page<Review> findAllByRoomId(Long roomId, Pageable pageable) {
+        return reviewRepository.findAllByRoomId(roomId, pageable);
     }
 
     private ReservationRecord findReservationRecordByReviewId(Long reviewId) {
@@ -438,12 +424,8 @@ public class ReviewService {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 
-    private Page<ReservationRecord> findAllReservationRecordByMemberId(Long memberId, Pageable pageable) {
-        return reservationRecordRepository.findAllByMemberId(memberId, pageable);
-    }
-
-    private List<ReservationRecord> findAllReservationRecordByRoomId(Long roomId) {
-        return reservationRecordRepository.findAllByRoomId(roomId);
+    private Page<ReservationRecord> findAllReservationRecordByMember(Member member, Pageable pageable) {
+        return reservationRecordRepository.findAllByMember(pageable, member);
     }
 
     private void deleteAllHashtagRecordByReviewId(Long reviewId) {
