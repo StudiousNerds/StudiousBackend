@@ -29,9 +29,4 @@ public class HashtagRecordService {
         }
         return hashtagNameList;
     }
-
-    @Transactional
-    public void deleteAllByReviewId(Long reviewId) {
-        hashtagRecordRepository.deleteAllByReviewId(reviewId);
-    }
 }

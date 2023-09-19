@@ -2,7 +2,6 @@ package nerds.studiousTestProject.bookmark.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.request.BookmarkRequest;
 import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
@@ -10,7 +9,8 @@ import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.reservation.service.ReservationRecordService;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
 import org.springframework.data.domain.Page;
@@ -31,13 +31,11 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final StudycafeService studycafeService;
     private final HashtagRecordService hashtagRecordService;
-    private final ReservationRecordService reservationRecordService;
+    private final ReservationRecordRepository reservationRecordRepository;
     private final TokenService tokenService;
 
     @Transactional
-    public void registerBookmark(String accessToken, BookmarkRequest bookmarkRequest){
-        Long studycafeId = bookmarkRequest.getStudycafeId();
-
+    public void registerBookmark(String accessToken, Long studycafeId){
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
@@ -60,7 +58,7 @@ public class BookmarkService {
                         .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumRevCnt(reservationRecordService.findAllByStudycafeId(studycafe.getId()).size())
+                        .accumRevCnt(findAllReservationRecordByStudycafeId(studycafe.getId()).size())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(studycafe.getTotalGrade())
@@ -73,9 +71,7 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(String accessToken, BookmarkRequest bookmarkRequest){
-        Long studycafeId = bookmarkRequest.getStudycafeId();
-
+    public void deleteBookmark(String accessToken, Long studycafeId){
         Member member = tokenService.getMemberFromAccessToken(accessToken);
         Studycafe studyCafe = studycafeService.getStudyCafe(studycafeId);
 
@@ -90,5 +86,9 @@ public class BookmarkService {
         }
 
         return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+    }
+
+    private List<ReservationRecord> findAllReservationRecordByStudycafeId(Long studycafeId) {
+        return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 }

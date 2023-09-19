@@ -121,6 +121,13 @@ public class Member implements UserDetails {
             this.nickname = nickname;
         }
     }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
+    }
+
     public void updatePassword(String encodedPassword) {
         if (encodedPassword != null && !encodedPassword.isEmpty()) {
             this.password = encodedPassword;

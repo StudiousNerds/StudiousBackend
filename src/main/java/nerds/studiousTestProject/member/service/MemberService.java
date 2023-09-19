@@ -10,9 +10,11 @@ import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
 import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
 import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
 import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
 import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
+import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
@@ -119,6 +121,11 @@ public class MemberService {
                 .build();
     }
 
+    public MemberInfoResponse findMemberInfoFromAccessToken(String accessToken) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        return MemberInfoResponse.of(member);
+    }
+
     @Transactional
     public void addPhoto(String accessToken, MultipartFile file) {
         Member member = tokenService.getMemberFromAccessToken(accessToken);
@@ -170,6 +177,14 @@ public class MemberService {
         return FindPasswordResponse.builder()
                 .tempPassword(temporaryPassword)
                 .build();
+    }
+
+    @Transactional
+    public void replacePhoneNumber(String accessToken, PatchPhoneNumberRequest patchPhoneNumberRequest) {
+        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
+
+        member.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional
