@@ -175,19 +175,6 @@ public class ReservationRecordService {
         return ReserveResponse.of(member, room, studycafe, conveniences, refundPolicyList);
     }
 
-    public Page<ReservationRecord> findAllByMember(Member member, Pageable pageable) {
-        return reservationRecordRepository.findAllByMember(pageable, member);
-    }
-
-    public List<ReservationRecord> findAllByRoomId(Long roomId) {
-        return reservationRecordRepository.findAllByRoomId(roomId);
-    }
-
-    public ReservationRecord findByReviewId(Long reviewId) {
-        return reservationRecordRepository.findByReviewId(reviewId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
     public ReservationCancelResponse getCancelInfo(Long reservationId) {
         ReservationRecord reservationRecord = findById(reservationId);
         Room room = reservationRecord.getRoom();
