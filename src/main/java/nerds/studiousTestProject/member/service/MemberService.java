@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
@@ -56,7 +55,7 @@ public class MemberService {
     private final LogoutAccessTokenService logoutAccessTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
 
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
@@ -130,7 +129,7 @@ public class MemberService {
     public void addPhoto(Long memberId, MultipartFile file) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
-        String photoUrl = storageService.uploadFile(file);
+        String photoUrl = storageProvider.uploadFile(file);
         member.updatePhoto(photoUrl);
     }
 

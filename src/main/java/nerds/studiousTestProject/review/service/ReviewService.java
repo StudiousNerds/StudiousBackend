@@ -3,7 +3,7 @@ package nerds.studiousTestProject.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
@@ -57,7 +57,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final ReviewRepository reviewRepository;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
     public final Double GRADE_COUNT = 3.0;
 
@@ -269,11 +269,11 @@ public class ReviewService {
     private void saveSubPhotos(Review review, List<MultipartFile> files) {
         List<SubPhoto> photoList = new ArrayList<>();
 
-        String representPhoto = storageService.uploadFile(files.get(0));
+        String representPhoto = storageProvider.uploadFile(files.get(0));
         review.addPhoto(representPhoto);
 
         for (int i = 2; i < files.size(); i++) {
-            String uploadFile = storageService.uploadFile(files.get(i));
+            String uploadFile = storageProvider.uploadFile(files.get(i));
             photoList.add(SubPhoto.builder().review(review).type(SubPhotoType.REVIEW).path(uploadFile).build());
         }
         saveAllPhotos(photoList);
@@ -283,7 +283,7 @@ public class ReviewService {
         List<String> reviewPhotos = findAllReviewPhotos(reviewId);
 
         for (String photoUrl : reviewPhotos) {
-            storageService.deleteFile(photoUrl);
+            storageProvider.deleteFile(photoUrl);
         }
         removeAllReviewPhotos(reviewId);
     }

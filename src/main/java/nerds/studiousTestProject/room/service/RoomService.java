@@ -3,7 +3,7 @@ package nerds.studiousTestProject.room.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -53,7 +53,7 @@ public class RoomService {
     private final OperationInfoRepository operationInfoRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordService reservationRecordService;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
     private final SubPhotoRepository subPhotoRepository;
 
@@ -203,7 +203,7 @@ public class RoomService {
         if (photos != null) {
             deletePhotos(room);
             for (MultipartFile file : photos) {
-                String photoUrl = storageService.uploadFile(file);
+                String photoUrl = storageProvider.uploadFile(file);
                 room.addSubPhoto(SubPhoto.builder().room(room).type(SubPhotoType.ROOM).path(photoUrl).build());
             }
         }
@@ -220,7 +220,7 @@ public class RoomService {
 
     private void deletePhotos(Room room) {
         for (SubPhoto photo : room.getSubPhotos()) {
-            storageService.deleteFile(photo.getPath());
+            storageProvider.deleteFile(photo.getPath());
             room.getSubPhotos().remove(photo.getPath());
         }
         removeAllRoomPhotos(room.getId());
