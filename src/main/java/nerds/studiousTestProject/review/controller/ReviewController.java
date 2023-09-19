@@ -43,7 +43,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/studious")
-@Secured(value = {RoleType.USER, RoleType.ADMIN, RoleType.SUPER_ADMIN})
 @Slf4j
 @Validated
 public class ReviewController {
@@ -95,7 +94,6 @@ public class ReviewController {
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews/managements")
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public List<ReviewInfoResponse> inquireStudycafeReviews(
             @LoggedInMember Long memberId,
             @PathVariable("studycafeId") Long studycafeId,
@@ -107,19 +105,16 @@ public class ReviewController {
     }
 
     @PostMapping("/reviews/managements/{reviewId}")
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public void registerComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid RegisterCommentRequest registerCommentRequest) {
         adminReviewService.registerComment(reviewId, registerCommentRequest);
     }
 
     @PatchMapping("/reviews/managements/{reviewId}")
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public void modifyComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ModifyCommentRequest modifyCommentRequest) {
         adminReviewService.modifyComment(reviewId, modifyCommentRequest);
     }
 
     @DeleteMapping("/reviews/managements/{reviewId}")
-    @Secured(value = MemberRole.ROLES.ADMIN)
     public void deleteComment(@PathVariable("reviewId") Long reviewId) {
         adminReviewService.deleteComment(reviewId);
     }

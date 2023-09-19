@@ -33,8 +33,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/studycafes")
-@Secured(RoleType.ADMIN)
+@RequestMapping("/studious/studycafes/managements")
 @Slf4j
 @Validated
 public class AdminStudycafeController {
@@ -56,33 +55,33 @@ public class AdminStudycafeController {
         return studycafeService.register(memberId, registerRequest);
     }
 
-    @GetMapping("/managements")
+    @GetMapping
     public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember Long memberId, @RequestParam Integer page) {
         return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, 4));
     }
 
-    @GetMapping("/managements/{studycafeId}")
+    @GetMapping("/{studycafeId}")
     public CafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
         return studycafeService.inquireManagedStudycafe(memberId, studycafeId);
     }
 
-    @PatchMapping("/managements/{studycafeId}")
+    @PatchMapping("/{studycafeId}")
     public void editManagedStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
         studycafeService.edit(memberId, studycafeId, cafeInfoEditRequest);
     }
 
-    @GetMapping("/managements/notificationInfos/{studycafeId}")
+    @GetMapping("/notificationInfos/{studycafeId}")
     public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
         return studycafeService.inquireAnnouncements(memberId, studycafeId);
     }
 
-    @PostMapping("/managements/notificationInfos/{studycafeId}")
+    @PostMapping("/notificationInfos/{studycafeId}")
     @Secured(RoleType.ADMIN)
     public void addNotificationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
         studycafeService.insertAnnouncements(memberId, studycafeId, announcementRequest);
     }
 
-    @DeleteMapping("/managements/{studycafeId}")
+    @DeleteMapping("/{studycafeId}")
     public void delete(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
         studycafeService.delete(memberId, studycafeId);
     }
