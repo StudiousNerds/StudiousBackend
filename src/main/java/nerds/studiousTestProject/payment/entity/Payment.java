@@ -25,8 +25,8 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.PAYMENT_NOT_C
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.*;
 
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
@@ -49,7 +49,7 @@ public class Payment {
     @Column(name = "price", nullable = false)
     private Integer price;
 
-    @Column(name = "payment_status")
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
