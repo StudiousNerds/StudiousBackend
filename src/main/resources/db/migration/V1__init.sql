@@ -101,19 +101,20 @@ CREATE TABLE IF NOT EXISTS `operation_info` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `payment` (
-    `id`              bigint       NOT NULL AUTO_INCREMENT,
-    `order_id`        varchar(255) NOT NULL,
-    `payment_key`     varchar(255) NOT NULL,
-    `method`          varchar(255) NOT NULL,
-    `complete_time`   TIMESTAMP    NOT NULL,
-    `price`           int          NOT NULL,
-    `payment_status`  varchar(255) NOT NULL,
-    `cancel_reason`   varchar(255),
-    `canceler`        varchar(255),
-    `virtual_account` varchar(255),
-    `bank_code`       varchar(255),
-    `due_date`        TIMESTAMP,
-    `secret`          varchar(255),
+    `id`                    bigint       NOT NULL AUTO_INCREMENT,
+    `order_id`              varchar(255) NOT NULL,
+    `payment_key`           varchar(255),
+    `method`                varchar(255),
+    `complete_time`         TIMESTAMP,
+    `price`                 int          NOT NULL,
+    `status`        varchar(255) NOT NULL,
+    `cancel_reason`         varchar(255),
+    `canceler`              varchar(255),
+    `virtual_account`       varchar(255),
+    `bank_code`             varchar(255),
+    `due_date`              TIMESTAMP,
+    `secret`                varchar(255),
+    `reservation_record_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
