@@ -31,7 +31,7 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PRIC
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_CONVENIENCE_RECORD;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
-import static nerds.studiousTestProject.payment.entity.PaymentMethod.가상계좌;
+import static nerds.studiousTestProject.payment.entity.PaymentMethod.VIRTUAL_ACCOUNT;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.CANCELED;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.DONE;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.WAITING_FOR_DEPOSIT;
@@ -86,7 +86,7 @@ public class PaymentService {
     }
 
     private void validPaymentMethod(PaymentResponseFromToss responseFromToss) {
-        if (!responseFromToss.getMethod().equals(가상계좌.name())) {
+        if (!responseFromToss.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
         }
     }
