@@ -125,19 +125,12 @@ public class ReservationRecordService {
             }
         }
         if (room.getPriceType() == PriceType.PER_PERSON) {
-            if (reservationInfo.getHeadCount() < room.getMinHeadCount()) {
-                if (reservationInfo.getPrice() != room.getPrice() * room.getMinHeadCount() * reservationInfo.getUsingTime() + conveniencePrice) {
-                    throw new BadRequestException(MISCALCULATED_PRICE);
-                }
-            }
-            if (reservationInfo.getHeadCount() >= room.getMinHeadCount()){
-                if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getHeadCount() * reservationInfo.getUsingTime() + conveniencePrice) {
-                    throw new BadRequestException(MISCALCULATED_PRICE);
-                }
+            int headCountToCalculate = Math.max(room.getMinHeadCount(), reservationInfo.getHeadCount());
+            if(reservationInfo.getPrice() != room.getPrice() * headCountToCalculate * reservationInfo.getUsingTime() + conveniencePrice){
+                throw new BadRequestException(MISCALCULATED_PRICE);
             }
         }
     }
-
 
     private void validCorrectDate(ReservationInfo reservationInfo) {
         if (reservationInfo.getDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
