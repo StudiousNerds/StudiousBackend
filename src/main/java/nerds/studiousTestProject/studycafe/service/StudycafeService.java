@@ -125,7 +125,6 @@ public class StudycafeService {
         return getNotice(studycafeId);
     }
 
-
     public MainPageResponse getMainPage() {
         List<RecommendCafeInfo> recommendStduycafes = getRecommendStudycafes();
         List<EventCafeInfo> eventStudycafes = getEventStudycafes();
