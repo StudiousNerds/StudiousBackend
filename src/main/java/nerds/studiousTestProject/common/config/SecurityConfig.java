@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .requestMatchers("/studious/members/logout").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/studious/members/**").permitAll()
                 .requestMatchers("/studious/search/**").permitAll()
+                .requestMatchers("/studious/studycafes/**").permitAll()
+                .requestMatchers("/studious/main").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .cors()

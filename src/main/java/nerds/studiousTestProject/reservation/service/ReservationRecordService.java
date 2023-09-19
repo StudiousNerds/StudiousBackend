@@ -9,6 +9,8 @@ import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
@@ -19,14 +21,16 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCanc
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
+import nerds.studiousTestProject.reservation.dto.reserve.request.PaidConvenience;
+import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
+import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.room.entity.PriceType;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -36,11 +40,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -48,11 +52,14 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INV
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVE_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.OVER_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
 
@@ -61,40 +68,78 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USI
 @Slf4j
 @Transactional(readOnly = true)
 public class ReservationRecordService {
+
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
     private final StudycafeRepository studycafeRepository;
     private final RefundPolicyRepository refundPolicyRepository;
-    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
-
+    private final PaymentRepository paymentRepository;
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
+
+    private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
+    private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
 
     @Transactional
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, Long memberId) {
         Room room = findRoomById(roomId);
-        validReservationInfo(reserveRequest.getReservationInfo(), room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
-        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, member));
+        validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
+        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
+        Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
+        String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
-        return PaymentInfoResponse.of(reserveRequest, reservationRecord);
+        return PaymentInfoResponse.of(payment, orderName);
     }
 
-    private void validReservationInfo(ReservationInfo reservationInfo, Room room) {
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
+    }
+
+    private Payment createInProgressPayment(ReservationRecord reservationRecord, ReserveRequest reserveRequest) {
+        return Payment.builder()
+                .reservationRecord(reservationRecord)
+                .status(PaymentStatus.IN_PROGRESS)
+                .price(reserveRequest.getReservationInfo().getPrice())
+                .orderId(UUID.randomUUID().toString())
+                .build();
+    }
+
+    private void validReservationInfo(ReserveRequest reserveRequest, Room room) {
+        ReservationInfo reservationInfo = reserveRequest.getReservationInfo();
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
         validCalculateUsingTime(reservationInfo);
         validUsingTimePerHour(reservationInfo);
         validMinUsingTime(reservationInfo, room);
+        validOverMaxHeadCount(reservationInfo, room);
+        validCalculatePrice(reserveRequest, room, reservationInfo);
+    }
+
+    private void validCalculatePrice(ReserveRequest reserveRequest, Room room, ReservationInfo reservationInfo) {
+        int conveniencePrice = reserveRequest.getPaidConveniences().stream().mapToInt(PaidConvenience::getPrice).sum();
+        if (room.getPriceType() == PriceType.PER_HOUR) {
+            if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getUsingTime() + conveniencePrice){
+                throw new BadRequestException(MISCALCULATED_PRICE);
+            }
+        }
+        if (room.getPriceType() == PriceType.PER_PERSON) {
+            int headCountToCalculate = Math.max(room.getMinHeadCount(), reservationInfo.getHeadCount());
+            if(reservationInfo.getPrice() != room.getPrice() * headCountToCalculate * reservationInfo.getUsingTime() + conveniencePrice){
+                throw new BadRequestException(MISCALCULATED_PRICE);
+            }
+        }
     }
 
     private void validCorrectDate(ReservationInfo reservationInfo) {
         if (reservationInfo.getDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
             throw new BadRequestException(INVALID_RESERVE_DATE);
         }
+    }
+
+    private void validOverMaxHeadCount(ReservationInfo reservationInfo, Room room) {
+        if(room.getMaxHeadCount() < reservationInfo.getHeadCount()) throw new BadRequestException(OVER_MAX_HEADCOUNT);
     }
 
     private void validCorrectTime(ReservationInfo reservationInfo) {
@@ -180,7 +225,7 @@ public class ReservationRecordService {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         List<RefundPolicy> refundPolicies = studycafe.getRefundPolicies();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
@@ -234,7 +279,7 @@ public class ReservationRecordService {
     public ReservationRecordInfoWithStatus createReservationSettingsResponse(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationRecordInfoWithStatus.of(studycafe, room, reservationRecord, payment);
     }
 
@@ -242,7 +287,12 @@ public class ReservationRecordService {
         ReservationRecord reservationRecord = findById(reservationRecordId);
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
-        Payment payment = reservationRecord.getPayment();
+        Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
+    }
+
+    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 }

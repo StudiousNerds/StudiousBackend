@@ -41,6 +41,7 @@ public class ReservationRecordInfoWithStatus {
                 .studycafeName(studycafe.getName())
                 .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
+                .reservationId(reservationRecord.getId())
                 .reservationDate(reservationRecord.getDate())
                 .reservationStartTime(reservationRecord.getStartTime())
                 .reservationEndTime(reservationRecord.getEndTime())

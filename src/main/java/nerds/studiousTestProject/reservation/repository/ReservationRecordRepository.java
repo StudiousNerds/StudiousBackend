@@ -28,10 +28,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
             "and r.review.id is not null")
     List<ReservationRecord> findAllByStudycafeId(@Param("studycafeId") Long studycafeId);
 
-    Optional<ReservationRecord> findByReviewId(Long reviewId);
-
     Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
 
-    Optional<ReservationRecord> findByPayment(Payment payment);
-
+    Optional<ReservationRecord> findByReviewId(Long reviewId);
 }
