@@ -10,7 +10,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.security.Principal;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_AUTHORIZE_ACCESS;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_AUTHORIZE_ACCESS;
 
 public class LoggedInMemberResolver implements HandlerMethodArgumentResolver {
     @Override

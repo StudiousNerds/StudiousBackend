@@ -44,17 +44,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_PAGE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_RESERVE_DATE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_USING_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISCALCULATED_USING_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.USING_TIME_NOT_PER_HOUR;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAGE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVE_DATE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
 
 @RequiredArgsConstructor
 @Service

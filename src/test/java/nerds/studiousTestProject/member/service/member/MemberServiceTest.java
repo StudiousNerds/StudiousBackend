@@ -1,9 +1,8 @@
 package nerds.studiousTestProject.member.service.member;
 
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
@@ -39,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_DEFAULT_TYPE_USER;
 import static nerds.studiousTestProject.support.fixture.LogoutAccessTokenFixture.FIRST_LOGOUT_ACCESS_TOKEN;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
@@ -64,10 +63,7 @@ class MemberServiceTest {
     LogoutAccessTokenService logoutAccessTokenService;
 
     @Mock
-    StorageService storageService;
-
-    @Mock
-    TokenService tokenService;
+    StorageProvider storageProvider;
 
     @Mock
     JwtTokenProvider jwtTokenProvider;
@@ -281,7 +277,7 @@ class MemberServiceTest {
         MultipartFile multipartFile = new MockMultipartFile("사진", new byte[2]);
 
         doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
-        doReturn(photo).when(storageService).uploadFile(multipartFile);
+        doReturn(photo).when(storageProvider).uploadFile(multipartFile);
 
         // when
         memberService.addPhoto(defaultMember.getId(), multipartFile);

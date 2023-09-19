@@ -1,8 +1,9 @@
 package nerds.studiousTestProject.common.config;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.common.exception.CustomAccessDeniedHandler;
-import nerds.studiousTestProject.common.exception.CustomAuthenticationEntryPoint;
+import nerds.studiousTestProject.common.exception.handler.CustomAccessDeniedHandler;
+import nerds.studiousTestProject.common.exception.handler.CustomAuthenticationEntryPoint;
+import nerds.studiousTestProject.common.exception.handler.HttpRequestEndPointChecker;
 import nerds.studiousTestProject.common.filter.JwtAuthenticationFilter;
 import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;

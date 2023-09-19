@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service

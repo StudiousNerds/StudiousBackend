@@ -34,17 +34,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_EMAIL;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PASSWORD;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_TOKEN;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_DEFAULT_TYPE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
 @Service

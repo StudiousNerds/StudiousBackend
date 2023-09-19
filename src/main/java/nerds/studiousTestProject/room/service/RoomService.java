@@ -37,11 +37,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_OPERATION_INFO;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_OPERATION_INFO;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Slf4j
