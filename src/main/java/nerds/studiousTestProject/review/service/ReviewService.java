@@ -56,13 +56,13 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
+
     private final HashtagRecordRepository hashtagRecordRepository;
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final ReviewRepository reviewRepository;
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
-    private final TokenService tokenService;
     private final PaymentRepository paymentRepository;
 
     public final Double GRADE_COUNT = 3.0;

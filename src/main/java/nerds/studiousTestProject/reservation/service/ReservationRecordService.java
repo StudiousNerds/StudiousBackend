@@ -75,6 +75,7 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USI
 @Slf4j
 @Transactional(readOnly = true)
 public class ReservationRecordService {
+
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final RoomRepository roomRepository;
@@ -83,6 +84,7 @@ public class ReservationRecordService {
     private final PaymentRepository paymentRepository;
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
+
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
     private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
@@ -91,11 +93,15 @@ public class ReservationRecordService {
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, Long memberId) {
         Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
-        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, tokenService.getMemberFromAccessToken(accessToken)));
+        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
         Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
         String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord);
         return PaymentInfoResponse.of(payment, orderName);
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
     private Payment createInProgressPayment(ReservationRecord reservationRecord, ReserveRequest reserveRequest) {
