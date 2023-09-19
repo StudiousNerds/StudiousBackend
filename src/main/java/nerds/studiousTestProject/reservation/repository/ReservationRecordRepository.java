@@ -20,7 +20,6 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
     List<ReservationRecord> findAllByRoomId(Long roomId);
-    Optional<ReservationRecord> findByOrderId(String orderId);
     Page<ReservationRecord> findAllByMemberId(Long memberId, Pageable pageable);
 
     @Query(value = "select r from ReservationRecord r " +
@@ -29,9 +28,5 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     List<ReservationRecord> findAllByStudycafeId(@Param("studycafeId") Long studycafeId);
 
     Optional<ReservationRecord> findByReviewId(Long reviewId);
-
-    Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
-
-    Optional<ReservationRecord> findByPayment(Payment payment);
 
 }

@@ -66,26 +66,16 @@ public class ReservationRecord {
     @Column(name = "request")
     private String request;
 
-    @Column(name = "order_id")
-    private String orderId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = true)
+    @JoinColumn(name = "review_id")
     private Review review;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
-    public void completePay(Payment payment) {
+    public void completePay() {
         this.status = ReservationStatus.CONFIRMED;
-        if(payment != null){
-            this.payment = payment;
-        }
     }
 
     public void completeDeposit(){
@@ -96,7 +86,7 @@ public class ReservationRecord {
         this.status = ReservationStatus.CANCELED;
     }
 
-   public void depositError() {
+    public void depositError() {
         this.status = ReservationStatus.INPROGRESS;
     }
 
