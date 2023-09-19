@@ -1,32 +1,33 @@
 package nerds.studiousTestProject.payment.util.totoss;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.common.exception.ErrorCode;
-import nerds.studiousTestProject.common.exception.BadRequestException;
 
+@AllArgsConstructor
 @Builder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ConfirmSuccessRequest extends RequestToToss {
 
+    @NotNull
     private String orderId;
+    @NotNull
     private Integer amount;
+    @NotNull
     private String paymentKey;
 
-    public static ConfirmSuccessRequest of(String orderId, Integer amount, String paymentKey) {
-        if ((orderId == null) || (amount == null) || (paymentKey == null)) {
-            throw new BadRequestException(ErrorCode.INVALID_REQUEST_BODY_TYPE);
-        }
-        return ConfirmSuccessRequest.builder()
-                .orderId(orderId)
-                .paymentKey(paymentKey)
-                .amount(amount)
-                .build();
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
 
+    public void setPaymentKey(String paymentKey) {
+        this.paymentKey = paymentKey;
+    }
 }
