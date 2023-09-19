@@ -165,10 +165,6 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public Studycafe getStudyCafe(Long studycafeId) {
-        return findStudycafeById(studycafeId);
-    }
-
     public List<String> getNotice(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
