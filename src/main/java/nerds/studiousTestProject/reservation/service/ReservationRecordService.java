@@ -24,14 +24,8 @@ import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservati
 import nerds.studiousTestProject.reservation.dto.reserve.request.PaidConvenience;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
-import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
-import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
-import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -46,7 +40,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
