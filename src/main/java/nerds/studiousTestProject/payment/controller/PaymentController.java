@@ -6,6 +6,7 @@ import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackReq
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
+import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +19,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/success")
-    public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
-                                            @RequestParam Integer amount,
-                                            @RequestParam String paymentKey) {
-        paymentService.confirmPayToToss(orderId, paymentKey, amount);
-        return ResponseEntity.noContent().build();
+    public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
+                                                       @RequestParam Integer amount,
+                                                       @RequestParam String paymentKey) {
+        return paymentService.confirmSuccess(orderId, paymentKey, amount);
     }
 
     @GetMapping("/fail")
