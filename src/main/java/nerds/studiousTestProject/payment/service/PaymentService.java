@@ -63,6 +63,9 @@ public class PaymentService {
         return createReservationDetailResponse(payment, reservationRecord);
     }
 
+    private void validConfirmRequest(ConfirmSuccessRequest confirmSuccessRequest, Payment payment){
+        if(confirmSuccessRequest.getAmount() != payment.getPrice()) throw new BadRequestException(MISMATCH_PRICE);
+    }
     private ReservationDetailResponse createReservationDetailResponse(Payment payment, ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
