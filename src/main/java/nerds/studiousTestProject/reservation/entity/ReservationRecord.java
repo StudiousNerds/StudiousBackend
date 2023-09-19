@@ -96,6 +96,10 @@ public class ReservationRecord {
         }
     }
 
+    public void deleteReview() {
+        this.review = null;
+    }
+
     public void setRoom(Room room) {
         if (room != null) {
             this.room = room;

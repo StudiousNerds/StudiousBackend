@@ -51,29 +51,29 @@ public class ReviewController {
 
     private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
-    @PostMapping("/reviews")
-    public RegisterReviewResponse registerReview(@RequestPart("registerReviewRequest") @Valid RegisterReviewRequest registerReviewRequest,
-                                                 @RequestPart(value = "file", required = false) List<MultipartFile> files) {
-        return reviewService.registerReview(registerReviewRequest, files);
+    @PostMapping("/mypage/reviews")
+    public RegisterReviewResponse register(@RequestPart("registerReviewRequest") @Valid RegisterReviewRequest registerReviewRequest,
+                                           @RequestPart(value = "file", required = false) List<MultipartFile> files) {
+        return reviewService.register(registerReviewRequest, files);
     }
 
-    @PatchMapping("/reviews/{reviewId}")
+    @PatchMapping("/mypage/reviews/{reviewId}")
     public ModifyReviewResponse modifyReview(@PathVariable("reviewId") Long reviewId, @RequestPart("modifyReviewRequest") @Valid ModifyReviewRequest modifyReviewRequest,
                                              @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         return reviewService.modifyReview(reviewId, modifyReviewRequest, files);
     }
 
-    @DeleteMapping("/reviews/{reviewId}")
+    @DeleteMapping("/mypage/reviews/{reviewId}")
     public DeleteReviewResponse deleteReview(@PathVariable("reviewId") Long reviewId) {
         return reviewService.deleteReview(reviewId);
     }
 
-    @GetMapping("/reviews/available")
+    @GetMapping("/mypage/reviews/available")
     public AvailableReviewResponse InquireAvailableReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestParam Integer page) {
         return reviewService.findAvailableReviews(accessToken, PageRequestConverter.of(page, 5));
     }
 
-    @GetMapping("/reviews")
+    @GetMapping("/mypage/reviews")
     public WrittenReviewResponse InquireWrittenReview(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
                                                       @RequestParam("startDate") LocalDate startDate,
                                                       @RequestParam("endDate") LocalDate endDate,
