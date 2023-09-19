@@ -27,9 +27,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final HttpRequestEndPointChecker httpRequestEndPointChecker;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
@@ -40,13 +41,18 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight request에 대해, 인증을 하지 않고 모든 요청을 허용
-                .anyRequest().permitAll()
+                .requestMatchers("/studious/mypage/**", "/studious/reservations/**", "/studious/payments/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/studious/**/managements/**").hasRole("ADMIN")
+                .requestMatchers("/studious/members/logout").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/studious/members/**").permitAll()
+                .requestMatchers("/studious/search/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .cors()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
                 .and()
-                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint(httpRequestEndPointChecker))
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
