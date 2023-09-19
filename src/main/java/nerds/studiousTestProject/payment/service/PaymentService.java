@@ -53,10 +53,10 @@ public class PaymentService {
 
 
     @Transactional
-    public ReservationDetailResponse confirmSuccess(String orderId, String paymentKey, Integer amount) {
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId,amount,paymentKey), CONFIRM_URI);
-        Payment payment = findByOrderId(orderId);
-        validPayment(responseFromToss, payment);
+    public ReservationDetailResponse confirmSuccess(ConfirmSuccessRequest confirmSuccessRequest) {
+        Payment payment = findByOrderId(confirmSuccessRequest.getOrderId());
+        validConfirmRequest(confirmSuccessRequest, payment);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(confirmSuccessRequest, CONFIRM_URI);
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = payment.getReservationRecord();
         reservationRecord.completePay();
@@ -74,32 +74,16 @@ public class PaymentService {
     }
 
     @Transactional
-    public VirtualAccountInfoResponse virtualAccount(String orderId, String paymentKey, Integer amount) {
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(ConfirmSuccessRequest.of(orderId, amount, paymentKey), CONFIRM_URI);
-        Payment payment = findByOrderId(orderId);
+    public VirtualAccountInfoResponse virtualAccount(ConfirmSuccessRequest confirmSuccessRequest) {
+        Payment payment = findByOrderId(confirmSuccessRequest.getOrderId());
+        validConfirmRequest(confirmSuccessRequest, payment);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(confirmSuccessRequest, CONFIRM_URI);
         validPaymentMethod(responseFromToss);
-        validPayment(responseFromToss, payment);
         payment.complete(responseFromToss.toVitualAccountPayment());
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         return VirtualAccountInfoResponse.from(payment);
     }
 
-    private void validPayment(PaymentResponseFromToss responseFromToss, Payment payment) {
-        validOrderId(responseFromToss.getOrderId(), payment);
-        validPrice(responseFromToss.getTotalAmount(), payment);
-    }
-
-    private void validOrderId(String orderId, Payment payment) {
-        if (!payment.getOrderId().equals(orderId)) {
-            throw new BadRequestException(MISMATCH_ORDER_ID);
-        }
-    }
-
-    private void validPrice(Integer price, Payment payment) {
-        if (payment.getPrice() != price) {
-            throw new BadRequestException(MISMATCH_PRICE);
-        }
-    }
     private void validPaymentMethod(PaymentResponseFromToss responseFromToss) {
         if (!responseFromToss.getMethod().equals(가상계좌.name())) {
             throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
