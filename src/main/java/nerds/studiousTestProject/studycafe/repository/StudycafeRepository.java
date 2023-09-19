@@ -11,7 +11,6 @@ import java.util.Optional;
 
 public interface StudycafeRepository extends JpaRepository<Studycafe, Long>, StudycafeRepositoryCustom {
     boolean existsByIdAndMember(Long id, Member member);
-    Optional<Studycafe> findById(Long id);
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
     List<Studycafe> findTop10ByOrderByCreatedDateDesc();
     Page<Studycafe> findByMemberOrderByCreatedDateAsc(Member member, Pageable pageable);
