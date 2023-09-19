@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.errorcode;
 
 public enum ErrorCode {
 
@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_TOKEN("유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN_VALID_TIME("토큰의 유효기간이 만료되었습니다."),
     NOT_FOUND_TOKEN("토큰을 찾을 수 없습니다."),
+    NOT_HAVE_PERMISSION("권한이 없습니다."),
     NOT_FOUND_USER("일치하는 회원 정보가 없습니다."),
     MISMATCH_TOKEN("토큰명이 일치하지 않습니다."),
     NOT_SUPPORTED_JWT("JWT 토큰이 지원하지 않습니다."),
@@ -59,7 +60,9 @@ public enum ErrorCode {
     MISCALCULATED_PRICE("잘못 계산된 최종 금액입니다."),
     NOT_FOUND_CONVENIENCE_RECORD("편의시설 기록을 찾을 수 없습니다."),
     MISMATCH_ORDER_ID("주문 번호가 일치하지 않는 결제입니다."),
-    MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다.");
+    MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다."),
+    INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
+    NOT_FOUND_PAGE("페이지가 없습니다.");
 
     private final String message;
     ErrorCode(String message) {

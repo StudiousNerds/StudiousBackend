@@ -5,8 +5,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
 import nerds.studiousTestProject.review.dto.manage.modify.request.ModifyCommentRequest;
@@ -43,6 +43,9 @@ class AdminReviewServiceTest {
     AdminReviewService adminReviewService;
 
     @Mock
+    MemberRepository memberRepository;
+
+    @Mock
     ReviewRepository reviewRepository;
 
     @Mock
@@ -50,9 +53,6 @@ class AdminReviewServiceTest {
 
     @Mock
     SubPhotoRepository subPhotoRepository;
-
-    @Mock
-    TokenService tokenService;
 
     private static ValidatorFactory validatorFactory;
     private static Validator validator;
@@ -73,16 +73,15 @@ class AdminReviewServiceTest {
     public void 회원_스터디카페_불일치() throws Exception {
 
         // given
-        String accessToken = "accessToken";
         Long studycafeId = 1L;
         Member member = DEFAULT_USER.생성();
 
-        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
         doReturn(false).when(studycafeRepository).existsByIdAndMember(studycafeId, member);
 
         // when
         assertThrows(NotFoundException.class, () -> {
-            adminReviewService.getWrittenReviews(studycafeId, accessToken, null, null);
+            adminReviewService.getWrittenReviews(studycafeId, member.getId(), null, null);
         });
 
         // then
@@ -94,7 +93,6 @@ class AdminReviewServiceTest {
     public void 스터디카페_모든_리뷰_조회() throws Exception {
 
         // given
-        String accessToken = "accessToken";
         Long studycafeId = 1L;
         Member member = DEFAULT_USER.생성();
 
@@ -104,12 +102,12 @@ class AdminReviewServiceTest {
         }
         Page<Review> pages = new PageImpl<>(reviews);
 
-        doReturn(member).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
         doReturn(true).when(studycafeRepository).existsByIdAndMember(studycafeId, member);
         doReturn(pages).when(reviewRepository).getPagedReviewsByStudycafeId(studycafeId, null, null);
 
         // when
-        List<ReviewInfoResponse> responses = adminReviewService.getWrittenReviews(studycafeId, accessToken, null, null);
+        List<ReviewInfoResponse> responses = adminReviewService.getWrittenReviews(studycafeId, member.getId(), null, null);
 
         // then
         assertThat(responses.size()).isEqualTo(30);

@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ExceptionResponse;
+import nerds.studiousTestProject.common.exception.response.ExceptionResponse;
 import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,15 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.handler;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
+import nerds.studiousTestProject.common.exception.NotAuthorizedException;
+import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.HeaderErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.MethodErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ParamErrorCode;
+import nerds.studiousTestProject.common.exception.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,9 +22,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_REQUEST_BODY_TYPE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_PARSING_BODY;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_REQUEST_BODY_TYPE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAGE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_PARSING_BODY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -51,27 +62,25 @@ public class GlobalExceptionAdvice {
                 .body(ExceptionResponse.from(message, code));
     }
 
-    /*
     /**
-     * 엔티티 제약 조건을 위반한 경우 발생하는 예외 핸들링
+     * @RequestParam의 @NotNull, @Size 등 기본 어노테이션 검증에 실패한 경우 발생하는 예외 핸들링
      * ConstraintViolationException 예외인 경우 예외 메시지를 직접 파싱하여 파라미터 이름을 찾아야 함... => 이 방법은 추후 리펙토링 예정
      * @param e ConstraintViolationException
      * @return 예외 메시지, 상태 코드를 담은 응답
-
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException e) {
         String param = e.getMessage().split(" ")[0].split("\\.")[1].replace(":", "");
+        String message = e.getMessage().split(":")[1].trim();
 
         ParamErrorCode paramErrorCode = ParamErrorCode.of(param);
         String code = paramErrorCode.name();
-        String message = paramErrorCode.getMessage();
 
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), code, message);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.from(message, code));
     }
-    */
 
     /**
      * @RequestHeader 값이 누락된 경우 발생하는 예외 핸들링
@@ -102,20 +111,13 @@ public class GlobalExceptionAdvice {
     }
 
     /**
-     * &#064;ModelAttribute 에서 객체 바인딩 또는 @ModelAttribute, @RequestBody 에서 @Valid 검증 실패 시 호출되는 예외 핸들링 메소드
+     * &#064;ModelAttribute 에서 객체 바인딩(Formatter) 또는 @ModelAttribute, @RequestBody 에서 @Valid 검증 실패 시 호출되는 예외 핸들링 메소드
      * @param e MethodArgumentNotValidException
      * @return 예외 메시지, 상태 코드를 담은 응답
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> MethodArgumentNotValidException(MethodArgumentNotValidException e) {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append(e.getClass().getSimpleName()).append(INVALID_REQUEST_BODY_TYPE.getMessage()).append(e.getMessage());
-//        log.info(stringBuilder.toString());
-//        stringBuilder.setLength(0); //stringBuilder 초기화
-
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String message = String.join(", ", e.getBindingResult().getAllErrors().stream().map(ObjectError::getDefaultMessage).toArray(String[]::new));
-
-//        e.getBindingResult().getAllErrors().forEach((objectError -> stringBuilder.append(objectError.getDefaultMessage()).append(System.lineSeparator())));
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), INVALID_REQUEST_BODY_TYPE.name(), message);
 
         return ResponseEntity.badRequest()
@@ -158,6 +160,8 @@ public class GlobalExceptionAdvice {
 
     /**
      * &#064;RequestBody 에서 (타입 오류 등의 이유로 Json Parser가) 바인딩 실패 시 호출되는 예외를 핸들링
+     * &#064;RequestBody는 객체 단위로 바인딩을 하므로 어떤 필드가 바인딩에 실패했는지 알 수 없다 (@ModelAttribute 와의 차이점)
+     * 따라서, 바인딩에 실패했다는 메시지만 출력함...
      * @param e HttpMessageNotReadableException
      * @return 예외 메시지, 상태 코드를 담은 응답
      */
@@ -165,5 +169,16 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.info(LOG_FORMAT, e.getClass().getSimpleName(), NOT_PARSING_BODY.name(), NOT_PARSING_BODY.getMessage());
         return ResponseEntity.status(BAD_REQUEST).body(ExceptionResponse.from(NOT_PARSING_BODY));
+    }
+
+    /**
+     * 잘못된 URL 요청시 호출되는 예외를 핸들링
+     * @param e NoHandlerFoundException
+     * @return 예외 메시지, 상태 코드를 담은 응답
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        log.info(LOG_FORMAT, e.getClass().getSimpleName(), NOT_FOUND_PAGE.name(), NOT_FOUND_PAGE.getMessage());
+        return ResponseEntity.status(NOT_FOUND).body(ExceptionResponse.from(NOT_FOUND_PAGE));
     }
 }

@@ -3,17 +3,17 @@ package nerds.studiousTestProject.studycafe.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.TokenService;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
+import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
@@ -65,20 +65,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 public class StudycafeService {
+    private final MemberRepository memberRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final HashtagRecordRepository hashtagRecordRepository;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
     private final RoomService roomService;
-    private final TokenService tokenService;
     private final ReservationRecordRepository reservationRecordRepository;
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
@@ -237,10 +238,10 @@ public class StudycafeService {
     }
 
     @Transactional
-    @Secured(value = MemberRole.ROLES.ADMIN)
-    public RegisterResponse register(String accessToken, RegisterRequest registerRequest) {
+    public RegisterResponse register(Long memberId, RegisterRequest registerRequest) {
         // 현재 로그인된 유저 정보를 가져온다.
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
@@ -332,21 +333,23 @@ public class StudycafeService {
     }
 
     @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(String accessToken, Pageable pageable) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(Long memberId, Pageable pageable) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
     }
 
     /**
      * 등록된 모든 스터디카페를 조회하는 메소드
-     * @param accessToken 사용자 엑세스 토크
+     * @param memberId 사용자 pk
      * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
-    public CafeDetailsResponse inquireManagedStudycafe(String accessToken, Long studycafeId) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public CafeDetailsResponse inquireManagedStudycafe(Long memberId, Long studycafeId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
@@ -378,15 +381,16 @@ public class StudycafeService {
 
     /**
      * 등록된 스터디카페 수정 메소드
-     * @param accessToken 사용자 엑세스 토큰
+     * @param memberId 사용자 pk
      * @param studycafeId 스터디카페 PK
      * @param cafeInfoEditRequest 수정된 데이터
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void edit(String accessToken, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public void edit(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         String introduction = cafeInfoEditRequest.getIntroduction();
         if (introduction != null) {
@@ -426,13 +430,13 @@ public class StudycafeService {
 
     /**
      * 공지사항 조회 로직
-     * @param accessToken 사용자 엑세스 토큰
+     * @param memberId 사용자 PK
      * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
-    public List<AnnouncementResponse> inquireAnnouncements(String accessToken, Long studycafeId) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public List<AnnouncementResponse> inquireAnnouncements(Long memberId, Long studycafeId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
@@ -440,28 +444,30 @@ public class StudycafeService {
 
     /**
      * 공지사항 추가 로직
-     * @param accessToken 사용자 엑세스 토큰
+     * @param memberId 사용자 PK
      * @param studycafeId 스터디카페 PK
      * @param announcementRequest 공지사항 요청 값
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void insertAnnouncements(String accessToken, Long studycafeId, AnnouncementRequest announcementRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public void insertAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         studycafe.addAnnouncement(announcementRequest.toEntity());
     }
 
     /**
      * 스터디카페 삭제 메소드, 실제로 DB에서 삭제
-     * @param accessToken 사용자 엑세스 토큰
+     * @param memberId 사용자 PK
      * @param studycafeId 스터디카페 PK
      */
-    @Secured(value = MemberRole.ROLES.ADMIN)
     @Transactional
-    public void delete(String accessToken, Long studycafeId) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public void delete(Long memberId, Long studycafeId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 }

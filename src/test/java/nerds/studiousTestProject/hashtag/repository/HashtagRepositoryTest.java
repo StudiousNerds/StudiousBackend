@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.hashtag.repository;
 
 import nerds.studiousTestProject.support.RepositoryTest;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.support.fixture.HashtagFixture;
 import nerds.studiousTestProject.support.fixture.ReviewFixture;

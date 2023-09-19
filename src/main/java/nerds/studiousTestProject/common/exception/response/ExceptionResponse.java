@@ -1,10 +1,12 @@
-package nerds.studiousTestProject.common.exception;
+package nerds.studiousTestProject.common.exception.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.common.exception.CustomException;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 
 @AllArgsConstructor
 @Builder

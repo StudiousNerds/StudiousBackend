@@ -21,7 +21,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.PAYMENT_NOT_CANCELED;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.PAYMENT_NOT_CANCELED;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.*;
 
 

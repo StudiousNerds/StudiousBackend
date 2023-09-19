@@ -3,19 +3,16 @@ package nerds.studiousTestProject.room.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.member.entity.member.MemberRole;
+import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.room.dto.find.response.FindAllRoomResponse;
 import nerds.studiousTestProject.room.dto.modify.request.ModifyRoomRequest;
 import nerds.studiousTestProject.room.dto.modify.response.ModifyRoomResponse;
 import nerds.studiousTestProject.room.service.RoomService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,15 +23,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/studious")
-@Secured(value = MemberRole.ROLES.ADMIN)
 @Slf4j
 public class RoomController {
 
     private final RoomService roomService;
 
     @GetMapping("/studycafes/managements/{studycafeId}/rooms/{roomId}")
-    public FindAllRoomResponse inquireModifyRoom(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId, @PathVariable Long roomId) {
-        return roomService.getAllRooms(accessToken, studycafeId, roomId);
+    public FindAllRoomResponse inquireModifyRoom(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
+        return roomService.getAllRooms(memberId, studycafeId, roomId);
     }
 
     @PatchMapping("/studycafes/managements/{studycafeId}/rooms/{roomId}")
