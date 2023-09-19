@@ -146,7 +146,6 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
     `request`           varchar(255),
     `status`            varchar(255) NOT NULL,
     `member_id`         bigint       NOT NULL,
-    `payment_id`        bigint,
     `room_id`           bigint       NOT NULL,
     `review_id`         bigint,
     PRIMARY KEY (`id`)
