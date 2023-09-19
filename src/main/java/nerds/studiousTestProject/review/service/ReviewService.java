@@ -2,6 +2,7 @@ package nerds.studiousTestProject.review.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
@@ -43,6 +44,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -63,6 +65,11 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
+        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
+        if (LocalDate.now().isBefore(reservationRecord.getDate().plusDays(7))) {
+            throw new BadRequestException(EXPIRED_VALID_DATE);
+        }
+
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
@@ -74,7 +81,6 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
 
-        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
 
         List<String> hashtags = registerReviewRequest.getHashtags();
@@ -130,8 +136,12 @@ public class ReviewService {
 
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
-        Review review = findReviewById(reviewId);
         ReservationRecord reservationRecord = findReservationRecordByReviewId(reviewId);
+        if (LocalDate.now().isBefore(reservationRecord.getDate().plusDays(7))) {
+            throw new BadRequestException(EXPIRED_VALID_DATE);
+        }
+
+        Review review = findReviewById(reviewId);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
 
         deleteAllHashtagRecordByReviewId(reviewId);
