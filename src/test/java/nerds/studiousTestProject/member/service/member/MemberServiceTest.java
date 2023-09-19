@@ -1,9 +1,8 @@
 package nerds.studiousTestProject.member.service.member;
 
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
 import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
 import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
@@ -39,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_DEFAULT_TYPE_USER;
 import static nerds.studiousTestProject.support.fixture.LogoutAccessTokenFixture.FIRST_LOGOUT_ACCESS_TOKEN;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
@@ -64,10 +63,7 @@ class MemberServiceTest {
     LogoutAccessTokenService logoutAccessTokenService;
 
     @Mock
-    StorageService storageService;
-
-    @Mock
-    TokenService tokenService;
+    StorageProvider storageProvider;
 
     @Mock
     JwtTokenProvider jwtTokenProvider;
@@ -163,12 +159,12 @@ class MemberServiceTest {
     public void 토큰_재발급() throws Exception {
 
         // given
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
         doReturn(refreshToken).when(refreshTokenService).findByMemberId(defaultMember.getId());
         doReturn(jwtTokenResponse).when(jwtTokenProvider).generateToken(defaultMember);
 
         // when
-        JwtTokenResponse response = memberService.reissueToken(accessToken, refreshToken.getToken());
+        JwtTokenResponse response = memberService.reissueToken(defaultMember.getId(), refreshToken.getToken());
 
         // then
         assertThat(response).isEqualTo(jwtTokenResponse);
@@ -259,10 +255,10 @@ class MemberServiceTest {
     public void 계정_관리() throws Exception {
 
         // given
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
 
         // when
-        MemberInfoResponse response = memberService.findMemberInfoFromAccessToken(accessToken);
+        MemberInfoResponse response = memberService.findMemberInfoFromMemberId(defaultMember.getId());
 
         // then
         assertThat(response.getName()).isEqualTo(defaultMember.getName());
@@ -279,11 +275,12 @@ class MemberServiceTest {
         // given
         String photo = "사진 경로";
         MultipartFile multipartFile = new MockMultipartFile("사진", new byte[2]);
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
-        doReturn(photo).when(storageService).uploadFile(multipartFile);
+
+        doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
+        doReturn(photo).when(storageProvider).uploadFile(multipartFile);
 
         // when
-        memberService.addPhoto(accessToken, multipartFile);
+        memberService.addPhoto(defaultMember.getId(), multipartFile);
 
         // then
         assertThat(defaultMember.getPhoto()).isEqualTo(photo);
@@ -294,15 +291,13 @@ class MemberServiceTest {
     public void 닉네임_수정() throws Exception {
 
         // given
-        PatchNicknameRequest request = PatchNicknameRequest
-                .builder()
-                .newNickname("newNickname")
-                .build();
+        PatchNicknameRequest request = new PatchNicknameRequest();
+        request.setNewNickname("newNickname");
 
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
 
         // when
-        memberService.replaceNickname(accessToken, request);
+        memberService.replaceNickname(defaultMember.getId(), request);
 
         // then
         assertThat(defaultMember.getNickname()).isEqualTo(request.getNewNickname());
@@ -318,11 +313,11 @@ class MemberServiceTest {
                 .password(password)
                 .build();
 
-        doReturn(defaultMember).when(tokenService).getMemberFromAccessToken(accessToken);
+        doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
         doReturn(true).when(passwordEncoder).matches(password, defaultMember.getPassword());
 
         // when
-        memberService.deactivate(accessToken, request);
+        memberService.deactivate(defaultMember.getId(), request);
 
         // then
         assertThat(defaultMember.isEnabled()).isFalse();

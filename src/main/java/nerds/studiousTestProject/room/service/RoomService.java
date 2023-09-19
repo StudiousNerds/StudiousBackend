@@ -2,13 +2,12 @@ package nerds.studiousTestProject.room.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
@@ -38,10 +37,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_OPERATION_INFO;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_ROOM;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_MEMBER_AND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_OPERATION_INFO;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,13 +49,13 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_STU
 @Transactional(readOnly = true)
 public class RoomService {
     private final ConvenienceRepository convenienceRepository;
+    private final MemberRepository memberRepository;
     private final OperationInfoRepository operationInfoRepository;
     private final RoomRepository roomRepository;
     private final ReservationRecordService reservationRecordService;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
     private final SubPhotoRepository subPhotoRepository;
-    private final TokenService tokenService;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
 
@@ -78,10 +78,11 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
-    public FindAllRoomResponse getAllRooms(String accessToken, Long studycafeId, Long roomId) {
-        Member memberFromAccessToken = tokenService.getMemberFromAccessToken(accessToken);
+    public FindAllRoomResponse getAllRooms(Long memberId, Long studycafeId, Long roomId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
 
-        if (!matchStudycafeAndMember(studycafeId, memberFromAccessToken)) {
+        if (!matchStudycafeAndMember(studycafeId, member)) {
             throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
         }
 
@@ -202,7 +203,7 @@ public class RoomService {
         if (photos != null) {
             deletePhotos(room);
             for (MultipartFile file : photos) {
-                String photoUrl = storageService.uploadFile(file);
+                String photoUrl = storageProvider.uploadFile(file);
                 room.addSubPhoto(SubPhoto.builder().room(room).type(SubPhotoType.ROOM).path(photoUrl).build());
             }
         }
@@ -219,7 +220,7 @@ public class RoomService {
 
     private void deletePhotos(Room room) {
         for (SubPhoto photo : room.getSubPhotos()) {
-            storageService.deleteFile(photo.getPath());
+            storageProvider.deleteFile(photo.getPath());
             room.getSubPhotos().remove(photo.getPath());
         }
         removeAllRoomPhotos(room.getId());

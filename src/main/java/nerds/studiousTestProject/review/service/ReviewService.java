@@ -3,26 +3,26 @@ package nerds.studiousTestProject.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
-import nerds.studiousTestProject.review.dto.find.response.TotalGradeInfo;
-import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
-import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewInfo;
+import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewInfo;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
+import nerds.studiousTestProject.review.dto.find.response.TotalGradeInfo;
+import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
+import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
 import nerds.studiousTestProject.review.dto.written.response.WrittenReviewInfo;
 import nerds.studiousTestProject.review.dto.written.response.WrittenReviewResponse;
@@ -43,8 +43,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REVIEW;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 
 @RequiredArgsConstructor
@@ -53,13 +54,12 @@ import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_REV
 @Transactional(readOnly = true)
 public class ReviewService {
     private final HashtagRecordRepository hashtagRecordRepository;
+    private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final ReviewRepository reviewRepository;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
-    private final TokenService tokenService;
     public final Double GRADE_COUNT = 3.0;
-
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
@@ -171,8 +171,8 @@ public class ReviewService {
                 .build();
     }
 
-    public AvailableReviewResponse findAvailableReviews(String accessToken, Pageable pageable) {
-        Page<ReservationRecord> reservationRecords = getReservationRecords(accessToken, pageable);
+    public AvailableReviewResponse findAvailableReviews(Long memberId, Pageable pageable) {
+        Page<ReservationRecord> reservationRecords = getReservationRecords(memberId, pageable);
 
         return AvailableReviewResponse.builder()
                 .totalPage(reservationRecords.getTotalPages())
@@ -181,8 +181,8 @@ public class ReviewService {
                 .build();
     }
 
-    public WrittenReviewResponse findWrittenReviews(String accessToken, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        Page<ReservationRecord> reservationRecords = getReservationRecords(accessToken, pageable);
+    public WrittenReviewResponse findWrittenReviews(Long memberId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        Page<ReservationRecord> reservationRecords = getReservationRecords(memberId, pageable);
 
         return WrittenReviewResponse.builder()
                 .totalPage(reservationRecords.getTotalPages())
@@ -289,11 +289,11 @@ public class ReviewService {
     private void saveSubPhotos(Review review, List<MultipartFile> files) {
         List<SubPhoto> photoList = new ArrayList<>();
 
-        String representPhoto = storageService.uploadFile(files.get(0));
+        String representPhoto = storageProvider.uploadFile(files.get(0));
         review.addPhoto(representPhoto);
 
         for (int i = 2; i < files.size(); i++) {
-            String uploadFile = storageService.uploadFile(files.get(i));
+            String uploadFile = storageProvider.uploadFile(files.get(i));
             photoList.add(SubPhoto.builder().review(review).type(SubPhotoType.REVIEW).path(uploadFile).build());
         }
         saveAllPhotos(photoList);
@@ -303,7 +303,7 @@ public class ReviewService {
         List<String> reviewPhotos = findAllReviewPhotos(reviewId);
 
         for (String photoUrl : reviewPhotos) {
-            storageService.deleteFile(photoUrl);
+            storageProvider.deleteFile(photoUrl);
         }
         removeAllReviewPhotos(reviewId);
     }
@@ -340,8 +340,9 @@ public class ReviewService {
         return findAllReservationRecordByStudycafeId(studycafeId);
     }
 
-    private Page<ReservationRecord> getReservationRecords(String accessToken, Pageable pageable) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    private Page<ReservationRecord> getReservationRecords(Long memberId, Pageable pageable) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
         return findAllReservationRecordByMemberId(member.getId(), pageable);
     }
 

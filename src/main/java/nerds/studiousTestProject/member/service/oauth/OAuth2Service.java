@@ -3,7 +3,7 @@ package nerds.studiousTestProject.member.service.oauth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.oauth.signup.OAuth2AuthenticateResponse;
@@ -29,9 +29,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 import java.util.Optional;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_USER;
 
 @Service
 @RequiredArgsConstructor

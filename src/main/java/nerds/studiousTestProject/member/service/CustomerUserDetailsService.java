@@ -1,8 +1,7 @@
 package nerds.studiousTestProject.member.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.User;

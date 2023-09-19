@@ -13,7 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotAuthorizedException;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
