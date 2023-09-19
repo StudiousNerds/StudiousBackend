@@ -94,7 +94,7 @@ public class Payment {
     }
 
 
-    public void canceled(PaymentResponseFromToss responseFromToss) {
+    public void cancel(PaymentResponseFromToss responseFromToss) {
         String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
         if (cancelReason != null) this.cancelReason = cancelReason;
         if (!status.equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);

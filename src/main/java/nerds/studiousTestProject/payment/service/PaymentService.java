@@ -112,7 +112,7 @@ public class PaymentService {
         Payment payment = findByReservationRecord(reservationRecord);
         validPaymentMethod(cancelRequest, payment);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
-        payment.canceled(responseFromToss);
+        payment.cancel(responseFromToss);
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
