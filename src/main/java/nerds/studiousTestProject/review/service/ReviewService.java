@@ -100,7 +100,7 @@ public class ReviewService {
         Review review = findReviewById(reviewId);
 
         Grade grade = review.getGrade();
-        grade.updateGrade(modifyReviewRequest.getCleanliness(),
+        grade.update(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
@@ -123,6 +123,7 @@ public class ReviewService {
         saveSubPhotos(review, files);
 
         review.updateDetail(modifyReviewRequest.getDetail());
+        review.updateIsRecommended(modifyReviewRequest.getIsRecommend());
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }

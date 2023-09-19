@@ -71,7 +71,15 @@ public class Review {
     }
 
     public void updateDetail(String detail) {
-        this.detail = detail;
+        if (detail != null) {
+            this.detail = detail;
+        }
+    }
+
+    public void updateIsRecommended(Boolean isRecommended) {
+        if (isRecommended != null) {
+            this.isRecommended = isRecommended;
+        }
     }
 
     public void updateComment(String comment) {
