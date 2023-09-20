@@ -71,8 +71,6 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
-        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
-
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
@@ -84,6 +82,7 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
 
+        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
 
         List<String> hashtags = registerReviewRequest.getHashtags();
