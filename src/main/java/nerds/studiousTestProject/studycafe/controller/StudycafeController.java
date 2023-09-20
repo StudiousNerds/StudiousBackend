@@ -33,7 +33,7 @@ public class StudycafeController {
     private static final int STUDYCAFE_SEARCH_SIZE = 8;
 
     @GetMapping("/search")
-    public List<SearchResponse> search(@RequestParam Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
+    public List<SearchResponse> search(@RequestParam(required = false) Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
         return studycafeService.inquire(searchRequest, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 

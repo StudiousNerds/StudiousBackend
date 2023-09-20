@@ -1,6 +1,5 @@
 package nerds.studiousTestProject.studycafe.dto.search.response;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -29,6 +28,7 @@ public class SearchResponse {
     public static SearchResponse from(Studycafe studycafe) {
         return SearchResponse.builder()
                 .id(studycafe.getId())
+                .name(studycafe.getName())
                 .photo(studycafe.getPhoto())
                 .grade(studycafe.getTotalGrade())
                 .accumRevCnt(studycafe.getAccumReserveCount())
