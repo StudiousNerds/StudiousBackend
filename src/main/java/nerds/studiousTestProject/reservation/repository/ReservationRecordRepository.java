@@ -21,8 +21,6 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
 
     List<ReservationRecord> findAllByRoomId(Long roomId);
 
-    Optional<ReservationRecord> findByOrderId(String orderId);
-
     @Query(value = "select r from ReservationRecord r " +
             "where r.room.id in (select ro.id from Room ro where ro.studycafe.id = :studycafeId) " +
             "and r.review.id is not null")
