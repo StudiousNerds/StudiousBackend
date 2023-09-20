@@ -16,6 +16,7 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewInfo;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
@@ -41,12 +42,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_STATUS;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_WRITE_REVIEW_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
@@ -71,6 +75,10 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
+        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
+        validateReservationStatus(reservationRecord);
+        validateAvailableReviewTime(reservationRecord);
+
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
@@ -82,7 +90,6 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
 
-        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
 
         List<String> hashtags = registerReviewRequest.getHashtags();
@@ -102,6 +109,7 @@ public class ReviewService {
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
+
 
     @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
@@ -463,5 +471,17 @@ public class ReviewService {
         reviewPhotos.addAll(reviewSubPhoto);
 
         return reviewPhotos;
+    }
+
+    private void validateAvailableReviewTime(ReservationRecord reservationRecord) {
+        if (LocalTime.now().isAfter(reservationRecord.getEndTime())) {
+            throw new BadRequestException(INVALID_WRITE_REVIEW_TIME);
+        }
+    }
+
+    private void validateReservationStatus(ReservationRecord reservationRecord) {
+        if (reservationRecord.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new BadRequestException(INVALID_RESERVATION_STATUS);
+        }
     }
 }
