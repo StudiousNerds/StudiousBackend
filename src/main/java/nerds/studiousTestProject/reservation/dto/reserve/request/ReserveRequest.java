@@ -8,9 +8,7 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
-
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -37,7 +35,6 @@ public class ReserveRequest {
                 .usingTime(reservationInfo.getUsingTime())
                 .status(ReservationStatus.INPROGRESS)
                 .room(room)
-                .orderId(UUID.randomUUID().toString())
                 .member(member)
                 .build();
     }

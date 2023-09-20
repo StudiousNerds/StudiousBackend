@@ -34,7 +34,7 @@ public class ReservationRecordController {
 
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
-    @PostMapping("/mypage/reservation-settings/{reservationId}/cancellations")
+    @PostMapping("/mypage/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId,
                                                   @RequestBody CancelRequest cancelRequest) {
         paymentService.cancel(cancelRequest, reservationId);
@@ -54,7 +54,7 @@ public class ReservationRecordController {
         return reservationRecordService.reserve(reserveRequest, roomId, memberId);
     }
 
-    @GetMapping("/mypage/reservation-settings/{reservationId}/cancellations")
+    @GetMapping("/mypage/reservations/{reservationId}/cancellations")
     public ReservationCancelResponse cancelReservationInfo(@PathVariable Long reservationId) {
         return reservationRecordService.getCancelInfo(reservationId);
     }
@@ -70,7 +70,7 @@ public class ReservationRecordController {
         return reservationRecordService.getAll(tab, studycafeName, startDate, endDate, page, memberId);
     }
 
-    @GetMapping("/mypage/reservation-settings/{reservationRecordId}")
+    @GetMapping("/mypage/reservations/{reservationRecordId}")
     public ReservationDetailResponse showDetail(@PathVariable Long reservationRecordId) {
         return reservationRecordService.showDetail(reservationRecordId);
     }

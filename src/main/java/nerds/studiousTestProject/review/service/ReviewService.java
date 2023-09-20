@@ -8,6 +8,8 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
@@ -43,6 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -53,12 +56,15 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
+
     private final HashtagRecordRepository hashtagRecordRepository;
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final ReviewRepository reviewRepository;
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
+    private final PaymentRepository paymentRepository;
+
     public final Double GRADE_COUNT = 3.0;
 
     @Transactional
@@ -317,9 +323,13 @@ public class ReviewService {
         return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null &&
                         !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord))
+                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord, findPaymentByReservation(reservationRecord)))
                 .sorted(Comparator.comparing(AvailableReviewInfo::getDate).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     /**

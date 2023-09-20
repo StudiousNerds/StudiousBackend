@@ -76,7 +76,7 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
     private BooleanExpression handleTab(ReservationSettingsStatus tab) {
         LocalDate nowDate = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
-        if (tab == ALL) return null;
+        if (tab == ALL) return reservationRecord.status.eq(ReservationStatus.CONFIRMED).or(reservationRecord.status.eq(ReservationStatus.CANCELED));
         if (tab == CANCELED)
             return reservationRecord.status.eq(ReservationStatus.CANCELED);
         if (tab == BEFORE_USING)
