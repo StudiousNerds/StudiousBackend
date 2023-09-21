@@ -34,16 +34,16 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_id", nullable = false, updatable = false)
+    @Column(name = "order_id", nullable = false)
     private String orderId;
 
-    @Column(name = "payment_key", nullable = false, updatable = false)
+    @Column(name = "payment_key")
     private String paymentKey;
 
-    @Column(name = "method", nullable = false)
+    @Column(name = "method")
     private String method;
 
-    @Column(name = "complete_time", nullable = false)
+    @Column(name = "complete_time")
     private LocalDateTime completeTime;
 
     @Column(name = "price", nullable = false)
