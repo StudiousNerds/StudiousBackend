@@ -116,6 +116,10 @@ public class PaymentService {
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
+    private Payments findPaymentsByReservationRecord(ReservationRecord reservationRecord) {
+        return new Payments(paymentRepository.findAllByReservationRecord(reservationRecord));
+    }
+
     private void validPaymentMethod(CancelRequest cancelRequest, Payment payment) {
         if (payment.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
