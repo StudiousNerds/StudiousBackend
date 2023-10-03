@@ -312,5 +312,17 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
+    public ShowChangeReservationResponse showChangeReservation(Long reservationRecordId) {
+        ReservationRecord reservationRecord = reservationRecordRepository.findByIdWithPlace(reservationRecordId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+        List<Payment> payments = paymentRepository.findAllByReservationRecord(reservationRecord);
+        List<Convenience> convenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
+        List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord)
+                .stream().map(convenienceRecord -> new PaidConvenienceInfo(convenienceRecord.getConvenienceName(), convenienceRecord.getPrice())).collect(Collectors.toList());
+        List<PaidConvenienceInfo> paidConvenienceListNotPaid = convenienceList.stream().filter(convenience -> !convenience.isFree() && !paidConvenienceListPaid.contains(convenience.getName().name()))
+                .map(convenience -> new PaidConvenienceInfo(convenience.getName().name(), convenience.getPrice())).collect(Collectors.toList());
+        return ShowChangeReservationResponse.of(reservationRecord, new Payments(payments), paidConvenienceListPaid, paidConvenienceListNotPaid);
+    }
+
 
 }
