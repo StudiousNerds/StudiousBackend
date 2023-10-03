@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.entity.Payments;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -24,9 +24,9 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_ORDER_ID;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_CONVENIENCE_RECORD;
 import static nerds.studiousTestProject.payment.entity.PaymentMethod.VIRTUAL_ACCOUNT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAYMENT_SECRET;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PAYMENT_METHOD;
@@ -102,10 +102,6 @@ public class PaymentService {
         return ConfirmFailResponse.of(message);
     }
 
-    private ConvenienceRecord findConvenienceRecordByReservationRecord(ReservationRecord reservationRecord) {
-        return convenienceRecordRepository.findByReservationRecord(reservationRecord).orElseThrow(()-> new NotFoundException(NOT_FOUND_CONVENIENCE_RECORD));
-    }
-
     @Transactional
     public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = findReservationById(reservationId);
@@ -119,7 +115,7 @@ public class PaymentService {
             totalCancelPrice += responseFromToss.getTotalAmount();
         }
         if (totalCancelPrice != payments.getTotalPrice()) {
-            throw new BadRequestException()
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
@@ -132,10 +128,6 @@ public class PaymentService {
         if (payment.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
         }
-    }
-
-    private Payment findByReservationRecord(ReservationRecord reservationRecord) {
-        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private ReservationRecord findReservationById(Long reservationId) {
