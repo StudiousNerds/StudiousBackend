@@ -211,8 +211,7 @@ public class ReservationRecordService {
     }
 
     public ReserveResponse show(Long cafeId, Long roomId, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         Room room = findRoomById(roomId);
         Studycafe studycafe = findStudycafeById(cafeId);
         List<Convenience> conveniences = convenienceRepository.findAllByRoom(room);
