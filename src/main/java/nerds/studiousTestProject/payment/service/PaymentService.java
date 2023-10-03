@@ -109,10 +109,18 @@ public class PaymentService {
     @Transactional
     public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = findReservationById(reservationId);
-        Payment payment = findByReservationRecord(reservationRecord);
-        validPaymentMethod(cancelRequest, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
-        payment.cancel(responseFromToss);
+        Payments payments = findPaymentsByReservationRecord(reservationRecord);
+        payments.getPayments().stream().forEach(payment -> validPaymentMethod(cancelRequest, payment));
+        //취소 금액 검증
+        int totalCancelPrice = 0;
+        for (Payment payment : payments.getPayments()) {
+            PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
+            payment.cancel(responseFromToss);
+            totalCancelPrice += responseFromToss.getTotalAmount();
+        }
+        if (totalCancelPrice != payments.getTotalPrice()) {
+            throw new BadRequestException()
+        }
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
