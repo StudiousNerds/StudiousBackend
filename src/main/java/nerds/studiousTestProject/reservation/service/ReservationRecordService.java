@@ -10,6 +10,7 @@ import nerds.studiousTestProject.convenience.repository.ConvenienceRecordReposit
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.entity.Payments;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.payment.entity.Payment;
@@ -19,6 +20,8 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWith
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfo;
+import nerds.studiousTestProject.reservation.dto.change.response.PaidConvenienceInfo;
+import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
 import nerds.studiousTestProject.reservation.dto.reserve.request.PaidConvenience;
@@ -38,6 +41,7 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -85,7 +89,7 @@ public class ReservationRecordService {
     @Transactional
     public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, Long memberId) {
         Room room = findRoomById(roomId);
-        validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우)
+        validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
         ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
         Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
         String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
@@ -241,28 +245,31 @@ public class ReservationRecordService {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         List<RefundPolicy> refundPolicies = studycafe.getRefundPolicies();
-        Payment payment = findPaymentByReservation(reservationRecord);
-
+        Payments payments = findPaymentsByReservationRecord(reservationRecord);
+        
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
 
         return ReservationCancelResponse.builder()
                 .reservationInfo(ReservationRecordInfo.of(studycafe, room, reservationRecord))
-                .paymentInfoWithRefund(calculateRefundMoney(payment, refundPolicyOnDay))
+                .paymentInfoWithRefund(calculateRefundMoney(payments, refundPolicyOnDay))
                 .refundPolicyInfo(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
                 .build();
-
     }
 
-    private PaymentInfoWithRefund calculateRefundMoney(Payment payment, RefundPolicy refundPolicyOnDay) {
-        Integer totalPrice = payment.getPrice();
+    private Payments findPaymentsByReservationRecord(ReservationRecord reservationRecord) {
+        return new Payments(paymentRepository.findAllByReservationRecord(reservationRecord));
+    }
+
+    private PaymentInfoWithRefund calculateRefundMoney(Payments payments, RefundPolicy refundPolicyOnDay) {
+        Integer totalPrice = payments.getTotalPrice();
         int refundFee = totalPrice * refundPolicyOnDay.getRate() * (1 / 100);
         int refundPrice = totalPrice - refundFee;
         return PaymentInfoWithRefund.builder()
                 .refundFee(refundFee)
                 .refundPrice(refundPrice)
                 .price(totalPrice)
-                .paymentMethod(payment.getMethod())
+                .paymentMethod(payments.getMethods())
                 .build();
     }
 
