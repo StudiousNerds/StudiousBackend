@@ -32,9 +32,6 @@ public class CafeInfoRequest {
     @Valid
     private List<ConvenienceInfoRequest> convenienceInfos; // 카페 편의 시설
 
-    @Size(min = 1, message = "스터디카페 사진을 1개 이상 등록해주세요.")
-    private List<String> photos;    // 카페 사진
-
     @Size(min = 1, message = "유의 사항을 1개 이상 등록해주세요.")
     private List<String> notices;   // 유의 사항
 
