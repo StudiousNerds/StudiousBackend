@@ -31,7 +31,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/studycafes/managements")
+@RequestMapping("/api/v1/studycafes/managements")
 @Slf4j
 @Validated
 public class AdminStudycafeController {

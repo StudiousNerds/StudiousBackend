@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious")
+@RequestMapping("/api/v1/")
 @Slf4j
 @Validated
 public class StudycafeController {
