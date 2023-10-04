@@ -42,7 +42,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     private static final String GROUP_CONCAT_TEMPLATE = "group_concat(distinct {0})";
 
     @Override
-    public Page<Studycafe> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
+    public Page<SearchResponseInfo> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -66,11 +66,25 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             return Page.empty();
         }
 
-        JPAQuery<Studycafe> contentQuery = queryFactory
-                .select(studycafe)
+        JPAQuery<SearchResponseInfo> contentQuery = queryFactory
+                .select(
+                        Projections.constructor(SearchResponseInfo.class,
+                                studycafe.id,
+                                studycafe.name,
+                                studycafe.photo,
+                                studycafe.accumReserveCount,
+                                reservationRecord.count().intValue(),
+                                studycafe.walkingTime,
+                                studycafe.nearestStation,
+                                Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name),
+                                Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name),
+                                studycafe.totalGrade,
+                                grade.total.avg()
+                        )
+                )
                 .from(studycafe);
 
-        List<Studycafe> content = getJoinedQuery(contentQuery, searchRequest)
+        List<SearchResponseInfo> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
