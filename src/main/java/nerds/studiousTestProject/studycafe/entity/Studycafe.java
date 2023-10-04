@@ -145,6 +145,12 @@ public class Studycafe {
         }
     }
 
+    public void updatePhoto(String photo) {
+        if (photo != null) {
+            this.photo = photo;
+        }
+    }
+
     public void updateConveniences(List<Convenience> conveniences) {
         if (conveniences != null) {
             this.conveniences = conveniences;
