@@ -37,6 +37,10 @@ import static org.springframework.util.StringUtils.hasText;
 public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
+    private static final String CAFE_CONVENIENCE_NAME = "cConvenienceList";
+    private static final String ROOM_CONVENIENCE_NAME = "rConvenienceList";
+    private static final String GROUP_CONCAT_TEMPLATE = "group_concat(distinct {0})";
+
     @Override
     public Page<Studycafe> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
         JPAQuery<Long> countQuery = queryFactory
