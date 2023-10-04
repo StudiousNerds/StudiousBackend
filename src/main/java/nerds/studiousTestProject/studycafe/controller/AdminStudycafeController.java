@@ -37,6 +37,8 @@ import java.util.List;
 public class AdminStudycafeController {
     private final StudycafeService studycafeService;
 
+    private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
+
     @PostMapping("/validations/accountInfos")
     public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
         return studycafeService.validateAccountInfo(accountInfoRequest);
