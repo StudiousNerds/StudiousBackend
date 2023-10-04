@@ -174,7 +174,7 @@ public class Studycafe {
     }
 
     @Builder
-    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, Integer accumReserveCount, String introduction, LocalDateTime createdDate, Double totalGrade) {
+    public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, String introduction) {
         this.id = id;
         this.member = member;
         this.name = name;
@@ -183,9 +183,9 @@ public class Studycafe {
         this.tel = tel;
         this.walkingTime = walkingTime;
         this.nearestStation = nearestStation;
-        this.accumReserveCount = accumReserveCount;
+        this.accumReserveCount = 0;
         this.introduction = introduction;
-        this.createdDate = createdDate;
-        this.totalGrade = totalGrade;
+        this.createdDate = LocalDateTime.now();
+        this.totalGrade = 0.;
     }
 }
