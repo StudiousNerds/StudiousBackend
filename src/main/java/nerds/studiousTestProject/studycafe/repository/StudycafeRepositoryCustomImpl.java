@@ -1,7 +1,10 @@
 package nerds.studiousTestProject.studycafe.repository;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nerds.studiousTestProject.hashtag.entity.QAccumHashtagHistory.accumHashtagHistory;
 import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.review.entity.QGrade.grade;
@@ -229,11 +233,11 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
-        return minGrade != null ? grade.total.goe(minGrade) : null;
+        return minGrade != null ? grade.total.avg().goe(minGrade) : null;
     }
 
     private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
-        return hashtags != null && !hashtags.isEmpty() ? hashtagRecord.name.in(hashtags) : null;
+        return hashtags != null && !hashtags.isEmpty() ? (hashtagRecord.name.in(hashtags)).count().eq((long) hashtags.size()) : null;
     }
 
     private BooleanExpression convenienceContains(List<ConvenienceName> conveniences) {
@@ -241,11 +245,15 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             return null;
         }
 
-        // Room과 Studycafe의 Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
-        QConvenience cConveniences = new QConvenience("cConvenienceList");
-        QConvenience rConveniences = new QConvenience("rConvenienceList");
+        // Room, Studycafe Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
+        QConvenience cConveniences = new QConvenience(CAFE_CONVENIENCE_NAME);
+        QConvenience rConveniences = new QConvenience(ROOM_CONVENIENCE_NAME);
 
-        return cConveniences.name.in(conveniences).and(rConveniences.name.in(conveniences));
+        NumberExpression<Long> cafeConvenienceCount = cConveniences.name.in(conveniences).count();
+        NumberExpression<Long> roomConvenienceCount = rConveniences.name.in(conveniences).count();
+        return (cafeConvenienceCount.add(roomConvenienceCount)).eq((long) conveniences.size());
+
+//        return cConveniences.name.in(conveniences).or(rConveniences.name.in(conveniences));
     }
 
     private OrderSpecifier[] createOrderSpecifier(SearchSortType sortType) {
