@@ -52,11 +52,12 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
-                        keywordContains(searchRequest.getKeyword()),
-                        totalGradeGoe(searchRequest.getMinGrade()),
-                        hashtagContains(searchRequest.getHashtags()),
-                        convenienceContains(searchRequest.getConveniences())
+                        keywordContains(searchRequest.getKeyword())
                 )
+                .having(
+                        hashtagContains(searchRequest.getHashtags()),
+                        totalGradeGoe(searchRequest.getMinGrade()),
+                        convenienceContains(searchRequest.getConveniences()))
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -88,11 +89,12 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
-                        keywordContains(searchRequest.getKeyword()),
-                        totalGradeGoe(searchRequest.getMinGrade()),
-                        hashtagContains(searchRequest.getHashtags()),
-                        convenienceContains(searchRequest.getConveniences())
+                        keywordContains(searchRequest.getKeyword())
                 )
+                .having(
+                        hashtagContains(searchRequest.getHashtags()),
+                        totalGradeGoe(searchRequest.getMinGrade()),
+                        convenienceContains(searchRequest.getConveniences()))
                 .groupBy(studycafe.id)
                 .orderBy(createOrderSpecifier(searchRequest.getSortType()))
                 .offset(pageable.getOffset())
