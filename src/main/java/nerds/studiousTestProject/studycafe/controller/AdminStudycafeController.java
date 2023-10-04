@@ -16,7 +16,6 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/studycafes/managements")
 @Slf4j
-@Validated
 public class AdminStudycafeController {
     private final StudycafeService studycafeService;
 
