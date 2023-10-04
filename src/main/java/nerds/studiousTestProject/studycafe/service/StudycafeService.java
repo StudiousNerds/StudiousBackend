@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.HolidayProvider;
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
@@ -82,6 +83,7 @@ public class StudycafeService {
     private final HashtagRecordRepository hashtagRecordRepository;
     private final HolidayProvider holidayProvider;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
+    private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
     private final RoomService roomService;
