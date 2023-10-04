@@ -10,9 +10,8 @@ import nerds.studiousTestProject.convenience.entity.QConvenience;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
-import nerds.studiousTestProject.studycafe.entity.Week;
+import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponseInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -28,6 +27,7 @@ import static nerds.studiousTestProject.reservation.entity.QReservationRecord.re
 import static nerds.studiousTestProject.review.entity.QGrade.grade;
 import static nerds.studiousTestProject.review.entity.QReview.review;
 import static nerds.studiousTestProject.room.entity.QRoom.room;
+import static nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType.GRADE_DESC;
 import static nerds.studiousTestProject.studycafe.entity.QOperationInfo.operationInfo;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 import static org.springframework.util.StringUtils.hasText;
@@ -248,10 +248,10 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return cConveniences.name.in(conveniences).and(rConveniences.name.in(conveniences));
     }
 
-    private OrderSpecifier[] createOrderSpecifier(SortType sortType) {
+    private OrderSpecifier[] createOrderSpecifier(SearchSortType sortType) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
-        switch (sortType != null ? sortType : SortType.GRADE_DESC) {
+        switch (sortType != null ? sortType : GRADE_DESC) {
             case RESERVATION_DESC -> orderSpecifiers.add(reservationRecord.count().desc());
             case GRADE_DESC -> orderSpecifiers.add(grade.total.avg().desc());
             case CREATED_DESC -> orderSpecifiers.add(studycafe.createdDate.desc());
