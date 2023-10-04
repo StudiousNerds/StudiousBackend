@@ -3,6 +3,7 @@ package nerds.studiousTestProject.studycafe.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.HolidayProvider;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
@@ -43,14 +44,16 @@ import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInR
 import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
-import nerds.studiousTestProject.studycafe.dto.search.request.SortType;
+import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponseInfo;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.entity.Week;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
 import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
@@ -60,8 +63,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +80,7 @@ public class StudycafeService {
     private final MemberRepository memberRepository;
     private final CafeRegistrationValidator cafeRegistrationValidator;
     private final HashtagRecordRepository hashtagRecordRepository;
+    private final HolidayProvider holidayProvider;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final StudycafeRepository studycafeRepository;
     private final ReviewService reviewService;
@@ -86,17 +91,27 @@ public class StudycafeService {
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
      * 해당 메소드에서 추가적으로 잘못 입력된 값에 대한 예외처리를 진행
-     * @param searchRequest 사용자 검색 요청값
-     * @param pageable 페이지
      * @return 검색 결과
      */
-    public List<SearchResponse> inquire(SearchRequest searchRequest, Pageable pageable) {
-        // 이 부분 Converter 도입 예정
-        if (searchRequest.getSortType() == null) {
-            searchRequest.setSortType(SortType.GRADE_DESC);
-        }
+    public List<SearchResponse> inquire(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
+        List<LocalDate> holidays = holidayProvider.getHolidays();
+        Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
 
-        return studycafeRepository.getSearchResult(searchRequest, pageable).getContent().stream().map(SearchResponse::from).toList();
+        SearchRequest searchRequest = SearchRequest.builder()
+                .keyword(keyword)
+                .date(date)
+                .week(week)
+                .startTime(startTime)
+                .endTime(endTime)
+                .headCount(headCount)
+                .minGrade(minGrade)
+                .hashtags(hashtags)
+                .conveniences(conveniences)
+                .sortType(sortType)
+                .build();
+
+        List<SearchResponseInfo> searchResponseInfos = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
+        return searchResponseInfos.stream().map(s -> SearchResponse.from(s, getAllHashtagNames(s), getAccumRevCnt(s), getGrade(s))).toList();
     }
 
     public FindStudycafeResponse findByDate(Long studycafeId, LocalDate date){
@@ -213,7 +228,45 @@ public class StudycafeService {
         return hashtagNameList;
     }
 
-    private Integer getAccumResCnt(Long studycafeId) {
+    private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
+        int total = 0;
+        Integer reflectedAccumResCnt = searchResponseInfo.getReflectedAccumResCnt();
+        if (reflectedAccumResCnt != null) {
+            total += reflectedAccumResCnt;
+        }
+
+        Integer accumRevCnt = searchResponseInfo.getAccumRevCnt();
+        if (accumRevCnt != null) {
+            total += accumRevCnt;
+        }
+
+        return total;
+    }
+
+    private double getGrade(SearchResponseInfo searchResponseInfo) {
+        double grade = searchResponseInfo.getReflectedTotalGrade();
+        Double notReflected = searchResponseInfo.getTotalGrade();
+        if (notReflected != null && notReflected != 0.) {
+            grade = (grade + notReflected) / 2;
+        }
+
+        return grade;
+    }
+
+    private List<HashtagName> getAllHashtagNames(SearchResponseInfo searchResponseInfo) {
+        List<HashtagName> hashtagNames = new ArrayList<>();
+
+        if (searchResponseInfo.getAccumHashtagHistoryNames() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtagHistoryNames().split(",")).map(HashtagName::valueOf).toList());
+        }
+
+        if (searchResponseInfo.getHashtagRecordNames() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getHashtagRecordNames().split(",")).map(HashtagName::valueOf).toList());
+        }
+        return hashtagNames;
+    }
+
+    private Integer getAccumRevCnt(Long studycafeId) {
         return findAllReservationRecordByStudycafeId(studycafeId).size();
     }
 
