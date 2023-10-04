@@ -46,7 +46,6 @@ public class AdminStudycafeController {
 
     @PostMapping("/validations/businessInfos")
     public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
-        log.info("business = {}", businessInfoRequest);
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
 
@@ -59,7 +58,7 @@ public class AdminStudycafeController {
 
     @GetMapping
     public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember Long memberId, @RequestParam Integer page) {
-        return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, 4));
+        return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
     }
 
     @GetMapping("/{studycafeId}")
