@@ -104,48 +104,34 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
+    /**
+     * 동적 Join 문을 만들어주는 메소드, 편의시설 조건이 있는 경우 추가 Join 발생
+     * @param query Join 문이 작성되기 전 JpaQuery 객체
+     * @param searchRequest 검색 요청
+     * @return Join 문이 작성된 JpaQuery 객체
+     * @param <T> Count Query 인 경우 Long, 나머지는 응답 객체 또는 Entity
+     */
     private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
-        if (searchRequest.getHeadCount() != null || searchRequest.getDate() != null ||
-                searchRequest.getConveniences() != null || searchRequest.getMinGrade() != null ||
-                searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
-            query = query.leftJoin(studycafe.rooms, room);
-
-            if (searchRequest.getDate() != null || searchRequest.getMinGrade() != null || searchRequest.getHashtags() != null || !searchRequest.getSortType().equals(SortType.CREATED_DESC)) {
-                query = query
-                        .leftJoin(room.reservationRecords, reservationRecord);
-
-                if (searchRequest.getDate() != null) {
-                    query = query
-                            .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(Week.of(searchRequest.getDate())));
-                }
-
-                if (searchRequest.getMinGrade() != null || (!searchRequest.getSortType().equals(SortType.CREATED_DESC) && !searchRequest.getSortType().equals(SortType.RESERVATION_DESC)) || searchRequest.getHashtags() != null) {
-                    query = query
-                            .leftJoin(reservationRecord.review, review);
-
-                    if (searchRequest.getMinGrade() != null || searchRequest.getSortType().equals(SortType.GRADE_DESC)) {
-                        query = query
-                                .leftJoin(review.grade, grade);
-                    }
-
-                    if (searchRequest.getHashtags() != null) {
-                        query = query
-                                .leftJoin(review.hashtagRecords, hashtagRecord);
-                    }
-                }
-            }
-
-            if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
-                QConvenience cConveniences = new QConvenience("cConvenienceList");
-                QConvenience rConveniences = new QConvenience("rConvenienceList");
-
-                query = query
-                        .leftJoin(studycafe.conveniences, cConveniences)
-                        .leftJoin(room.conveniences, rConveniences);
-            }
+        if (searchRequest.getDate() != null && searchRequest.getWeek() != null) {
+            query = query
+                    .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(searchRequest.getWeek()));
         }
 
-        return query;
+        if (searchRequest.getConveniences() != null && !searchRequest.getConveniences().isEmpty()) {
+            QConvenience cConveniences = new QConvenience(CAFE_CONVENIENCE_NAME);
+            QConvenience rConveniences = new QConvenience(ROOM_CONVENIENCE_NAME);
+
+            query = query
+                    .leftJoin(studycafe.conveniences, cConveniences)
+                    .leftJoin(room.conveniences, rConveniences);
+        }
+
+        return query.leftJoin(studycafe.accumHashtagHistories, accumHashtagHistory)
+                .leftJoin(studycafe.rooms, room)
+                .leftJoin(room.reservationRecords, reservationRecord)
+                .leftJoin(reservationRecord.review, review)
+                .leftJoin(review.grade, grade)
+                .leftJoin(review.hashtagRecords, hashtagRecord);
     }
 
     private BooleanExpression headCountBetween(Integer headCount) {
