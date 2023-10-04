@@ -31,6 +31,7 @@ public class StudycafeController {
     private final StudycafeService studycafeService;
 
     private static final int STUDYCAFE_SEARCH_SIZE = 8;
+    private static final String TIME_DEFAULT_VALUE = "#{T(java.time.LocalDateTime).now()}";
 
     @GetMapping("/search")
     public List<SearchResponse> search(@RequestParam(required = false) Integer page, @ModelAttribute @Valid SearchRequest searchRequest) {
@@ -40,7 +41,7 @@ public class StudycafeController {
     @GetMapping("/studycafes/{studycafeId}")
     public FindStudycafeResponse findStudycafeInfo(
             @PathVariable("studycafeId") Long studycafeId,
-            @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") @FutureOrPresent LocalDate date) {
+            @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") LocalDate date) {
         return studycafeService.findByDate(studycafeId, date);
     }
 
