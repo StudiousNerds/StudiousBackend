@@ -9,7 +9,7 @@ public class SearchResponseInfo {
     private String name;
     private String photo;
     private Integer reflectedAccumResCnt;
-    private Integer accumResCnt;
+    private Integer accumRevCnt;
     private Integer walkingTime;
     private String nearestStation;
     private String accumHashtagHistoryNames;
@@ -18,12 +18,12 @@ public class SearchResponseInfo {
     private Double totalGrade;
 
     @Builder
-    public SearchResponseInfo(Long id, String name, String photo, Integer reflectedAccumResCnt, Integer accumResCnt, Integer walkingTime, String nearestStation, String accumHashtagHistoryNames, String hashtagRecordNames, Double reflectedTotalGrade, Double totalGrade) {
+    public SearchResponseInfo(Long id, String name, String photo, Integer reflectedAccumResCnt, Integer accumRevCnt, Integer walkingTime, String nearestStation, String accumHashtagHistoryNames, String hashtagRecordNames, Double reflectedTotalGrade, Double totalGrade) {
         this.id = id;
         this.name = name;
         this.photo = photo;
         this.reflectedAccumResCnt = reflectedAccumResCnt;
-        this.accumResCnt = accumResCnt;
+        this.accumRevCnt = accumRevCnt;
         this.walkingTime = walkingTime;
         this.nearestStation = nearestStation;
         this.accumHashtagHistoryNames = accumHashtagHistoryNames;
