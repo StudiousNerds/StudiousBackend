@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.List;
 
@@ -48,9 +50,11 @@ public class AdminStudycafeController {
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
 
-    @PostMapping("/registrations")
-    public RegisterResponse register(@LoggedInMember Long memberId, @RequestBody @Valid RegisterRequest registerRequest) {
-        return studycafeService.register(memberId, registerRequest);
+    @PostMapping
+    public RegisterResponse register(@LoggedInMember Long memberId,
+                                     @RequestPart @Valid RegisterRequest registerRequest,
+                                     MultipartHttpServletRequest request) {
+        return studycafeService.register(memberId, registerRequest, request.getMultiFileMap());
     }
 
     @GetMapping
