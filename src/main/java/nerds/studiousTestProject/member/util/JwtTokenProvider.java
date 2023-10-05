@@ -9,12 +9,11 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotAuthorizedException;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
@@ -22,6 +21,7 @@ import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -167,13 +167,16 @@ public class JwtTokenProvider {
     }
 
     public void setRefreshTokenAtCookie(RefreshToken refreshToken) {
-        Cookie cookie = new Cookie(JwtTokenConst.TOKEN_TYPE_REFRESH, refreshToken.getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(Math.toIntExact(refreshToken.getExpiration()));
+        ResponseCookie responseCookie = ResponseCookie.from(JwtTokenConst.REFRESH_TOKEN_COOKIE_PREFIX, refreshToken.getToken())
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(Math.toIntExact(refreshToken.getExpiration()))
+                .build();
 
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", responseCookie.toString());
     }
 
     public Long getRemainTime(String token) {
