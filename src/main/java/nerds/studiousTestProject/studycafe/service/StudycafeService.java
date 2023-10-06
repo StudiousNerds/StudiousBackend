@@ -310,7 +310,7 @@ public class StudycafeService {
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
-        Studycafe studycafe = cafeInfo.toEntity(member, nearestStationInfoResponse);
+        Studycafe studycafe = cafeInfo.toStudycafe(member, nearestStationInfoResponse);
         addStudycafeInfos(multipartFileMap, cafeInfo, studycafe);   // 스터디카페 관련 정보들을 등록
 
         addRoomInfos(roomInfos, multipartFileMap, studycafe);   // 룸 정보 등록

@@ -41,7 +41,7 @@ public class CafeInfoRequest {
     @Valid
     private List<RefundPolicyRequest> refundPolicies;  // 환불 정책
 
-    public Studycafe toEntity(Member member, NearestStationInfoResponse nearestStationInfoResponse) {
+    public Studycafe toStudycafe(Member member, NearestStationInfoResponse nearestStationInfoResponse) {
         return Studycafe.builder()
                 .name(name)
                 .member(member)
