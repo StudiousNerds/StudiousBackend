@@ -71,7 +71,7 @@ public class HolidayFinder {
      */
     private List<LocalDate> getOneMonthHolidayDateInfos(int year, int month) {
         Map<String, Object> response = getHolidayApiResponse(year, month);
-        validate(response);
+        validateResultCode(response);
 
         List<String> parseResponse = parseResponse(response);
         return parseResponse.stream().map(this::stringToLocalDate).toList();
@@ -152,7 +152,7 @@ public class HolidayFinder {
      * @param response 공휴일 데이터 API 응답
      * @return 검증 결과
      */
-    private void validate(Map<String, Object> response) throws WebClientResponseException {
+    private void validateResultCode(Map<String, Object> response) throws WebClientResponseException {
         Map<String, Object> header = (Map<String, Object>) response.get("header");
         log.info(header.toString());
         String resultCode = String.valueOf(header.get("resultCode"));
