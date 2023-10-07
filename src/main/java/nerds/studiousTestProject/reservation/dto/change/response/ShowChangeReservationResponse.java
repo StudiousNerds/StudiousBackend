@@ -20,9 +20,9 @@ public class ShowChangeReservationResponse {
     private List<PaidConvenienceInfo> paidList;
     private List<PaidConvenienceInfo> notPaidList;
 
-    public static ShowChangeReservationResponse of(ReservationRecord reservationRecord, Payments payments, List<PaidConvenienceInfo> paidConvenienceList, List<PaidConvenienceInfo> notPaidConvenienceList) {
+    public static ShowChangeReservationResponse of(ReservationRecord reservationRecord, int price, List<PaidConvenienceInfo> paidConvenienceList, List<PaidConvenienceInfo> notPaidConvenienceList) {
         return ShowChangeReservationResponse.builder()
-                .info(ReservationWithPlaceAndPayInfo.of(payments, reservationRecord))
+                .info(ReservationWithPlaceAndPayInfo.of(price, reservationRecord))
                 .headCount(reservationRecord.getHeadCount())
                 .paidList(paidConvenienceList)
                 .notPaidList(notPaidConvenienceList)
