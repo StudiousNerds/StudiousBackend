@@ -29,15 +29,17 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious")
+@RequestMapping("/api/v1")
 public class ReservationRecordController {
 
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
+
     @PostMapping("/mypage/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId,
                                                   @RequestBody CancelRequest cancelRequest) {
         paymentService.cancel(cancelRequest, reservationId);
+
         return ResponseEntity.noContent().build();
     }
 
