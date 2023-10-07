@@ -41,7 +41,6 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -322,13 +321,13 @@ public class ReservationRecordService {
     public ShowChangeReservationResponse showChangeReservation(Long reservationRecordId) {
         ReservationRecord reservationRecord = reservationRecordRepository.findByIdWithPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-        List<Payment> payments = paymentRepository.findAllByReservationRecord(reservationRecord);
-        List<Convenience> convenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
-        List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord)
-                .stream().map(convenienceRecord -> new PaidConvenienceInfo(convenienceRecord.getConvenienceName(), convenienceRecord.getPrice())).collect(Collectors.toList());
-        List<PaidConvenienceInfo> paidConvenienceListNotPaid = convenienceList.stream().filter(convenience -> !convenience.isFree() && !paidConvenienceListPaid.contains(convenience.getName().name()))
-                .map(convenience -> new PaidConvenienceInfo(convenience.getName().name(), convenience.getPrice())).collect(Collectors.toList());
-        return ShowChangeReservationResponse.of(reservationRecord, new Payments(payments), paidConvenienceListPaid, paidConvenienceListNotPaid);
+        int price = paymentRepository.findTotalPriceByReservationId(reservationRecord);
+        List<Convenience> paidConvenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
+        List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream()
+                .map(PaidConvenienceInfo::from).toList();
+        List<PaidConvenienceInfo> paidConvenienceListNotPaid = paidConvenienceList.stream()
+                .filter(convenience -> !paidConvenienceListPaid.contains(convenience.getName().name())).map(PaidConvenienceInfo::from).toList();
+        return ShowChangeReservationResponse.of(reservationRecord, price, paidConvenienceListPaid, paidConvenienceListNotPaid);
     }
 
 
