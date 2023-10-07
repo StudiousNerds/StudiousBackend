@@ -6,6 +6,7 @@ import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
+import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
@@ -75,5 +76,10 @@ public class ReservationRecordController {
     @GetMapping("/mypage/reservations/{reservationRecordId}")
     public ReservationDetailResponse showDetail(@PathVariable Long reservationRecordId) {
         return reservationRecordService.showDetail(reservationRecordId);
+    }
+
+    @GetMapping("/mypage/reservations/{reservationRecordId}/changing")
+    public ShowChangeReservationResponse showChangeReservation(@PathVariable Long reservationRecordId) {
+        return reservationRecordService.showChangeReservation(reservationRecordId);
     }
 }
