@@ -24,6 +24,8 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_ORDER_ID;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
@@ -108,23 +110,23 @@ public class PaymentService {
     @Transactional
     public void cancel(CancelRequest cancelRequest, Long reservationId){
         ReservationRecord reservationRecord = findReservationById(reservationId);
-        Payments payments = findPaymentsByReservationRecord(reservationRecord);
-        payments.getPayments().stream().forEach(payment -> validPaymentMethod(cancelRequest, payment));
+        List<Payment> payments = findPaymentsByReservationRecord(reservationRecord);
+        payments.stream().forEach(payment -> validPaymentMethod(cancelRequest, payment));
         //취소 금액 검증
         int totalCancelPrice = 0;
-        for (Payment payment : payments.getPayments()) {
+        for (Payment payment : payments) {
             PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
             payment.cancel(responseFromToss);
             totalCancelPrice += responseFromToss.getTotalAmount();
         }
-        if (totalCancelPrice != payments.getTotalPrice()) {
+        if (totalCancelPrice != payments.stream().mapToInt(Payment::getPrice).sum()) {
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
-    private Payments findPaymentsByReservationRecord(ReservationRecord reservationRecord) {
-        return new Payments(paymentRepository.findAllByReservationRecord(reservationRecord));
+    private List<Payment> findPaymentsByReservationRecord(ReservationRecord reservationRecord) {
+        return paymentRepository.findAllByReservationRecord(reservationRecord);
     }
 
     private void validPaymentMethod(CancelRequest cancelRequest, Payment payment) {
