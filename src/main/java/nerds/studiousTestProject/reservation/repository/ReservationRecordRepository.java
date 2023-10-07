@@ -29,4 +29,7 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
 
     Optional<ReservationRecord> findByReviewId(Long reviewId);
 
+    @Query("select r from ReservationRecord r join fetch r.room ro join ro.studycafe where r.id = :reservationId")
+    Optional<ReservationRecord> findByIdWithPlace(@Param("reservationId") Long reservationRecordId);
+
 }
