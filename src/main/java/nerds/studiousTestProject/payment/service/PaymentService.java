@@ -95,9 +95,9 @@ public class PaymentService {
     public ConfirmFailResponse confirmFail(String message, String orderId){
         Payment payment = findByOrderId(orderId);
         ReservationRecord reservationRecord = payment.getReservationRecord();
-        ConvenienceRecord convenienceRecord = findConvenienceRecordByReservationRecord(reservationRecord);
-        convenienceRecordRepository.delete(convenienceRecord);
-        reservationRecordRepository.delete(reservationRecord);
+        //해당 결제에서 결제한 convenience만 삭제 되어야함..
+        convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
+        //해당 결제만 존재하는 경우 reservation이 삭제 돼야함
         paymentRepository.delete(payment);
         return ConfirmFailResponse.of(message);
     }
