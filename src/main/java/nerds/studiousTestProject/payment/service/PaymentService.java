@@ -99,6 +99,9 @@ public class PaymentService {
         convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
         //해당 결제만 존재하는 경우 reservation이 삭제 돼야함
         paymentRepository.delete(payment);
+        if (!paymentRepository.existsByReservationRecord(reservationRecord)) { //더이상 결제가 존재하지 않는 경우 -> 최초 결제 였던 경우
+            reservationRecordRepository.delete(reservationRecord);
+        }
         return ConfirmFailResponse.of(message);
     }
 
