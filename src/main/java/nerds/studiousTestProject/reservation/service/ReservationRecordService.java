@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -16,6 +15,7 @@ import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
 import nerds.studiousTestProject.reservation.dto.PaymentInfo;
+import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
@@ -42,14 +42,12 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -61,7 +59,6 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INV
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
@@ -380,5 +377,10 @@ public class ReservationRecordService {
     private void validRequestBothNull(final ChangeReservationRequest request) {
         if (request.isBothNull())
             throw new BadRequestException(INVALID_CHANGE_REQUEST);
+    }
+
+    public ShowAdminCancelResponse showAdminCancel(Long reservationId) {
+        ReservationRecord reservationRecord = findByIdWithPlace(reservationId);
+        return ShowAdminCancelResponse.from(reservationRecord);
     }
 }
