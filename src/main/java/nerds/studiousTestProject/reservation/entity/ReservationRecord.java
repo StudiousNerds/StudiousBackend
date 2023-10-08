@@ -105,4 +105,10 @@ public class ReservationRecord {
             this.room = room;
         }
     }
+
+    public void updateHeadCount(final Integer headCount) {
+        if (headCount != null) {
+            this.headCount = headCount;
+        }
+    }
 }
