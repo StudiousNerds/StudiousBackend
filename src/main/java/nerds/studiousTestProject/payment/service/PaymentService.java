@@ -48,6 +48,7 @@ public class PaymentService {
     private final ConvenienceRecordRepository convenienceRecordRepository;
 
     private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
+    private static final String INQUIRY_PAYMENT_URI = "https://api.tosspayments.com/v1/payments/%s";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
 
 
@@ -71,7 +72,7 @@ public class PaymentService {
     public VirtualAccountInfoResponse virtualAccount(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(INQUIRY_PAYMENT_URI, paymentKey));
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.BankCode;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 
@@ -87,7 +88,7 @@ public class PaymentResponseFromToss {
                 .method(method)
                 .status(PaymentStatus.valueOf(status))
                 .dueDate(LocalDateTime.parse(virtualAccount.getDueDate(), DateTimeFormatter.ofPattern(DATE_FORMAT)))
-                .bankCode(virtualAccount.getBankCode())
+                .bankCode(BankCode.from(virtualAccount.getBankCode()))
                 .virtualAccount(virtualAccount.getAccountNumber())
                 .secret(secret)
                 .build();

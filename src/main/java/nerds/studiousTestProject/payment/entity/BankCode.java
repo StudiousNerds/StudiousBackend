@@ -35,7 +35,14 @@ public enum BankCode {
         this.bankCode = bankCode;
     }
 
-    public static String getBankName(String bankCode){
-        return BankCode.valueOf(bankCode).name();
+    public static BankCode from(String bankCode){
+        for(BankCode code : BankCode.values()){
+            if(code.getBankCode().equals(bankCode)) return code;
+        }
+        return null;
+    }
+
+    public String getBankCode() {
+        return bankCode;
     }
 }

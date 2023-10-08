@@ -60,7 +60,8 @@ public class Payment {
     private String virtualAccount;
 
     @Column(name = "bank_code")
-    private String bankCode;
+    @Enumerated(EnumType.STRING)
+    private BankCode bankCode;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
@@ -77,7 +78,7 @@ public class Payment {
     private ReservationRecord reservationRecord;
 
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, String bankCode, LocalDateTime dueDate, String secret, MemberRole canceler, ReservationRecord reservationRecord) {
+    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, BankCode bankCode, LocalDateTime dueDate, String secret, MemberRole canceler, ReservationRecord reservationRecord) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -153,7 +154,7 @@ public class Payment {
         }
     }
 
-    private void updateBankCode(String bankCode) {
+    private void updateBankCode(BankCode bankCode) {
         if (bankCode != null) {
             this.bankCode = bankCode;
         }
