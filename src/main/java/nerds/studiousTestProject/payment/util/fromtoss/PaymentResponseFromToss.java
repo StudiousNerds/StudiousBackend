@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class PaymentResponseFromToss {
+
     private String version;
     private String paymentKey;
     private String type;
@@ -38,7 +39,7 @@ public class PaymentResponseFromToss {
     private int taxFreeAmount;
     private Integer taxExemptionAmount;
     @Nullable
-    private List<Cancels> cancels;
+    private List<Cancel> cancels;
     private boolean isPartialCancelable;
     @Nullable
     private Card card;
