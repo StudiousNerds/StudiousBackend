@@ -49,7 +49,7 @@ public class ReservationRecordController {
         return reservationRecordService.show(roomId, memberId);
     }
 
-    @PostMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    @PostMapping("/reservations/rooms/{roomId}")
     public PaymentInfoResponse reserve(
             @LoggedInMember Long memberId,
             @PathVariable Long roomId,
