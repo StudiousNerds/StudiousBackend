@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto.detail.response;
+package nerds.studiousTestProject.reservation.dto;
 
 import lombok.Builder;
 import lombok.Getter;
