@@ -63,7 +63,8 @@ public enum ErrorCode {
     MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다."),
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
     NOT_FOUND_PAGE("페이지가 없습니다."),
-    MISMATCH_CANCEL_PRICE("총 취소 금액이 맞지않습니다.");
+    MISMATCH_CANCEL_PRICE("총 취소 금액이 맞지않습니다."),
+    INVALID_CHANGE_REQUEST("변경 사항이 없습니다.");
 
     private final String message;
     ErrorCode(String message) {
