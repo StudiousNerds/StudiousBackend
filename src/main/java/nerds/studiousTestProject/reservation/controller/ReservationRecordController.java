@@ -57,7 +57,7 @@ public class ReservationRecordController {
     }
 
     @GetMapping("/mypage/reservations/{reservationId}/cancellations")
-    public ReservationCancelResponse cancelReservationInfo(@PathVariable Long reservationId) {
+    public ReservationCancelResponse cancelInfo(@PathVariable Long reservationId) {
         return reservationRecordService.getCancelInfo(reservationId);
     }
 
