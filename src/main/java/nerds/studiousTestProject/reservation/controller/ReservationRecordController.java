@@ -85,8 +85,7 @@ public class ReservationRecordController {
 
 
     @PostMapping("/mypage/reservations/{reservationRecordId}/changing")
-    public ResponseEntity<Void> change(@PathVariable Long reservationRecordId, @RequestBody ChangeReservationRequest request) {
-        reservationRecordService.change(reservationRecordId, request);
-        return ResponseEntity.noContent().build();
+    public PaymentInfoResponse change(@PathVariable Long reservationRecordId, @RequestBody ChangeReservationRequest request) {
+        return reservationRecordService.change(reservationRecordId, request);
     }
 }

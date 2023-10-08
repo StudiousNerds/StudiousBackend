@@ -331,15 +331,15 @@ public class ReservationRecordService {
 
 
     @Transactional
-    public void change(final Long reservationRecordId, final ChangeReservationRequest request) {
+    public PaymentInfoResponse change(final Long reservationRecordId, final ChangeReservationRequest request) {
         ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
-        Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
+        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
         final Integer headCount = request.getHeadCount();
-        List<PaidConvenienceInfo> conveniences = request.getConveniences();
+        final List<PaidConvenienceInfo> conveniences = request.getConveniences();
         if(conveniences == null && headCount == null)
             throw new BadRequestException(INVALID_CHANGE_REQUEST);
         int price = 0;
-        Room room = reservationRecord.getRoom();
+        final Room room = reservationRecord.getRoom();
         if (headCount != null) {
             if (request.getHeadCount() > room.getMaxHeadCount()) {
                 throw new BadRequestException(OVER_MAX_HEADCOUNT);
@@ -361,6 +361,7 @@ public class ReservationRecordService {
         if (price != request.getPrice()) {
             throw new BadRequestException(MISMATCH_PRICE);
         }
-
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), headCount);
+        return PaymentInfoResponse.of(payment, orderName);
     }
 }
