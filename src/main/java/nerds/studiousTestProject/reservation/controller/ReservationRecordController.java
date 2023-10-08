@@ -44,9 +44,9 @@ public class ReservationRecordController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    @GetMapping("/reservations/rooms/{roomId}")
     public ReserveResponse showReservationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
-        return reservationRecordService.show(studycafeId, roomId, memberId);
+        return reservationRecordService.show(roomId, memberId);
     }
 
     @PostMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
