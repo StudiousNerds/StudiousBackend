@@ -42,6 +42,7 @@ import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -332,15 +333,18 @@ public class ReservationRecordService {
 
     @Transactional
     public PaymentInfoResponse change(final Long reservationRecordId, final ChangeReservationRequest request) {
-        ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
-        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
         validRequestBothNull(request);
+        ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
         int price = 0;
         final Room room = reservationRecord.getRoom();
         price += updateHeadCount(reservationRecord, request.getHeadCount(), room);
+        if (request.getPrice() == 0 && price == 0 && request.getConveniences() == null) {
+            return null;
+        }
+        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
-        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount());
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount() == null ? reservationRecord.getHeadCount() : request.getHeadCount());
         return PaymentInfoResponse.of(payment, orderName);
     }
 
