@@ -93,7 +93,7 @@ public class ReservationRecordService {
         final Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
         final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
-        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
+        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest.getReservationInfo().getPrice()));
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord, payment);
         return PaymentInfoResponse.of(payment, orderName);
@@ -103,11 +103,11 @@ public class ReservationRecordService {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    private Payment createInProgressPayment(final ReservationRecord reservationRecord, final ReserveRequest reserveRequest) {
+    private Payment createInProgressPayment(final ReservationRecord reservationRecord, final Integer price) {
         return Payment.builder()
                 .reservationRecord(reservationRecord)
                 .status(PaymentStatus.IN_PROGRESS)
-                .price(reserveRequest.getReservationInfo().getPrice())
+                .price(price)
                 .orderId(UUID.randomUUID().toString())
                 .build();
     }
@@ -335,13 +335,16 @@ public class ReservationRecordService {
     }
 
 
+    @Transactional
     public void change(final Long reservationRecordId, final ChangeReservationRequest request) {
-        if(request.getConveniences() == null && request.getHeadCount() == null)
+        ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
+        Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
+        final Integer headCount = request.getHeadCount();
+        List<PaidConvenienceInfo> conveniences = request.getConveniences();
+        if(conveniences == null && headCount == null)
             throw new BadRequestException(INVALID_CHANGE_REQUEST);
         int price = 0;
-        ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
         Room room = reservationRecord.getRoom();
-        final Integer headCount = request.getHeadCount();
         if (headCount != null) {
             if (request.getHeadCount() > room.getMaxHeadCount()) {
                 throw new BadRequestException(OVER_MAX_HEADCOUNT);
