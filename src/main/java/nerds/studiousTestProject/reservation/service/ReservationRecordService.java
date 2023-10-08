@@ -341,10 +341,15 @@ public class ReservationRecordService {
         int price = 0;
         ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
         Room room = reservationRecord.getRoom();
-        if (request.getHeadCount() != null) {
+        final Integer headCount = request.getHeadCount();
+        if (headCount != null) {
             if (request.getHeadCount() > room.getMaxHeadCount()) {
                 throw new BadRequestException(OVER_MAX_HEADCOUNT);
             }
+            if (room.getPriceType() == PriceType.PER_PERSON) {
+                price += reservationRecord.getUsingTime() * (headCount - reservationRecord.getHeadCount());
+            }
+            reservationRecord.updateHeadCount(headCount);
         }
     }
 }
