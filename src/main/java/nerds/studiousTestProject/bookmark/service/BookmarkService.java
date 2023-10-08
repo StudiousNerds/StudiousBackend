@@ -7,7 +7,8 @@ import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.hashtag.service.HashtagRecordService;
+import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,10 +35,11 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 @RequiredArgsConstructor
 public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
-    private final HashtagRecordService hashtagRecordService;
+    private final HashtagRecordRepository hashtagRecordRepository;
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final StudycafeRepository studycafeRepository;
+    private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
     @Transactional
     public void registerBookmark(Long memberId, Long studycafeId){
@@ -65,7 +68,7 @@ public class BookmarkService {
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(studycafe.getTotalGrade())
-                        .hashtags(hashtagRecordService.findStudycafeHashtag(studycafe.getId()))
+                        .hashtags(findStudycafeHashtag(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
 
@@ -102,5 +105,17 @@ public class BookmarkService {
 
     private Studycafe findStudycafeById(Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    }
+
+    private List<String> findStudycafeHashtag(Long studycafeId) {
+        List<HashtagRecord> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+
+        int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
+
+        List<String> hashtagNameList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            hashtagNameList.add(hashtagNames.get(i).getName().name());
+        }
+        return hashtagNameList;
     }
 }
