@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
+import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
 @Builder
@@ -17,5 +20,15 @@ public class PaidConvenience {
 
     @NotBlank
     private Integer price;
+
+    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord, Payment payment) {
+        return ConvenienceRecord.builder()
+                .reservationRecord(reservationRecord)
+                .payment(payment)
+                .convenienceName(convenienceName)
+                .price(price)
+                .build();
+    }
+
 
 }

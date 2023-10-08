@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
+import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
 @Getter
@@ -18,6 +20,15 @@ public class PaidConvenienceInfo {
 
     public static PaidConvenienceInfo from(ConvenienceRecord convenienceRecord) {
         return new PaidConvenienceInfo(convenienceRecord.getConvenienceName(), convenienceRecord.getPrice());
+    }
+
+    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord, Payment payment) {
+        return ConvenienceRecord.builder()
+                .reservationRecord(reservationRecord)
+                .convenienceName(this.name)
+                .price(this.price)
+                .payment(payment)
+                .build();
     }
 
 }
