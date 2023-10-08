@@ -1,7 +1,9 @@
 package nerds.studiousTestProject.reservation.dto.change.response;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.payment.entity.Payment;
@@ -9,6 +11,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaidConvenienceInfo {
 
     private String name;
