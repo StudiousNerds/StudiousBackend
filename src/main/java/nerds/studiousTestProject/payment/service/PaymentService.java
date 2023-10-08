@@ -100,7 +100,7 @@ public class PaymentService {
     @Transactional
     public void cancel(final CancelRequest cancelRequest, final Long reservationId){
         final ReservationRecord reservationRecord = findReservationById(reservationId);
-        final List<Payment> payments = findPaymentsByReservationRecord(reservationRecord);
+        final List<Payment> payments = findAllByReservationRecord(reservationRecord);
         payments.stream().forEach(payment -> validPaymentMethod(cancelRequest, payment));
         //취소 금액 검증
         int totalCancelPrice = 0;
@@ -115,7 +115,7 @@ public class PaymentService {
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
-    private List<Payment> findPaymentsByReservationRecord(final ReservationRecord reservationRecord) {
+    private List<Payment> findAllByReservationRecord(final ReservationRecord reservationRecord) {
         return paymentRepository.findAllByReservationRecord(reservationRecord);
     }
 
@@ -171,5 +171,21 @@ public class PaymentService {
     }
 
 
-
+    @Transactional
+    public void adminCancel(final Long reservationId, final CancelRequest request) {
+        final ReservationRecord reservationRecord = findReservationById(reservationId);
+        List<Payment> payments = findAllByReservationRecord(reservationRecord);
+        payments.stream().forEach(payment -> validPaymentMethod(request, payment));
+        //취소 금액 검증
+        int totalCancelPrice = 0;
+        for (Payment payment : payments) {
+            final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(request, String.format(CANCEL_URI, payment.getPaymentKey()));
+            payment.cancel(responseFromToss, MemberRole.ADMIN);
+            totalCancelPrice += responseFromToss.getTotalAmount();
+        }
+        if (totalCancelPrice != payments.stream().mapToInt(Payment::getPrice).sum()) {
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
+        }
+        reservationRecord.canceled();
+    }
 }
