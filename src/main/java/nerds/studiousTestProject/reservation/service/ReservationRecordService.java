@@ -86,21 +86,21 @@ public class ReservationRecordService {
     private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
 
     @Transactional
-    public PaymentInfoResponse reserve(ReserveRequest reserveRequest, Long roomId, Long memberId) {
-        Room room = findRoomById(roomId);
+    public PaymentInfoResponse reserve(final ReserveRequest reserveRequest, final Long roomId, final Long memberId) {
+        final Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
-        ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
-        Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
-        String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
+        final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
+        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest));
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord, payment);
         return PaymentInfoResponse.of(payment, orderName);
     }
 
-    private Member findMemberById(Long memberId) {
+    private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    private Payment createInProgressPayment(ReservationRecord reservationRecord, ReserveRequest reserveRequest) {
+    private Payment createInProgressPayment(final ReservationRecord reservationRecord, final ReserveRequest reserveRequest) {
         return Payment.builder()
                 .reservationRecord(reservationRecord)
                 .status(PaymentStatus.IN_PROGRESS)
@@ -109,7 +109,7 @@ public class ReservationRecordService {
                 .build();
     }
 
-    private void validReservationInfo(ReserveRequest reserveRequest, Room room) {
+    private void validReservationInfo(final ReserveRequest reserveRequest, final Room room) {
         ReservationInfo reservationInfo = reserveRequest.getReservationInfo();
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
@@ -120,8 +120,8 @@ public class ReservationRecordService {
         validCalculatePrice(reserveRequest, room, reservationInfo);
     }
 
-    private void validCalculatePrice(ReserveRequest reserveRequest, Room room, ReservationInfo reservationInfo) {
-        int conveniencePrice = reserveRequest.getPaidConveniences().stream().mapToInt(PaidConvenience::getPrice).sum();
+    private void validCalculatePrice(final ReserveRequest reserveRequest, final Room room, final ReservationInfo reservationInfo) {
+        final int conveniencePrice = reserveRequest.getPaidConveniences().stream().mapToInt(PaidConvenience::getPrice).sum();
         if (room.getPriceType() == PriceType.PER_HOUR) {
             if (reservationInfo.getPrice() != room.getPrice() * reservationInfo.getUsingTime() + conveniencePrice) {
                 throw new BadRequestException(MISCALCULATED_PRICE);
@@ -135,41 +135,41 @@ public class ReservationRecordService {
         }
     }
 
-    private void validCorrectDate(ReservationInfo reservationInfo) {
+    private void validCorrectDate(final ReservationInfo reservationInfo) {
         if (reservationInfo.getDate().isBefore(LocalDate.now())) { // 예약 날짜가 오늘 전일 경우 (지난 날짜일 경우)
             throw new BadRequestException(INVALID_RESERVE_DATE);
         }
     }
 
-    private void validOverMaxHeadCount(ReservationInfo reservationInfo, Room room) {
+    private void validOverMaxHeadCount(final ReservationInfo reservationInfo, Room room) {
         if (room.getMaxHeadCount() < reservationInfo.getHeadCount()) throw new BadRequestException(OVER_MAX_HEADCOUNT);
     }
 
-    private void validCorrectTime(ReservationInfo reservationInfo) {
+    private void validCorrectTime(final ReservationInfo reservationInfo) {
         if (reservationInfo.getStartTime().isAfter(reservationInfo.getEndTime())) { // 예약 끝 시간은 시작 시간보다 뒤여야함
             throw new BadRequestException(START_TIME_AFTER_THAN_END_TIME);
         }
     }
 
-    private void validUsingTimePerHour(ReservationInfo reservationInfo) {
+    private void validUsingTimePerHour(final ReservationInfo reservationInfo) {
         if (reservationInfo.getStartTime().getMinute() != 0 || reservationInfo.getEndTime().getMinute() != 0) { //시간 단위가 아닐 때
             throw new BadRequestException(USING_TIME_NOT_PER_HOUR);
         }
     }
 
-    private void validCalculateUsingTime(ReservationInfo reservationInfo) {
+    private void validCalculateUsingTime(final ReservationInfo reservationInfo) {
         if (reservationInfo.getEndTime().getHour() - reservationInfo.getStartTime().getHour() != reservationInfo.getUsingTime()) {
             throw new BadRequestException(MISCALCULATED_USING_TIME);
         }
     }
 
-    private void validMinUsingTime(ReservationInfo reservationInfo, Room room) {
+    private void validMinUsingTime(final ReservationInfo reservationInfo,final  Room room) {
         if (reservationInfo.getUsingTime() < room.getMinUsingTime()) { // 최소 이용시간 보다 작을 때
             throw new BadRequestException(INVALID_USING_TIME);
         }
     }
 
-    private void savePaidConvenienceRecord(ReserveRequest reserveRequest, ReservationRecord reservationRecord, Payment payment) {
+    private void savePaidConvenienceRecord(final ReserveRequest reserveRequest,final  ReservationRecord reservationRecord,final  Payment payment) {
         reserveRequest.getPaidConveniences().stream()
                 .map(paidConvenience -> convenienceRecordRepository.save(
                         ConvenienceRecord.builder()
@@ -201,27 +201,27 @@ public class ReservationRecordService {
         return reservationTimes;
     }
 
-    public ReservationRecord findByIdWithPlace(Long reservationRecordId) {
+    public ReservationRecord findByIdWithPlace(final Long reservationRecordId) {
         return reservationRecordRepository.findByIdWithPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    public Room findRoomById(Long roomId) {
+    public Room findRoomById(final Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
-    private Room findRoomByIdWithStudycafe(Long roomId) {
+    private Room findRoomByIdWithStudycafe(final Long roomId) {
         return roomRepository.findByIdWithStudycafe(roomId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
-    public ReserveResponse show(Long cafeId, Long roomId, Long memberId) {
-        Member member = findMemberById(memberId);
-        Room room = findRoomById(roomId);
-        Studycafe studycafe = findStudycafeById(cafeId);
-        List<Convenience> conveniences = convenienceRepository.findAllByRoom(room);
-        List<RefundPolicy> refundPolicyList = refundPolicyRepository.findAllByStudycafe(studycafe);
+    public ReserveResponse show(final Long roomId, final Long memberId) {
+        final Member member = findMemberById(memberId);
+        final Room room = findRoomByIdWithStudycafe(roomId);
+        final Studycafe studycafe = room.getStudycafe();
+        final List<Convenience> conveniences = convenienceRepository.findAllByRoom(room);
+        final List<RefundPolicy> refundPolicyList = refundPolicyRepository.findAllByStudycafe(studycafe);
         return ReserveResponse.of(member, room, studycafe, conveniences, refundPolicyList);
     }
 
@@ -270,24 +270,24 @@ public class ReservationRecordService {
         return new PaymentInfoWithRefund(refundPrice, refundFee, payments.stream().map(PaymentInfo::from).toList());
     }
 
-    private RefundPolicy getRefundPolicyOnDay(List<RefundPolicy> refundPolicies, int remainDate) {
+    private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {
         return refundPolicies.stream()
                 .filter(refundPolicy -> refundPolicy.getRemaining().getRemain() == remainDate)
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
     }
 
-    private int getRemainDate(LocalDate reservationDate, LocalDate now) {
+    private int getRemainDate(final LocalDate reservationDate, final LocalDate now) {
         int remainDate = reservationDate.getDayOfYear() - now.getDayOfYear();
         return remainDate > 8 ? 8 : remainDate;
     }
 
     public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, Long memberId) {
         page = validPageAndAssign(page);
-        Member member = memberRepository.findById(memberId).orElseThrow(
+        final Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
-        Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
-        List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
+        final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
+        final List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
         return MypageReservationResponse.of(reservationRecordInfoWithStatusList, reservationRecordPage);
     }
 
@@ -296,37 +296,37 @@ public class ReservationRecordService {
         return page - 1;
     }
 
-    public ReservationRecordInfoWithStatus createReservationSettingsResponse(ReservationRecord reservationRecord) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
-        Payment payment = findPaymentByReservation(reservationRecord);
+    public ReservationRecordInfoWithStatus createReservationSettingsResponse(final ReservationRecord reservationRecord) {
+        final Room room = reservationRecord.getRoom();
+        final Studycafe studycafe = room.getStudycafe();
+        final Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationRecordInfoWithStatus.of(studycafe, room, reservationRecord, payment);
     }
 
-    public ReservationDetailResponse showDetail(Long reservationRecordId) {
-        ReservationRecord reservationRecord = findReservationByIdWithPlace(reservationRecordId);
-        Payment payment = findPaymentByReservation(reservationRecord);
+    public ReservationDetailResponse showDetail(final Long reservationRecordId) {
+        final ReservationRecord reservationRecord = findReservationByIdWithPlace(reservationRecordId);
+        final Payment payment = findPaymentByReservation(reservationRecord);
         return ReservationDetailResponse.of(reservationRecord, payment);
     }
 
-    private ReservationRecord findReservationByIdWithPlace(Long reservationRecordId) {
+    private ReservationRecord findReservationByIdWithPlace(final Long reservationRecordId) {
         return reservationRecordRepository.findByIdWithPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
+    private Payment findPaymentByReservation(final ReservationRecord reservationRecord) {
         return paymentRepository.findByReservationRecord(reservationRecord)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
-    public ShowChangeReservationResponse showChangeReservation(Long reservationRecordId) {
-        ReservationRecord reservationRecord = reservationRecordRepository.findByIdWithPlace(reservationRecordId)
+    public ShowChangeReservationResponse showChangeReservation(final Long reservationRecordId) {
+        final ReservationRecord reservationRecord = reservationRecordRepository.findByIdWithPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-        int price = paymentRepository.findTotalPriceByReservationId(reservationRecord);
-        List<Convenience> paidConvenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
-        List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream()
+        final int price = paymentRepository.findTotalPriceByReservationId(reservationRecord);
+        final List<Convenience> paidConvenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
+        final List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream()
                 .map(PaidConvenienceInfo::from).toList();
-        List<PaidConvenienceInfo> paidConvenienceListNotPaid = paidConvenienceList.stream()
+        final List<PaidConvenienceInfo> paidConvenienceListNotPaid = paidConvenienceList.stream()
                 .filter(convenience -> !paidConvenienceListPaid.contains(convenience.getName().name())).map(PaidConvenienceInfo::from).toList();
         return ShowChangeReservationResponse.of(reservationRecord, price, paidConvenienceListPaid, paidConvenienceListNotPaid);
     }
