@@ -11,9 +11,9 @@ import java.util.List;
 public interface HashtagRecordRepository extends JpaRepository<HashtagRecord, Long> {
     void deleteAllByReviewId(Long reviewId);
 
-    @Query(value = "select h.name from HashtagRecord as h join fetch ReservationRecord as r " +
+    @Query(value = "select h from HashtagRecord as h join fetch ReservationRecord as r " +
             "where r.room.studycafe.id = :studycafeId " +
             "group by h.name " +
             "order by count(h.id) desc")
-    List<HashtagName> findHashtagRecordByStudycafeId(@Param("studycafeId") Long studycafeId);
+    List<HashtagRecord> findHashtagRecordByStudycafeId(@Param("studycafeId") Long studycafeId);
 }
