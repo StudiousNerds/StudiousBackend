@@ -21,4 +21,8 @@ public class ChangeReservationRequest {
     private Integer headCount;
     private List<PaidConvenienceInfo> conveniences;
 
+    public boolean isBothNull() {
+        return headCount == null && conveniences == null;
+    }
+
 }
