@@ -7,6 +7,7 @@ import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -64,11 +65,11 @@ public class BookmarkService {
                         .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumRevCnt(findAllReservationRecordByStudycafeId(studycafe.getId()).size())
+                        .accumRevCnt(findReservationRecordsByStudycafeId(studycafe.getId()).size())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(studycafe.getTotalGrade())
-                        .hashtags(findStudycafeHashtag(studycafe.getId()))
+                        .hashtags(findHashtagById(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
 
@@ -94,27 +95,26 @@ public class BookmarkService {
         return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
     }
 
-    private List<ReservationRecord> findAllReservationRecordByStudycafeId(Long studycafeId) {
+    private List<ReservationRecord> findReservationRecordsByStudycafeId(Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 
     private Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private List<String> findStudycafeHashtag(Long studycafeId) {
-        List<HashtagRecord> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+    private List<String> findHashtagById(Long studycafeId) {
+        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
         List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).getName().name());
+            hashtagNameList.add(hashtagNames.get(i).name());
         }
         return hashtagNameList;
     }
