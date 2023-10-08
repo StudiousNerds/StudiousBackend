@@ -474,7 +474,7 @@ public class ReviewService {
     }
 
     private void validateAvailableReviewTime(ReservationRecord reservationRecord) {
-        if (LocalTime.now().isAfter(reservationRecord.getEndTime())) {
+        if (LocalDate.now().isBefore(reservationRecord.getDate()) || LocalTime.now().isBefore(reservationRecord.getEndTime())) {
             throw new BadRequestException(INVALID_WRITE_REVIEW_TIME);
         }
     }
