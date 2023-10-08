@@ -267,7 +267,7 @@ public class ReservationRecordService {
         final int totalPrice = payments.stream().mapToInt(Payment::getPrice).sum();
         final int refundFee = totalPrice * refundPolicyOnDay.getRate() * (1 / 100);
         final int refundPrice = totalPrice - refundFee;
-        return new PaymentInfoWithRefund(refundPrice, refundFee, payments.stream().map(PaymentInfo::from).toList());
+        return new PaymentInfoWithRefund(totalPrice, refundPrice, refundFee, payments.stream().map(PaymentInfo::from).toList());
     }
 
     private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {

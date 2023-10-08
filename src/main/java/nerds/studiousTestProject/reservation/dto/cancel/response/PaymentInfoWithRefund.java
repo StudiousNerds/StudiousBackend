@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class PaymentInfoWithRefund {
 
+    private int totalPrice;
     private int refundPrice;
     private int refundFee;
     List<PaymentInfo> payment;
