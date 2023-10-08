@@ -60,6 +60,7 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INV
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
@@ -361,6 +362,10 @@ public class ReservationRecordService {
                 price += convenience.getPrice();
                 convenienceRecordRepository.save(convenience.toConvenienceRecord(reservationRecord, payment));
             }
+        }
+
+        if (price != request.getPrice()) {
+            throw new BadRequestException(MISMATCH_PRICE);
         }
 
     }
