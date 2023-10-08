@@ -19,7 +19,7 @@ public class VirtualAccountInfoResponse {
         return VirtualAccountInfoResponse.builder()
                 .dueDate(payment.getDueDate())
                 .virtualAccount(payment.getVirtualAccount())
-                .bankName(BankCode.getBankName(payment.getBankCode()))
+                .bankName(payment.getBankCode().name())
                 .build();
     }
 }
