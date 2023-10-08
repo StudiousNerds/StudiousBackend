@@ -69,6 +69,7 @@ public class Payment {
     private String secret;
 
     @Column(name = "canceler")
+    @Enumerated(EnumType.STRING)
     private MemberRole canceler;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -97,7 +98,7 @@ public class Payment {
     public void cancel(final PaymentResponseFromToss responseFromToss, final MemberRole canceler) {
         final String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
         if (cancelReason != null) this.cancelReason = cancelReason;
-        if (!status.equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
+        if (!responseFromToss.getStatus().equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
         this.status = CANCELED;
         if (canceler != null) this.canceler = MemberRole.USER;
     }
