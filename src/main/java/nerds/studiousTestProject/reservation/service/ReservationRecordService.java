@@ -120,7 +120,7 @@ public class ReservationRecordService {
         validCalculateUsingTime(reservationInfo);
         validUsingTimePerHour(reservationInfo);
         validMinUsingTime(reservationInfo, room);
-        validOverMaxHeadCount(reservationInfo, room);
+        validOverMaxHeadCount(reservationInfo.getHeadCount(), room);
         validCalculatePrice(reserveRequest, room, reservationInfo);
     }
 
@@ -145,8 +145,8 @@ public class ReservationRecordService {
         }
     }
 
-    private void validOverMaxHeadCount(final ReservationInfo reservationInfo, Room room) {
-        if (room.getMaxHeadCount() < reservationInfo.getHeadCount()) throw new BadRequestException(OVER_MAX_HEADCOUNT);
+    private void validOverMaxHeadCount(final int headCount, Room room) {
+        if (room.getMaxHeadCount() < headCount) throw new BadRequestException(OVER_MAX_HEADCOUNT);
     }
 
     private void validCorrectTime(final ReservationInfo reservationInfo) {
@@ -334,34 +334,47 @@ public class ReservationRecordService {
     public PaymentInfoResponse change(final Long reservationRecordId, final ChangeReservationRequest request) {
         ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
         final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
-        final Integer headCount = request.getHeadCount();
-        final List<PaidConvenienceInfo> conveniences = request.getConveniences();
-        if(conveniences == null && headCount == null)
-            throw new BadRequestException(INVALID_CHANGE_REQUEST);
+        validRequestBothNull(request);
         int price = 0;
         final Room room = reservationRecord.getRoom();
-        if (headCount != null) {
-            if (request.getHeadCount() > room.getMaxHeadCount()) {
-                throw new BadRequestException(OVER_MAX_HEADCOUNT);
-            }
-            if (room.getPriceType() == PriceType.PER_PERSON) {
-                price += reservationRecord.getUsingTime() * (headCount - reservationRecord.getHeadCount());
-            }
-            reservationRecord.updateHeadCount(headCount);
-        }
+        price += updateHeadCount(reservationRecord, request.getHeadCount(), room);
+        price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
+        validMatchPrice(request, price);
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount());
+        return PaymentInfoResponse.of(payment, orderName);
+    }
 
-
+    private int updateConvenienceRecord(final ReservationRecord reservationRecord, final Payment payment, final List<PaidConvenienceInfo> conveniences) {
+        int price = 0;
         if (conveniences != null) {
             for (PaidConvenienceInfo convenience : conveniences) {
                 price += convenience.getPrice();
                 convenienceRecordRepository.save(convenience.toConvenienceRecord(reservationRecord, payment));
             }
         }
+        return price;
+    }
 
-        if (price != request.getPrice()) {
-            throw new BadRequestException(MISMATCH_PRICE);
+    private int updateHeadCount(final ReservationRecord reservationRecord, final Integer headCount, final Room room) {
+        int price = 0;
+        if (headCount != null) {
+            validOverMaxHeadCount(headCount, room);
+            if (room.getPriceType() == PriceType.PER_PERSON) {
+                price += reservationRecord.getUsingTime() * (headCount - reservationRecord.getHeadCount());
+            }
+            reservationRecord.updateHeadCount(headCount);
         }
-        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), headCount);
-        return PaymentInfoResponse.of(payment, orderName);
+        return price;
+    }
+
+    private void validMatchPrice(final ChangeReservationRequest request, final int price) {
+        if (price != request.getPrice()) {
+            throw new BadRequestException(MISCALCULATED_PRICE);
+        }
+    }
+
+    private void validRequestBothNull(final ChangeReservationRequest request) {
+        if (request.isBothNull())
+            throw new BadRequestException(INVALID_CHANGE_REQUEST);
     }
 }
