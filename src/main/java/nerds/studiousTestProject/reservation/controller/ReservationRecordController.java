@@ -36,8 +36,8 @@ public class ReservationRecordController {
     private final ReservationRecordService reservationRecordService;
 
     @PostMapping("/mypage/reservations/{reservationId}/cancellations")
-    public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId,
-                                                  @RequestBody CancelRequest cancelRequest) {
+    public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
+                                       @RequestBody CancelRequest cancelRequest) {
         paymentService.cancel(cancelRequest, reservationId);
 
         return ResponseEntity.noContent().build();
