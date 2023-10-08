@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
@@ -104,7 +105,7 @@ public class PaymentService {
         int totalCancelPrice = 0;
         for (Payment payment : payments) {
             PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
-            payment.cancel(responseFromToss);
+            payment.cancel(responseFromToss, MemberRole.USER);
             totalCancelPrice += responseFromToss.getTotalAmount();
         }
         if (totalCancelPrice != payments.stream().mapToInt(Payment::getPrice).sum()) {
