@@ -211,9 +211,9 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
-    public Studycafe findStudycafeById(Long studycafeId) {
-        return studycafeRepository.findById(studycafeId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    private Room findRoomByIdWithStudycafe(Long roomId) {
+        return roomRepository.findByIdWithStudycafe(roomId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
     public ReserveResponse show(Long cafeId, Long roomId, Long memberId) {
