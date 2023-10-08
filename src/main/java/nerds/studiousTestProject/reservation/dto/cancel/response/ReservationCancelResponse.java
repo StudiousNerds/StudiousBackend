@@ -8,7 +8,9 @@ import lombok.Getter;
 @Builder
 @Getter
 public class ReservationCancelResponse {
-    private ReservationRecordInfo reservationInfo;
-    private PaymentInfoWithRefund paymentInfoWithRefund;
-    private RefundPolicyInfoWithOnDay refundPolicyInfo;
+
+    private ReservationRecordInfoWithPlace reservation;
+    private PaymentInfoWithRefund paymentRecord;
+    private RefundPolicyInfoWithOnDay refundPolicy;
+
 }

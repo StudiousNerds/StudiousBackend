@@ -6,6 +6,7 @@ import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
+import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
@@ -23,30 +24,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.time.LocalDate;
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious")
+@RequestMapping("/api/v1")
 public class ReservationRecordController {
 
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
+
     @PostMapping("/mypage/reservations/{reservationId}/cancellations")
-    public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId,
-                                                  @RequestBody CancelRequest cancelRequest) {
+    public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
+                                       @RequestBody CancelRequest cancelRequest) {
         paymentService.cancel(cancelRequest, reservationId);
+
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    @GetMapping("/reservations/rooms/{roomId}")
     public ReserveResponse showReservationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
-        return reservationRecordService.show(studycafeId, roomId, memberId);
+        return reservationRecordService.show(roomId, memberId);
     }
 
-    @PostMapping("/reservations/studycafes/{studycafeId}/rooms/{roomId}")
+    @PostMapping("/reservations/rooms/{roomId}")
     public PaymentInfoResponse reserve(
             @LoggedInMember Long memberId,
             @PathVariable Long roomId,
@@ -55,7 +57,7 @@ public class ReservationRecordController {
     }
 
     @GetMapping("/mypage/reservations/{reservationId}/cancellations")
-    public ReservationCancelResponse cancelReservationInfo(@PathVariable Long reservationId) {
+    public ReservationCancelResponse cancelInfo(@PathVariable Long reservationId) {
         return reservationRecordService.getCancelInfo(reservationId);
     }
 
@@ -73,5 +75,10 @@ public class ReservationRecordController {
     @GetMapping("/mypage/reservations/{reservationRecordId}")
     public ReservationDetailResponse showDetail(@PathVariable Long reservationRecordId) {
         return reservationRecordService.showDetail(reservationRecordId);
+    }
+
+    @GetMapping("/mypage/reservations/{reservationRecordId}/changing")
+    public ShowChangeReservationResponse showChangeReservation(@PathVariable Long reservationRecordId) {
+        return reservationRecordService.showChangeReservation(reservationRecordId);
     }
 }

@@ -1,9 +1,8 @@
-package nerds.studiousTestProject.reservation.dto.detail.response;
+package nerds.studiousTestProject.reservation.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.payment.entity.Payment;
-
 import java.time.LocalDateTime;
 
 @Getter

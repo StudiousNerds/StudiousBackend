@@ -24,7 +24,6 @@ import static nerds.studiousTestProject.reservation.entity.QReservationRecord.re
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 
 
-@Component
 @RequiredArgsConstructor
 public class ReservationRecordRepositoryCustomImpl implements ReservationRecordRepositoryCustom {
 
@@ -54,15 +53,15 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
         return query.innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
                 .innerJoin(reservationRecord.room.studycafe, studycafe)
                 .where(
-                        equalToStudycafeName(studycafeName),
+                        searchByStudycafeName(studycafeName),
                         handleTab(tab),
                         afterReservationStartDate(startDate),
                         beforeReservationEndDate(endDate)
                 );
     }
 
-    private BooleanExpression equalToStudycafeName(String studycafeName) {
-        return studycafeName == null ? null : studycafe.name.eq(studycafeName);
+    private BooleanExpression searchByStudycafeName(String studycafeName) {
+        return studycafeName == null ? null : studycafe.name.contains(studycafeName);
     }
 
     private BooleanExpression afterReservationStartDate(LocalDate startDate) {
