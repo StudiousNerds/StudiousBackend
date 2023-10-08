@@ -6,6 +6,7 @@ import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.dto.PaymentInfo;
 import nerds.studiousTestProject.reservation.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
+import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
