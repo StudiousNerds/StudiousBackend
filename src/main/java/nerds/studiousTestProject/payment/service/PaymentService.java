@@ -8,7 +8,6 @@ import nerds.studiousTestProject.convenience.repository.ConvenienceRecordReposit
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
-import nerds.studiousTestProject.payment.entity.Payments;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -19,11 +18,8 @@ import nerds.studiousTestProject.payment.util.PaymentGenerator;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
@@ -56,24 +52,18 @@ public class PaymentService {
 
     @Transactional
     public ReservationDetailResponse confirmSuccess(String orderId, String paymentKey, Integer amount) {
-        Payment payment = findByOrderId(orderId);
+        Payment payment = findByOrderIdWithReservationAndPlace(orderId);
         validConfirmRequest(orderId, amount, payment);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = payment.getReservationRecord();
         reservationRecord.completePay();
-        return createReservationDetailResponse(payment, reservationRecord);
+        return ReservationDetailResponse.of(reservationRecord, payment);
     }
 
     private void validConfirmRequest(String orderId, Integer amount, Payment payment){
         if(!amount.equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
         if(!orderId.equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
-    }
-
-    private ReservationDetailResponse createReservationDetailResponse(Payment payment, ReservationRecord reservationRecord) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
-        return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
     }
 
     @Transactional
@@ -82,7 +72,7 @@ public class PaymentService {
         validConfirmRequest(orderId, amount, payment);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
         validPaymentMethod(responseFromToss);
-        payment.complete(responseFromToss.toVitualAccountPayment());
+        payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         return VirtualAccountInfoResponse.from(payment);
     }
@@ -95,13 +85,11 @@ public class PaymentService {
 
     @Transactional
     public ConfirmFailResponse confirmFail(String message, String orderId){
-        Payment payment = findByOrderId(orderId);
+        Payment payment = findByOrderIdWithReservation(orderId);
         ReservationRecord reservationRecord = payment.getReservationRecord();
-        //해당 결제에서 결제한 convenience만 삭제 되어야함..
-        convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
-        //해당 결제만 존재하는 경우 reservation이 삭제 돼야함
+        convenienceRecordRepository.findAllByPayment(payment).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
         paymentRepository.delete(payment);
-        if (!paymentRepository.existsByReservationRecord(reservationRecord)) { //더이상 결제가 존재하지 않는 경우 -> 최초 결제 였던 경우
+        if (!paymentRepository.existsByReservationRecord(reservationRecord)) {
             reservationRecordRepository.delete(reservationRecord);
         }
         return ConfirmFailResponse.of(message);
@@ -140,7 +128,7 @@ public class PaymentService {
     }
 
     public void processDepositByStatus(DepositCallbackRequest depositCallbackRequest) {
-        Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
+        Payment payment = findByOrderIdWithReservation(depositCallbackRequest.getOrderId());
         String status = depositCallbackRequest.getStatus();
         ReservationRecord reservationRecord = payment.getReservationRecord();
         if(isDepositError(payment, status)){ // 입금 오류
@@ -171,5 +159,15 @@ public class PaymentService {
     private Payment findByOrderId(String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
+
+    private Payment findByOrderIdWithReservation(String orderId) {
+        return paymentRepository.findByOrderIdWithReservation(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    }
+
+    private Payment findByOrderIdWithReservationAndPlace(String orderId) {
+        return paymentRepository.findByOrderIdWithReservationAndPlace(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    }
+
+
 
 }
