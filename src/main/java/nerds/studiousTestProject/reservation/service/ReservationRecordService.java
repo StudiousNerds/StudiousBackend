@@ -354,5 +354,14 @@ public class ReservationRecordService {
             }
             reservationRecord.updateHeadCount(headCount);
         }
+
+
+        if (conveniences != null) {
+            for (PaidConvenienceInfo convenience : conveniences) {
+                price += convenience.getPrice();
+                convenienceRecordRepository.save(convenience.toConvenienceRecord(reservationRecord, payment));
+            }
+        }
+
     }
 }
