@@ -20,6 +20,7 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWith
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfoWithPlace;
+import nerds.studiousTestProject.reservation.dto.change.request.ChangeReservationRequest;
 import nerds.studiousTestProject.reservation.dto.change.response.PaidConvenienceInfo;
 import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
@@ -51,6 +52,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_CHANGE_REQUEST;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAGE_NUMBER;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVE_DATE;
@@ -332,4 +334,9 @@ public class ReservationRecordService {
     }
 
 
+    public void change(Long reservationRecordId, ChangeReservationRequest request) {
+        if(request.getConveniences() == null && request.getHeadCount() == null)
+            throw new BadRequestException(INVALID_CHANGE_REQUEST);
+
+    }
 }
