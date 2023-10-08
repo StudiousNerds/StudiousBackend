@@ -304,11 +304,14 @@ public class ReservationRecordService {
     }
 
     public ReservationDetailResponse showDetail(Long reservationRecordId) {
-        ReservationRecord reservationRecord = findById(reservationRecordId);
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
+        ReservationRecord reservationRecord = findReservationByIdWithPlace(reservationRecordId);
         Payment payment = findPaymentByReservation(reservationRecord);
-        return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
+        return ReservationDetailResponse.of(reservationRecord, payment);
+    }
+
+    private ReservationRecord findReservationByIdWithPlace(Long reservationRecordId) {
+        return reservationRecordRepository.findByIdWithPlace(reservationRecordId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
