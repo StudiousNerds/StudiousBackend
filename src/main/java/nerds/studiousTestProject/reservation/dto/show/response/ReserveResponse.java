@@ -3,13 +3,11 @@ package nerds.studiousTestProject.reservation.dto.show.response;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceType;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
