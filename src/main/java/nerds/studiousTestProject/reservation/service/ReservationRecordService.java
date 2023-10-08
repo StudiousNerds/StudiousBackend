@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -334,9 +335,16 @@ public class ReservationRecordService {
     }
 
 
-    public void change(Long reservationRecordId, ChangeReservationRequest request) {
+    public void change(final Long reservationRecordId, final ChangeReservationRequest request) {
         if(request.getConveniences() == null && request.getHeadCount() == null)
             throw new BadRequestException(INVALID_CHANGE_REQUEST);
-
+        int price = 0;
+        ReservationRecord reservationRecord = findByIdWithPlace(reservationRecordId);
+        Room room = reservationRecord.getRoom();
+        if (request.getHeadCount() != null) {
+            if (request.getHeadCount() > room.getMaxHeadCount()) {
+                throw new BadRequestException(OVER_MAX_HEADCOUNT);
+            }
+        }
     }
 }
