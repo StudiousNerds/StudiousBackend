@@ -14,6 +14,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByReservationRecord(ReservationRecord reservationRecord);
     Optional<Payment> findByOrderId(String orderId);
 
+    @Query("select p from Payment p join fetch ReservationRecord where p.orderId = :orderId")
+    Optional<Payment> findByOrderIdWithReservation(@Param("orderId") String orderId);
+
+    @Query("select p from Payment p join fetch ReservationRecord r join fetch r.room ro join fetch ro.studycafe where p.orderId = :orderId")
+    Optional<Payment> findByOrderIdWithReservationAndPlace(@Param("orderId") String orderId);
+
     List<Payment> findAllByReservationRecord(ReservationRecord reservationRecord);
 
     boolean existsByReservationRecord(ReservationRecord reservationRecord);
