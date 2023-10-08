@@ -9,8 +9,6 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
@@ -51,7 +49,6 @@ import java.util.stream.Collectors;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_STATUS;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_WRITE_REVIEW_TIME;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -69,8 +66,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
-    private final PaymentRepository paymentRepository;
-
     public final Double GRADE_COUNT = 3.0;
 
     @Transactional
@@ -109,7 +104,6 @@ public class ReviewService {
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
-
 
     @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {

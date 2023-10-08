@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -197,13 +198,13 @@ public class StudycafeService {
     }
 
     private List<String> findHashtagById(Long studycafeId) {
-        List<HashtagRecord> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
         List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).getName().name());
+            hashtagNameList.add(hashtagNames.get(i).name());
         }
         return hashtagNameList;
     }
