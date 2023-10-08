@@ -84,7 +84,6 @@ public class PaymentResponseFromToss {
                 .paymentKey(paymentKey)
                 .orderId(orderId)
                 .price(totalAmount)
-                .completeTime(LocalDateTime.parse(approvedAt, DateTimeFormatter.ofPattern(DATE_FORMAT)))
                 .method(method)
                 .status(PaymentStatus.valueOf(status))
                 .dueDate(LocalDateTime.parse(virtualAccount.getDueDate(), DateTimeFormatter.ofPattern(DATE_FORMAT)))
