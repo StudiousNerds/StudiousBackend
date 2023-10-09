@@ -3,6 +3,7 @@ package nerds.studiousTestProject.common.service;
 import io.netty.handler.codec.http.HttpScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.IntervalServerException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.WEB_CLIENT_ERROR;
 
 @RequiredArgsConstructor
 @Service
@@ -53,7 +56,7 @@ public class HolidayFinder {
 
         // 공휴일 데이터 API 응답에 오류가 생긴 경우
         if (currentMonthHolidays == null || nextMonthHolidays == null) {
-            return null;
+            throw new IntervalServerException(WEB_CLIENT_ERROR);
         }
 
         List<LocalDate> totalHolidays = new ArrayList<>();
@@ -78,47 +81,6 @@ public class HolidayFinder {
     }
 
     /**
-     * 공휴일 데이터 API 응답 형태
-     * [
-     *        {
-     * 		"response" : {
-     * 			"header" : {
-     * 				"resultCode":"00",
-     * 				"resultMsg":"NORMAL SERVICE."
-     *            },
-     * 			"body":{
-     * 				"items":{
-     * 					"item":[
-     *                        {
-     * 							"dateKind":"01"
-     * 							,"dateName":"임시공휴일",
-     * 							"isHoliday":"Y",
-     * 							"locdate":20231002,
-     * 							"seq":2
-     *                        },
-     *                        {
-     * 							"dateKind":"01",
-     * 							"dateName":"개천절",
-     * 							"isHoliday":"Y",
-     * 							"locdate":20231003,
-     * 							"seq":1
-     *                        },
-     *                        {
-     * 							"dateKind":"01",
-     * 							"dateName":"한글날",
-     * 							"isHoliday":"Y",
-     * 							"locdate":20231009,
-     * 							"seq":1
-     *                        }
-     * 					]
-     *                },
-     * 				"numOfRows":10,
-     * 				"pageNo":1,
-     * 				"totalCount":3
-     *            }
-     *        }
-     *    }
-     * ]
      * @param year 공휴일 조회 연도
      * @param month 공휴일 조회 월
      * @return 해당 년도/월에 모든 공휴일 날짜
@@ -177,12 +139,6 @@ public class HolidayFinder {
         return item.stream().map(m -> String.valueOf(m.get("locdate"))).toList();
     }
 
-    /**
-     * 월을 문자열로 바꿔주는 메소드
-     *  ex) 2 -> "02", 12 -> "12"
-     * @param month 달
-     * @return month 파라미터를 문자열로 바꾼 값
-     */
     private String parseMonthValue(int month) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -193,12 +149,6 @@ public class HolidayFinder {
         return stringBuilder.append(month).toString();
     }
 
-    /**
-     * 현재 달의 다음 달을 계산하는 메소드
-     * 12월인 경우 1월을 반환
-     * @param month 달
-     * @return 다음 달
-     */
     private int getNextMonth(int month) {
         return month < 12 ? month + 1 : 1;
     }
