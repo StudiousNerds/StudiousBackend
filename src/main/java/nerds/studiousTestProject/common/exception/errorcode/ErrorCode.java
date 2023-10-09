@@ -62,7 +62,9 @@ public enum ErrorCode {
     MISMATCH_ORDER_ID("주문 번호가 일치하지 않는 결제입니다."),
     MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다."),
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
-    NOT_FOUND_PAGE("페이지가 없습니다.");
+    NOT_FOUND_PAGE("페이지가 없습니다."),
+    INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
+    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
 
     private final String message;
     ErrorCode(String message) {

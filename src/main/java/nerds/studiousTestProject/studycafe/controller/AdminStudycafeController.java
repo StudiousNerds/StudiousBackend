@@ -16,7 +16,6 @@ import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,17 +24,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/studycafes/managements")
+@RequestMapping("/api/v1/studycafes/managements")
 @Slf4j
-@Validated
 public class AdminStudycafeController {
     private final StudycafeService studycafeService;
+
+    private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
 
     @PostMapping("/validations/accountInfos")
     public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
@@ -44,18 +46,19 @@ public class AdminStudycafeController {
 
     @PostMapping("/validations/businessInfos")
     public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
-        log.info("business = {}", businessInfoRequest);
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
 
-    @PostMapping("/registrations")
-    public RegisterResponse register(@LoggedInMember Long memberId, @RequestBody @Valid RegisterRequest registerRequest) {
-        return studycafeService.register(memberId, registerRequest);
+    @PostMapping
+    public RegisterResponse register(@LoggedInMember Long memberId,
+                                     @RequestPart @Valid RegisterRequest registerRequest,
+                                     MultipartHttpServletRequest request) {
+        return studycafeService.register(memberId, registerRequest, request.getMultiFileMap());
     }
 
     @GetMapping
     public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember Long memberId, @RequestParam Integer page) {
-        return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, 4));
+        return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
     }
 
     @GetMapping("/{studycafeId}")

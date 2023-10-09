@@ -80,7 +80,7 @@ public class Room {
     }
 
     @Builder
-    public Room(Long id, Studycafe studycafe, String name, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, String photo, PriceType type) {
+    public Room(Long id, Studycafe studycafe, String name, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, PriceType type) {
         this.id = id;
         this.studycafe = studycafe;
         this.name = name;
