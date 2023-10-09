@@ -10,18 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-@AllArgsConstructor
-@Builder
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Convenience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +46,17 @@ public class Convenience {
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ConvenienceType type;
+
+    @Builder
+    public Convenience(Long id, Studycafe studycafe, Room room, ConvenienceName name, Integer price, Boolean isFree, ConvenienceType type) {
+        this.id = id;
+        this.studycafe = studycafe;
+        this.room = room;
+        this.name = name;
+        this.price = price;
+        this.isFree = isFree;
+        this.type = type;
+    }
 
     public boolean isFree(){
         return this.isFree;
