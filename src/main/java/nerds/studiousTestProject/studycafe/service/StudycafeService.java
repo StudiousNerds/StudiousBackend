@@ -254,13 +254,17 @@ public class StudycafeService {
     }
 
     private double getGrade(SearchResponseInfo searchResponseInfo) {
-        double grade = searchResponseInfo.getReflectedTotalGrade();
-        Double notReflected = searchResponseInfo.getTotalGrade();
-        if (notReflected != null && notReflected != 0.) {
-            grade = (grade + notReflected) / 2;
-        }
+        Double reflectedGradeSum = searchResponseInfo.getReflectedGradeSum();
+        Double gradeSum = searchResponseInfo.getGradeSum();
+        double sum = (reflectedGradeSum != null ? reflectedGradeSum : 0.) + (gradeSum != null ? gradeSum : 0.);
 
-        return grade;
+        Integer reflectedGradeCount = searchResponseInfo.getReflectedGradeCount();
+        Integer gradeCount = searchResponseInfo.getGradeCount();
+        int count = (reflectedGradeCount != null ? reflectedGradeCount : 0) + (gradeCount != null ? gradeCount : 0);
+
+        count = Math.max(count, 1); // count 값이 0인 경우 NaN이 발생하는 오류 핸들링
+
+        return sum / count;
     }
 
     private List<HashtagName> getAllHashtagNames(SearchResponseInfo searchResponseInfo) {
