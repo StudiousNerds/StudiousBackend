@@ -17,7 +17,7 @@ public class HolidayProvider {
     private final HolidayFinder holidayFinder;
     private final RedisProvider redisProvider;
 
-    private static final String CRON_SCHEDULER_VALUE = "0 0 0 1 * *"; // 매달 1일 자정
+    private static final String CRON_SCHEDULER_ONE_MONTH_VALUE = "0 0 0 1 * *"; // 매달 1일 자정
     private static final String REDIS_HOLIDAY_KEY = "holiday";
     private static final String FAIL_LOG_MESSAGE = "공휴일 데이터 API 요청 과정에서 오류가 발생해 저장하지 못하였습니다. 예외 메시지 = {}";
     private static final String SUCCESS_LOG_MESSAGE = "공휴일 데이터를 성공적으로 저장하였습니다.";
@@ -25,7 +25,7 @@ public class HolidayProvider {
     /**
      * 매달 1일마다 Redis에 이번/다음 달 공휴일 정보를 저장하는 메소드
      */
-    @Scheduled(cron = CRON_SCHEDULER_VALUE)
+    @Scheduled(cron = CRON_SCHEDULER_ONE_MONTH_VALUE)
     private void insertHolidayData() {
         List<LocalDate> holidayInfo;
         try {
