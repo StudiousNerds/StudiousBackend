@@ -69,8 +69,11 @@ public class Studycafe {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @Column(name = "total_grade", nullable = true)
-    private Double totalGrade;
+    @Column(name = "grade_sum", nullable = true)
+    private Double gradeSum;
+
+    @Column(name = "grade_count", nullable = true)
+    private Integer gradeCount;
 
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<Announcement> announcements = new ArrayList<>();
@@ -169,10 +172,6 @@ public class Studycafe {
         }
     }
 
-    public void addTotalGrade(Double totalGrade) {
-        this.totalGrade = totalGrade;
-    }
-
     @Builder
     public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, String introduction) {
         this.id = id;
@@ -186,6 +185,7 @@ public class Studycafe {
         this.accumReserveCount = 0;
         this.introduction = introduction;
         this.createdDate = LocalDateTime.now();
-        this.totalGrade = 0.;
+        this.gradeSum = 0.;
+        this.gradeCount = 0;
     }
 }
