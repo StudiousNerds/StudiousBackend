@@ -12,6 +12,6 @@ public class JwtTokenConst {
     public static final String TYPE_KEY = "typ";
     public static final String TYPE_VALUE = "JWT";
     public static final String TOKEN_PREFIX = "Bearer";
-    public static final String TOKEN_TYPE_REFRESH = "refresh_token";
+    public static final String REFRESH_TOKEN_COOKIE_PREFIX = "refresh_token";
     public static final String AUTHORITIES_KEY = "auth";
 }

@@ -39,14 +39,9 @@ public class RoomInfoRequest {
     @Valid
     private List<ConvenienceInfoRequest> convenienceInfos; // 룸 편의시설
 
-    @NotNull(message = "스터디룸 사진을 1개 이상 선택해주세요.")
-    @Size(min = 1, message = "스터디룸 사진을 1개 이상 선택해주세요.")
-    private List<String> photos;    // 룸 사진
-
-    public Room toEntity(String roomMainPhoto) {
+    public Room toEntity() {
         return Room.builder()
                 .name(name)
-                .photo(roomMainPhoto)
                 .minHeadCount(minHeadCount)
                 .maxHeadCount(maxHeadCount)
                 .minUsingTime(minUsingTime)
