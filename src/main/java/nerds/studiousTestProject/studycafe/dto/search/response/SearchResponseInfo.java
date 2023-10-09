@@ -14,11 +14,13 @@ public class SearchResponseInfo {
     private String nearestStation;
     private String accumHashtagHistoryNames;
     private String hashtagRecordNames;
-    private Double reflectedTotalGrade;
-    private Double totalGrade;
+    private Double reflectedGradeSum;
+    private Integer reflectedGradeCount;
+    private Double gradeSum;
+    private Integer gradeCount;
 
     @Builder
-    public SearchResponseInfo(Long id, String name, String photo, Integer reflectedAccumResCnt, Integer accumRevCnt, Integer walkingTime, String nearestStation, String accumHashtagHistoryNames, String hashtagRecordNames, Double reflectedTotalGrade, Double totalGrade) {
+    public SearchResponseInfo(Long id, String name, String photo, Integer reflectedAccumResCnt, Integer accumRevCnt, Integer walkingTime, String nearestStation, String accumHashtagHistoryNames, String hashtagRecordNames, Double reflectedGradeSum, Integer reflectedGradeCount, Double gradeSum, Integer gradeCount) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -28,7 +30,9 @@ public class SearchResponseInfo {
         this.nearestStation = nearestStation;
         this.accumHashtagHistoryNames = accumHashtagHistoryNames;
         this.hashtagRecordNames = hashtagRecordNames;
-        this.reflectedTotalGrade = reflectedTotalGrade;
-        this.totalGrade = totalGrade;
+        this.reflectedGradeSum = reflectedGradeSum;
+        this.reflectedGradeCount = reflectedGradeCount;
+        this.gradeSum = gradeSum;
+        this.gradeCount = gradeCount;
     }
 }
