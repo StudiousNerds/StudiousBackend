@@ -23,9 +23,9 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     @PostMapping("/{studycafeId}")
-    public ResponseEntity<?> registerBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
+    public ResponseEntity<Void> registerBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
         bookmarkService.registerBookmark(memberId, studycafeId);
-        return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
@@ -34,8 +34,8 @@ public class BookmarkController {
     }
 
     @DeleteMapping("/{studycafeId}")
-    public ResponseEntity<?> deleteBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
+    public ResponseEntity<Void> deleteBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
         bookmarkService.deleteBookmark(memberId, studycafeId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
