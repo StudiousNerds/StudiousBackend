@@ -4,7 +4,8 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     private static final String CAFE_CONVENIENCE_NAME = "cConvenienceList";
     private static final String ROOM_CONVENIENCE_NAME = "rConvenienceList";
     private static final String GROUP_CONCAT_TEMPLATE = "group_concat(distinct {0})";
+    private static final String CONCAT_REPLACE_STR = "";
 
     @Override
     public Page<SearchResponseInfo> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
@@ -56,12 +58,11 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
-                        keywordContains(searchRequest.getKeyword())
-                )
+                        keywordContains(searchRequest.getKeyword()),
+                        convenienceContains(searchRequest.getConveniences()))
                 .having(
                         hashtagContains(searchRequest.getHashtags()),
-                        totalGradeGoe(searchRequest.getMinGrade()),
-                        convenienceContains(searchRequest.getConveniences()))
+                        totalGradeGoe(searchRequest.getMinGrade()))
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -83,22 +84,24 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                                 studycafe.nearestStation,
                                 Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name),
                                 Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name),
-                                studycafe.totalGrade,
-                                grade.total.avg()
+                                studycafe.gradeSum,
+                                studycafe.gradeCount,
+                                grade.total.sum(),
+                                grade.count().intValue()
                         )
                 )
                 .from(studycafe);
+
 
         List<SearchResponseInfo> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
-                        keywordContains(searchRequest.getKeyword())
-                )
+                        keywordContains(searchRequest.getKeyword()),
+                        convenienceContains(searchRequest.getConveniences()))
                 .having(
                         hashtagContains(searchRequest.getHashtags()),
-                        totalGradeGoe(searchRequest.getMinGrade()),
-                        convenienceContains(searchRequest.getConveniences()))
+                        totalGradeGoe(searchRequest.getMinGrade()))
                 .groupBy(studycafe.id)
                 .orderBy(createOrderSpecifier(searchRequest.getSortType()))
                 .offset(pageable.getOffset())
@@ -116,6 +119,14 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
      * @param <T> Count Query 인 경우 Long, 나머지는 응답 객체 또는 Entity
      */
     private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
+        query = query
+                .leftJoin(studycafe.accumHashtagHistories, accumHashtagHistory)
+                .leftJoin(studycafe.rooms, room)
+                .leftJoin(room.reservationRecords, reservationRecord)
+                .leftJoin(reservationRecord.review, review)
+                .leftJoin(review.grade, grade)
+                .leftJoin(review.hashtagRecords, hashtagRecord);
+
         if (searchRequest.getDate() != null && searchRequest.getWeek() != null) {
             query = query
                     .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(searchRequest.getWeek()));
@@ -130,12 +141,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                     .leftJoin(room.conveniences, rConveniences);
         }
 
-        return query.leftJoin(studycafe.accumHashtagHistories, accumHashtagHistory)
-                .leftJoin(studycafe.rooms, room)
-                .leftJoin(room.reservationRecords, reservationRecord)
-                .leftJoin(reservationRecord.review, review)
-                .leftJoin(review.grade, grade)
-                .leftJoin(review.hashtagRecords, hashtagRecord);
+        return query;
     }
 
     private BooleanExpression headCountBetween(Integer headCount) {
@@ -233,11 +239,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
-        return minGrade != null ? grade.total.avg().goe(minGrade) : null;
-    }
-
-    private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
-        return hashtags != null && !hashtags.isEmpty() ? (hashtagRecord.name.in(hashtags)).count().eq((long) hashtags.size()) : null;
+        return minGrade != null ? studycafe.gradeSum.add(grade.total).divide(studycafe.gradeCount.add(grade.count())).goe(minGrade) : null;
     }
 
     private BooleanExpression convenienceContains(List<ConvenienceName> conveniences) {
@@ -249,11 +251,31 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         QConvenience cConveniences = new QConvenience(CAFE_CONVENIENCE_NAME);
         QConvenience rConveniences = new QConvenience(ROOM_CONVENIENCE_NAME);
 
-        NumberExpression<Long> cafeConvenienceCount = cConveniences.name.in(conveniences).count();
-        NumberExpression<Long> roomConvenienceCount = rConveniences.name.in(conveniences).count();
-        return (cafeConvenienceCount.add(roomConvenienceCount)).eq((long) conveniences.size());
+        StringExpression cafeConvenienceNames = cConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
+        StringExpression roomConvenienceNames = rConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
+        StringExpression concat = cafeConvenienceNames.concat(roomConvenienceNames);
 
-//        return cConveniences.name.in(conveniences).or(rConveniences.name.in(conveniences));
+        return getBooleanExpression(conveniences, concat);
+    }
+
+    private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
+        if (hashtags == null || hashtags.isEmpty()) {
+            return null;
+        }
+
+        StringTemplate reflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name.stringValue().coalesce(CONCAT_REPLACE_STR));
+        StringTemplate NotReflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name.stringValue().coalesce(CONCAT_REPLACE_STR));
+        StringExpression concat = reflectedHashtagNames.concat(NotReflectedHashtagNames);
+
+        return getBooleanExpression(hashtags, concat);
+    }
+
+    private <T extends Enum<?>> BooleanExpression getBooleanExpression(List<T> list, StringExpression concat) {
+        return Expressions.allOf(list.stream().map(e -> nameContainedWithinConcat(e.name(), concat)).toArray(BooleanExpression[]::new));
+    }
+
+    private BooleanExpression nameContainedWithinConcat(String name, StringExpression concat) {
+        return concat.contains(name);
     }
 
     private OrderSpecifier[] createOrderSpecifier(SearchSortType sortType) {
