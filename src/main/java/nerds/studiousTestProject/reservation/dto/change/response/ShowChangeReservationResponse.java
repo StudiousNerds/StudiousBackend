@@ -3,6 +3,7 @@ package nerds.studiousTestProject.reservation.dto.change.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import nerds.studiousTestProject.reservation.dto.PaidConvenienceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;

@@ -21,7 +21,7 @@ import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInf
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfoWithPlace;
 import nerds.studiousTestProject.reservation.dto.change.request.ChangeReservationRequest;
-import nerds.studiousTestProject.reservation.dto.change.response.PaidConvenienceInfo;
+import nerds.studiousTestProject.reservation.dto.PaidConvenienceInfo;
 import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
 import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservationResponse;
