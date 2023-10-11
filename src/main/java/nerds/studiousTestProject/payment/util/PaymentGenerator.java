@@ -34,4 +34,14 @@ public class PaymentGenerator {
         return responseFromToss;
     }
 
+    public PaymentResponseFromToss requestToToss(String requestURI) {
+        String secretKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+        PaymentResponseFromToss responseFromToss = WebClient.create().get()
+                .uri(requestURI)
+                .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)
+                .retrieve()
+                .bodyToMono(PaymentResponseFromToss.class)
+                .block();
+        return responseFromToss;
+    }
 }
