@@ -23,7 +23,7 @@ public class PaymentGenerator {
     @NonNull
     public PaymentResponseFromToss requestToToss(RequestToToss request, String requestURI) {
         String secretKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
-        PaymentResponseFromToss responseFromToss = webClient.method(HttpMethod.POST)
+        PaymentResponseFromToss responseFromToss = webClient.post()
                 .uri(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, SECRET_KEY_PREFIX + secretKey)
