@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.room.entity.Room;
@@ -15,27 +16,28 @@ import java.util.List;
 public class ReserveRequest {
 
     @NotNull
-    private ReserveUser reserveUser;
+    private ReserveUser user;
 
     @NotNull
-    private ReservationInfo reservationInfo;
+    private ReservationInfo reservation;
 
     @Nullable
     private List<PaidConvenience> paidConveniences;
 
-    public ReservationRecord toReservationRecord(Room room, Member member) {
+    public ReservationRecord toReservationRecord(Room room, Member member, Payment payment) {
         return ReservationRecord.builder()
-                .userName(reserveUser.getName())
-                .userPhoneNumber(reserveUser.getPhoneNumber())
-                .date(reservationInfo.getDate())
-                .startTime(reservationInfo.getStartTime())
-                .endTime(reservationInfo.getEndTime())
-                .request(reserveUser.getRequest())
-                .headCount(reservationInfo.getHeadCount())
-                .usingTime(reservationInfo.getUsingTime())
+                .userName(user.getName())
+                .userPhoneNumber(user.getPhoneNumber())
+                .date(reservation.getDate())
+                .startTime(reservation.getStartTime())
+                .endTime(reservation.getEndTime())
+                .request(user.getRequest())
+                .headCount(reservation.getHeadCount())
+                .usingTime(reservation.getUsingTime())
                 .status(ReservationStatus.INPROGRESS)
                 .room(room)
                 .member(member)
+                .payment(payment)
                 .build();
     }
 

@@ -91,9 +91,9 @@ public class ReservationRecordService {
     public PaymentInfoResponse reserve(final ReserveRequest reserveRequest, final Long roomId, final Long memberId) {
         final Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
-        final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
-        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, reserveRequest.getReservationInfo().getPrice()));
-        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservationInfo().getHeadCount());
+        final Payment payment = paymentRepository.save(createInProgressPayment(reserveRequest.getReservation().getPrice()));
+        final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId), payment));
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservation().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord, payment);
         return PaymentInfoResponse.of(payment, orderName);
     }
@@ -102,9 +102,8 @@ public class ReservationRecordService {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    private Payment createInProgressPayment(final ReservationRecord reservationRecord, final Integer price) {
+    private Payment createInProgressPayment(final Integer price) {
         return Payment.builder()
-                .reservationRecord(reservationRecord)
                 .status(PaymentStatus.IN_PROGRESS)
                 .price(price)
                 .orderId(UUID.randomUUID().toString())
@@ -112,7 +111,7 @@ public class ReservationRecordService {
     }
 
     private void validReservationInfo(final ReserveRequest reserveRequest, final Room room) {
-        ReservationInfo reservationInfo = reserveRequest.getReservationInfo();
+        ReservationInfo reservationInfo = reserveRequest.getReservation();
         validCorrectDate(reservationInfo);
         validCorrectTime(reservationInfo);
         validCalculateUsingTime(reservationInfo);
@@ -338,7 +337,7 @@ public class ReservationRecordService {
         if (request.getPrice() == 0 && price == 0 && request.getConveniences() == null) {
             return null;
         }
-        final Payment payment = paymentRepository.save(createInProgressPayment(reservationRecord, request.getPrice()));
+        final Payment payment = paymentRepository.save(createInProgressPayment(request.getPrice()));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount() == null ? reservationRecord.getHeadCount() : request.getHeadCount());
