@@ -74,6 +74,10 @@ public class ReservationRecord {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     public void completePay() {
         this.status = ReservationStatus.CONFIRMED;
     }
