@@ -49,7 +49,6 @@ public class BookmarkService {
     }
 
     public FindBookmarkResponse findBookmark(Long memberId, Pageable pageable){
-        pageable = getPageable(pageable);
         Member member = findMemberById(memberId);
         Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
 
@@ -83,15 +82,6 @@ public class BookmarkService {
 
         member.deleteBookmark(Bookmark.builder().studycafe(studyCafe).build());
         bookmarkRepository.deleteById(studycafeId);
-    }
-
-    private PageRequest getPageable(Pageable pageable) {
-        Integer page = Integer.valueOf(pageable.getPageNumber());
-        if(page == null || page < 1) {
-            return PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
-        }
-
-        return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
     }
 
     private List<ReservationRecord> findReservationRecordsByStudycafeId(Long studycafeId) {
