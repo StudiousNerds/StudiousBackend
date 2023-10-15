@@ -95,7 +95,7 @@ class SubPhotoRepositoryTest {
         List<Review> reviewList = reviewRepository.findAll();
         // then
         assertThat(photoList).isEmpty();
-        assertThat(reviewList.size()).isEqualTo(1);
+        assertThat(reviewList).containsExactly(review);
     }
 
     @Test
@@ -114,6 +114,6 @@ class SubPhotoRepositoryTest {
         List<Room> roomList = roomRepository.findAll();
         // then
         assertThat(photoList).isEmpty();
-        assertThat(roomList.size()).isEqualTo(1);
+        assertThat(roomList).containsExactly(room);
     }
 }
