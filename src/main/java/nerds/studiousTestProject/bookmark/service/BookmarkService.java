@@ -8,7 +8,6 @@ import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
@@ -65,7 +64,7 @@ public class BookmarkService {
                         .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumRevCnt(findReservationRecordsByStudycafeId(studycafe.getId()).size())
+                        .accumResCnt(findReservationRecordsByStudycafeId(studycafe.getId()).size())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(null)    // Studycafe 평점 컬럼 변경으로 인해 null로 수정 (기존 studycafe.getTotalGrade())
