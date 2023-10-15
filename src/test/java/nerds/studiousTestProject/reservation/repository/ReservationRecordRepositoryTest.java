@@ -21,12 +21,16 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static nerds.studiousTestProject.support.EntitySaveProvider.권한_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.리뷰_저장;
+import static nerds.studiousTestProject.support.EntitySaveProvider.스터디카페_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReviewFixture.TODAY_COMMENTED_REVIEW;
+import static nerds.studiousTestProject.support.fixture.RoleFixture.ADMIN;
 import static nerds.studiousTestProject.support.fixture.RoleFixture.USER;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
@@ -98,7 +102,9 @@ class ReservationRecordRepositoryTest {
 
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
         Member member2 = 멤버_저장(DEFAULT_USER.생성(2L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+        Member admin = 회원_저장(KAKAO_USER.생성());
+        권한_저장(ADMIN.멤버_생성(admin));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(admin))));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
