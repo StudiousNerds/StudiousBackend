@@ -39,7 +39,7 @@ class HashtagRecordRepositoryTest {
         Assertions.assertThat(review.getHashtagRecords().contains(HashtagFixture.COST_EFFECTIVE_HASHTAG));
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         hashtagRecordRepository.deleteAllByReviewId(1L);
-        Review foundreview = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+        Review foundreview = reviewRepository.findById(1L).get();
         List<HashtagRecord> hashtagList = hashtagRecordRepository.findAll();
         // then
         Assertions.assertThat(hashtagList).isEmpty();
