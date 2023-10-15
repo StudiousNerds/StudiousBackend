@@ -32,7 +32,6 @@ class RoomRepositoryTest {
         // given
         Member admin = 회원_저장(DEFAULT_USER.생성());
         ADMIN.멤버_생성(admin);
-
         Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
@@ -40,7 +39,7 @@ class RoomRepositoryTest {
         // when
         List<Room> roomList = roomRepository.findAllByStudycafeId(studycafe.getId());
         // then
-        Assertions.assertThat(roomList).hasSize(3);
+        Assertions.assertThat(roomList).contains(room1, room2, room3);
     }
 
     @Test
