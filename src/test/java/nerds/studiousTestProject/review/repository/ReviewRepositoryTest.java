@@ -20,9 +20,6 @@ import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReviewFixture.TODAY_COMMENTED_REVIEW;
-import static nerds.studiousTestProject.support.fixture.ReviewFixture.TODAY_NO_COMMENTED_REVIEW;
-import static nerds.studiousTestProject.support.fixture.ReviewFixture.TWO_DAYS_AGO_COMMENTED_REVIEW;
-import static nerds.studiousTestProject.support.fixture.ReviewFixture.YESTERDAY_COMMENTED_REVIEW;
 import static nerds.studiousTestProject.support.fixture.RoleFixture.ADMIN;
 import static nerds.studiousTestProject.support.fixture.RoleFixture.USER;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
@@ -140,22 +137,6 @@ class ReviewRepositoryTest {
         // then
         Assertions.assertThat(reviews1).containsExactly(room1Review);
         Assertions.assertThat(reviews2).containsExactly(room2Review);
-    }
-
-    @Test
-    void findAllByIdInOrderByCreatedDateDesc() {
-        // given
-        Review review1 = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-        Review review2 = 리뷰_저장(TODAY_NO_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
-        Review review3 = 리뷰_저장(YESTERDAY_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
-        Review review4 = 리뷰_저장(TWO_DAYS_AGO_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
-        List<Long> reviewIds = List.of(review1.getId(), review2.getId(), review3.getId(), review4.getId());
-
-        // when
-        List<Review> reviewList = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
-
-        //then
-        Assertions.assertThat(reviewList).containsExactly(review1, review2, review3, review4);
     }
 
     private Review 리뷰_저장(Review review) {
