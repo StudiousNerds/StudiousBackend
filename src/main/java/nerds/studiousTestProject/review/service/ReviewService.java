@@ -348,10 +348,6 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    private List<ReservationRecord> getAllReservation(Long studycafeId){
-        return findAllReservationRecordByStudycafeId(studycafeId);
-    }
-
     private Page<ReservationRecord> getReservationRecords(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
@@ -384,11 +380,7 @@ public class ReviewService {
     }
 
     private List<Review> getAllReviews(Long studycafeId) {
-        List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        List<Long> reviewIds = recordList.stream()
-                .map(reservationRecord -> reservationRecord.getReview().getId())
-                .collect(Collectors.toList());
-        return reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
+        return reviewRepository.findAllByStudycafeIdWithoutPage(studycafeId);
     }
 
     private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
@@ -430,10 +422,6 @@ public class ReviewService {
     private ReservationRecord findReservationRecordById(Long reservationRecordId) {
         return reservationRecordRepository.findById(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
-    private List<ReservationRecord> findAllReservationRecordByStudycafeId(Long studycafeId) {
-        return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 
     private Page<ReservationRecord> findAllReservationRecordByMember(Member member, Pageable pageable) {
