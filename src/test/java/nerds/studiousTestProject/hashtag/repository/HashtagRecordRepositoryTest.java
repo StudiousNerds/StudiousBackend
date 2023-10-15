@@ -42,7 +42,7 @@ class HashtagRecordRepositoryTest {
         Review foundreview = reviewRepository.findById(1L).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
         List<HashtagRecord> hashtagList = hashtagRecordRepository.findAll();
         // then
-        Assertions.assertThat(hashtagList.size()).isEqualTo(0);
+        Assertions.assertThat(hashtagList).isEmpty();
         Assertions.assertThat(foundreview.getHashtagRecords()).isEmpty();
     }
 }
