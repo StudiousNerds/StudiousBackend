@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static nerds.studiousTestProject.support.EntitySaveProvider.룸_저장;
@@ -116,82 +115,41 @@ class ReviewRepositoryTest {
 
         Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
-        Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
-        Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
 
         LocalDate currentReserveDate1 = LocalDate.of(2023, 7, 1);
         LocalTime startTime1 = LocalTime.of(17, 0);
         LocalTime endTime1 = LocalTime.of(19, 0);
 
-        for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room1, review));
-        }
-
-        for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room2, review));
-        }
-
-        for (long i = 0L; i < 31L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
-        }
+        Review room1Review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1, startTime1, endTime1, member, room1, room1Review));
 
         Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
-        Room room4 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
-        Room room5 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
-        Room room6 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
+        Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
 
         LocalDate currentReserveDate2 = LocalDate.of(2023, 6, 1);
         LocalTime startTime2 = LocalTime.of(17, 0);
         LocalTime endTime2 = LocalTime.of(19, 0);
 
-        for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room4, review));
-        }
-
-        for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room5, review));
-        }
-
-        for (long i = 0L; i < 30L; i++) {
-            Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room6, review));
-        }
+        Review room2Review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2, startTime2, endTime2, member, room2, room2Review));
 
         // when
         List<Review> reviews1 = reviewRepository.findAllByRoomId(room1.getId(), null).getContent();
         List<Review> reviews2 = reviewRepository.findAllByRoomId(room2.getId(), null).getContent();
-        List<Review> reviews3 = reviewRepository.findAllByRoomId(room3.getId(), null).getContent();
-        List<Review> reviews4 = reviewRepository.findAllByRoomId(room4.getId(), null).getContent();
-        List<Review> reviews5 = reviewRepository.findAllByRoomId(room5.getId(), null).getContent();
-        List<Review> reviews6 = reviewRepository.findAllByRoomId(room6.getId(), null).getContent();
 
         // then
-        Assertions.assertThat(reviews1.size()).isEqualTo(31);
-        Assertions.assertThat(reviews2.size()).isEqualTo(31);
-        Assertions.assertThat(reviews3.size()).isEqualTo(31);
-        Assertions.assertThat(reviews4.size()).isEqualTo(30);
-        Assertions.assertThat(reviews5.size()).isEqualTo(30);
-        Assertions.assertThat(reviews6.size()).isEqualTo(30);
+        Assertions.assertThat(reviews1).containsExactly(room1Review);
+        Assertions.assertThat(reviews2).containsExactly(room2Review);
     }
 
     @Test
     void findAllByIdInOrderByCreatedDateDesc() {
         // given
-        List<Long> reviewIds = new ArrayList<>();
         Review review1 = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         Review review2 = 리뷰_저장(TODAY_NO_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
         Review review3 = 리뷰_저장(YESTERDAY_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
         Review review4 = 리뷰_저장(TWO_DAYS_AGO_COMMENTED_REVIEW.평점_정보_생성(2, 2, 1, 1.0));
-
-        reviewIds.add(review1.getId());
-        reviewIds.add(review2.getId());
-        reviewIds.add(review3.getId());
-        reviewIds.add(review4.getId());
+        List<Long> reviewIds = List.of(review1.getId(), review2.getId(), review3.getId(), review4.getId());
 
         // when
         List<Review> reviewList = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
