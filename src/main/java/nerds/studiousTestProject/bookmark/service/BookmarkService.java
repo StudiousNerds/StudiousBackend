@@ -16,12 +16,10 @@ import nerds.studiousTestProject.reservation.repository.ReservationRecordReposit
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +64,7 @@ public class BookmarkService {
                         .accumResCnt(findReservationRecordsByStudycafeId(studycafe.getId()).size())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
-                        .grade(null)    // Studycafe 평점 컬럼 변경으로 인해 null로 수정 (기존 studycafe.getTotalGrade())
+                        .grade(findGradeByStudycafe(studycafe))
                         .hashtags(findHashtagById(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
@@ -98,13 +96,12 @@ public class BookmarkService {
 
     private List<String> findHashtagById(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
-
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<String> hashtagNameList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).name());
-        }
-        return hashtagNameList;
+        return hashtagNames.stream().map(tag -> tag.name()).limit(size).toList();
+    }
+
+    private Double findGradeByStudycafe(Studycafe studycafe) {
+        return studycafe.getGradeSum() / studycafe.getGradeCount();
     }
 }
