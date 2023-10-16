@@ -11,7 +11,7 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.review.service.ReviewService;

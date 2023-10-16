@@ -3,7 +3,7 @@ package nerds.studiousTestProject.reservation.dto.detail.response;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.reservation.dto.PaymentInfo;
+import nerds.studiousTestProject.payment.dto.PaymentInfo;
 import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;

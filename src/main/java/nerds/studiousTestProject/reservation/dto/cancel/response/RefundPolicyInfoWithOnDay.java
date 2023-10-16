@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 

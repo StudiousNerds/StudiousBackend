@@ -5,7 +5,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;

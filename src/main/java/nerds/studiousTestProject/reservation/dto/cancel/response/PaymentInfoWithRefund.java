@@ -3,7 +3,7 @@ package nerds.studiousTestProject.reservation.dto.cancel.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import nerds.studiousTestProject.reservation.dto.PaymentInfo;
+import nerds.studiousTestProject.payment.dto.PaymentInfo;
 import java.util.List;
 
 @AllArgsConstructor

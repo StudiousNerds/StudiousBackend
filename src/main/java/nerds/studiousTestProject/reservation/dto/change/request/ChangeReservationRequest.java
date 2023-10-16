@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.reservation.dto.PaidConvenienceInfo;
+import nerds.studiousTestProject.convenience.dto.PaidConvenienceInfo;
 
 import java.util.List;
 

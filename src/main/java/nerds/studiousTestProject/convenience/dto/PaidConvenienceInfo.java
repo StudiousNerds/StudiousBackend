@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto;
+package nerds.studiousTestProject.convenience.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
