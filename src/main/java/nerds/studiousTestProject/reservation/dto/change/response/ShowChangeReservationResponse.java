@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.reservation.dto.PaidConvenienceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
-import nerds.studiousTestProject.reservation.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
