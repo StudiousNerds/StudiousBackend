@@ -6,9 +6,15 @@ import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackReq
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
-import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -22,8 +28,8 @@ public class PaymentController {
     public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
                                                        @RequestParam String paymentKey,
                                                        @RequestParam Integer amount) {
-        paymentService.confirmSuccess(orderId, paymentKey, amount);
-        return ResponseEntity.noContent().build();
+        Long reservationRecordId = paymentService.confirmSuccess(orderId, paymentKey, amount);
+        return ResponseEntity.created(URI.create("/api/v1/mypage/reservations/" + reservationRecordId)).build();
     }
 
     @PostMapping("/fail")

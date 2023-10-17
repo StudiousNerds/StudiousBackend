@@ -52,12 +52,14 @@ public class PaymentService {
     private final ConvenienceRecordRepository convenienceRecordRepository;
 
     @Transactional
-    public void confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
+    public Long confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderIdWithReservationAndPlace(orderId);
         validConfirmRequest(orderId, amount, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), new ConfirmSuccessRequest(orderId, paymentKey, amount));
         payment.complete(responseFromToss.toPayment());
-        payment.getReservationRecord().completePay();
+        ReservationRecord reservationRecord = payment.getReservationRecord();
+        reservationRecord.completePay();
+        return reservationRecord.getId();
     }
 
     private void validConfirmRequest(final String orderId, final Integer amount, final Payment payment){
