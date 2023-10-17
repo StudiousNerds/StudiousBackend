@@ -19,10 +19,11 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/success")
-    public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
+    public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
                                                        @RequestParam String paymentKey,
                                                        @RequestParam Integer amount) {
-        return paymentService.confirmSuccess(orderId, paymentKey, amount);
+        paymentService.confirmSuccess(orderId, paymentKey, amount);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/fail")
