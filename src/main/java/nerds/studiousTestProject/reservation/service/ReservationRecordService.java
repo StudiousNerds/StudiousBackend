@@ -349,7 +349,7 @@ public class ReservationRecordService {
         final Payment payment = paymentRepository.save(createInProgressPayment(previousPrice + request.getPrice(), reservationRecord));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
-        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount() == null ? reservationRecord.getHeadCount() : request.getHeadCount());
+        final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reservationRecord.getHeadCount());
         return PaymentInfoResponse.of(payment, orderName);
     }
 
