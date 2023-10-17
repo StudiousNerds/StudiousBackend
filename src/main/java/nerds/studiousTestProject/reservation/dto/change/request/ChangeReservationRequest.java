@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.convenience.dto.PaidConvenienceInfo;
+import nerds.studiousTestProject.payment.util.totoss.RefundReceiveAccount;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ChangeReservationRequest {
     private Integer price;
     private Integer headCount;
     private List<PaidConvenienceInfo> conveniences;
+    private RefundReceiveAccount receiveAccount;
 
     public boolean isBothNull() {
         return headCount == null && conveniences == null;

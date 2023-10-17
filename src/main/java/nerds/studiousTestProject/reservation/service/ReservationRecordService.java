@@ -12,9 +12,12 @@ import nerds.studiousTestProject.payment.entity.PaymentStatus;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.util.PaymentGenerator;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
+import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
+import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
-import nerds.studiousTestProject.payment.dto.PaymentInfo;
 import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
 import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
@@ -59,6 +62,7 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INV
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
@@ -67,7 +71,7 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.OVER_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
-
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -82,10 +86,13 @@ public class ReservationRecordService {
     private final PaymentRepository paymentRepository;
     private final ConvenienceRepository convenienceRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
+    private final PaymentGenerator paymentGenerator;
 
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
     private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
     private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
+    private static final String CHANGE_CANCEL_REASON = "재결제를 위한 취소";
+
 
     @Transactional
     public PaymentInfoResponse reserve(final ReserveRequest reserveRequest, final Long roomId, final Long memberId) {
@@ -338,7 +345,12 @@ public class ReservationRecordService {
         if (request.getPrice() == 0 && price == 0 && request.getConveniences() == null) {
             return null;
         }
-        final Payment payment = paymentRepository.save(createInProgressPayment(request.getPrice()));
+        Payment previousPayment = findPaymentByReservation(reservationRecord);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
+        if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != previousPayment.getPrice()) {
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
+        }
+        final Payment payment = paymentRepository.save(createInProgressPayment(request.getPrice(), reservationRecord));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount() == null ? reservationRecord.getHeadCount() : request.getHeadCount());
