@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
@@ -21,6 +20,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 @Getter
 @NoArgsConstructor
 public class ConvenienceRecord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,7 +35,4 @@ public class ConvenienceRecord {
     @Column(name = "price", nullable = false)
     private Integer price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private Payment payment;
 }
