@@ -2,7 +2,6 @@ package nerds.studiousTestProject.payment.dto.virtual.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import nerds.studiousTestProject.payment.entity.BankCode;
 import nerds.studiousTestProject.payment.entity.Payment;
 
 import java.time.LocalDateTime;
