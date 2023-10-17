@@ -11,6 +11,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 public class PlaceInfo {
 
     private String studycafeName;
+    private String studycafePhoto;
     private String roomName;
     private String address;
 
@@ -27,6 +28,7 @@ public class PlaceInfo {
     private static PlaceInfo createPlaceInfo(Studycafe studycafe, Room room) {
         return PlaceInfo.builder()
                 .studycafeName(studycafe.getName())
+                .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
                 .address(studycafe.getAddress().getEntryAddress())
                 .build();
