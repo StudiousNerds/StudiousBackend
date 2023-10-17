@@ -1,5 +1,6 @@
 package nerds.studiousTestProject.reservation.repository;
 
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -101,11 +101,6 @@ public class PaymentService {
         return ConfirmFailResponse.of(message);
     }
 
-    private ReservationRecord findReservationByPayment(Payment payment) {
-        return reservationRecordRepository.findByPayment(payment)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
     @Transactional
     public void cancel(final CancelRequest cancelRequest, final Long reservationId, final MemberRole canceler){
         final ReservationRecord reservationRecord = findReservationById(reservationId);
