@@ -74,7 +74,7 @@ public class PaymentService {
     public VirtualAccountInfoResponse virtualAccount(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(INQUIRY.getUriFormat(), paymentKey));
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(INQUIRY.getUriFormat(paymentKey));
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
@@ -114,7 +114,7 @@ public class PaymentService {
         final ReservationRecord reservationRecord = findReservationById(reservationId);
         final Payment payment = findByReservationRecord(reservationRecord);
         validPaymentMethod(cancelRequest, payment);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(CANCEL.getUriFormat(), payment.getPaymentKey()), cancelRequest);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
         payment.cancel(responseFromToss, canceler);
         if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
