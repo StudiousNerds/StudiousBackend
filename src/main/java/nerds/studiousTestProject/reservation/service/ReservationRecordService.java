@@ -20,9 +20,7 @@ import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
 import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
-import nerds.studiousTestProject.reservation.dto.cancel.response.RefundPolicyInfoWithOnDay;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
-import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationRecordInfoWithPlace;
 import nerds.studiousTestProject.reservation.dto.change.request.ChangeReservationRequest;
 import nerds.studiousTestProject.convenience.dto.PaidConvenienceInfo;
 import nerds.studiousTestProject.reservation.dto.change.response.ShowChangeReservationResponse;
@@ -253,12 +251,8 @@ public class ReservationRecordService {
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
-
-        return ReservationCancelResponse.builder()
-                .reservation(ReservationRecordInfoWithPlace.of(studycafe, room, reservationRecord))
-                .paymentRecord(calculateRefundMoney(findPaymentByReservationRecord(reservationRecord), refundPolicyOnDay))
-                .refundPolicy(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
-                .build();
+        PaymentInfoWithRefund paymentInfoWithRefund = calculateRefundMoney(findPaymentByReservationRecord(reservationRecord), refundPolicyOnDay);
+        return ReservationCancelResponse.of(reservationRecord, paymentInfoWithRefund, refundPolicies, refundPolicyOnDay);
     }
 
     private Payment findPaymentByReservationRecord(final ReservationRecord reservationRecord) {
