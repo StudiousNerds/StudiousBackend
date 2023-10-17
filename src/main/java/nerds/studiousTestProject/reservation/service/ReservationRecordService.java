@@ -94,7 +94,7 @@ public class ReservationRecordService {
         final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
         final Payment payment = paymentRepository.save(createInProgressPayment(reserveRequest.getReservation().getPrice(), reservationRecord));
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservation().getHeadCount());
-        savePaidConvenienceRecord(reserveRequest, reservationRecord, payment);
+        savePaidConvenienceRecord(reserveRequest, reservationRecord);
         return PaymentInfoResponse.of(payment, orderName);
     }
 
