@@ -345,15 +345,19 @@ public class ReservationRecordService {
         if (request.getPrice() == 0 && price == 0 && request.getConveniences() == null) {
             return null;
         }
-        Payment previousPayment = findPaymentByReservation(reservationRecord);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
-        validCancelPrice(previousPayment, responseFromToss);
-        paymentRepository.delete(previousPayment);
+        cancelPreviousPayment(request, reservationRecord);
         final Payment payment = paymentRepository.save(createInProgressPayment(request.getPrice(), reservationRecord));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), request.getHeadCount() == null ? reservationRecord.getHeadCount() : request.getHeadCount());
         return PaymentInfoResponse.of(payment, orderName);
+    }
+
+    private void cancelPreviousPayment(ChangeReservationRequest request, ReservationRecord reservationRecord) {
+        Payment previousPayment = findPaymentByReservation(reservationRecord);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
+        validCancelPrice(previousPayment, responseFromToss);
+        paymentRepository.delete(previousPayment);
     }
 
     private void validCancelPrice(Payment previousPayment, PaymentResponseFromToss responseFromToss) {
