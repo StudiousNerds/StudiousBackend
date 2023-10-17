@@ -270,7 +270,7 @@ public class ReservationRecordService {
         final int price = payment.getPrice();
         final int refundPrice = price * refundPolicyOnDay.getRate() * (1 / 100);
         final int refundFee = price - refundPrice;
-        return PaymentInfoWithRefund.of(price, refundPrice, refundFee, payment);
+        return PaymentInfoWithRefund.of(refundPrice, refundFee, payment);
     }
 
     private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {

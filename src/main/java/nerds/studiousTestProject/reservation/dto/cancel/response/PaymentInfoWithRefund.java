@@ -13,14 +13,12 @@ import java.util.List;
 @Builder
 public class PaymentInfoWithRefund {
 
-    private int totalPrice;
     private int refundPrice;
     private int refundFee;
     private PaymentInfo payment;
 
-    public static PaymentInfoWithRefund of(int totalPrice, int refundPrice, int refundFee, Payment payment) {
+    public static PaymentInfoWithRefund of(int refundPrice, int refundFee, Payment payment) {
         return PaymentInfoWithRefund.builder()
-                .totalPrice(totalPrice)
                 .refundPrice(refundPrice)
                 .refundFee(refundFee)
                 .payment(PaymentInfo.from(payment))
