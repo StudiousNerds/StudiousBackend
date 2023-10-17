@@ -243,14 +243,14 @@ public class ReservationRecordService {
         final Room room = reservationRecord.getRoom();
         final Studycafe studycafe = room.getStudycafe();
         final List<RefundPolicy> refundPolicies = refundPolicyRepository.findAllByStudycafe(studycafe);
-        final List<Payment> payments = findPaymentByReservationRecord(reservationRecord);
+        final Payment payment = findPaymentByReservationRecord(reservationRecord);
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
 
         return ReservationCancelResponse.builder()
                 .reservation(ReservationRecordInfoWithPlace.of(studycafe, room, reservationRecord))
-                .paymentRecord(calculateRefundMoney(payments, refundPolicyOnDay))
+                .paymentRecord(calculateRefundMoney(payment, refundPolicyOnDay))
                 .refundPolicy(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
                 .build();
     }
@@ -260,11 +260,11 @@ public class ReservationRecordService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
-    private PaymentInfoWithRefund calculateRefundMoney(final List<Payment> payments, final RefundPolicy refundPolicyOnDay) {
-        final int totalPrice = payments.stream().mapToInt(Payment::getPrice).sum();
-        final int refundPrice = totalPrice * refundPolicyOnDay.getRate() * (1 / 100);
-        final int refundFee = totalPrice - refundPrice;
-        return new PaymentInfoWithRefund(totalPrice, refundPrice, refundFee, payments.stream().map(PaymentInfo::from).toList());
+    private PaymentInfoWithRefund calculateRefundMoney(final Payment payment, final RefundPolicy refundPolicyOnDay) {
+        final int price = payment.getPrice();
+        final int refundPrice = price * refundPolicyOnDay.getRate() * (1 / 100);
+        final int refundFee = price - refundPrice;
+        return PaymentInfoWithRefund.of(price, refundPrice, refundFee, payment);
     }
 
     private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {
