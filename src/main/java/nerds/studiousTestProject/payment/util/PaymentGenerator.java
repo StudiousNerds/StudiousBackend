@@ -22,7 +22,7 @@ public class PaymentGenerator {
     private static final String AUTHORIZATION_VALUE = SECRET_KEY_PREFIX + ENCODED_SECRET;
 
     @NonNull
-    public PaymentResponseFromToss requestToToss(RequestToToss request, String requestURI) {
+    public PaymentResponseFromToss requestToToss(String requestURI, RequestToToss request) {
         PaymentResponseFromToss responseFromToss = webClient.post()
                 .uri(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
