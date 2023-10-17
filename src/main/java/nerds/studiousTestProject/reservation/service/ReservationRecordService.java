@@ -34,6 +34,7 @@ import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSett
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.PriceType;
 import nerds.studiousTestProject.room.entity.Room;
@@ -70,6 +71,11 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.OVE
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
 import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.CANCELED;
+import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.USING;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -294,10 +300,21 @@ public class ReservationRecordService {
     }
 
     public ReservationRecordInfoWithStatus createReservationSettingsResponse(final ReservationRecord reservationRecord) {
-        final Room room = reservationRecord.getRoom();
-        final Studycafe studycafe = room.getStudycafe();
         final Payment payment = findPaymentByReservation(reservationRecord);
-        return ReservationRecordInfoWithStatus.of(studycafe, room, reservationRecord, payment);
+        ReservationSettingsStatus status = getReservationSettingsResponse(reservationRecord);
+        return ReservationRecordInfoWithStatus.of(reservationRecord, payment, status);
+    }
+
+    private ReservationSettingsStatus getReservationSettingsResponse(ReservationRecord reservationRecord) {
+        LocalDate reserveDate = reservationRecord.getDate();
+        if (reservationRecord.getStatus() == ReservationStatus.CANCELED) return CANCELED;
+        LocalDate nowDate = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+        if (reserveDate.isBefore(nowDate) || (reserveDate == nowDate && reservationRecord.getStartTime().isAfter(nowTime)))
+            return AFTER_USING;
+        if (reserveDate.isAfter(nowDate) || (reserveDate == nowDate && reservationRecord.getEndTime().isBefore(nowTime)))
+            return BEFORE_USING;
+        return USING;
     }
 
     public ReservationDetailResponse showDetail(final Long reservationRecordId) {
