@@ -353,7 +353,7 @@ public class ReservationRecordService {
         return PaymentInfoResponse.of(payment, orderName);
     }
 
-    private int cancelPreviousPayment(ChangeReservationRequest request, ReservationRecord reservationRecord) {
+    private int cancelPreviousPayment(final ChangeReservationRequest request, final ReservationRecord reservationRecord) {
         Payment previousPayment = findPaymentByReservation(reservationRecord);
         final Integer price = previousPayment.getPrice();
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
@@ -362,7 +362,7 @@ public class ReservationRecordService {
         return price;
     }
 
-    private void validCancelPrice(Payment previousPayment, PaymentResponseFromToss responseFromToss) {
+    private void validCancelPrice(final Payment previousPayment, final PaymentResponseFromToss responseFromToss) {
         if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != previousPayment.getPrice()) {
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
@@ -402,8 +402,8 @@ public class ReservationRecordService {
             throw new BadRequestException(INVALID_CHANGE_REQUEST);
     }
 
-    public ShowAdminCancelResponse showAdminCancel(Long reservationId) {
-        ReservationRecord reservationRecord = findByIdWithPlace(reservationId);
+    public ShowAdminCancelResponse showAdminCancel(final Long reservationId) {
+        final ReservationRecord reservationRecord = findByIdWithPlace(reservationId);
         return ShowAdminCancelResponse.from(reservationRecord);
     }
 }
