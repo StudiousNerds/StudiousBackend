@@ -35,6 +35,9 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.CANCELED;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.DONE;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.WAITING_FOR_DEPOSIT;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CONFIRM;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.INQUIRY;
 
 
 @RequiredArgsConstructor
@@ -48,8 +51,6 @@ public class PaymentService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
 
-    private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String INQUIRY_PAYMENT_URI = "https://api.tosspayments.com/v1/payments/%s";
     private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
 
 
@@ -57,7 +58,7 @@ public class PaymentService {
     public ReservationDetailResponse confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderIdWithReservationAndPlace(orderId);
         validConfirmRequest(orderId, amount, payment);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), new ConfirmSuccessRequest(orderId, paymentKey, amount));
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = payment.getReservationRecord();
         reservationRecord.completePay();
@@ -73,7 +74,7 @@ public class PaymentService {
     public VirtualAccountInfoResponse virtualAccount(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(INQUIRY_PAYMENT_URI, paymentKey));
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(INQUIRY.getUriFormat(), paymentKey));
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
@@ -113,7 +114,7 @@ public class PaymentService {
         final ReservationRecord reservationRecord = findReservationById(reservationId);
         final Payment payment = findByReservationRecord(reservationRecord);
         validPaymentMethod(cancelRequest, payment);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(String.format(CANCEL.getUriFormat(), payment.getPaymentKey()), cancelRequest);
         payment.cancel(responseFromToss, canceler);
         if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
