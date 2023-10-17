@@ -18,14 +18,14 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @GetMapping("/success")
+    @PostMapping("/success")
     public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
                                                        @RequestParam String paymentKey,
                                                        @RequestParam Integer amount) {
         return paymentService.confirmSuccess(orderId, paymentKey, amount);
     }
 
-    @GetMapping("/fail")
+    @PostMapping("/fail")
     public ConfirmFailResponse payConfirmFail(@RequestParam String code,
                                               @RequestParam String message,
                                               @RequestParam String orderId) {
