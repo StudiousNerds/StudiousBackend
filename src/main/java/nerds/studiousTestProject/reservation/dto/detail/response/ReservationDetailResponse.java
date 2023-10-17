@@ -18,7 +18,7 @@ public class ReservationDetailResponse {
     private PlaceInfo place;
     private ReservationInfo reservation;
     private PaymentInfo payment;
-    private ReserveUserInfo reserveUser;
+    private ReserveUserInfo user;
 
     public static ReservationDetailResponse of(ReservationRecord reservationRecord, Payment payment) {
         Room room = reservationRecord.getRoom();
@@ -27,7 +27,7 @@ public class ReservationDetailResponse {
                 .place(PlaceInfo.of(studycafe, room))
                 .reservation(ReservationInfo.from(reservationRecord))
                 .payment(PaymentInfo.from(payment))
-                .reserveUser(ReserveUserInfo.from(reservationRecord))
+                .user(ReserveUserInfo.from(reservationRecord))
                 .build();
     }
 }
