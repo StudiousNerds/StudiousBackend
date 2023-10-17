@@ -24,4 +24,11 @@ public class PlaceInfo {
                 .build();
     }
 
+    public static PlaceInfo of(Studycafe studycafe, Room room) {
+        return PlaceInfo.builder()
+                .studycafeName(studycafe.getName())
+                .roomName(room.getName())
+                .address(studycafe.getAddress().getEntryAddress())
+                .build();
+    }
 }
