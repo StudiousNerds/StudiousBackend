@@ -2,6 +2,7 @@ package nerds.studiousTestProject.reservation.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @Getter
@@ -15,6 +16,13 @@ public class ReserveUserInfo {
         return ReserveUserInfo.builder()
                 .name(reservationRecord.getUserName())
                 .phoneNumber(reservationRecord.getUserPhoneNumber())
+                .build();
+    }
+
+    public static ReserveUserInfo from(Member member) {
+        return ReserveUserInfo.builder()
+                .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
                 .build();
     }
 
