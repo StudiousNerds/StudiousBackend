@@ -88,13 +88,15 @@ public class PaymentService {
     @Transactional
     public ConfirmFailResponse confirmFail(final String message, final String orderId){
         final Payment payment = findByOrderIdWithReservation(orderId);
-        final ReservationRecord reservationRecord = payment.getReservationRecord();
         convenienceRecordRepository.findAllByPayment(payment).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
         paymentRepository.delete(payment);
-        if (!paymentRepository.existsByReservationRecord(reservationRecord)) {
-            reservationRecordRepository.delete(reservationRecord);
-        }
+        reservationRecordRepository.delete(payment.getReservationRecord());
         return ConfirmFailResponse.of(message);
+    }
+
+    private ReservationRecord findReservationByPayment(Payment payment) {
+        return reservationRecordRepository.findByPayment(payment)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     @Transactional
@@ -126,13 +128,14 @@ public class PaymentService {
     }
 
     private ReservationRecord findReservationById(final Long reservationId) {
-        return reservationRecordRepository.findById(reservationId).orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+        return reservationRecordRepository.findById(reservationId)
+                .orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     public void processDepositByStatus(final DepositCallbackRequest depositCallbackRequest) {
-        Payment payment = findByOrderIdWithReservation(depositCallbackRequest.getOrderId());
+        Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
         final String status = depositCallbackRequest.getStatus();
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationByPayment(payment);
         if(isDepositError(payment, status)){ // 입금 오류
             //입금 오류에 관한 알림 전송
             reservationRecord.depositError();
