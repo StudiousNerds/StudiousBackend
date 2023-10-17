@@ -23,7 +23,6 @@ public class PaymentGenerator {
 
     @NonNull
     public PaymentResponseFromToss requestToToss(RequestToToss request, String requestURI) {
-        String secretKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
         PaymentResponseFromToss responseFromToss = webClient.post()
                 .uri(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -36,7 +35,6 @@ public class PaymentGenerator {
     }
 
     public PaymentResponseFromToss requestToToss(String requestURI) {
-        String secretKey = Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
         PaymentResponseFromToss responseFromToss = WebClient.create().get()
                 .uri(requestURI)
                 .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_VALUE)
