@@ -24,7 +24,7 @@ public class ReserveRequest {
     @Nullable
     private List<PaidConvenience> paidConveniences;
 
-    public ReservationRecord toReservationRecord(Room room, Member member, Payment payment) {
+    public ReservationRecord toReservationRecord(Room room, Member member) {
         return ReservationRecord.builder()
                 .userName(user.getName())
                 .userPhoneNumber(user.getPhoneNumber())
@@ -37,7 +37,6 @@ public class ReserveRequest {
                 .status(ReservationStatus.INPROGRESS)
                 .room(room)
                 .member(member)
-                .payment(payment)
                 .build();
     }
 
