@@ -355,7 +355,7 @@ public class ReservationRecordService {
 
     private int cancelPreviousPayment(ChangeReservationRequest request, ReservationRecord reservationRecord) {
         Payment previousPayment = findPaymentByReservation(reservationRecord);
-        Integer price = previousPayment.getPrice();
+        final Integer price = previousPayment.getPrice();
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
         validCancelPrice(previousPayment, responseFromToss);
         paymentRepository.delete(previousPayment);
