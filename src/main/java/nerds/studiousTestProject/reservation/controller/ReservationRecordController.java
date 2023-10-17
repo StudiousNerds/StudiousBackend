@@ -3,6 +3,7 @@ package nerds.studiousTestProject.reservation.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.util.LoggedInMember;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
@@ -39,8 +40,7 @@ public class ReservationRecordController {
     @PostMapping("/mypage/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
                                        @RequestBody CancelRequest cancelRequest) {
-        paymentService.cancel(cancelRequest, reservationId);
-
+        paymentService.cancel(cancelRequest, reservationId, MemberRole.USER);
         return ResponseEntity.noContent().build();
     }
 

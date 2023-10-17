@@ -2,6 +2,7 @@ package nerds.studiousTestProject.reservation.controller;
 
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.common.util.LoggedInMember;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
@@ -30,7 +31,7 @@ public class AdminReservationRecordController {
 
     @PostMapping("/{reservationId}/cancel")
     public ResponseEntity<Void> cancel(@PathVariable Long reservationId, @RequestBody CancelRequest request) {
-        paymentService.adminCancel(reservationId, request);
+        paymentService.cancel(request, reservationId, MemberRole.ADMIN);
         return ResponseEntity.noContent().build();
     }
 

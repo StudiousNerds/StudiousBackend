@@ -9,6 +9,7 @@ import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -85,6 +86,14 @@ public class PaymentService {
         }
     }
 
+    /**
+     * 지금은 결제 실패시 무조건 예약 내역, 결제 삭제
+     * 예약 변경 중 실패한다면 롤백할 필요가 있어보임
+     * 변경 기록 중 reservation Id 가 동일한게 있다면 -> 최근 변경 기록 전으로 롤백하는 기능추가가 필요해 보임
+     * @param message
+     * @param orderId
+     * @return
+     */
     @Transactional
     public ConfirmFailResponse confirmFail(final String message, final String orderId){
         final Payment payment = findByOrderIdWithReservation(orderId);
@@ -100,25 +109,21 @@ public class PaymentService {
     }
 
     @Transactional
-    public void cancel(final CancelRequest cancelRequest, final Long reservationId){
+    public void cancel(final CancelRequest cancelRequest, final Long reservationId, final MemberRole canceler){
         final ReservationRecord reservationRecord = findReservationById(reservationId);
-        final List<Payment> payments = findAllByReservationRecord(reservationRecord);
-        payments.stream().forEach(payment -> validPaymentMethod(cancelRequest, payment));
-        //취소 금액 검증
-        int totalCancelPrice = 0;
-        for (Payment payment : payments) {
-            final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
-            payment.cancel(responseFromToss, MemberRole.USER);
-            totalCancelPrice += responseFromToss.getTotalAmount();
-        }
-        if (totalCancelPrice != payments.stream().mapToInt(Payment::getPrice).sum()) {
+        final Payment payment = findByReservationRecord(reservationRecord);
+        validPaymentMethod(cancelRequest, payment);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
+        payment.cancel(responseFromToss, canceler);
+        if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
         reservationRecord.canceled(); //결제 취소 상태로 변경
     }
 
-    private List<Payment> findAllByReservationRecord(final ReservationRecord reservationRecord) {
-        return paymentRepository.findAllByReservationRecord(reservationRecord);
+
+    private Payment findByReservationRecord(final ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private void validPaymentMethod(final CancelRequest cancelRequest, final Payment payment) {
@@ -171,24 +176,5 @@ public class PaymentService {
 
     private Payment findByOrderIdWithReservationAndPlace(final String orderId) {
         return paymentRepository.findByOrderIdWithReservationAndPlace(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-    }
-
-
-    @Transactional
-    public void adminCancel(final Long reservationId, final CancelRequest request) {
-        final ReservationRecord reservationRecord = findReservationById(reservationId);
-        List<Payment> payments = findAllByReservationRecord(reservationRecord);
-        payments.stream().forEach(payment -> validPaymentMethod(request, payment));
-        //취소 금액 검증
-        int totalCancelPrice = 0;
-        for (Payment payment : payments) {
-            final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(request, String.format(CANCEL_URI, payment.getPaymentKey()));
-            payment.cancel(responseFromToss, MemberRole.ADMIN);
-            totalCancelPrice += responseFromToss.getTotalAmount();
-        }
-        if (totalCancelPrice != payments.stream().mapToInt(Payment::getPrice).sum()) {
-            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
-        }
-        reservationRecord.canceled();
     }
 }
