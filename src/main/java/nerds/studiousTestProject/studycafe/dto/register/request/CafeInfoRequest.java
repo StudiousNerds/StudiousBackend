@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import nerds.studiousTestProject.convenience.entity.ConvenienceName;
+import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 import java.util.List;
 
@@ -32,13 +34,22 @@ public class CafeInfoRequest {
     @Valid
     private List<ConvenienceInfoRequest> convenienceInfos; // 카페 편의 시설
 
-    @Size(min = 1, message = "스터디카페 사진을 1개 이상 등록해주세요.")
-    private List<String> photos;    // 카페 사진
-
     @Size(min = 1, message = "유의 사항을 1개 이상 등록해주세요.")
     private List<String> notices;   // 유의 사항
 
     @Size(min = 9, max = 9, message = "환불 정책을 입력해주세요.")
     @Valid
     private List<RefundPolicyRequest> refundPolicies;  // 환불 정책
+
+    public Studycafe toStudycafe(Member member, NearestStationInfoResponse nearestStationInfoResponse) {
+        return Studycafe.builder()
+                .name(name)
+                .member(member)
+                .address(addressInfo.of())
+                .tel(tel)
+                .walkingTime(nearestStationInfoResponse.getWalkingTime())
+                .nearestStation(nearestStationInfoResponse.getNearestStation())
+                .introduction(introduction)
+                .build();
+    }
 }

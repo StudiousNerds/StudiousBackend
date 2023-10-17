@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/members")
+@RequestMapping("/api/v1/members")
 public class MemberController {
     private final MemberService memberService;
 

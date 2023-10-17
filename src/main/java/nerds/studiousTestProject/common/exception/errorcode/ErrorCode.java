@@ -64,7 +64,9 @@ public enum ErrorCode {
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
     NOT_FOUND_PAGE("페이지가 없습니다."),
     MISMATCH_CANCEL_PRICE("총 취소 금액이 맞지않습니다."),
-    INVALID_CHANGE_REQUEST("변경 사항이 없습니다.");
+    INVALID_CHANGE_REQUEST("변경 사항이 없습니다."),
+    INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
+    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
 
     private final String message;
     ErrorCode(String message) {

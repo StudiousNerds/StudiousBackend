@@ -66,7 +66,7 @@ public class BookmarkService {
                         .accumRevCnt(findAllReservationRecordByStudycafeId(studycafe.getId()).size())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
-                        .grade(studycafe.getTotalGrade())
+                        .grade(null)    // Studycafe 평점 컬럼 변경으로 인해 null로 수정 (기존 studycafe.getTotalGrade())
                         .hashtags(hashtagRecordService.findStudycafeHashtag(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
