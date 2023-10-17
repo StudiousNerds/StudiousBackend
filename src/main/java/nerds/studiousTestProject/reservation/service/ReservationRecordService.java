@@ -345,7 +345,7 @@ public class ReservationRecordService {
         if (request.getPrice() == 0 && price == 0 && request.getConveniences() == null) {
             return null;
         }
-        int previousPrice = cancelPreviousPayment(request, reservationRecord);
+        final int previousPrice = cancelPreviousPayment(request, reservationRecord);
         final Payment payment = paymentRepository.save(createInProgressPayment(previousPrice + request.getPrice(), reservationRecord));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
