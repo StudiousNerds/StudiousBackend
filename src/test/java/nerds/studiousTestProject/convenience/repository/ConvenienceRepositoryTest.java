@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static nerds.studiousTestProject.support.EntitySaveProvider.권한_저장;
+import static nerds.studiousTestProject.support.EntitySaveProvider.룸_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.스터디카페_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.편의시설_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장;
@@ -38,7 +39,7 @@ class ConvenienceRepositoryTest {
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
         Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
-        Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         편의시설_저장(ROOM_HDMI_FREE.룸_생성(room, null));
         // when
         convenienceRepository.deleteAllByRoomId(room.getId());

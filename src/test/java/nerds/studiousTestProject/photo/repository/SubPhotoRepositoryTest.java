@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static nerds.studiousTestProject.support.EntitySaveProvider.권한_저장;
+import static nerds.studiousTestProject.support.EntitySaveProvider.룸_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.리뷰_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.스터디카페_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장;
@@ -73,7 +74,7 @@ class SubPhotoRepositoryTest {
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
         Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
-        Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         SubPhoto roomPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 1L));
         SubPhoto roomphoto2 = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 2L));
         // when
@@ -105,7 +106,7 @@ class SubPhotoRepositoryTest {
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
         Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
-        Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 1L));
         subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 2L));
         // when
