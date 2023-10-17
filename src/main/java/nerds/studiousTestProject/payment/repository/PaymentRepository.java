@@ -19,6 +19,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("select p from Payment p join fetch p.reservationRecord r where p.orderId = :orderId")
     Optional<Payment> findByOrderIdWithReservation(@Param("orderId") String orderId);
 
-    @Query("select sum(p.price) from Payment p where p.reservationRecord = :reservationRecord")
-    int findTotalPriceByReservationId(@Param("reservationRecord") ReservationRecord reservationRecord);
 }
