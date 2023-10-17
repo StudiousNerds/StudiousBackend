@@ -243,7 +243,7 @@ public class ReservationRecordService {
         final Room room = reservationRecord.getRoom();
         final Studycafe studycafe = room.getStudycafe();
         final List<RefundPolicy> refundPolicies = refundPolicyRepository.findAllByStudycafe(studycafe);
-        final List<Payment> payments = findPaymentsByReservationRecord(reservationRecord);
+        final List<Payment> payments = findPaymentByReservationRecord(reservationRecord);
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
@@ -255,8 +255,9 @@ public class ReservationRecordService {
                 .build();
     }
 
-    private List<Payment> findPaymentsByReservationRecord(final ReservationRecord reservationRecord) {
-        return paymentRepository.findAllByReservationRecord(reservationRecord);
+    private Payment findPaymentByReservationRecord(final ReservationRecord reservationRecord) {
+        return paymentRepository.findByReservationRecord(reservationRecord)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private PaymentInfoWithRefund calculateRefundMoney(final List<Payment> payments, final RefundPolicy refundPolicyOnDay) {
