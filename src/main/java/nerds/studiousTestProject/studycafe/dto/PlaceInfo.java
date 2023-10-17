@@ -17,14 +17,14 @@ public class PlaceInfo {
     public static PlaceInfo from(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
-        return PlaceInfo.builder()
-                .studycafeName(studycafe.getName())
-                .roomName(room.getName())
-                .address(studycafe.getAddress().getEntryAddress())
-                .build();
+        return createPlaceInfo(studycafe, room);
     }
 
     public static PlaceInfo of(Studycafe studycafe, Room room) {
+        return createPlaceInfo(studycafe, room);
+    }
+
+    private static PlaceInfo createPlaceInfo(Studycafe studycafe, Room room) {
         return PlaceInfo.builder()
                 .studycafeName(studycafe.getName())
                 .roomName(room.getName())
