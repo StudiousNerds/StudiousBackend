@@ -301,15 +301,15 @@ public class ReservationRecordService {
 
     public ReservationRecordInfoWithStatus createReservationSettingsResponse(final ReservationRecord reservationRecord) {
         final Payment payment = findPaymentByReservation(reservationRecord);
-        ReservationSettingsStatus status = getReservationSettingsResponse(reservationRecord);
+        final ReservationSettingsStatus status = getReservationSettingsResponse(reservationRecord);
         return ReservationRecordInfoWithStatus.of(reservationRecord, payment, status);
     }
 
-    private ReservationSettingsStatus getReservationSettingsResponse(ReservationRecord reservationRecord) {
-        LocalDate reserveDate = reservationRecord.getDate();
+    private ReservationSettingsStatus getReservationSettingsResponse(final ReservationRecord reservationRecord) {
+        final LocalDate reserveDate = reservationRecord.getDate();
         if (reservationRecord.getStatus() == ReservationStatus.CANCELED) return CANCELED;
-        LocalDate nowDate = LocalDate.now();
-        LocalTime nowTime = LocalTime.now();
+        final LocalDate nowDate = LocalDate.now();
+        final LocalTime nowTime = LocalTime.now();
         if (reserveDate.isBefore(nowDate) || (reserveDate == nowDate && reservationRecord.getStartTime().isAfter(nowTime)))
             return AFTER_USING;
         if (reserveDate.isAfter(nowDate) || (reserveDate == nowDate && reservationRecord.getEndTime().isBefore(nowTime)))
