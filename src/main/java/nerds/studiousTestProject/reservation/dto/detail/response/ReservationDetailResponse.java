@@ -8,8 +8,6 @@ import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
 @Builder
@@ -21,10 +19,8 @@ public class ReservationDetailResponse {
     private ReserveUserInfo user;
 
     public static ReservationDetailResponse of(ReservationRecord reservationRecord, Payment payment) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
         return ReservationDetailResponse.builder()
-                .place(PlaceInfo.of(studycafe, room))
+                .place(PlaceInfo.from(reservationRecord))
                 .reservation(ReservationInfo.from(reservationRecord))
                 .payment(PaymentInfo.from(payment))
                 .user(ReserveUserInfo.from(reservationRecord))

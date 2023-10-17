@@ -2,6 +2,7 @@ package nerds.studiousTestProject.studycafe.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
@@ -13,7 +14,9 @@ public class PlaceInfo {
     private String roomName;
     private String address;
 
-    public static PlaceInfo of(Studycafe studycafe, Room room) {
+    public static PlaceInfo from(ReservationRecord reservationRecord) {
+        Room room = reservationRecord.getRoom();
+        Studycafe studycafe = room.getStudycafe();
         return PlaceInfo.builder()
                 .studycafeName(studycafe.getName())
                 .roomName(room.getName())

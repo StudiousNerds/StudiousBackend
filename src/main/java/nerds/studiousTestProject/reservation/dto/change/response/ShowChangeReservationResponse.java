@@ -24,10 +24,8 @@ public class ShowChangeReservationResponse {
     private List<PaidConvenienceInfo> notPaidList;
 
     public static ShowChangeReservationResponse of(ReservationRecord reservationRecord, int price, List<PaidConvenienceInfo> paidConvenienceList, List<PaidConvenienceInfo> notPaidConvenienceList) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
         return ShowChangeReservationResponse.builder()
-                .place(PlaceInfo.of(studycafe, room))
+                .place(PlaceInfo.from(reservationRecord))
                 .reservation(ReservationInfo.from(reservationRecord))
                 .headCount(reservationRecord.getHeadCount())
                 .paidList(paidConvenienceList)

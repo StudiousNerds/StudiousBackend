@@ -7,8 +7,6 @@ import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @AllArgsConstructor
 @Builder
@@ -20,10 +18,8 @@ public class ShowAdminCancelResponse {
     private ReserveUserInfo user;
 
     public static ShowAdminCancelResponse from(ReservationRecord reservationRecord) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
         return ShowAdminCancelResponse.builder()
-                .place(PlaceInfo.of(studycafe, room))
+                .place(PlaceInfo.from(reservationRecord))
                 .reservation(ReservationInfo.from(reservationRecord))
                 .user(ReserveUserInfo.from(reservationRecord))
                 .build();
