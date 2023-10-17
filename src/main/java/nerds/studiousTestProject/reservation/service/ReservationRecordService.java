@@ -243,14 +243,13 @@ public class ReservationRecordService {
         final Room room = reservationRecord.getRoom();
         final Studycafe studycafe = room.getStudycafe();
         final List<RefundPolicy> refundPolicies = refundPolicyRepository.findAllByStudycafe(studycafe);
-        final Payment payment = findPaymentByReservationRecord(reservationRecord);
 
         final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
         final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
 
         return ReservationCancelResponse.builder()
                 .reservation(ReservationRecordInfoWithPlace.of(studycafe, room, reservationRecord))
-                .paymentRecord(calculateRefundMoney(payment, refundPolicyOnDay))
+                .paymentRecord(calculateRefundMoney(findPaymentByReservationRecord(reservationRecord), refundPolicyOnDay))
                 .refundPolicy(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
                 .build();
     }
