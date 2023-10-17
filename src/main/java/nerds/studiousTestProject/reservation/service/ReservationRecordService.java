@@ -285,10 +285,9 @@ public class ReservationRecordService {
         return remainDate > 8 ? 8 : remainDate;
     }
 
-    public MypageReservationResponse getAll(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, int page, Long memberId) {
+    public MypageReservationResponse getAll(final ReservationSettingsStatus tab, final String studycafeName, LocalDate startDate, LocalDate endDate, int page, final Long memberId) {
         page = validPageAndAssign(page);
-        final Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        final Member member = findMemberById(memberId);
         final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
         final List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
         return MypageReservationResponse.of(reservationRecordInfoWithStatusList, reservationRecordPage);
