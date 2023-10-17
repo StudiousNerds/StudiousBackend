@@ -51,9 +51,6 @@ public class PaymentService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
 
-    private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
-
-
     @Transactional
     public ReservationDetailResponse confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderIdWithReservationAndPlace(orderId);
