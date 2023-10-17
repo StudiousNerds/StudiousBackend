@@ -335,13 +335,12 @@ public class ReservationRecordService {
     public ShowChangeReservationResponse showChangeReservation(final Long reservationRecordId) {
         final ReservationRecord reservationRecord = reservationRecordRepository.findByIdWithPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-        final int price = paymentRepository.findTotalPriceByReservationId(reservationRecord);
         final List<Convenience> paidConvenienceList = convenienceRepository.findAllByRoomIdWherePaid(reservationRecord.getRoom().getId());
         final List<PaidConvenienceInfo> paidConvenienceListPaid = convenienceRecordRepository.findAllByReservationRecord(reservationRecord).stream()
                 .map(PaidConvenienceInfo::from).toList();
         final List<PaidConvenienceInfo> paidConvenienceListNotPaid = paidConvenienceList.stream()
                 .filter(convenience -> !paidConvenienceListPaid.contains(convenience.getName().name())).map(PaidConvenienceInfo::from).toList();
-        return ShowChangeReservationResponse.of(reservationRecord, price, paidConvenienceListPaid, paidConvenienceListNotPaid);
+        return ShowChangeReservationResponse.of(reservationRecord, paidConvenienceListPaid, paidConvenienceListNotPaid);
     }
 
 
