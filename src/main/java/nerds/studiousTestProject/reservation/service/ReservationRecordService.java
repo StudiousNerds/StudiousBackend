@@ -348,6 +348,7 @@ public class ReservationRecordService {
         Payment previousPayment = findPaymentByReservation(reservationRecord);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(previousPayment.getPaymentKey()), CancelRequest.from(CHANGE_CANCEL_REASON, request));
         validCancelPrice(previousPayment, responseFromToss);
+        paymentRepository.delete(previousPayment);
         final Payment payment = paymentRepository.save(createInProgressPayment(request.getPrice(), reservationRecord));
         price += updateConvenienceRecord(reservationRecord, payment, request.getConveniences());
         validMatchPrice(request, price);
