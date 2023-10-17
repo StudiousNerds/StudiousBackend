@@ -20,16 +20,14 @@ public class ShowChangeReservationResponse {
     private PlaceInfo place;
     private ReservationInfo reservation;
     private int headCount;
-    private List<PaidConvenienceInfo> paidList;
-    private List<PaidConvenienceInfo> notPaidList;
+    private PaidConvenienceInfoForChange paidConveniences;
 
     public static ShowChangeReservationResponse of(ReservationRecord reservationRecord, int price, List<PaidConvenienceInfo> paidConvenienceList, List<PaidConvenienceInfo> notPaidConvenienceList) {
         return ShowChangeReservationResponse.builder()
                 .place(PlaceInfo.from(reservationRecord))
                 .reservation(ReservationInfo.from(reservationRecord))
                 .headCount(reservationRecord.getHeadCount())
-                .paidList(paidConvenienceList)
-                .notPaidList(notPaidConvenienceList)
+                .paidConveniences(PaidConvenienceInfoForChange.of(paidConvenienceList, notPaidConvenienceList))
                 .build();
     }
 
