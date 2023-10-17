@@ -171,9 +171,9 @@ public class ReservationRecordService {
         }
     }
 
-    private void savePaidConvenienceRecord(final ReserveRequest reserveRequest,final  ReservationRecord reservationRecord,final  Payment payment) {
+    private void savePaidConvenienceRecord(final ReserveRequest reserveRequest,final  ReservationRecord reservationRecord) {
         reserveRequest.getPaidConveniences().stream()
-                .forEach(paidConvenience -> convenienceRecordRepository.save(paidConvenience.toConvenienceRecord(reservationRecord, payment)));
+                .forEach(paidConvenience -> convenienceRecordRepository.save(paidConvenience.toConvenienceRecord(reservationRecord)));
     }
 
     public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {

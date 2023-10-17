@@ -21,10 +21,9 @@ public class PaidConvenience {
     @NotBlank
     private Integer price;
 
-    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord, Payment payment) {
+    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord) {
         return ConvenienceRecord.builder()
                 .reservationRecord(reservationRecord)
-                .payment(payment)
                 .convenienceName(convenienceName)
                 .price(price)
                 .build();
