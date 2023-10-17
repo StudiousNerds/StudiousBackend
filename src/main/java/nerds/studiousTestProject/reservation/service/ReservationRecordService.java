@@ -91,8 +91,8 @@ public class ReservationRecordService {
     public PaymentInfoResponse reserve(final ReserveRequest reserveRequest, final Long roomId, final Long memberId) {
         final Room room = findRoomById(roomId);
         validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
-        final Payment payment = paymentRepository.save(createInProgressPayment(reserveRequest.getReservation().getPrice()));
-        final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId), payment));
+        final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId)));
+        final Payment payment = paymentRepository.save(createInProgressPayment(reserveRequest.getReservation().getPrice(), reservationRecord));
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservation().getHeadCount());
         savePaidConvenienceRecord(reserveRequest, reservationRecord, payment);
         return PaymentInfoResponse.of(payment, orderName);
@@ -102,11 +102,12 @@ public class ReservationRecordService {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    private Payment createInProgressPayment(final Integer price) {
+    private Payment createInProgressPayment(final Integer price, final ReservationRecord reservationRecord) {
         return Payment.builder()
                 .status(PaymentStatus.IN_PROGRESS)
                 .price(price)
                 .orderId(UUID.randomUUID().toString())
+                .reservationRecord(reservationRecord)
                 .build();
     }
 
