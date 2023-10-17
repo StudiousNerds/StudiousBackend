@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 public class MypageReservationResponse {
+
     private List<ReservationRecordInfoWithStatus> reservations;
     private Integer pageNumber;
     private Integer totalPage;
