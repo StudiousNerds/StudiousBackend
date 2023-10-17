@@ -55,8 +55,8 @@ class ReservationRecordRepositoryTest {
         // given
         Member member = 멤버_저장(DEFAULT_USER.생성(1L));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member))));
-        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room));
-        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
         List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByRoomId(room.getId());
         // then
@@ -73,7 +73,7 @@ class ReservationRecordRepositoryTest {
         Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe, 1L));
         Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
-        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
         List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByStudycafeId(studycafe.getId());
         // then
@@ -88,7 +88,7 @@ class ReservationRecordRepositoryTest {
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member))));
         Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
-        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
         ReservationRecord reservationRecord = reservationRecordRepository.findByReviewId(review.getId()).get();
         // then
@@ -105,14 +105,14 @@ class ReservationRecordRepositoryTest {
         권한_저장(ADMIN.멤버_생성(admin));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(admin))));
 
-        예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(16, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(18, 0), member1, room));
-        ReservationRecord reservation1 = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(19, 0), LocalTime.of(21, 0), member1, room));
-        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(23, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(19, 0), LocalTime.of(20, 0), member2, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(12, 0), member2, room));
+        예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(16, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(16, 0), LocalTime.of(18, 0), member1, room));
+        ReservationRecord reservation1 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(19, 0), LocalTime.of(21, 0), member1, room));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(23, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(19, 0), LocalTime.of(20, 0), member2, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(12, 0), member2, room));
         Pageable pageable = PageRequest.of(0, 2);
         Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.ALL, null, null, null, member1, pageable);
         assertAll(
@@ -127,10 +127,10 @@ class ReservationRecordRepositoryTest {
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
 
-        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(16, 0), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(23, 0), member1, room));
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(14, 0), LocalTime.of(16, 0), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(22, 0), LocalTime.of(23, 0), member1, room));
         Pageable pageable = PageRequest.of(0, 1);
         Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.CANCELED, null, null, null, member1, pageable);
         assertAll(
@@ -145,10 +145,10 @@ class ReservationRecordRepositoryTest {
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
 
-        예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10,0), LocalTime.now(), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now().minusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
-        예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now().plusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
-        ReservationRecord reservation = 예약_내역_저장(CONFIRM_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(2), member1, room));
+        예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10,0), LocalTime.now(), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().minusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().plusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
+        ReservationRecord reservation = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(2), member1, room));
         Pageable pageable = PageRequest.of(0, 1);
         Page<ReservationRecord> page = reservationRecordRepository.getReservationRecordsConditions(ReservationSettingsStatus.BEFORE_USING, null, null, null, member1, pageable);
 
