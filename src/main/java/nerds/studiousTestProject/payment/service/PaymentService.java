@@ -136,9 +136,9 @@ public class PaymentService {
     }
 
     public void processDepositByStatus(final DepositCallbackRequest depositCallbackRequest) {
-        Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
+        Payment payment = findByOrderIdWithReservation(depositCallbackRequest.getOrderId());
         final String status = depositCallbackRequest.getStatus();
-        ReservationRecord reservationRecord = findReservationByPayment(payment);
+        ReservationRecord reservationRecord = payment.getReservationRecord();
         if(isDepositError(payment, status)){ // 입금 오류
             //입금 오류에 관한 알림 전송
             reservationRecord.depositError();
