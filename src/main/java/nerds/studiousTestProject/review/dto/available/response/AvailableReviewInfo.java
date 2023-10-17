@@ -16,23 +16,19 @@ public class AvailableReviewInfo {
     private String studycafePhoto;
     private Long reservationId;
     private String roomName;
-    private String paymentType;
-    private Integer price;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private Integer usingTime;
     private LocalDate validDate;
 
-    public static AvailableReviewInfo of(ReservationRecord reservationRecord, Payment payment) {
+    public static AvailableReviewInfo of(ReservationRecord reservationRecord) {
         return AvailableReviewInfo.builder()
                 .reservationId(reservationRecord.getId())
                 .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
                 .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
                 .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
                 .roomName(reservationRecord.getRoom().getName())
-                .paymentType(payment.getMethod())
-                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getUsingTime())
                 .date(reservationRecord.getDate())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())

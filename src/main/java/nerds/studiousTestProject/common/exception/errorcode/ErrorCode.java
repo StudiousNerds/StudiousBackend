@@ -63,6 +63,9 @@ public enum ErrorCode {
     MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다."),
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
     NOT_FOUND_PAGE("페이지가 없습니다."),
+    EXPIRED_VALID_DATE("유효 기간이 만료되었습니다"),
+    INVALID_RESERVATION_STATUS("예약이 완료되지 않았습니다."),
+    INVALID_WRITE_REVIEW_TIME("리뷰 작성 가능 시간이 아닙니다."),
     INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
     INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
 

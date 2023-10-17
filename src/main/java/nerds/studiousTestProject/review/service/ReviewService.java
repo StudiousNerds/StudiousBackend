@@ -2,19 +2,19 @@ package nerds.studiousTestProject.review.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.photo.entity.SubPhotoType;
 import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewInfo;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
@@ -40,12 +40,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_STATUS;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_WRITE_REVIEW_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -63,12 +66,14 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
-    private final PaymentRepository paymentRepository;
-
     public final Double GRADE_COUNT = 3.0;
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
+        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
+        validateReservationStatus(reservationRecord);
+        validateAvailableReviewTime(reservationRecord);
+
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
@@ -80,7 +85,6 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
 
-        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
         reservationRecord.addReview(review);
 
         List<String> hashtags = registerReviewRequest.getHashtags();
@@ -106,12 +110,10 @@ public class ReviewService {
         Review review = findReviewById(reviewId);
 
         Grade grade = review.getGrade();
-        grade.updateGrade(modifyReviewRequest.getCleanliness(),
+        grade.update(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-
-        // 추천 여부 수정 만들어야 함
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         deleteAllHashtagRecordByReviewId(reviewId);
@@ -124,19 +126,23 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
         }
 
-        // 사진은 리뷰id를 통해 삭제하고, 다시 받아온 url로 저장을 한다.
         deleteAllPhotos(reviewId);
         saveSubPhotos(review, files);
 
         review.updateDetail(modifyReviewRequest.getDetail());
+        review.updateIsRecommended(modifyReviewRequest.getIsRecommend());
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
 
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
-        Review review = findReviewById(reviewId);
         ReservationRecord reservationRecord = findReservationRecordByReviewId(reviewId);
+        if (LocalDate.now().isBefore(reservationRecord.getDate().plusDays(7))) {
+            throw new BadRequestException(EXPIRED_VALID_DATE);
+        }
+
+        Review review = findReviewById(reviewId);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
 
         deleteAllHashtagRecordByReviewId(reviewId);
@@ -323,19 +329,15 @@ public class ReviewService {
         return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null &&
                         !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord, findPaymentByReservation(reservationRecord)))
+                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord))
                 .sorted(Comparator.comparing(AvailableReviewInfo::getDate).reversed())
                 .collect(Collectors.toList());
-    }
-
-    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
-        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     /**
      * 리뷰 작성한 내역을 조회하는 메소드
      */
-    public List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservationRecords, LocalDate startDate, LocalDate endDate) {
+    private List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservationRecords, LocalDate startDate, LocalDate endDate) {
         List<ReservationRecord> reservationRecordList = reservationRecords.getContent();
 
         return reservationRecordList.stream()
@@ -346,17 +348,13 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    private List<ReservationRecord> getAllReservation(Long studycafeId){
-        return findAllReservationRecordByStudycafeId(studycafeId);
-    }
-
     private Page<ReservationRecord> getReservationRecords(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
-        return findAllReservationRecordByMemberId(member.getId(), pageable);
+        return findAllReservationRecordByMember(member, pageable);
     }
 
-    public List<FindReviewInfo> getReviewInfo(Page<Review> reviewList) {
+    private List<FindReviewInfo> getReviewInfo(Page<Review> reviewList) {
         return reviewList.stream()
                 .filter(review -> review != null && reviewList.hasContent())
                 .map(review -> FindReviewInfo.builder()
@@ -382,43 +380,17 @@ public class ReviewService {
     }
 
     private List<Review> getAllReviews(Long studycafeId) {
-        List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        List<Long> reviewIds = new ArrayList<>();
-        List<Review> reviewList = new ArrayList<>();
-        for (ReservationRecord reservationRecord : recordList) {
-            reviewIds.add(reservationRecord.getReview().getId());
-        }
-
-        List<Review> reviews = reviewRepository.findAllByIdInOrderByCreatedDateDesc(reviewIds);
-
-        for (int i = 0; i < reviews.size(); i++) {
-            reviewList.add(reviews.get(i));
-        }
-        return reviewList;
+        return reviewRepository.findAllByStudycafeIdWithoutPage(studycafeId);
     }
 
     private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
         pageable = getPageable(pageable);
-        List<ReservationRecord> recordList = getAllReservation(studycafeId);
-        return getReviewList(pageable, recordList);
+        return findAllByStudycafeId(studycafeId, pageable);
     }
 
     private Page<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
         pageable = getPageable(pageable);
-        List<ReservationRecord> recordList = findAllReservationRecordByRoomId(roomId);
-        return getReviewList(pageable, recordList);
-    }
-
-    private Page<Review> getReviewList(Pageable pageable, List<ReservationRecord> recordList) {
-        List<Long> reviewIds = new ArrayList<>();
-
-        for (ReservationRecord reservationRecord : recordList) {
-            if(reservationRecord.getReview() != null) {
-                reviewIds.add(reservationRecord.getReview().getId());
-            }
-        }
-
-        return reviewRepository.findAllByIdIn(reviewIds, pageable);
+        return findAllByRoomId(roomId, pageable);
     }
 
     private PageRequest getPageable(Pageable pageable) {
@@ -434,6 +406,14 @@ public class ReviewService {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
     }
 
+    private Page<Review> findAllByStudycafeId(Long studycafeId, Pageable pageable) {
+        return reviewRepository.findAllByStudycafeId(studycafeId, pageable);
+    }
+
+    private Page<Review> findAllByRoomId(Long roomId, Pageable pageable) {
+        return reviewRepository.findAllByRoomId(roomId, pageable);
+    }
+
     private ReservationRecord findReservationRecordByReviewId(Long reviewId) {
         return reservationRecordRepository.findByReviewId(reviewId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
@@ -444,16 +424,8 @@ public class ReviewService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    private List<ReservationRecord> findAllReservationRecordByStudycafeId(Long studycafeId) {
-        return reservationRecordRepository.findAllByStudycafeId(studycafeId);
-    }
-
-    private Page<ReservationRecord> findAllReservationRecordByMemberId(Long memberId, Pageable pageable) {
-        return reservationRecordRepository.findAllByMemberId(memberId, pageable);
-    }
-
-    private List<ReservationRecord> findAllReservationRecordByRoomId(Long roomId) {
-        return reservationRecordRepository.findAllByRoomId(roomId);
+    private Page<ReservationRecord> findAllReservationRecordByMember(Member member, Pageable pageable) {
+        return reservationRecordRepository.findAllByMember(pageable, member);
     }
 
     private void deleteAllHashtagRecordByReviewId(Long reviewId) {
@@ -477,5 +449,17 @@ public class ReviewService {
         reviewPhotos.addAll(reviewSubPhoto);
 
         return reviewPhotos;
+    }
+
+    private void validateAvailableReviewTime(ReservationRecord reservationRecord) {
+        if (LocalDate.now().isBefore(reservationRecord.getDate()) || LocalTime.now().isBefore(reservationRecord.getEndTime())) {
+            throw new BadRequestException(INVALID_WRITE_REVIEW_TIME);
+        }
+    }
+
+    private void validateReservationStatus(ReservationRecord reservationRecord) {
+        if (reservationRecord.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new BadRequestException(INVALID_RESERVATION_STATUS);
+        }
     }
 }

@@ -150,7 +150,6 @@ public class StudycafeService {
         return getNotice(studycafeId);
     }
 
-
     public MainPageResponse getMainPage() {
         List<RecommendCafeInfo> recommendStduycafes = getRecommendStudycafes();
         List<EventCafeInfo> eventStudycafes = getEventStudycafes();
@@ -165,7 +164,7 @@ public class StudycafeService {
                         .studycafeId(studycafe.getId())
                         .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumRevCnt(getAccumRevCnt(studycafe.getId()))
+                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
@@ -182,17 +181,13 @@ public class StudycafeService {
                         .studycafeId(studycafe.getId())
                         .studycafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumRevCnt(getAccumRevCnt(studycafe.getId()))
+                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
                         .hashtags(findHashtagById(studycafe.getId()))
                         .build())
                 .collect(Collectors.toList());
-    }
-
-    public Studycafe getStudyCafe(Long studycafeId) {
-        return findStudycafeById(studycafeId);
     }
 
     public List<String> getNotice(Long studycafeId) {
@@ -226,7 +221,7 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> findHashtagById(Long studycafeId) {
+    private List<String> findHashtagById(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
