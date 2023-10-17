@@ -2,7 +2,6 @@ package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.studycafe.entity.Address;
-import nerds.studiousTestProject.studycafe.entity.NearestStationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Studycafe.StudycafeBuilder;
 
@@ -50,11 +49,11 @@ public enum StudycafeFixture {
         return 기본_정보_빌더_생성(id).build();
     }
 
-    public Studycafe 멤버_생성(Member member) {
-        return 멤버_생성(member, null);
+    public Studycafe 멤버_추가_생성(Member member) {
+        return 멤버_추가_생성(member, null);
     }
 
-    public Studycafe 멤버_생성(Member member, Long id) {
+    public Studycafe 멤버_추가_생성(Member member, Long id) {
         return 기본_정보_빌더_생성(id).member(member).build();
     }
 

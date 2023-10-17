@@ -54,7 +54,7 @@ class ReservationRecordRepositoryTest {
     void findAllByRoomId() {
         // given
         Member member = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member))));
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room));
         ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
@@ -69,7 +69,7 @@ class ReservationRecordRepositoryTest {
         // given
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
-        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(member));
+        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_추가_생성(member));
         Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe, 1L));
         Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
@@ -85,7 +85,7 @@ class ReservationRecordRepositoryTest {
     void findByReviewId() {
         // given
         Member member = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member))));
         Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
         ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
@@ -103,7 +103,7 @@ class ReservationRecordRepositoryTest {
         Member member2 = 멤버_저장(DEFAULT_USER.생성(2L));
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(admin))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(admin))));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -125,7 +125,7 @@ class ReservationRecordRepositoryTest {
     void 예약_취소_탭을_페이징해_조회한다(){
 
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member1))));
 
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -143,7 +143,7 @@ class ReservationRecordRepositoryTest {
     @DisplayName("지난 예약 탭을 페이징 해 조회할 수 있다.")
     public void 지난_예약_탭_조회() {
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member1))));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10,0), LocalTime.now(), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().minusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));

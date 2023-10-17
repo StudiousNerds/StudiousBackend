@@ -58,7 +58,7 @@ class SubPhotoRepositoryTest {
         // given
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
-        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         SubPhoto studycafePhoto1 = subPhotoRepository.save(REVIEW_PHOTO.스터디카페_생성(studycafe, 1L));
         SubPhoto studycafePhoto2 = subPhotoRepository.save(REVIEW_PHOTO.스터디카페_생성(studycafe, 2L));
         // when
@@ -73,7 +73,7 @@ class SubPhotoRepositoryTest {
         // given
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
-        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         SubPhoto roomPhoto1 = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 1L));
         SubPhoto roomphoto2 = subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 2L));
@@ -105,7 +105,7 @@ class SubPhotoRepositoryTest {
         // given
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
-        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe));
         subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 1L));
         subPhotoRepository.save(REVIEW_PHOTO.룸_생성(room, 2L));

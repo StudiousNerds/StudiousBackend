@@ -50,7 +50,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
@@ -74,7 +74,7 @@ class ReviewRepositoryCustomImplTest {
             예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
         }
 
-        Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room4 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
         Room room5 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
         Room room6 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
@@ -120,7 +120,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
@@ -144,7 +144,7 @@ class ReviewRepositoryCustomImplTest {
             예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
         }
 
-        Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room4 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
         Room room5 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
         Room room6 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
@@ -190,7 +190,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
@@ -230,7 +230,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
@@ -270,7 +270,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
@@ -310,7 +310,7 @@ class ReviewRepositoryCustomImplTest {
         Member member = 회원_저장(DEFAULT_USER.생성());
         USER.멤버_생성(member);
 
-        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
         Room room1 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));
         Room room3 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe1));

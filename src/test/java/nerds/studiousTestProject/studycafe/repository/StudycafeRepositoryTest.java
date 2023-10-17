@@ -29,11 +29,11 @@ public class StudycafeRepositoryTest {
         // given
         Member admin = 회원_저장(KAKAO_USER.생성());
         권한_저장(ADMIN.멤버_생성(admin));
-        Studycafe studycafe1 = 스터디카페_저장(FIRST_STUDYCAFE.멤버_생성(admin));
-        Studycafe studycafe2 = 스터디카페_저장(FOURTH_STUDYCAFE.멤버_생성(admin));
-        Studycafe studycafe3 = 스터디카페_저장(NERDS.멤버_생성(admin));
-        Studycafe studycafe4 = 스터디카페_저장(SECOND_STUDYCAFE.멤버_생성(admin));
-        Studycafe studycafe5 = 스터디카페_저장(THIRD_STUDYCAFE.멤버_생성(admin));
+        Studycafe studycafe1 = 스터디카페_저장(FIRST_STUDYCAFE.멤버_추가_생성(admin));
+        Studycafe studycafe2 = 스터디카페_저장(FOURTH_STUDYCAFE.멤버_추가_생성(admin));
+        Studycafe studycafe3 = 스터디카페_저장(NERDS.멤버_추가_생성(admin));
+        Studycafe studycafe4 = 스터디카페_저장(SECOND_STUDYCAFE.멤버_추가_생성(admin));
+        Studycafe studycafe5 = 스터디카페_저장(THIRD_STUDYCAFE.멤버_추가_생성(admin));
         // when
         List<Studycafe> top10ByOrderByTotalGradeDesc = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
         // then
