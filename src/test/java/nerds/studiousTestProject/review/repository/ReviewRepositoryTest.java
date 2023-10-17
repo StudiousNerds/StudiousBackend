@@ -53,17 +53,17 @@ class ReviewRepositoryTest {
 
         for (long i = 0L; i < 31L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room1, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room1, review));
         }
 
         for (long i = 0L; i < 31L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room2, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room2, review));
         }
 
         for (long i = 0L; i < 31L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1.plusDays(i), startTime1, endTime1, member, room3, review));
         }
 
         Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
@@ -77,17 +77,17 @@ class ReviewRepositoryTest {
 
         for (long i = 0L; i < 30L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room4, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room4, review));
         }
 
         for (long i = 0L; i < 30L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room5, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room5, review));
         }
 
         for (long i = 0L; i < 30L; i++) {
             Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-            예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room6, review));
+            예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate2.plusDays(i), startTime2, endTime2, member, room6, review));
         }
 
         // when
@@ -118,7 +118,7 @@ class ReviewRepositoryTest {
         LocalTime endTime1 = LocalTime.of(19, 0);
 
         Review room1Review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate1, startTime1, endTime1, member, room1, room1Review));
+        예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate1, startTime1, endTime1, member, room1, room1Review));
 
         Studycafe studycafe2 = 스터디카페_저장(NERDS.멤버_생성(admin));
         Room room2 = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(studycafe2));
@@ -128,7 +128,7 @@ class ReviewRepositoryTest {
         LocalTime endTime2 = LocalTime.of(19, 0);
 
         Review room2Review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
-        예약_정보_저장(CONFIRM_RESERVATION.예약_내역_생성(currentReserveDate2, startTime2, endTime2, member, room2, room2Review));
+        예약_정보_저장(CONFIRM_RESERVATION.리뷰_추가_생성(currentReserveDate2, startTime2, endTime2, member, room2, room2Review));
 
         // when
         List<Review> reviews1 = reviewRepository.findAllByRoomId(room1.getId(), null).getContent();
