@@ -68,7 +68,8 @@ public enum ErrorCode {
     INVALID_RESERVATION_STATUS("예약이 완료되지 않았습니다."),
     INVALID_WRITE_REVIEW_TIME("리뷰 작성 가능 시간이 아닙니다."),
     INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
-    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
+    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다."),
+    ALREADY_EXIST_BOOKMARK("이미 존재하는 북마크입니다.");
 
     private final String message;
     ErrorCode(String message) {
