@@ -120,17 +120,17 @@ public class MemberService {
     }
 
     public MemberInfoResponse findMemberInfoFromMemberId(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         return MemberInfoResponse.of(member);
     }
 
     @Transactional
-    public void addPhoto(Long memberId, MultipartFile file) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+    public String addPhoto(Long memberId, MultipartFile file) {
+        Member member = findMemberById(memberId);
         String photoUrl = storageProvider.uploadFile(file);
         member.updatePhoto(photoUrl);
+
+        return photoUrl;
     }
 
     @Transactional
@@ -181,8 +181,7 @@ public class MemberService {
 
     @Transactional
     public void replacePhoneNumber(Long memberId, PatchPhoneNumberRequest patchPhoneNumberRequest) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
 
         member.updatePhoneNumber(newPhoneNumber);
@@ -193,8 +192,7 @@ public class MemberService {
         String oldPassword = patchPasswordRequest.getOldPassword();
         String newPassword = patchPasswordRequest.getNewPassword();
 
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
@@ -219,8 +217,7 @@ public class MemberService {
 
     @Transactional
     public void deactivate(Long memberId, WithdrawRequest withdrawRequest) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         String password = withdrawRequest.getPassword();
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -240,8 +237,7 @@ public class MemberService {
      */
     @Transactional
     public JwtTokenResponse reissueToken(Long memberId, String refreshToken) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
         RefreshToken redisRefreshToken = refreshTokenService.findByMemberId(member.getId());
         if (redisRefreshToken == null) {
             throw new NotFoundException(EXPIRED_TOKEN_VALID_TIME);
@@ -260,6 +256,10 @@ public class MemberService {
 //        String password = passwordEncoder.encode(member.getPassword());
 
         return jwtTokenProvider.generateToken(member);
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
     private void validate(SignUpRequest signUpRequest) {
