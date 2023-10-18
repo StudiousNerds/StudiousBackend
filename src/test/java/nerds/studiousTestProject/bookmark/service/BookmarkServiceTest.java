@@ -51,4 +51,22 @@ class BookmarkServiceTest {
         //then
         Assertions.assertThat(member.getBookmarks().size()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("북마크를 삭제할 수 있다.")
+    void deleteBookmark() {
+        // given
+        Studycafe studycafe = NERDS.생성();
+        Member member = DEFAULT_USER.생성();
+        Bookmark bookmark = Bookmark.builder().studycafe(studycafe).member(member).build();
+
+        doReturn(Optional.of(member)).when(memberRepository).findById(member.getId());
+        doReturn(Optional.of(bookmark)).when(bookmarkRepository).findByStudycafeId(studycafe.getId());
+
+        // when
+        bookmarkService.deleteBookmark(member.getId(), studycafe.getId());
+
+        // then
+        Assertions.assertThat(member.getBookmarks()).isEmpty();
+    }
 }
