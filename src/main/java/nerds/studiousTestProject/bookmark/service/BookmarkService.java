@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_BOOKMARK;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
@@ -47,8 +48,7 @@ public class BookmarkService {
     }
 
     public FindBookmarkResponse findBookmark(Long memberId, Pageable pageable){
-        Member member = findMemberById(memberId);
-        Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(member.getId(), pageable);
+        Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
             return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
@@ -75,11 +75,8 @@ public class BookmarkService {
 
     @Transactional
     public void deleteBookmark(Long memberId, Long studycafeId){
-        Member member = findMemberById(memberId);
-        Studycafe studyCafe = findStudycafeById(studycafeId);
-
-        member.deleteBookmark(Bookmark.builder().studycafe(studyCafe).build());
-        bookmarkRepository.deleteById(studycafeId);
+        Bookmark bookmark = bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
+        bookmarkRepository.deleteById(bookmark.getId());
     }
 
     private List<ReservationRecord> findReservationRecordsByStudycafeId(Long studycafeId) {
