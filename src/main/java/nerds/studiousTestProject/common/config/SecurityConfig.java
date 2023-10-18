@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/members/**").permitAll()
                 .requestMatchers("/api/v1/search/**").permitAll()
                 .requestMatchers("/api/v1/studycafes/**").permitAll()
-                .requestMatchers("/studious/main").permitAll()
+                .requestMatchers("/api/v1/main").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .cors()
