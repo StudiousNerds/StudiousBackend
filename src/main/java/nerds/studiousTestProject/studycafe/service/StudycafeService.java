@@ -156,7 +156,7 @@ public class StudycafeService {
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
         return getSearchResponses(topTenCafeList);
     }
-    
+
     public List<SearchResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
         return getSearchResponses(topTenCafeList);
@@ -168,12 +168,11 @@ public class StudycafeService {
         return studycafe.getNotices().stream().map(Notice::getDetail).toList();
     }
 
-    public List<String> getConveniences(Long studycafeId) {
+    public List<ConvenienceName> getConveniences(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getConveniences().stream()
                 .map(Convenience::getName)
-                .map(ConvenienceName::toString)
                 .toList();
     }
 
