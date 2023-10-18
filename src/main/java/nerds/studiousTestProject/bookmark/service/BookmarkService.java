@@ -44,10 +44,7 @@ public class BookmarkService {
 
     @Transactional
     public void registerBookmark(Long memberId, Long studycafeId){
-        if(bookmarkRepository.existsByStudycafeId(studycafeId)) {
-            throw new BadRequestException(ALREADY_EXIST_BOOKMARK);
-        }
-
+        validateExistence(studycafeId);
         Member member = findMemberById(memberId);
         Studycafe studyCafe = findStudycafeById(studycafeId);
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
@@ -108,5 +105,11 @@ public class BookmarkService {
 
     private Double findGradeByStudycafe(Studycafe studycafe) {
         return studycafe.getGradeSum() / studycafe.getGradeCount();
+    }
+
+    private void validateExistence(Long studycafeId) {
+        if(bookmarkRepository.existsByStudycafeId(studycafeId)) {
+            throw new BadRequestException(ALREADY_EXIST_BOOKMARK);
+        }
     }
 }
