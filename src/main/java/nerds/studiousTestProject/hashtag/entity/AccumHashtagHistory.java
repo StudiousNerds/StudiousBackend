@@ -20,7 +20,7 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 @Builder
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AccumHashtagHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

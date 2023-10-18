@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Studycafe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -169,6 +170,20 @@ public class Studycafe {
     public void updateRefundPolices(List<RefundPolicy> refundPolicies) {
         if (refundPolicies != null) {
             this.refundPolicies = refundPolicies;
+        }
+    }
+
+    public void updateAccumData(Integer accumReserveCount, Double gradeSum, Integer gradeCount) {
+        if (accumReserveCount != null) {
+            this.accumReserveCount += accumReserveCount;
+        }
+
+        if (gradeSum != null) {
+            this.gradeSum += gradeSum;
+        }
+
+        if (gradeCount != null) {
+            this.gradeCount += gradeCount;
         }
     }
 
