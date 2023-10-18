@@ -12,10 +12,10 @@ public class SearchResponse {
     private Long id;
     private String name;
     private String photo;
-    private Integer accumRevCnt;
+    private Integer accumResCnt;
     private Integer walkingTime;
     private String nearestStation;
-    private List<HashtagName> hashtagNames;
+    private List<HashtagName> hashtags;
     private Double grade;
 
     public static SearchResponse from(SearchResponseInfo searchResponseInfo, List<HashtagName> hashtagNames, Integer accumRevCnt, Double grade) {
@@ -24,10 +24,10 @@ public class SearchResponse {
                 .id(searchResponseInfo.getId())
                 .name(searchResponseInfo.getName())
                 .photo(searchResponseInfo.getPhoto())
-                .accumRevCnt(accumRevCnt)
+                .accumResCnt(accumRevCnt)
                 .walkingTime(searchResponseInfo.getWalkingTime())
                 .nearestStation(searchResponseInfo.getNearestStation())
-                .hashtagNames(hashtagNames)
+                .hashtags(hashtagNames)
                 .grade(grade)
                 .build();
     }

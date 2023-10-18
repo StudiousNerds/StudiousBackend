@@ -2,6 +2,7 @@ package nerds.studiousTestProject.studycafe.dto.enquiry.response;
 
 import lombok.Builder;
 import lombok.Data;
+import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.room.dto.find.response.FindRoomResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.AnnouncementInResponse;
 
@@ -16,7 +17,7 @@ public class FindStudycafeResponse {
     private Integer accumResCnt;
     private Integer walkingTime;
     private String nearestStation;
-    private List<String> hashtags;
+    private List<HashtagName> hashtags;
     private String introduction;
     private List<String> conveniences;
     private List<AnnouncementInResponse> announcement;
