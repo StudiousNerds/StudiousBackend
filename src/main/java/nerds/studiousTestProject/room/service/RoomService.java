@@ -3,6 +3,7 @@ package nerds.studiousTestProject.room.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.NotFoundException;
+import nerds.studiousTestProject.common.service.HolidayProvider;
 import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRepository;
@@ -56,6 +57,7 @@ public class RoomService {
     private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
     private final SubPhotoRepository subPhotoRepository;
+    private final HolidayProvider holidayProvider;
 
     public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
 
@@ -128,7 +130,9 @@ public class RoomService {
         getStudycafeById(studycafeId);
         Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
 
-        OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, Week.of(date));
+        boolean isHoliday = holidayProvider.getHolidays().contains(date);
+        Week week = date != null ? (isHoliday ? Week.HOLIDAY : Week.of(date)) : null;
+        OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, week);
         int start = operationInfo.getStartTime() != null ? operationInfo.getStartTime().getHour() : LocalTime.MIN.getHour();
         int end = operationInfo.getEndTime() != null ? operationInfo.getEndTime().getHour() : LocalTime.MAX.getHour();
 
