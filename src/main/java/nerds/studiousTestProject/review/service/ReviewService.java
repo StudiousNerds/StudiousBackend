@@ -33,7 +33,6 @@ import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.room.entity.Room;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,17 +83,7 @@ public class ReviewService {
                 .grade(grade)
                 .build();
         reviewRepository.save(review);
-
-        reservationRecord.addReview(review);
-
-        List<String> hashtags = registerReviewRequest.getHashtags();
-        for (String userHashtag : hashtags) {
-            HashtagRecord hashtagRecord = HashtagRecord.builder()
-                    .review(review)
-                    .name(HashtagName.valueOf(userHashtag))
-                    .build();
-            review.addHashtagRecord(hashtagRecord);
-        }
+        updateHashtagRecord(registerReviewRequest.getHashtags(), review);
 
         if (!files.isEmpty()) {
             saveSubPhotos(review, files);
@@ -117,14 +106,7 @@ public class ReviewService {
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         deleteAllHashtagRecordByReviewId(reviewId);
-        List<String> hashtags = modifyReviewRequest.getHashtags();
-        for (String userHashtag : hashtags) {
-            HashtagRecord hashtagRecord = HashtagRecord.builder()
-                    .review(review)
-                    .name(HashtagName.valueOf(userHashtag))
-                    .build();
-            review.addHashtagRecord(hashtagRecord);
-        }
+        updateHashtagRecord(modifyReviewRequest.getHashtags(), review);
 
         deleteAllPhotos(reviewId);
         saveSubPhotos(review, files);
@@ -384,22 +366,11 @@ public class ReviewService {
     }
 
     private Page<Review> getAllReviewsSorted(Long studycafeId, Pageable pageable) {
-        pageable = getPageable(pageable);
         return findAllByStudycafeId(studycafeId, pageable);
     }
 
     private Page<Review> getRoomReviewsSorted(Long studycafeId, Long roomId, Pageable pageable) {
-        pageable = getPageable(pageable);
         return findAllByRoomId(roomId, pageable);
-    }
-
-    private PageRequest getPageable(Pageable pageable) {
-        Integer page = Integer.valueOf(pageable.getPageNumber());
-        if(page == null || page < 1) {
-            return PageRequest.of(1, pageable.getPageSize(), pageable.getSort());
-        }
-
-        return PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
     }
 
     private Review findReviewById(Long reviewId) {
@@ -460,6 +431,16 @@ public class ReviewService {
     private void validateReservationStatus(ReservationRecord reservationRecord) {
         if (reservationRecord.getStatus() != ReservationStatus.CONFIRMED) {
             throw new BadRequestException(INVALID_RESERVATION_STATUS);
+        }
+    }
+    private void updateHashtagRecord(List<String> registerReviewRequest, Review review) {
+        List<String> hashtags = registerReviewRequest;
+        for (String userHashtag : hashtags) {
+            HashtagRecord hashtagRecord = HashtagRecord.builder()
+                    .review(review)
+                    .name(HashtagName.valueOf(userHashtag))
+                    .build();
+            review.addHashtagRecord(hashtagRecord);
         }
     }
 }
