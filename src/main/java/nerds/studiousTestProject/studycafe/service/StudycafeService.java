@@ -16,7 +16,6 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
@@ -88,7 +87,6 @@ public class StudycafeService {
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
-    private final ReviewService reviewService;
     private final RoomService roomService;
     private final ReservationRecordRepository reservationRecordRepository;
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
@@ -279,7 +277,9 @@ public class StudycafeService {
     }
 
     private Double getTotalGrade(Long studycafeId) {
-        return reviewService.getAvgGrade(studycafeId);
+        Studycafe studycafe = findStudycafeById(studycafeId);
+
+        return Double.isNaN(studycafe.getGradeSum() / studycafe.getGradeCount()) ? 0.0 : studycafe.getGradeSum() / studycafe.getGradeCount();
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
