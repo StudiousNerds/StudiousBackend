@@ -154,36 +154,12 @@ public class StudycafeService {
 
     public List<SearchResponse> getRecommendStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> SearchResponse.builder()
-                        .id(studycafe.getId())
-                        .name(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(studycafe.getAccumReserveCount())
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
+        return getSearchResponses(topTenCafeList);
     }
-
+    
     public List<SearchResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> SearchResponse.builder()
-                        .id(studycafe.getId())
-                        .name(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(studycafe.getAccumReserveCount())
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
+        return getSearchResponses(topTenCafeList);
     }
 
     public List<String> getNotice(Long studycafeId) {
@@ -224,6 +200,21 @@ public class StudycafeService {
         return hashtagNames.stream()
                 .limit(size)
                 .toList();
+    }
+
+    private List<SearchResponse> getSearchResponses(List<Studycafe> topTenCafeList) {
+        return topTenCafeList.stream()
+                .map(studycafe -> SearchResponse.builder()
+                        .id(studycafe.getId())
+                        .name(studycafe.getName())
+                        .photo(studycafe.getPhoto())
+                        .accumResCnt(studycafe.getAccumReserveCount())
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
+                        .grade(getTotalGrade(studycafe.getId()))
+                        .hashtags(findHashtagById(studycafe.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
