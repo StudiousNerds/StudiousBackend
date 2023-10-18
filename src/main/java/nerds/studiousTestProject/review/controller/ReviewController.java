@@ -39,8 +39,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious")
-@Slf4j
+@RequestMapping("/api/v1")
 @Validated
 public class ReviewController {
     private final ReviewService reviewService;
@@ -90,7 +89,7 @@ public class ReviewController {
         return reviewService.findRoomReviews(studycafeId, roomId, pageable);
     }
 
-    @GetMapping("/studycafes/{studycafeId}/reviews/managements")
+    @GetMapping("/admin/studycafes/{studycafeId}/reviews")
     public List<ReviewInfoResponse> inquireStudycafeReviews(
             @LoggedInMember Long memberId,
             @PathVariable("studycafeId") Long studycafeId,
@@ -101,17 +100,17 @@ public class ReviewController {
         return adminReviewService.getWrittenReviews(studycafeId, memberId, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
     }
 
-    @PostMapping("/reviews/managements/{reviewId}")
+    @PostMapping("/admin/reviews/{reviewId}")
     public void registerComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid RegisterCommentRequest registerCommentRequest) {
         adminReviewService.registerComment(reviewId, registerCommentRequest);
     }
 
-    @PatchMapping("/reviews/managements/{reviewId}")
+    @PatchMapping("/admin/reviews/{reviewId}")
     public void modifyComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ModifyCommentRequest modifyCommentRequest) {
         adminReviewService.modifyComment(reviewId, modifyCommentRequest);
     }
 
-    @DeleteMapping("/reviews/managements/{reviewId}")
+    @DeleteMapping("admin/reviews/{reviewId}")
     public void deleteComment(@PathVariable("reviewId") Long reviewId) {
         adminReviewService.deleteComment(reviewId);
     }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight request에 대해, 인증을 하지 않고 모든 요청을 허용
                 .requestMatchers("/studious/mypage/**", "/studious/reservations/**", "/studious/payments/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/v1/**/managements/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/members/logout").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/v1/members/**").permitAll()
                 .requestMatchers("/api/v1/search/**").permitAll()

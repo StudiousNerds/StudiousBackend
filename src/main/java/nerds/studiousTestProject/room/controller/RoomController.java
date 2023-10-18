@@ -22,25 +22,25 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious")
+@RequestMapping("/api/v1/admin")
 @Slf4j
 public class RoomController {
 
     private final RoomService roomService;
 
-    @GetMapping("/studycafes/managements/{studycafeId}/rooms/{roomId}")
+    @GetMapping("/studycafes/{studycafeId}/rooms/{roomId}")
     public FindAllRoomResponse inquireModifyRoom(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
         return roomService.getAllRooms(memberId, studycafeId, roomId);
     }
 
-    @PatchMapping("/studycafes/managements/{studycafeId}/rooms/{roomId}")
+    @PatchMapping("/studycafes/{studycafeId}/rooms/{roomId}")
     public ModifyRoomResponse modifyRoom(@PathVariable Long studycafeId, @PathVariable Long roomId,
                                          @RequestPart("modifyRoomReuqest") @Valid ModifyRoomRequest modifyRoomRequest,
                                          @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         return roomService.modifyRoom(studycafeId, roomId, modifyRoomRequest, files);
     }
 
-    @DeleteMapping("/studycafes/managements/{studycafeId}/rooms/{roomId}")
+    @DeleteMapping("/studycafes/{studycafeId}/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long studycafeId, @PathVariable Long roomId) {
         roomService.deleteRoom(roomId);
         return ResponseEntity.noContent().build();

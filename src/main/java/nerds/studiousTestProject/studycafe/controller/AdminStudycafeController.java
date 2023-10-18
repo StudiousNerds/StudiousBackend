@@ -32,19 +32,19 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/studycafes/managements")
+@RequestMapping("/api/v1/admin/studycafes")
 @Slf4j
 public class AdminStudycafeController {
     private final StudycafeService studycafeService;
 
     private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
 
-    @PostMapping("/validations/accountInfos")
+    @PostMapping("/accountInfos")
     public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
         return studycafeService.validateAccountInfo(accountInfoRequest);
     }
 
-    @PostMapping("/validations/businessInfos")
+    @PostMapping("/businessInfos")
     public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
@@ -71,12 +71,12 @@ public class AdminStudycafeController {
         studycafeService.edit(memberId, studycafeId, cafeInfoEditRequest);
     }
 
-    @GetMapping("/notificationInfos/{studycafeId}")
+    @GetMapping("/{studycafeId}/notificationInfos")
     public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
         return studycafeService.inquireAnnouncements(memberId, studycafeId);
     }
 
-    @PostMapping("/notificationInfos/{studycafeId}")
+    @PostMapping("/{studycafeId}/notificationInfos")
     public void addNotificationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
         studycafeService.insertAnnouncements(memberId, studycafeId, announcementRequest);
     }
