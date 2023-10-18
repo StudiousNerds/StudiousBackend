@@ -173,6 +173,13 @@ public class Studycafe {
         }
     }
 
+    public void updateGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum = gradeSum;
+        }
+        gradeCount++;
+    }
+
     @Builder
     public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, String introduction) {
         this.id = id;
