@@ -310,7 +310,7 @@ public class StudycafeService {
         List<RoomInfoRequest> roomInfos = registerRequest.getRoomInfos();
         validatePhotos(multipartFileMap, roomInfos);    // 사진에 대한 검증
 
-        Member member = findMemberFromId(memberId);     // 현재 로그인된 유저 정보를 가져온다.
+        Member member = findMemberById(memberId);     // 현재 로그인된 유저 정보를 가져온다.
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
@@ -434,7 +434,7 @@ public class StudycafeService {
     }
 
     public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(Long memberId, Pageable pageable) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
 
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
@@ -447,7 +447,7 @@ public class StudycafeService {
      * @return 등록된 모든 스터디카페 정보
      */
     public CafeDetailsResponse inquireManagedStudycafe(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
@@ -485,7 +485,7 @@ public class StudycafeService {
      */
     @Transactional
     public void edit(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -532,7 +532,7 @@ public class StudycafeService {
      * @return 스터디카페의 모든 공지사항
      */
     public List<AnnouncementResponse> inquireAnnouncements(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
@@ -546,7 +546,7 @@ public class StudycafeService {
      */
     @Transactional
     public void insertAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -560,12 +560,12 @@ public class StudycafeService {
      */
     @Transactional
     public void delete(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private Member findMemberFromId(Long memberId) {
+    private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 }
