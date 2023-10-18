@@ -19,10 +19,8 @@ import nerds.studiousTestProject.reservation.repository.ReservationRecordReposit
 import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeInfo;
 import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
@@ -151,20 +149,20 @@ public class StudycafeService {
     }
 
     public MainPageResponse getMainPage() {
-        List<RecommendCafeInfo> recommendStduycafes = getRecommendStudycafes();
-        List<EventCafeInfo> eventStudycafes = getEventStudycafes();
+        List<SearchResponse> recommendStduycafes = getRecommendStudycafes();
+        List<SearchResponse> eventStudycafes = getEventStudycafes();
         return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
     }
 
-    public List<RecommendCafeInfo> getRecommendStudycafes(){
+    public List<SearchResponse> getRecommendStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
 
         return topTenCafeList.stream()
-                .map(studycafe -> RecommendCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
+                .map(studycafe -> SearchResponse.builder()
+                        .id(studycafe.getId())
+                        .name(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
+                        .accumResCnt(studycafe.getAccumReserveCount())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
@@ -173,15 +171,15 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public List<EventCafeInfo> getEventStudycafes(){
+    public List<SearchResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
 
         return topTenCafeList.stream()
-                .map(studycafe -> EventCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
+                .map(studycafe -> SearchResponse.builder()
+                        .id(studycafe.getId())
+                        .name(studycafe.getName())
                         .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
+                        .accumResCnt(studycafe.getAccumReserveCount())
                         .walkingTime(studycafe.getWalkingTime())
                         .nearestStation(studycafe.getNearestStation())
                         .grade(getTotalGrade(studycafe.getId()))
@@ -221,16 +219,13 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    private List<String> findHashtagById(Long studycafeId) {
+    private List<HashtagName> findHashtagById(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
-
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<String> hashtagNameList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).name());
-        }
-        return hashtagNameList;
+        return hashtagNames.stream()
+                .limit(size)
+                .toList();
     }
 
     private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
