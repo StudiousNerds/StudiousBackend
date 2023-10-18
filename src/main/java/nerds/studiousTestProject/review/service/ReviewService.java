@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.StorageProvider;
+import nerds.studiousTestProject.hashtag.entity.AccumHashtagHistory;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
+import nerds.studiousTestProject.hashtag.repository.AccumHashtagHistoryRepository;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
@@ -32,6 +34,8 @@ import nerds.studiousTestProject.review.entity.Grade;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.room.entity.Room;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
+import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,13 +47,16 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_STATUS;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_WRITE_REVIEW_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_HASHTAG;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_REVIEW;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 
@@ -58,13 +65,14 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
-
+    private final AccumHashtagHistoryRepository accumHashtagHistoryRepository;
     private final HashtagRecordRepository hashtagRecordRepository;
     private final MemberRepository memberRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final ReviewRepository reviewRepository;
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
+    private final StudycafeRepository studycafeRepository;
     public final Double GRADE_COUNT = 3.0;
 
     @Transactional
@@ -72,9 +80,11 @@ public class ReviewService {
         ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
         validateReservationStatus(reservationRecord);
         validateAvailableReviewTime(reservationRecord);
+        Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
 
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+        studycafe.updateGrade(getGradeSum(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
                 .createdDate(LocalDate.now())
@@ -83,7 +93,7 @@ public class ReviewService {
                 .grade(grade)
                 .build();
         reviewRepository.save(review);
-        updateHashtagRecord(registerReviewRequest.getHashtags(), review);
+        updateHashtagRecord(registerReviewRequest.getHashtags(), review, studycafe);
 
         if (!files.isEmpty()) {
             saveSubPhotos(review, files);
@@ -97,16 +107,18 @@ public class ReviewService {
     @Transactional
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
         Review review = findReviewById(reviewId);
+        Studycafe studycafe = findStudycafeById(modifyReviewRequest);
 
         Grade grade = review.getGrade();
         grade.update(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
                 getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+        
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         deleteAllHashtagRecordByReviewId(reviewId);
-        updateHashtagRecord(modifyReviewRequest.getHashtags(), review);
+        updateHashtagRecord(modifyReviewRequest.getHashtags(), review, studycafe);
 
         deleteAllPhotos(reviewId);
         saveSubPhotos(review, files);
@@ -116,6 +128,7 @@ public class ReviewService {
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
+
 
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
@@ -264,6 +277,10 @@ public class ReviewService {
         return (cleanliness + deafening + fixtureStatus) / GRADE_COUNT;
     }
 
+    public Double getGradeSum(Integer cleanliness, Integer deafening, Integer fixtureStatus) {
+        return Double.valueOf(cleanliness + deafening + fixtureStatus);
+    }
+
     public Double getAvgGrade(Long studycafeId) {
         List<Review> reviewList = getAllReviews(studycafeId);
         Integer count = 0;
@@ -373,6 +390,10 @@ public class ReviewService {
         return findAllByRoomId(roomId, pageable);
     }
 
+    private Studycafe findStudycafeById(ModifyReviewRequest modifyReviewRequest) {
+        return studycafeRepository.findById(modifyReviewRequest.getCafeId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    }
+
     private Review findReviewById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(NOT_FOUND_REVIEW));
     }
@@ -393,6 +414,10 @@ public class ReviewService {
     private ReservationRecord findReservationRecordById(Long reservationRecordId) {
         return reservationRecordRepository.findById(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
+    private AccumHashtagHistory findAccumHashtagHistoryByName(String userHashtag) {
+        return accumHashtagHistoryRepository.findByHashtagName(HashtagName.valueOf(userHashtag)).orElseThrow(() -> new NotFoundException(NOT_FOUND_HASHTAG));
     }
 
     private Page<ReservationRecord> findAllReservationRecordByMember(Member member, Pageable pageable) {
@@ -433,14 +458,24 @@ public class ReviewService {
             throw new BadRequestException(INVALID_RESERVATION_STATUS);
         }
     }
-    private void updateHashtagRecord(List<String> registerReviewRequest, Review review) {
-        List<String> hashtags = registerReviewRequest;
+
+    private void updateHashtagRecord(List<String> hashtags, Review review, Studycafe studycafe) {
         for (String userHashtag : hashtags) {
             HashtagRecord hashtagRecord = HashtagRecord.builder()
-                    .review(review)
                     .name(HashtagName.valueOf(userHashtag))
                     .build();
             review.addHashtagRecord(hashtagRecord);
+
+            validateExistedAccumHashtag(userHashtag);
+            AccumHashtagHistory hashtagHistory = AccumHashtagHistory.builder().count(1).name(HashtagName.valueOf(userHashtag)).build();
+            studycafe.addAccumHashtagHistory(hashtagHistory);
+        }
+    }
+
+    private void validateExistedAccumHashtag(String userHashtag) {
+        if (accumHashtagHistoryRepository.existsByHashtagName(HashtagName.valueOf(userHashtag))) {
+            AccumHashtagHistory hashtagHistory = findAccumHashtagHistoryByName(userHashtag);
+            hashtagHistory.updateCount();
         }
     }
 }
