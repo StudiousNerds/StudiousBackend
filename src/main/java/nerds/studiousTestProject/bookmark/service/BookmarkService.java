@@ -6,6 +6,7 @@ import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
+import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_BOOKMARK;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_BOOKMARK;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
@@ -42,6 +44,10 @@ public class BookmarkService {
 
     @Transactional
     public void registerBookmark(Long memberId, Long studycafeId){
+        if(bookmarkRepository.existsByStudycafeId(studycafeId)) {
+            throw new BadRequestException(ALREADY_EXIST_BOOKMARK);
+        }
+
         Member member = findMemberById(memberId);
         Studycafe studyCafe = findStudycafeById(studycafeId);
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
@@ -75,7 +81,9 @@ public class BookmarkService {
 
     @Transactional
     public void deleteBookmark(Long memberId, Long studycafeId){
+        Member member = findMemberById(memberId);
         Bookmark bookmark = bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
+        member.deleteBookmark(bookmark);
         bookmarkRepository.deleteById(bookmark.getId());
     }
 
