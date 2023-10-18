@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/mypage/members")
+@RequestMapping("/api/v1/members")
 public class MyPageMemberController {
     private final MemberService memberService;
 
@@ -32,7 +32,6 @@ public class MyPageMemberController {
 
     @PostMapping("/photo")
     public void addProfile(@LoggedInMember Long memberId, @RequestParam MultipartFile file) {
-        log.info("file = {}", file);
         memberService.addPhoto(memberId, file);
     }
 

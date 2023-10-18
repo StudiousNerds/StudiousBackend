@@ -47,8 +47,6 @@ public class MemberController {
 
     @PostMapping("/password")
     public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
-        log.info("email = {}", findPasswordRequest.getEmail());
-        log.info("phoneNumber = {}", findPasswordRequest.getPhoneNumber());
         return memberService.issueTemporaryPassword(findPasswordRequest);
     }
 
