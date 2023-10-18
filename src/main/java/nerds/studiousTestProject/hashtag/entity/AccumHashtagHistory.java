@@ -43,4 +43,8 @@ public class AccumHashtagHistory {
             this.studycafe = studycafe;
         }
     }
+
+    public void updateCount() {
+        count++;
+    }
 }
