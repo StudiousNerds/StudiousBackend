@@ -156,6 +156,33 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("각 평점 값이 5점을 넘는 경우 검증에 실패한다.")
+    void 리뷰_등록_MAX_검증_실패() {
+        // given
+        Long reservationId = 1L;
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add(HashtagName.FOCUS.name());
+
+        RegisterReviewRequest request = RegisterReviewRequest.builder()
+                .reservationId(reservationId)
+                .cleanliness(6)
+                .deafening(4)
+                .fixtureStatus(4)
+                .isRecommend(true)
+                .hashtags(hashtags)
+                .detail("정말 최고의 스터디카페입니다. 다시 등록하고 싶어요")
+                .build();
+
+        // when
+        Set<ConstraintViolation<RegisterReviewRequest>> violations = validator.validate(request);
+
+        // then
+        Assertions.assertThat(violations.stream().anyMatch(
+                error -> error.getMessage().equals("최대 5점까지 가능합니다.")
+        )).isTrue();
+    }
+
+    @Test
     @DisplayName("등록한 리뷰를 수정할 수 있다.")
     void modifyReview() {
         // given
