@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.inquire.response;
+package nerds.studiousTestProject.member.dto.enquiry.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,7 @@ import nerds.studiousTestProject.member.entity.member.MemberType;
 
 @Builder
 @Data
-public class MemberInfoResponse {
+public class ProfileResponse {
     private String name;
     private String nickname;
     private String email;
@@ -15,8 +15,8 @@ public class MemberInfoResponse {
     private String photo;
     private String phoneNumber;
 
-    public static MemberInfoResponse of(Member member) {
-        return MemberInfoResponse.builder()
+    public static ProfileResponse of(Member member) {
+        return ProfileResponse.builder()
                 .name(member.getName())
                 .nickname(member.getNickname())
                 .email(member.getEmail())
