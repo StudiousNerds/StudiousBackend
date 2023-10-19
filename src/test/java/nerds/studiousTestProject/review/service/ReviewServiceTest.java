@@ -1,12 +1,18 @@
 package nerds.studiousTestProject.review.service;
 
+import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.repository.AccumHashtagHistoryRepository;
+import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.photo.repository.SubPhotoRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
+import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
 import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResponse;
+import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.review.repository.GradeRepository;
 import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.room.entity.Room;
@@ -29,6 +35,7 @@ import java.util.Optional;
 
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
+import static nerds.studiousTestProject.support.fixture.ReviewFixture.YESTERDAY_COMMENTED_REVIEW;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_TWO_FOUR;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
 import static org.mockito.Mockito.doReturn;
@@ -52,6 +59,15 @@ class ReviewServiceTest {
 
     @Mock
     AccumHashtagHistoryRepository accumHashtagHistoryRepository;
+
+    @Mock
+    HashtagRecordRepository hashtagRecordRepository;
+
+    @Mock
+    SubPhotoRepository subPhotoRepository;
+
+    @Mock
+    StorageProvider storageProvider;
 
     @Test
     @DisplayName("리뷰를 등록할 수 있다.")
@@ -86,5 +102,38 @@ class ReviewServiceTest {
         // then
         Assertions.assertThat(reservationRecord.getReview()).isNotNull();
         Assertions.assertThat(response.getCreatedAt()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    @DisplayName("등록한 리뷰를 수정할 수 있다.")
+    void modifyReview() {
+        // given
+        Studycafe studycafe = NERDS.생성(1L);
+        Review review = YESTERDAY_COMMENTED_REVIEW.평점_정보_생성(1L, 4,4,4,4.0);
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add(HashtagName.FOCUS.name());
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        ModifyReviewRequest request = ModifyReviewRequest.builder()
+                .cafeId(studycafe.getId())
+                .cleanliness(4)
+                .deafening(3)
+                .fixtureStatus(4)
+                .isRecommend(true)
+                .hashtags(hashtags)
+                .detail("정말 최고의 스터디카페입니다. 다시 등록하고 싶어요")
+                .build();
+
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+        doReturn(Optional.of(studycafe)).when(studycafeRepository).findById(studycafe.getId());
+
+        // when
+        ModifyReviewResponse modifyReviewResponse = reviewService.modifyReview(review.getId(), request, multipartFiles);
+        Review modifiedReview = reviewRepository.findById(review.getId()).get();
+
+        // then
+        Assertions.assertThat(modifyReviewResponse.getReviewId()).isEqualTo(review.getId());
+        Assertions.assertThat(modifiedReview.getGrade().getDeafening()).isEqualTo(3);
+        Assertions.assertThat(modifiedReview.getDetail()).isEqualTo("정말 최고의 스터디카페입니다. 다시 등록하고 싶어요");
     }
 }
