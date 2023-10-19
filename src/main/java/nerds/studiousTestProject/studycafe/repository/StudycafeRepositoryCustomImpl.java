@@ -59,10 +59,10 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
-                        convenienceContains(searchRequest.getConveniences()))
-                .having(
-                        hashtagContains(searchRequest.getHashtags()),
+                        convenienceContains(searchRequest.getConveniences()),
                         totalGradeGoe(searchRequest.getMinGrade()))
+                .having(
+                        hashtagContains(searchRequest.getHashtags()))
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -98,10 +98,10 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
-                        convenienceContains(searchRequest.getConveniences()))
-                .having(
-                        hashtagContains(searchRequest.getHashtags()),
+                        convenienceContains(searchRequest.getConveniences()),
                         totalGradeGoe(searchRequest.getMinGrade()))
+                .having(
+                        hashtagContains(searchRequest.getHashtags()))
                 .groupBy(studycafe.id)
                 .orderBy(createOrderSpecifier(searchRequest.getSortType()))
                 .offset(pageable.getOffset())
@@ -239,7 +239,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     }
 
     private BooleanExpression totalGradeGoe(Integer minGrade) {
-        return minGrade != null ? studycafe.gradeSum.add(grade.total).divide(studycafe.gradeCount.add(grade.count())).goe(minGrade) : null;
+        return minGrade != null ? studycafe.gradeSum.divide(studycafe.gradeCount).goe(minGrade) : null;
     }
 
     private BooleanExpression convenienceContains(List<ConvenienceName> conveniences) {
