@@ -12,22 +12,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.member.entity.member.Member;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "reservation_record")
 public class ReservationRecord {
     @Id
@@ -73,6 +70,23 @@ public class ReservationRecord {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
+
+    @Builder
+    public ReservationRecord(Long id, Member member, String userName, String userPhoneNumber, LocalDate date, LocalTime startTime, LocalTime endTime, Integer usingTime, Integer headCount, ReservationStatus status, String request, Room room, Review review) {
+        this.id = id;
+        this.member = member;
+        this.userName = userName;
+        this.userPhoneNumber = userPhoneNumber;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.usingTime = usingTime;
+        this.headCount = headCount;
+        this.status = status;
+        this.request = request;
+        this.room = room;
+        this.review = review;
+    }
 
     public void completePay() {
         this.status = ReservationStatus.CONFIRMED;

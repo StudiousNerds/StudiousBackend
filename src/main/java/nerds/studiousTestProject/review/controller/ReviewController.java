@@ -6,6 +6,7 @@ import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
+import nerds.studiousTestProject.review.dto.find.request.UserReviewSortType;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
 import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewSortType;
 import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewType;
@@ -19,7 +20,6 @@ import nerds.studiousTestProject.review.dto.register.response.RegisterReviewResp
 import nerds.studiousTestProject.review.dto.written.response.WrittenReviewResponse;
 import nerds.studiousTestProject.review.service.AdminReviewService;
 import nerds.studiousTestProject.review.service.ReviewService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +43,7 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
     private final AdminReviewService adminReviewService;
-
+    private static final int STUDYCAFE_PAGE_REVIEW_SIZE = 8;
     private static final int REVIEW_INQUIRE_SIZE = 5;
     private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
@@ -79,13 +79,18 @@ public class ReviewController {
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews")
-    public FindReviewSortedResponse findAllReviews(@PathVariable("studycafeId") Long studycafeId, Pageable pageable) {
-        return reviewService.findAllReviews(studycafeId, pageable);
+    public FindReviewSortedResponse findAllReviews(@PathVariable("studycafeId") Long studycafeId,
+                                                   @RequestParam Integer page,
+                                                   @RequestParam(required = false, defaultValue = UserReviewSortType.Names.CREATED_DATE_DESC) UserReviewSortType sortType) {
+        return reviewService.findAllReviews(studycafeId, PageRequestConverter.of(page, STUDYCAFE_PAGE_REVIEW_SIZE, sortType.getSort()));
     }
 
     @GetMapping("/studycafes/{studycafeId}/rooms/{roomId}/reviews")
-    public FindReviewSortedResponse findRoomReviews(@PathVariable("studycafeId") Long studycafeId, @PathVariable("roomId") Long roomId, Pageable pageable) {
-        return reviewService.findRoomReviews(studycafeId, roomId, pageable);
+    public FindReviewSortedResponse findRoomReviews(@PathVariable("studycafeId") Long studycafeId,
+                                                    @PathVariable("roomId") Long roomId,
+                                                    @RequestParam Integer page,
+                                                    @RequestParam(required = false, defaultValue = UserReviewSortType.Names.CREATED_DATE_DESC) UserReviewSortType sortType) {
+        return reviewService.findRoomReviews(studycafeId, roomId, PageRequestConverter.of(page, STUDYCAFE_PAGE_REVIEW_SIZE, sortType.getSort()));
     }
 
     @GetMapping("/admin/studycafes/{studycafeId}/reviews")
