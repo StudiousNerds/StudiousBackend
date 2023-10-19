@@ -103,12 +103,12 @@ public class PaymentService {
 
     @Transactional
     public void userCancel(final CancelRequest cancelRequest, final Long reservationId){
-        final ReservationRecord reservationRecord = findReservationById(reservationId);
-        final Payment payment = findByReservationRecord(reservationRecord);
+        Payment payment = findByReservationIdWithReservation(reservationId);
+        ReservationRecord reservationRecord = payment.getReservationRecord();
         cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
     }
 
-    private void cancel(CancelRequest cancelRequest, MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
+    private void cancel(final CancelRequest cancelRequest, final MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
         validPaymentMethod(cancelRequest, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
         payment.cancel(responseFromToss, canceler);
@@ -121,8 +121,8 @@ public class PaymentService {
 
     @Transactional
     public void adminCancel(final AdminCancelRequest adminCancelRequest, final Long reservationId) {
-        final ReservationRecord reservationRecord = findReservationById(reservationId);
-        final Payment payment = findByReservationRecord(reservationRecord);
+        Payment payment = findByReservationIdWithReservation(reservationId);
+        ReservationRecord reservationRecord = payment.getReservationRecord();
         CancelRequest cancelRequest = CancelRequest.builder()
                 .cancelAmount(payment.getPrice())
                 .cancelReason(adminCancelRequest.getCancelReason())
@@ -130,20 +130,15 @@ public class PaymentService {
         cancel(cancelRequest, MemberRole.ADMIN, reservationRecord, payment);
     }
 
-
-    private Payment findByReservationRecord(final ReservationRecord reservationRecord) {
-        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    private Payment findByReservationIdWithReservation(Long reservationRecordId) {
+        return paymentRepository.findByReservationIdWithReservation(reservationRecordId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private void validPaymentMethod(final CancelRequest cancelRequest, final Payment payment) {
         if (payment.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
         }
-    }
-
-    private ReservationRecord findReservationById(final Long reservationId) {
-        return reservationRecordRepository.findById(reservationId)
-                .orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     public void processDepositByStatus(final DepositCallbackRequest depositCallbackRequest) {
