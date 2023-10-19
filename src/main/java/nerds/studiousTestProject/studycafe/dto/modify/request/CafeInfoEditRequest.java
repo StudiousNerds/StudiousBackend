@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.manage.request;
+package nerds.studiousTestProject.studycafe.dto.modify.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

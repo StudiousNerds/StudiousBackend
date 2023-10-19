@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.manage.response;
+package nerds.studiousTestProject.studycafe.dto.modify.response;
 
 import lombok.Builder;
 import lombok.Data;
