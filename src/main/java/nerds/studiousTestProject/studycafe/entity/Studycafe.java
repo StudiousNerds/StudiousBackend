@@ -96,6 +96,14 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<SubPhoto> subPhotos = new ArrayList<>();
 
+    public void updateAccumReserveCount(){
+        accumReserveCount++;
+    }
+
+    public void cancelReservation() {
+        accumReserveCount--;
+    }
+
     public void addRoom(Room room) {
         rooms.add(room);
         room.setStudycafe(this);
