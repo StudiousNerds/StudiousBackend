@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class CustomerUserDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
-    @Cacheable(value = "UserCacheStore", key = "#username")
+    @Cacheable(value = "memberCacheStore", key = "#username")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, NumberFormatException {
         return memberRepository.findById(Long.valueOf(username))
