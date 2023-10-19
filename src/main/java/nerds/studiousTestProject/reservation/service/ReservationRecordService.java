@@ -18,6 +18,7 @@ import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
+import nerds.studiousTestProject.reservation.controller.ViewCriteria;
 import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
 import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentInfoWithRefund;
 import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
@@ -54,6 +55,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.DATE_ONLY_ONE_NULL;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_CHANGE_REQUEST;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAGE_NUMBER;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
@@ -414,5 +416,26 @@ public class ReservationRecordService {
     public ShowAdminCancelResponse showAdminCancel(final Long reservationId) {
         final ReservationRecord reservationRecord = findByIdWithPlace(reservationId);
         return ShowAdminCancelResponse.from(reservationRecord);
+    }
+
+    public void showAdmin(final ViewCriteria viewCriteria, LocalDate startDate, LocalDate endDate, final ReservationSettingsStatus reservationStatus, final Long studycafeId, final Long roomId, Integer page) {
+        int pageNumber = validPageAndAssign(page);
+        assignRecentOneYearIfBothNull(startDate, endDate);
+        validDateOnlyOneNull(startDate, endDate);
+
+
+    }
+
+    private void validDateOnlyOneNull(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new BadRequestException(DATE_ONLY_ONE_NULL);
+        }
+    }
+
+    private void assignRecentOneYearIfBothNull(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null && endDate == null) {
+            startDate = LocalDate.now().minusYears(1);
+            endDate = LocalDate.now();
+        }
     }
 }
