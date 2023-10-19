@@ -30,7 +30,7 @@ import nerds.studiousTestProject.reservation.dto.reserve.request.PaidConvenience
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReservationInfo;
 import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationRecordInfoWithStatus;
-import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -71,10 +71,10 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.OVE
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
 import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.CANCELED;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.AFTER_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.BEFORE_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.CANCELED;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.USING;
 
 @RequiredArgsConstructor
 @Service

@@ -8,6 +8,7 @@ import nerds.studiousTestProject.payment.dto.PaymentInfo;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.dto.ReservationInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 
 @Getter

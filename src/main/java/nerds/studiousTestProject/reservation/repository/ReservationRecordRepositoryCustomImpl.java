@@ -5,21 +5,21 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.ALL;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.CANCELED;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.AFTER_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.ALL;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.BEFORE_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.CANCELED;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.USING;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 
