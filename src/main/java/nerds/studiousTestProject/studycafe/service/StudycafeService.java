@@ -270,13 +270,14 @@ public class StudycafeService {
     private List<HashtagName> getAllHashtagNames(SearchResponseInfo searchResponseInfo) {
         List<HashtagName> hashtagNames = new ArrayList<>();
 
-        if (searchResponseInfo.getAccumHashtagHistoryNames() != null) {
-            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtagHistoryNames().split(",")).map(HashtagName::valueOf).toList());
+        if (searchResponseInfo.getAccumHashtags() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtags().split(",")).map(HashtagName::valueOf).toList());
         }
 
-        if (searchResponseInfo.getHashtagRecordNames() != null) {
-            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getHashtagRecordNames().split(",")).map(HashtagName::valueOf).toList());
+        if (searchResponseInfo.getHashtags() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getHashtags().split(",")).map(HashtagName::valueOf).toList());
         }
+
         return hashtagNames;
     }
 
