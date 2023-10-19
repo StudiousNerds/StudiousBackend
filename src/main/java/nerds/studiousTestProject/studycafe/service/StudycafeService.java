@@ -103,7 +103,7 @@ public class StudycafeService {
      * 해당 메소드에서 추가적으로 잘못 입력된 값에 대한 예외처리를 진행
      * @return 검색 결과
      */
-    public List<SearchResponse> inquire(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
+    public List<SearchResponse> enquiry(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
         List<LocalDate> holidays = holidayProvider.getHolidays();
         Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
 
@@ -240,9 +240,9 @@ public class StudycafeService {
 
     private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
         int total = 0;
-        Integer reflectedAccumResCnt = searchResponseInfo.getReflectedAccumResCnt();
-        if (reflectedAccumResCnt != null) {
-            total += reflectedAccumResCnt;
+        Integer reflectedAccumRevCnt = searchResponseInfo.getReflectedAccumRevCnt();
+        if (reflectedAccumRevCnt != null) {
+            total += reflectedAccumRevCnt;
         }
 
         Integer accumRevCnt = searchResponseInfo.getAccumRevCnt();
@@ -434,7 +434,7 @@ public class StudycafeService {
         }
     }
 
-    public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(Long memberId, Pageable pageable) {
+    public List<CafeBasicInfoResponse> enquiryManagedEntryStudycafes(Long memberId, Pageable pageable) {
         Member member = findMemberById(memberId);
 
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
@@ -447,7 +447,7 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
-    public CafeDetailsResponse inquireManagedStudycafe(Long memberId, Long studycafeId) {
+    public CafeDetailsResponse enquiryManagedStudycafe(Long memberId, Long studycafeId) {
         Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -485,7 +485,7 @@ public class StudycafeService {
      * @param cafeInfoEditRequest 수정된 데이터
      */
     @Transactional
-    public void edit(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
+    public void modify(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
         Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
@@ -532,7 +532,7 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
-    public List<AnnouncementResponse> inquireAnnouncements(Long memberId, Long studycafeId) {
+    public List<AnnouncementResponse> enquiryAnnouncements(Long memberId, Long studycafeId) {
         Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -546,7 +546,7 @@ public class StudycafeService {
      * @param announcementRequest 공지사항 요청 값
      */
     @Transactional
-    public void insertAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
+    public void registerAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
         Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
