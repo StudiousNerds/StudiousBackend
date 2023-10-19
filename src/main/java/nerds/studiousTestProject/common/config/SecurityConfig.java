@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/studious/mypage/**", "/studious/reservations/**", "/studious/payments/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/members/logout").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/v1/oauth/**").permitAll()
                 .requestMatchers("/api/v1/members/**").permitAll()
                 .requestMatchers("/api/v1/search/**").permitAll()
                 .requestMatchers("/api/v1/studycafes/**").permitAll()
