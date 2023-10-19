@@ -1,5 +1,9 @@
 package nerds.studiousTestProject.review.service;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import nerds.studiousTestProject.common.service.StorageProvider;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.hashtag.repository.AccumHashtagHistoryRepository;
@@ -19,6 +23,8 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +38,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
@@ -71,6 +78,21 @@ class ReviewServiceTest {
     @Mock
     StorageProvider storageProvider;
 
+
+    private static ValidatorFactory validatorFactory;
+    private static Validator validator;
+
+    @BeforeAll
+    public static void init() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    @AfterAll
+    public static void close() {
+        validatorFactory.close();
+    }
+
     @Test
     @DisplayName("리뷰를 등록할 수 있다.")
     void register() {
@@ -107,6 +129,33 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("요청 DTO에 null값이 있는 경우 검증에 실패한다.")
+    void 리뷰_등록_NULL_검증_실패() {
+        // given
+        Long reservationId = 1L;
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add(HashtagName.FOCUS.name());
+
+        RegisterReviewRequest request = RegisterReviewRequest.builder()
+                .reservationId(reservationId)
+                .cleanliness(null)
+                .deafening(4)
+                .fixtureStatus(4)
+                .isRecommend(true)
+                .hashtags(hashtags)
+                .detail("정말 최고의 스터디카페입니다. 다시 등록하고 싶어요")
+                .build();
+
+        // when
+        Set<ConstraintViolation<RegisterReviewRequest>> violations = validator.validate(request);
+
+        // then
+        Assertions.assertThat(violations.stream().anyMatch(
+                error -> error.getMessage().equals("청결도 평점은 필수입니다.")
+        )).isTrue();
+    }
+
+    @Test
     @DisplayName("등록한 리뷰를 수정할 수 있다.")
     void modifyReview() {
         // given
@@ -140,6 +189,7 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("등록한 리뷰를 삭제할 수 있다.")
     void deleteReview() {
         // given
         Member member = DEFAULT_USER.생성();
