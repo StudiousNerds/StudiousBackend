@@ -38,7 +38,9 @@ import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture
 import static nerds.studiousTestProject.support.fixture.ReviewFixture.YESTERDAY_COMMENTED_REVIEW;
 import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_TWO_FOUR;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -135,5 +137,30 @@ class ReviewServiceTest {
         Assertions.assertThat(modifyReviewResponse.getReviewId()).isEqualTo(review.getId());
         Assertions.assertThat(modifiedReview.getGrade().getDeafening()).isEqualTo(3);
         Assertions.assertThat(modifiedReview.getDetail()).isEqualTo("정말 최고의 스터디카페입니다. 다시 등록하고 싶어요");
+    }
+
+    @Test
+    void deleteReview() {
+        // given
+        Member member = DEFAULT_USER.생성();
+        Studycafe studycafe = NERDS.생성();
+        Room room = ROOM_TWO_FOUR.스터디카페_생성(studycafe);
+        Review review = YESTERDAY_COMMENTED_REVIEW.평점_정보_생성(1L, 4,4,4,4.0);
+        ReservationRecord reservationRecord = CONFIRM_RESERVATION.예약_내역_생성(
+                LocalDate.of(2013,10,12),
+                LocalTime.of(16,0,0),
+                LocalTime.of(20,0,0),member,room);
+
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add(HashtagName.FOCUS.name());
+
+        doReturn(Optional.of(review)).when(reviewRepository).findById(review.getId());
+        doReturn(Optional.of(reservationRecord)).when(reservationRecordRepository).findByReviewId(review.getId());
+
+        // when
+        reviewService.deleteReview(review.getId());
+
+        // then
+        verify(reviewRepository, atMostOnce()).deleteById(review.getId());
     }
 }
