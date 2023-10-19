@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.member.dto.find;
+package nerds.studiousTestProject.member.dto.find.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
