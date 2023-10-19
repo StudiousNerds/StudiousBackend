@@ -1,9 +1,9 @@
 package nerds.studiousTestProject.reservation.controller;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.service.PaymentService;
+import nerds.studiousTestProject.payment.util.totoss.AdminCancelRequest;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
 import nerds.studiousTestProject.reservation.dto.admin.ShowAdminCancelResponse;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/admin/reservations")
@@ -30,8 +29,8 @@ public class AdminReservationRecordController {
     }
 
     @PostMapping("/{reservationId}/cancel")
-    public ResponseEntity<Void> cancel(@PathVariable Long reservationId, @RequestBody CancelRequest request) {
-        paymentService.cancel(request, reservationId, MemberRole.ADMIN);
+    public ResponseEntity<Void> cancel(@PathVariable Long reservationId, @RequestBody AdminCancelRequest request) {
+        paymentService.adminCancel(request, reservationId);
         return ResponseEntity.noContent().build();
     }
 

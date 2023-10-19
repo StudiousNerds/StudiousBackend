@@ -40,7 +40,7 @@ public class ReservationRecordController {
     @PostMapping("/mypage/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
                                        @RequestBody CancelRequest cancelRequest) {
-        paymentService.cancel(cancelRequest, reservationId, MemberRole.USER);
+        paymentService.userCancel(cancelRequest, reservationId);
         return ResponseEntity.noContent().build();
     }
 
