@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.review.dto.manage.inquire.request;
+package nerds.studiousTestProject.review.dto.enquiry.request;
 
 import lombok.Getter;
 import org.springframework.data.domain.Sort;
