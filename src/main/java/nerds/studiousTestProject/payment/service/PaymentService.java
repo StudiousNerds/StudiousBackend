@@ -10,6 +10,7 @@ import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackReq
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
+import nerds.studiousTestProject.payment.util.totoss.AdminCancelRequest;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -17,12 +18,10 @@ import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailRespons
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
-import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_ORDER_ID;
@@ -59,6 +58,7 @@ public class PaymentService {
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = payment.getReservationRecord();
         reservationRecord.completePay();
+        reservationRecord.getRoom().getStudycafe().updateAccumReserveCount();
         return reservationRecord.getId();
     }
 
@@ -102,16 +102,32 @@ public class PaymentService {
     }
 
     @Transactional
-    public void cancel(final CancelRequest cancelRequest, final Long reservationId, final MemberRole canceler){
+    public void userCancel(final CancelRequest cancelRequest, final Long reservationId){
         final ReservationRecord reservationRecord = findReservationById(reservationId);
         final Payment payment = findByReservationRecord(reservationRecord);
+        cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
+    }
+
+    private void cancel(CancelRequest cancelRequest, MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
         validPaymentMethod(cancelRequest, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
         payment.cancel(responseFromToss, canceler);
         if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
-        reservationRecord.canceled(); //결제 취소 상태로 변경
+        reservationRecord.canceled();
+        reservationRecord.getRoom().getStudycafe().cancelReservation();
+    }
+
+    @Transactional
+    public void adminCancel(final AdminCancelRequest adminCancelRequest, final Long reservationId) {
+        final ReservationRecord reservationRecord = findReservationById(reservationId);
+        final Payment payment = findByReservationRecord(reservationRecord);
+        CancelRequest cancelRequest = CancelRequest.builder()
+                .cancelAmount(payment.getPrice())
+                .cancelReason(adminCancelRequest.getCancelReason())
+                .build();
+        cancel(cancelRequest, MemberRole.ADMIN, reservationRecord, payment);
     }
 
 
