@@ -183,6 +183,37 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("코멘트가 200자를 넘는 경우 검증에 실패한다.")
+    void 리뷰_등록_DETAIL_MAX_검증_실패() {
+        // given
+        Long reservationId = 1L;
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add(HashtagName.FOCUS.name());
+
+        RegisterReviewRequest request = RegisterReviewRequest.builder()
+                .reservationId(reservationId)
+                .cleanliness(4)
+                .deafening(4)
+                .fixtureStatus(4)
+                .isRecommend(true)
+                .hashtags(hashtags)
+                .detail("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" +
+                        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" +
+                        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" +
+                        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" +
+                        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+                .build();
+
+        // when
+        Set<ConstraintViolation<RegisterReviewRequest>> violations = validator.validate(request);
+
+        // then
+        Assertions.assertThat(violations.stream().anyMatch(
+                error -> error.getMessage().equals("최대 200자까지 작성가능합니다.")
+        )).isTrue();
+    }
+
+    @Test
     @DisplayName("등록한 리뷰를 수정할 수 있다.")
     void modifyReview() {
         // given
