@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.studycafe.dto.manage.request;
+package nerds.studiousTestProject.studycafe.dto.modify.request;
 
 import lombok.Data;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
