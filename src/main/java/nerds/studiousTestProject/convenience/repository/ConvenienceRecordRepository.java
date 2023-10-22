@@ -11,6 +11,4 @@ public interface ConvenienceRecordRepository extends JpaRepository<ConvenienceRe
 
     List<ConvenienceRecord> findAllByReservationRecord(ReservationRecord reservationRecord);
 
-    List<ConvenienceRecord> findAllByPayment(Payment payment);
-
 }
