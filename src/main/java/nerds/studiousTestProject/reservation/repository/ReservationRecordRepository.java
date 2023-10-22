@@ -32,4 +32,14 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     @Query("select r from ReservationRecord r join fetch r.room o join fetch o.studycafe where r.id = :reservationRecordId")
     Optional<ReservationRecord> findByIdWithPlace(@Param("reservationRecordId") Long reservationRecordId);
 
+    @Query("select r from ReservationRecord r join fetch r.payment join fetch r.room o join fetch o.studycafe where r.id = :reservationRecordId")
+    Optional<ReservationRecord> findByIdWithPaymentAndPlace(@Param("reservationRecordId") Long reservationRecordId);
+
+    @Query("select r from ReservationRecord r join fetch r.room o join fetch o.studycafe where r.payment.id = :paymentId")
+    Optional<ReservationRecord> findByPaymentWithPlace(@Param("paymentId") Long paymentId);
+
+    Optional<ReservationRecord> findByPayment(Payment payment);
+
+    @Query("select r from ReservationRecord r join fetch r.payment where r.id = :reservationRecordId")
+    Optional<ReservationRecord> findByIdWithPayment(@Param("reservationRecordId") Long reservationRecordId);
 }
