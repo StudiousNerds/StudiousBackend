@@ -20,12 +20,13 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
     List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
     List<ReservationRecord> findAllByRoomId(Long roomId);
-    Page<ReservationRecord> findAllByMemberId(Long memberId, Pageable pageable);
 
     @Query(value = "select r from ReservationRecord r " +
             "where r.room.id in (select ro.id from Room ro where ro.studycafe.id = :studycafeId) " +
             "and r.review.id is not null")
     List<ReservationRecord> findAllByStudycafeId(@Param("studycafeId") Long studycafeId);
+
+    Page<ReservationRecord> findAllByMember(Pageable pageable, Member member);
 
     Optional<ReservationRecord> findByReviewId(Long reviewId);
 

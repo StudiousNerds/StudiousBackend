@@ -2,7 +2,6 @@ package nerds.studiousTestProject.review.dto.available.response;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 import java.time.LocalDate;
@@ -16,8 +15,6 @@ public class AvailableReviewInfo {
     private String studycafePhoto;
     private Long reservationId;
     private String roomName;
-    private String paymentType;
-    private Integer price;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -25,15 +22,12 @@ public class AvailableReviewInfo {
     private LocalDate validDate;
 
     public static AvailableReviewInfo from(ReservationRecord reservationRecord) {
-        Payment payment = reservationRecord.getPayment();
         return AvailableReviewInfo.builder()
                 .reservationId(reservationRecord.getId())
                 .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
                 .studycafeName(reservationRecord.getRoom().getStudycafe().getName())
                 .studycafePhoto(reservationRecord.getRoom().getStudycafe().getPhoto())
                 .roomName(reservationRecord.getRoom().getName())
-                .paymentType(payment.getMethod())
-                .price(reservationRecord.getRoom().getPrice() * reservationRecord.getUsingTime())
                 .date(reservationRecord.getDate())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())

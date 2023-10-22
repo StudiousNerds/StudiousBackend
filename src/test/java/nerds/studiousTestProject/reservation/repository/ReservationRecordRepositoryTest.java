@@ -9,7 +9,6 @@ import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.review.entity.Review;
-import nerds.studiousTestProject.review.repository.ReviewRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,17 +21,21 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static nerds.studiousTestProject.support.EntitySaveProvider.권한_저장;
+import static nerds.studiousTestProject.support.EntitySaveProvider.리뷰_저장;
+import static nerds.studiousTestProject.support.EntitySaveProvider.회원_저장;
 import static nerds.studiousTestProject.support.fixture.MemberFixture.DEFAULT_USER;
+import static nerds.studiousTestProject.support.fixture.MemberFixture.KAKAO_USER;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CANCELED_RESERVATION;
 import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.CONFIRM_RESERVATION;
-import static nerds.studiousTestProject.support.fixture.ReservationRecordFixture.IN_PROGRESS_RESERVATION;
-import static nerds.studiousTestProject.support.fixture.RoomFixture.*;
+import static nerds.studiousTestProject.support.fixture.ReviewFixture.TODAY_COMMENTED_REVIEW;
+import static nerds.studiousTestProject.support.fixture.RoleFixture.ADMIN;
+import static nerds.studiousTestProject.support.fixture.RoleFixture.USER;
+import static nerds.studiousTestProject.support.fixture.RoomFixture.ROOM_FOUR_SIX;
 import static nerds.studiousTestProject.support.fixture.StudycafeFixture.NERDS;
-import static nerds.studiousTestProject.support.fixture.ReviewFixture.*;
-import static nerds.studiousTestProject.support.fixture.StudycafeFixture.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @RepositoryTest
 class ReservationRecordRepositoryTest {
@@ -45,47 +48,51 @@ class ReservationRecordRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private StudycafeRepository studycafeRepository;
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     @Test
+    @DisplayName(value = "룸 id를 통해 예약 내역을 조회할 수 있다.")
     void findAllByRoomId() {
         // given
-        Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(2L));
-        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
-        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
+        Member member = 멤버_저장(DEFAULT_USER.생성(1L));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member))));
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
-        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByRoomId(2L);
+        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByRoomId(room.getId());
         // then
-        assertThat(reservationRecordList).contains(save1, save2);
+        assertThat(reservationRecordList).contains(reservation1, reservation2);
     }
 
-//    @Test
-//    void findAllByMemberId() {
-//        // given
-//        Member member = memberRepository.save(POTATO.생성(3L));
-//        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.멤버_생성(member, 7L));
-//        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.멤버_생성(member, 8L));
-//        // when
-//        List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByMemberId(member.getId());
-//        // then
-//        assertThat(reservationRecordList).contains(save1, save2);
-//    }
-
     @Test
+    @DisplayName(value = "스터디카페 id를 통해 예약 내역(리뷰가 있는)을 조회할 수 있다.")
     void findAllByStudycafeId() {
         // given
-        Studycafe studycafe = studycafeRepository.save(FIRST_STUDYCAFE.생성(1L));
-        Room room1 = roomRepository.save(ROOM_FOUR_SIX.생성(1L));
-        studycafe.addRoom(room1);
-        Review review = reviewRepository.save(TODAY_COMMENTED_REVIEW.기본_정보_생성(1L));
-        ReservationRecord save1 = reservationRecordRepository.save(CONFIRM_RESERVATION.룸_생성(room1, 1L));
-        ReservationRecord save2 = reservationRecordRepository.save(IN_PROGRESS_RESERVATION.룸_생성(room1, 2L));
-//        save1.addReview(review);
+        Member member = 회원_저장(DEFAULT_USER.생성());
+        USER.멤버_생성(member);
+        Studycafe studycafe = 스터디카페_저장(NERDS.멤버_추가_생성(member));
+        Room room = roomRepository.save(ROOM_FOUR_SIX.스터디카페_생성(studycafe, 1L));
+        Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
         // when
         List<ReservationRecord> reservationRecordList = reservationRecordRepository.findAllByStudycafeId(studycafe.getId());
         // then
-        assertThat(reservationRecordList).contains(save1);
+        assertThat(reservationRecordList).contains(reservation1);
+    }
+
+    @Test
+    @DisplayName(value = "리뷰 id를 통해 예약 내역을 조회할 수 있다")
+    void findByReviewId() {
+        // given
+        Member member = 멤버_저장(DEFAULT_USER.생성(1L));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member))));
+        Review review = 리뷰_저장(TODAY_COMMENTED_REVIEW.평점_정보_생성(1, 1, 1, 1.0));
+        ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.리뷰_추가_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member, room, review));
+        ReservationRecord reservation2 = 예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member, room));
+        // when
+        ReservationRecord reservationRecord = reservationRecordRepository.findByReviewId(review.getId()).get();
+        // then
+        assertThat(reservationRecord).isEqualTo(reservation1);
     }
 
     @Test
@@ -94,7 +101,9 @@ class ReservationRecordRepositoryTest {
 
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
         Member member2 = 멤버_저장(DEFAULT_USER.생성(2L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.생성())));
+        Member admin = 회원_저장(KAKAO_USER.생성());
+        권한_저장(ADMIN.멤버_생성(admin));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(admin))));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -116,7 +125,7 @@ class ReservationRecordRepositoryTest {
     void 예약_취소_탭을_페이징해_조회한다(){
 
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member1))));
 
         ReservationRecord reservation1 = 예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10, 0), LocalTime.of(12, 0), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(12, 0), LocalTime.of(14, 0), member1, room));
@@ -134,7 +143,7 @@ class ReservationRecordRepositoryTest {
     @DisplayName("지난 예약 탭을 페이징 해 조회할 수 있다.")
     public void 지난_예약_탭_조회() {
         Member member1 = 멤버_저장(DEFAULT_USER.생성(1L));
-        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_생성(member1))));
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member1))));
 
         예약_내역_저장(CANCELED_RESERVATION.예약_내역_생성(LocalDate.now(), LocalTime.of(10,0), LocalTime.now(), member1, room));
         예약_내역_저장(CONFIRM_RESERVATION.예약_내역_생성(LocalDate.now().minusMonths(1), LocalTime.now(), LocalTime.now(), member1, room));
@@ -165,4 +174,5 @@ class ReservationRecordRepositoryTest {
     private Studycafe 스터디카페_저장(Studycafe studycafe) {
         return studycafeRepository.save(studycafe);
     }
+
 }
