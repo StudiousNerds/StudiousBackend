@@ -21,6 +21,6 @@ public class CancelRequest extends RequestToToss {
     private RefundReceiveAccount refundReceiveAccount;
 
     public static CancelRequest from(String cancelReason, ChangeReservationRequest request) {
-        return new CancelRequest(cancelReason, null, Optional.ofNullable(request.getReceiveAccount()).orElseGet(null));
+        return new CancelRequest(cancelReason, null, request.getReceiveAccount());
     }
 }
