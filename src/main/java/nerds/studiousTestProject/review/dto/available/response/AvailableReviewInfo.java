@@ -24,7 +24,8 @@ public class AvailableReviewInfo {
     private Integer usingTime;
     private LocalDate validDate;
 
-    public static AvailableReviewInfo of(ReservationRecord reservationRecord, Payment payment) {
+    public static AvailableReviewInfo from(ReservationRecord reservationRecord) {
+        Payment payment = reservationRecord.getPayment();
         return AvailableReviewInfo.builder()
                 .reservationId(reservationRecord.getId())
                 .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
