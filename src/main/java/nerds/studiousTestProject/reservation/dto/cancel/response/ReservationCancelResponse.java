@@ -17,14 +17,14 @@ public class ReservationCancelResponse {
 
     private ReservationInfo reservation;
     private PlaceInfo place;
-    private PaymentInfoWithRefund payment;
+    private PaymentInfoWithRefund paymentWithRefund;
     private RefundPolicyInfoWithOnDay refundPolicy;
 
     public static ReservationCancelResponse of(ReservationRecord reservationRecord, PaymentInfoWithRefund paymentInfoWithRefund, List<RefundPolicy> refundPolicies, RefundPolicy refundPolicyOnDay) {
         return ReservationCancelResponse.builder()
                 .reservation(ReservationInfo.from(reservationRecord))
                 .place(PlaceInfo.from(reservationRecord))
-                .payment(paymentInfoWithRefund)
+                .paymentWithRefund(paymentInfoWithRefund)
                 .refundPolicy(RefundPolicyInfoWithOnDay.of(refundPolicies, refundPolicyOnDay))
                 .build();
 

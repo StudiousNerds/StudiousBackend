@@ -74,12 +74,9 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private MemberRole canceler;
 
-    @JoinColumn(name = "reservation_record_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private ReservationRecord reservationRecord;
 
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, BankCode bankCode, LocalDateTime dueDate, String secret, MemberRole canceler, ReservationRecord reservationRecord) {
+    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, BankCode bankCode, LocalDateTime dueDate, String secret, MemberRole canceler) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -93,7 +90,6 @@ public class Payment {
         this.dueDate = dueDate;
         this.secret = secret;
         this.canceler = canceler;
-        this.reservationRecord = reservationRecord;
     }
 
 

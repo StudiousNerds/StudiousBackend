@@ -323,14 +323,11 @@ public class ReviewService {
         return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null &&
                         !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord, findPaymentByReservation(reservationRecord)))
+                .map(reservationRecord -> AvailableReviewInfo.from(reservationRecord))
                 .sorted(Comparator.comparing(AvailableReviewInfo::getDate).reversed())
                 .collect(Collectors.toList());
     }
 
-    private Payment findPaymentByReservation(ReservationRecord reservationRecord) {
-        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-    }
 
     /**
      * 리뷰 작성한 내역을 조회하는 메소드

@@ -74,6 +74,10 @@ public class ReservationRecord {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     public void completePay() {
         this.status = ReservationStatus.CONFIRMED;
     }
@@ -109,6 +113,12 @@ public class ReservationRecord {
     public void updateHeadCount(final Integer headCount) {
         if (headCount != null) {
             this.headCount = headCount;
+        }
+    }
+
+    public void updatePayment(Payment payment) {
+        if (payment != null) {
+            this.payment = payment;
         }
     }
 }

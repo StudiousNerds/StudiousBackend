@@ -52,14 +52,19 @@ public class PaymentService {
 
     @Transactional
     public Long confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
-        Payment payment = findByOrderIdWithReservationAndPlace(orderId);
+        Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), new ConfirmSuccessRequest(orderId, paymentKey, amount));
         payment.complete(responseFromToss.toPayment());
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationRecordByPaymentIdWithPlace(payment.getId());
         reservationRecord.completePay();
         reservationRecord.getRoom().getStudycafe().updateAccumReserveCount();
         return reservationRecord.getId();
+    }
+
+    private ReservationRecord findReservationRecordByPaymentIdWithPlace(Long paymentId) {
+        return reservationRecordRepository.findByPaymentWithPlace(paymentId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     private void validConfirmRequest(final String orderId, final Integer amount, final Payment payment){
@@ -94,35 +99,44 @@ public class PaymentService {
      */
     @Transactional
     public ConfirmFailResponse confirmFail(final String message, final String orderId){
-        final Payment payment = findByOrderIdWithReservation(orderId);
-        convenienceRecordRepository.findAllByPayment(payment).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
+        final Payment payment = findByOrderId(orderId);
+        reservationRecordRepository.delete(findReservationRecordByPayment(payment));
+        //convenienceRecordRepository.findAllByPayment(payment).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
         paymentRepository.delete(payment);
-        reservationRecordRepository.delete(payment.getReservationRecord());
         return ConfirmFailResponse.of(message);
+    }
+
+    private ReservationRecord findReservationRecordByPayment(Payment payment) {
+        return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     @Transactional
     public void userCancel(final CancelRequest cancelRequest, final Long reservationId){
-        Payment payment = findByReservationIdWithReservation(reservationId);
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
+        Payment payment = reservationRecord.getPayment();
+        //취소 금액 validation 해야 하는데, validate 하는 메서드가 reservationService에 있음 설계 엉망..
         cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
     }
 
     private void cancel(final CancelRequest cancelRequest, final MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
         validPaymentMethod(cancelRequest, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
+        validMatchCancelAmount(payment, responseFromToss);
         payment.cancel(responseFromToss, canceler);
-        if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
-            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
-        }
         reservationRecord.canceled();
         reservationRecord.getRoom().getStudycafe().cancelReservation();
     }
 
+    private void validMatchCancelAmount(Payment payment, PaymentResponseFromToss responseFromToss) {
+        if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
+        }
+    }
+
     @Transactional
     public void adminCancel(final AdminCancelRequest adminCancelRequest, final Long reservationId) {
-        Payment payment = findByReservationIdWithReservation(reservationId);
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
+        Payment payment = reservationRecord.getPayment();
         CancelRequest cancelRequest = CancelRequest.builder()
                 .cancelAmount(payment.getPrice())
                 .cancelReason(adminCancelRequest.getCancelReason())
@@ -130,9 +144,9 @@ public class PaymentService {
         cancel(cancelRequest, MemberRole.ADMIN, reservationRecord, payment);
     }
 
-    private Payment findByReservationIdWithReservation(Long reservationRecordId) {
-        return paymentRepository.findByReservationIdWithReservation(reservationRecordId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    private ReservationRecord findReservationRecordByIdWithPayment(Long reservationId) {
+        return reservationRecordRepository.findByIdWithPayment(reservationId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
     private void validPaymentMethod(final CancelRequest cancelRequest, final Payment payment) {
@@ -142,9 +156,9 @@ public class PaymentService {
     }
 
     public void processDepositByStatus(final DepositCallbackRequest depositCallbackRequest) {
-        Payment payment = findByOrderIdWithReservation(depositCallbackRequest.getOrderId());
+        Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
+        ReservationRecord reservationRecord = findReservationRecordByPayment(payment);
         final String status = depositCallbackRequest.getStatus();
-        ReservationRecord reservationRecord = payment.getReservationRecord();
         if(isDepositError(payment, status)){ // 입금 오류
             //입금 오류에 관한 알림 전송
             reservationRecord.depositError();
@@ -172,13 +186,5 @@ public class PaymentService {
 
     private Payment findByOrderId(final String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-    }
-
-    private Payment findByOrderIdWithReservation(final String orderId) {
-        return paymentRepository.findByOrderIdWithReservation(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-    }
-
-    private Payment findByOrderIdWithReservationAndPlace(final String orderId) {
-        return paymentRepository.findByOrderIdWithReservationAndPlace(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 }

@@ -36,19 +36,21 @@ public class ReservationRecordController {
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
 
-    @PostMapping("/mypage/reservations/{reservationId}/cancellations")
+    private final static String DEFAULT_PAGE_NUMBER = "1";
+
+    @PostMapping("/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
-                                       @RequestBody CancelRequest cancelRequest) {
+                                       @RequestBody @Valid CancelRequest cancelRequest) {
         paymentService.userCancel(cancelRequest, reservationId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reservations/rooms/{roomId}")
-    public ReserveResponse showReservationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
+    @GetMapping("/rooms/{roomId}")
+    public ReserveResponse showReservationInfo(@LoggedInMember Long memberId, @PathVariable Long roomId) {
         return reservationRecordService.show(roomId, memberId);
     }
 
-    @PostMapping("/reservations/rooms/{roomId}")
+    @PostMapping("/rooms/{roomId}")
     public PaymentInfoResponse reserve(
             @LoggedInMember Long memberId,
             @PathVariable Long roomId,
@@ -56,34 +58,34 @@ public class ReservationRecordController {
         return reservationRecordService.reserve(reserveRequest, roomId, memberId);
     }
 
-    @GetMapping("/mypage/reservations/{reservationId}/cancellations")
+    @GetMapping("/reservations/{reservationId}/cancellations")
     public ReservationCancelResponse cancelInfo(@PathVariable Long reservationId) {
         return reservationRecordService.getCancelInfo(reservationId);
     }
 
-    @GetMapping("/mypage/reservations")
+    @GetMapping("/reservations")
     public MypageReservationResponse reservationSettingsInfoList(
             @LoggedInMember Long memberId,
             @RequestParam(defaultValue = NAME.ALL) ReservationSettingsStatus tab,
             @RequestParam(required = false) String studycafeName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "1") Integer page) {
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) Integer page) {
         return reservationRecordService.getAll(tab, studycafeName, startDate, endDate, page, memberId);
     }
 
-    @GetMapping("/mypage/reservations/{reservationRecordId}")
+    @GetMapping("/reservations/{reservationRecordId}")
     public ReservationDetailResponse showDetail(@PathVariable Long reservationRecordId) {
         return reservationRecordService.showDetail(reservationRecordId);
     }
 
-    @GetMapping("/mypage/reservations/{reservationRecordId}/changing")
+    @GetMapping("/reservations/{reservationRecordId}/changing")
     public ShowChangeReservationResponse showChangeReservation(@PathVariable Long reservationRecordId) {
         return reservationRecordService.showChangeReservation(reservationRecordId);
     }
 
 
-    @PostMapping("/mypage/reservations/{reservationRecordId}/changing")
+    @PostMapping("/reservations/{reservationRecordId}/changing")
     public ResponseEntity<?> change(@PathVariable Long reservationRecordId, @RequestBody ChangeReservationRequest request) {
         PaymentInfoResponse response = reservationRecordService.change(reservationRecordId, request);
         return response == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(response);

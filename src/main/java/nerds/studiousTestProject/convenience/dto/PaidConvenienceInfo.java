@@ -25,12 +25,11 @@ public class PaidConvenienceInfo {
         return new PaidConvenienceInfo(convenienceRecord.getConvenienceName(), convenienceRecord.getPrice());
     }
 
-    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord, Payment payment) {
+    public ConvenienceRecord toConvenienceRecord(ReservationRecord reservationRecord) {
         return ConvenienceRecord.builder()
                 .reservationRecord(reservationRecord)
                 .convenienceName(this.name)
                 .price(this.price)
-                .payment(payment)
                 .build();
     }
 

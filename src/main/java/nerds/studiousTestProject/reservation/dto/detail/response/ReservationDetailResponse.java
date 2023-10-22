@@ -18,7 +18,8 @@ public class ReservationDetailResponse {
     private PaymentInfo payment;
     private ReserveUserInfo user;
 
-    public static ReservationDetailResponse of(ReservationRecord reservationRecord, Payment payment) {
+    public static ReservationDetailResponse of(ReservationRecord reservationRecord) {
+        Payment payment = reservationRecord.getPayment();
         return ReservationDetailResponse.builder()
                 .place(PlaceInfo.from(reservationRecord))
                 .reservation(ReservationInfo.from(reservationRecord))

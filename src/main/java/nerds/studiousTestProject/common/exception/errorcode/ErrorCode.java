@@ -66,7 +66,8 @@ public enum ErrorCode {
     MISMATCH_CANCEL_PRICE("총 취소 금액이 맞지않습니다."),
     INVALID_CHANGE_REQUEST("변경 사항이 없습니다."),
     INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
-    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
+    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다."),
+    DATE_ONLY_ONE_NULL("시작일과 끝나는 일자는 둘 중 하나만 없을 수 없습니다.");
 
     private final String message;
     ErrorCode(String message) {

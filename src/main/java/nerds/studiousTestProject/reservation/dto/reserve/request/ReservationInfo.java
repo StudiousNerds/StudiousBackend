@@ -22,7 +22,5 @@ public class ReservationInfo {
     private Integer usingTime;
     @NotNull(message = "예약 인원수는 필수입니다.")
     private Integer headCount;
-    @NotNull(message = "예약 가격은 필수입니다.")
-    private Integer price;
 
 }
