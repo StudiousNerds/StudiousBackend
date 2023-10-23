@@ -3,12 +3,14 @@ package nerds.studiousTestProject.member.service.member;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.service.StorageProvider;
-import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
-import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
+import nerds.studiousTestProject.member.dto.find.request.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.request.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.enquiry.response.ProfileResponse;
+import nerds.studiousTestProject.member.dto.enquiry.response.MenuBarProfileResponse;
+import nerds.studiousTestProject.member.dto.login.response.LoginResponse;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyNicknameRequest;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
@@ -130,11 +132,15 @@ class MemberServiceTest {
         doReturn(jwtTokenResponse).when(jwtTokenProvider).generateToken(defaultMember);
 
         // when
-        JwtTokenResponse loginTokenResponse = memberService.issueToken(email, password);
+        LoginResponse loginResponse = memberService.issueToken(email, password);
+        JwtTokenResponse tokenInfo = loginResponse.getTokenInfo();
+        MenuBarProfileResponse profile = loginResponse.getProfile();
 
         // then
-        assertThat(loginTokenResponse.getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
-        assertThat(loginTokenResponse.getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(tokenInfo.getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
+        assertThat(tokenInfo.getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(profile.getNickname()).isEqualTo(defaultMember.getNickname());
+        assertThat(profile.getPhoto()).isEqualTo(defaultMember.getPhoto());
     }
 
     @Test
@@ -164,10 +170,15 @@ class MemberServiceTest {
         doReturn(jwtTokenResponse).when(jwtTokenProvider).generateToken(defaultMember);
 
         // when
-        JwtTokenResponse response = memberService.reissueToken(defaultMember.getId(), refreshToken.getToken());
+        LoginResponse loginResponse = memberService.reissueToken(defaultMember.getId(), refreshToken.getToken());
+        JwtTokenResponse tokenInfo = loginResponse.getTokenInfo();
+        MenuBarProfileResponse profile = loginResponse.getProfile();
 
         // then
-        assertThat(response).isEqualTo(jwtTokenResponse);
+        assertThat(tokenInfo.getGrantType()).isEqualTo(jwtTokenResponse.getGrantType());
+        assertThat(tokenInfo.getAccessToken()).isEqualTo(jwtTokenResponse.getAccessToken());
+        assertThat(profile.getNickname()).isEqualTo(defaultMember.getNickname());
+        assertThat(profile.getPhoto()).isEqualTo(defaultMember.getPhoto());
     }
 
     @Test
@@ -182,7 +193,7 @@ class MemberServiceTest {
         doReturn(Optional.of(defaultMember)).when(memberRepository).findByPhoneNumber(phoneNumber);
 
         // when
-        FindEmailResponse response = memberService.findEmailFromPhoneNumber(request);
+        FindEmailResponse response = memberService.enquiryEmail(request);
 
         // then
         assertThat(response.getEmail()).isEqualTo(defaultMember.getEmail());
@@ -201,7 +212,7 @@ class MemberServiceTest {
 
         // when
         BadRequestException badRequestException = assertThrows(BadRequestException.class, () -> {
-            memberService.findEmailFromPhoneNumber(request);
+            memberService.enquiryEmail(request);
         });
 
         // then
@@ -258,7 +269,7 @@ class MemberServiceTest {
         doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
 
         // when
-        MemberInfoResponse response = memberService.findMemberInfoFromMemberId(defaultMember.getId());
+        ProfileResponse response = memberService.getProfile(defaultMember.getId());
 
         // then
         assertThat(response.getName()).isEqualTo(defaultMember.getName());
@@ -280,7 +291,7 @@ class MemberServiceTest {
         doReturn(photo).when(storageProvider).uploadFile(multipartFile);
 
         // when
-        memberService.addPhoto(defaultMember.getId(), multipartFile);
+        memberService.modifyPhoto(defaultMember.getId(), multipartFile);
 
         // then
         assertThat(defaultMember.getPhoto()).isEqualTo(photo);
@@ -291,13 +302,13 @@ class MemberServiceTest {
     public void 닉네임_수정() throws Exception {
 
         // given
-        PatchNicknameRequest request = new PatchNicknameRequest();
+        ModifyNicknameRequest request = new ModifyNicknameRequest();
         request.setNewNickname("newNickname");
 
         doReturn(Optional.of(defaultMember)).when(memberRepository).findById(defaultMember.getId());
 
         // when
-        memberService.replaceNickname(defaultMember.getId(), request);
+        memberService.modifyNickname(defaultMember.getId(), request);
 
         // then
         assertThat(defaultMember.getNickname()).isEqualTo(request.getNewNickname());

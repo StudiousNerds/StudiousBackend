@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/studious/oauth")
+@RequestMapping("/api/v1/oauth")
 public class OAuth2Controller {
     private final OAuth2Service oAuth2Service;
 

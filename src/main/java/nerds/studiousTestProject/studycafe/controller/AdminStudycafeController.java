@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
-import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.request.AnnouncementRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.CafeInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.response.AnnouncementResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.CafeBasicInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.CafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
@@ -32,19 +32,19 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/studycafes/managements")
+@RequestMapping("/api/v1/admin/studycafes")
 @Slf4j
 public class AdminStudycafeController {
     private final StudycafeService studycafeService;
 
     private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
 
-    @PostMapping("/validations/accountInfos")
+    @PostMapping("/accountInfos")
     public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
         return studycafeService.validateAccountInfo(accountInfoRequest);
     }
 
-    @PostMapping("/validations/businessInfos")
+    @PostMapping("/businessInfos")
     public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
@@ -58,27 +58,27 @@ public class AdminStudycafeController {
 
     @GetMapping
     public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember Long memberId, @RequestParam Integer page) {
-        return studycafeService.inquireManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
+        return studycafeService.enquiryManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
     }
 
     @GetMapping("/{studycafeId}")
     public CafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
-        return studycafeService.inquireManagedStudycafe(memberId, studycafeId);
+        return studycafeService.enquiryManagedStudycafe(memberId, studycafeId);
     }
 
     @PatchMapping("/{studycafeId}")
-    public void editManagedStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
-        studycafeService.edit(memberId, studycafeId, cafeInfoEditRequest);
+    public void modifyManagedStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
+        studycafeService.modify(memberId, studycafeId, cafeInfoEditRequest);
     }
 
-    @GetMapping("/notificationInfos/{studycafeId}")
+    @GetMapping("/{studycafeId}/notificationInfos")
     public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
-        return studycafeService.inquireAnnouncements(memberId, studycafeId);
+        return studycafeService.enquiryAnnouncements(memberId, studycafeId);
     }
 
-    @PostMapping("/notificationInfos/{studycafeId}")
+    @PostMapping("/{studycafeId}/notificationInfos")
     public void addNotificationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
-        studycafeService.insertAnnouncements(memberId, studycafeId, announcementRequest);
+        studycafeService.registerAnnouncements(memberId, studycafeId, announcementRequest);
     }
 
     @DeleteMapping("/{studycafeId}")

@@ -11,14 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-@AllArgsConstructor
-@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,9 +35,22 @@ public class AccumHashtagHistory {
     @JoinColumn(name = "studycafe_id", nullable = false)
     private Studycafe studycafe;
 
+    @Builder
+    public AccumHashtagHistory(HashtagName name, Studycafe studycafe) {
+        this.count = 0;
+        this.name = name;
+        this.studycafe = studycafe;
+    }
+
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {
             this.studycafe = studycafe;
+        }
+    }
+
+    public void updateCount(Integer count) {
+        if (count != null) {
+            this.count += count;
         }
     }
 }

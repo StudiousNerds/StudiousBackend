@@ -23,18 +23,18 @@ import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeInfo;
-import nerds.studiousTestProject.studycafe.dto.manage.request.AnnouncementRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.CafeInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.ConvenienceInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.OperationInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.request.RefundPolicyEditRequest;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AddressInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.AnnouncementResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.CafeBasicInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.CafeDetailsResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.ConvenienceInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.OperationInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.manage.response.RefundPolicyResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.request.AnnouncementRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.CafeInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.ConvenienceInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.OperationInfoEditRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.RefundPolicyEditRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.response.AddressInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.AnnouncementResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.CafeBasicInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.CafeDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.ConvenienceInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.OperationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.modify.response.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.CafeInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.ConvenienceInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.OperationInfoRequest;
@@ -103,7 +103,7 @@ public class StudycafeService {
      * 해당 메소드에서 추가적으로 잘못 입력된 값에 대한 예외처리를 진행
      * @return 검색 결과
      */
-    public List<SearchResponse> inquire(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
+    public List<SearchResponse> enquiry(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
         List<LocalDate> holidays = holidayProvider.getHolidays();
         Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
 
@@ -235,9 +235,9 @@ public class StudycafeService {
 
     private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
         int total = 0;
-        Integer reflectedAccumResCnt = searchResponseInfo.getReflectedAccumResCnt();
-        if (reflectedAccumResCnt != null) {
-            total += reflectedAccumResCnt;
+        Integer reflectedAccumRevCnt = searchResponseInfo.getReflectedAccumRevCnt();
+        if (reflectedAccumRevCnt != null) {
+            total += reflectedAccumRevCnt;
         }
 
         Integer accumRevCnt = searchResponseInfo.getAccumRevCnt();
@@ -265,13 +265,14 @@ public class StudycafeService {
     private List<HashtagName> getAllHashtagNames(SearchResponseInfo searchResponseInfo) {
         List<HashtagName> hashtagNames = new ArrayList<>();
 
-        if (searchResponseInfo.getAccumHashtagHistoryNames() != null) {
-            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtagHistoryNames().split(",")).map(HashtagName::valueOf).toList());
+        if (searchResponseInfo.getAccumHashtags() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtags().split(",")).map(HashtagName::valueOf).toList());
         }
 
-        if (searchResponseInfo.getHashtagRecordNames() != null) {
-            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getHashtagRecordNames().split(",")).map(HashtagName::valueOf).toList());
+        if (searchResponseInfo.getHashtags() != null) {
+            hashtagNames.addAll(Arrays.stream(searchResponseInfo.getHashtags().split(",")).map(HashtagName::valueOf).toList());
         }
+
         return hashtagNames;
     }
 
@@ -305,7 +306,7 @@ public class StudycafeService {
         List<RoomInfoRequest> roomInfos = registerRequest.getRoomInfos();
         validatePhotos(multipartFileMap, roomInfos);    // 사진에 대한 검증
 
-        Member member = findMemberFromId(memberId);     // 현재 로그인된 유저 정보를 가져온다.
+        Member member = findMemberById(memberId);     // 현재 로그인된 유저 정보를 가져온다.
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
         NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
@@ -428,8 +429,8 @@ public class StudycafeService {
         }
     }
 
-    public List<CafeBasicInfoResponse> inquireManagedEntryStudycafes(Long memberId, Pageable pageable) {
-        Member member = findMemberFromId(memberId);
+    public List<CafeBasicInfoResponse> enquiryManagedEntryStudycafes(Long memberId, Pageable pageable) {
+        Member member = findMemberById(memberId);
 
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
@@ -441,8 +442,8 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
-    public CafeDetailsResponse inquireManagedStudycafe(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+    public CafeDetailsResponse enquiryManagedStudycafe(Long memberId, Long studycafeId) {
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
@@ -479,8 +480,8 @@ public class StudycafeService {
      * @param cafeInfoEditRequest 수정된 데이터
      */
     @Transactional
-    public void edit(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
-        Member member = findMemberFromId(memberId);
+    public void modify(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -526,8 +527,8 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
-    public List<AnnouncementResponse> inquireAnnouncements(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+    public List<AnnouncementResponse> enquiryAnnouncements(Long memberId, Long studycafeId) {
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
@@ -540,8 +541,8 @@ public class StudycafeService {
      * @param announcementRequest 공지사항 요청 값
      */
     @Transactional
-    public void insertAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
-        Member member = findMemberFromId(memberId);
+    public void registerAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
+        Member member = findMemberById(memberId);
         Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
@@ -555,12 +556,12 @@ public class StudycafeService {
      */
     @Transactional
     public void delete(Long memberId, Long studycafeId) {
-        Member member = findMemberFromId(memberId);
+        Member member = findMemberById(memberId);
         studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private Member findMemberFromId(Long memberId) {
+    private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 }

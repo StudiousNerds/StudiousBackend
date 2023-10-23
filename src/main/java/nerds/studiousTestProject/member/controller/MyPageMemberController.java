@@ -3,10 +3,12 @@ package nerds.studiousTestProject.member.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
-import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
-import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
-import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
+import nerds.studiousTestProject.member.dto.enquiry.response.ProfileResponse;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyNicknameRequest;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyPasswordRequest;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyPhoneNumberRequest;
+import nerds.studiousTestProject.member.dto.modify.response.ModifyNicknameResponse;
+import nerds.studiousTestProject.member.dto.modify.response.ModifyPhotoResponse;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
 import nerds.studiousTestProject.member.service.MemberService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,34 +23,33 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/mypage/members")
+@RequestMapping("/api/v1/members")
 public class MyPageMemberController {
     private final MemberService memberService;
 
     @GetMapping
-    public MemberInfoResponse inquireMember(@LoggedInMember Long memberId) {
-        return memberService.findMemberInfoFromMemberId(memberId);
+    public ProfileResponse enquiryProfile(@LoggedInMember Long memberId) {
+        return memberService.getProfile(memberId);
     }
 
     @PostMapping("/photo")
-    public void addProfile(@LoggedInMember Long memberId, @RequestParam MultipartFile file) {
-        log.info("file = {}", file);
-        memberService.addPhoto(memberId, file);
+    public ModifyPhotoResponse modifyPhoto(@LoggedInMember Long memberId, @RequestParam MultipartFile file) {
+        return memberService.modifyPhoto(memberId, file);
     }
 
     @PatchMapping("/nickname")
-    public void patchNickname(@LoggedInMember Long memberId, @RequestBody PatchNicknameRequest patchNicknameRequest) {
-        memberService.replaceNickname(memberId, patchNicknameRequest);
+    public ModifyNicknameResponse modifyNickname(@LoggedInMember Long memberId, @RequestBody ModifyNicknameRequest modifyNicknameRequest) {
+        return memberService.modifyNickname(memberId, modifyNicknameRequest);
     }
 
     @PatchMapping("/phoneNumber")
-    public void patchPhoneNumber(@LoggedInMember Long memberId, @RequestBody PatchPhoneNumberRequest patchPhoneNumberRequest) {
-        memberService.replacePhoneNumber(memberId, patchPhoneNumberRequest);
+    public void modifyPhoneNumber(@LoggedInMember Long memberId, @RequestBody ModifyPhoneNumberRequest modifyPhoneNumberRequest) {
+        memberService.modifyPhoneNumber(memberId, modifyPhoneNumberRequest);
     }
 
     @PatchMapping("/password")
-    public void patchPassword(@LoggedInMember Long memberId, @RequestBody PatchPasswordRequest patchPasswordRequest) {
-        memberService.replacePassword(memberId, patchPasswordRequest);
+    public void modifyPassword(@LoggedInMember Long memberId, @RequestBody ModifyPasswordRequest modifyPasswordRequest) {
+        memberService.modifyPassword(memberId, modifyPasswordRequest);
     }
 
     @PostMapping("/withdraw")

@@ -47,7 +47,7 @@ public class StudycafeController {
                                        @RequestParam(required = false) List<HashtagName> hashtags,
                                        @RequestParam(required = false) List<ConvenienceName> conveniences,
                                        @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) SearchSortType sortType) {
-        return studycafeService.inquire(keyword, date, startTime, endTime, headCount, minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
+        return studycafeService.enquiry(keyword, date, startTime, endTime, headCount, minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}")
