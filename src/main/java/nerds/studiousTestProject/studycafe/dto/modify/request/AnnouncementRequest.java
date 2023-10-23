@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.studycafe.entity.Announcement;
-import nerds.studiousTestProject.studycafe.validator.manage.RegisterAnnouncementCheck;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-@RegisterAnnouncementCheck
 public class AnnouncementRequest {
     @NotNull(message = "공지사항은 필수입니다.")
     @Length(min = 10, max = 100, message = "공지사항은 10 ~ 100자 사이여야 합니다.")
