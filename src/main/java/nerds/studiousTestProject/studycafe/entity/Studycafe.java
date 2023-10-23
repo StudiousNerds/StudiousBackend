@@ -173,11 +173,13 @@ public class Studycafe {
         }
     }
 
-    public void updateAccumData(Integer accumReserveCount, Double gradeSum, Integer gradeCount) {
+    public void updateAccumReserveCount(Integer accumReserveCount) {
         if (accumReserveCount != null) {
             this.accumReserveCount += accumReserveCount;
         }
+    }
 
+    public void updateGradeData(Double gradeSum, Integer gradeCount) {
         if (gradeSum != null) {
             this.gradeSum += gradeSum;
         }
