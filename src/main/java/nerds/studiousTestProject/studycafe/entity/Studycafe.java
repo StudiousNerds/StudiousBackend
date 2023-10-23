@@ -173,6 +173,22 @@ public class Studycafe {
         }
     }
 
+    public void updateAccumReserveCount(Integer accumReserveCount) {
+        if (accumReserveCount != null) {
+            this.accumReserveCount += accumReserveCount;
+        }
+    }
+
+    public void updateGradeData(Double gradeSum, Integer gradeCount) {
+        if (gradeSum != null) {
+            this.gradeSum += gradeSum;
+        }
+
+        if (gradeCount != null) {
+            this.gradeCount += gradeCount;
+        }
+    }
+
     @Builder
     public Studycafe(Long id, Member member, String name, Address address, String photo, String tel, Integer walkingTime, String nearestStation, String introduction) {
         this.id = id;

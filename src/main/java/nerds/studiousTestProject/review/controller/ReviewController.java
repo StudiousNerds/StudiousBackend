@@ -2,18 +2,17 @@ package nerds.studiousTestProject.review.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.review.dto.available.response.AvailableReviewResponse;
 import nerds.studiousTestProject.review.dto.delete.response.DeleteReviewResponse;
 import nerds.studiousTestProject.review.dto.find.request.UserReviewSortType;
 import nerds.studiousTestProject.review.dto.find.response.FindReviewSortedResponse;
-import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewSortType;
-import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
-import nerds.studiousTestProject.review.dto.manage.inquire.response.ReviewInfoResponse;
-import nerds.studiousTestProject.review.dto.manage.modify.request.ModifyCommentRequest;
-import nerds.studiousTestProject.review.dto.manage.register.request.RegisterCommentRequest;
+import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewSortType;
+import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.enquiry.response.ReviewInfoResponse;
+import nerds.studiousTestProject.review.dto.modify.request.ModifyCommentRequest;
+import nerds.studiousTestProject.review.dto.register.response.RegisterCommentRequest;
 import nerds.studiousTestProject.review.dto.modify.request.ModifyReviewRequest;
 import nerds.studiousTestProject.review.dto.modify.response.ModifyReviewResponse;
 import nerds.studiousTestProject.review.dto.register.request.RegisterReviewRequest;
@@ -40,7 +39,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-@Slf4j
 @Validated
 public class ReviewController {
     private final ReviewService reviewService;
@@ -95,7 +93,7 @@ public class ReviewController {
         return reviewService.findRoomReviews(studycafeId, roomId, PageRequestConverter.of(page, STUDYCAFE_PAGE_REVIEW_SIZE, sortType.getSort()));
     }
 
-    @GetMapping("/studycafes/{studycafeId}/reviews/managements")
+    @GetMapping("/admin/studycafes/{studycafeId}/reviews")
     public List<ReviewInfoResponse> inquireStudycafeReviews(
             @LoggedInMember Long memberId,
             @PathVariable("studycafeId") Long studycafeId,
@@ -106,17 +104,17 @@ public class ReviewController {
         return adminReviewService.getWrittenReviews(studycafeId, memberId, reviewType, PageRequestConverter.of(page, ADMIN_REVIEW_INQUIRE_SIZE, sortType.getSort()));
     }
 
-    @PostMapping("/reviews/managements/{reviewId}")
+    @PostMapping("/admin/reviews/{reviewId}")
     public void registerComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid RegisterCommentRequest registerCommentRequest) {
         adminReviewService.registerComment(reviewId, registerCommentRequest);
     }
 
-    @PatchMapping("/reviews/managements/{reviewId}")
+    @PatchMapping("/admin/reviews/{reviewId}")
     public void modifyComment(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ModifyCommentRequest modifyCommentRequest) {
         adminReviewService.modifyComment(reviewId, modifyCommentRequest);
     }
 
-    @DeleteMapping("/reviews/managements/{reviewId}")
+    @DeleteMapping("admin/reviews/{reviewId}")
     public void deleteComment(@PathVariable("reviewId") Long reviewId) {
         adminReviewService.deleteComment(reviewId);
     }

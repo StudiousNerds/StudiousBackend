@@ -4,23 +4,22 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
-import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.login.LoginRequest;
+import nerds.studiousTestProject.member.dto.find.request.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.request.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.login.request.LoginRequest;
+import nerds.studiousTestProject.member.dto.login.response.LoginResponse;
 import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -30,25 +29,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
+    private static final String REFRESH_TOKEN = "refresh_token";
+
     @PostMapping("/signup")
     public JwtTokenResponse signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         return memberService.register(signUpRequest);
     }
 
     @PostMapping("/login")
-    public JwtTokenResponse login(@RequestBody @Valid LoginRequest loginRequest) {
+    public LoginResponse login(@RequestBody @Valid LoginRequest loginRequest) {
         return memberService.issueToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
     @PostMapping("/email")
     public FindEmailResponse findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
-        return memberService.findEmailFromPhoneNumber(findEmailRequest);
+        return memberService.enquiryEmail(findEmailRequest);
     }
 
     @PostMapping("/password")
     public FindPasswordResponse findPassword(@RequestBody @Valid FindPasswordRequest findPasswordRequest) {
-        log.info("email = {}", findPasswordRequest.getEmail());
-        log.info("phoneNumber = {}", findPasswordRequest.getPhoneNumber());
         return memberService.issueTemporaryPassword(findPasswordRequest);
     }
 
@@ -58,17 +57,7 @@ public class MemberController {
     }
 
     @PostMapping("/reissue")
-    public JwtTokenResponse reissue(@LoggedInMember Long memberId, @CookieValue("refresh_token") String refreshToken) {
+    public LoginResponse reissue(@LoggedInMember Long memberId, @CookieValue(REFRESH_TOKEN) String refreshToken) {
         return memberService.reissueToken(memberId, refreshToken);
-    }
-
-    /**
-     * USER 권한에서 잘 실행되는지 테스트하기 위한 메소드
-     * @return
-     */
-    @ResponseBody
-    @GetMapping("/test")
-    public String test() {
-        return "success";
     }
 }
