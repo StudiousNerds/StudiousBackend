@@ -7,25 +7,34 @@ import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailRespons
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
+@RestController
+@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 @Slf4j
-@RestController
-@RequestMapping("/studious/payments")
 public class PaymentController {
+
+    private static final String REDIRECT_URI_TO_RESERVATION = "/api/v1/mypage/reservations/";
 
     private final PaymentService paymentService;
 
-    @GetMapping("/success")
+    @PostMapping("/success")
     public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
-                                            @RequestParam Integer amount,
-                                            @RequestParam String paymentKey) {
-        paymentService.confirmPayToToss(orderId, paymentKey, amount);
-        return ResponseEntity.noContent().build();
+                                                       @RequestParam String paymentKey,
+                                                       @RequestParam Integer amount) {
+        Long reservationRecordId = paymentService.confirmSuccess(orderId, paymentKey, amount);
+        return ResponseEntity.created(URI.create(REDIRECT_URI_TO_RESERVATION + reservationRecordId)).build();
     }
 
-    @GetMapping("/fail")
+    @PostMapping("/fail")
     public ConfirmFailResponse payConfirmFail(@RequestParam String code,
                                               @RequestParam String message,
                                               @RequestParam String orderId) {
@@ -34,8 +43,8 @@ public class PaymentController {
 
     @GetMapping("/virtual/success")
     public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
-                                                            @RequestParam Integer amount,
-                                                            @RequestParam String paymentKey) {
+                                                            @RequestParam String paymentKey,
+                                                            @RequestParam Integer amount) {
         return paymentService.virtualAccount(orderId, paymentKey, amount);
     }
 

@@ -1,6 +1,6 @@
 package nerds.studiousTestProject.member.dto.oauth.authenticate.userinfo;
 
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 
 import java.util.Map;

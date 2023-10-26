@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.payment.util.totoss;
 
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 
 public class RefundReceiveAccount {
     private String bank;

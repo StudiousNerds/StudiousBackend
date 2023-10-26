@@ -1,14 +1,14 @@
 package nerds.studiousTestProject.common.config;
 
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.common.exception.CustomAccessDeniedHandler;
-import nerds.studiousTestProject.common.exception.CustomAuthenticationEntryPoint;
-import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
+import nerds.studiousTestProject.common.exception.handler.CustomAccessDeniedHandler;
+import nerds.studiousTestProject.common.exception.handler.CustomAuthenticationEntryPoint;
+import nerds.studiousTestProject.common.exception.handler.HttpRequestEndPointChecker;
 import nerds.studiousTestProject.common.filter.JwtAuthenticationFilter;
+import nerds.studiousTestProject.common.filter.JwtExceptionHandlerFilter;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,17 +21,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 /**
  * Spring Security 관련 설정 사항들
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final HttpRequestEndPointChecker httpRequestEndPointChecker;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
@@ -42,27 +41,21 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight request에 대해, 인증을 하지 않고 모든 요청을 허용
-                .requestMatchers("studious/oauth/**", "/studious/members/signup", "/studious/members/login").permitAll()    // 일반, 소셜 회원가입 및 로그인
-                .requestMatchers("/studious/studycafes/{cafeId}", "/studious/main").permitAll()
-                .requestMatchers("/studious/members/logout", "/studious/members/reissue").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")  // 로그아웃, 토큰 재발급
-                .requestMatchers("/studious/mypage/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN") // 닉네임, 비밀번호 수정 및 회원 탈퇴
-                .requestMatchers("/studious/search/**").permitAll()
-                .requestMatchers("/studious/valid/**").permitAll()   // 임시 허용
-                .requestMatchers("/studious/studycafes/{studycafeId}/notice", "/studious/studycafes/{studycafeId}/refundPolicy", "/studious/studycafes/{studycafeId}/reviews").permitAll()
-                .requestMatchers("/studious/studycafes/{studycafeId}", "studious/studycafes/{studycafeId}/rooms/{roomId}/reviews").permitAll()
-                .requestMatchers("/studious/studycafes/registrations").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/studious/members/email").permitAll()      // 이메일 찾기
-                .requestMatchers(HttpMethod.POST, "/studious/members/password").permitAll()  // 비밀번호 찾기
-                .requestMatchers("/studious/members/test").hasRole("USER")      // 테스트 용
-                .requestMatchers("/payment/**").permitAll()//결제 테스트
-                .requestMatchers("/studious/payments/**").permitAll()//결제 테스트
+                .requestMatchers("/studious/mypage/**", "/studious/reservations/**", "/studious/payments/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/members/logout").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/v1/oauth/**").permitAll()
+                .requestMatchers("/api/v1/members/**").permitAll()
+                .requestMatchers("/api/v1/search/**").permitAll()
+                .requestMatchers("/api/v1/studycafes/**").permitAll()
+                .requestMatchers("/api/v1/main").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .cors()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
                 .and()
-                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint(httpRequestEndPointChecker))
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
@@ -84,22 +77,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public DefaultUriBuilderFactory defaultUriBuilderFactory() {
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
-        return factory;
-    }
-
-    /**
-     * 인증 키를 포함 한 URL을 입력 받을 때 인코딩 관련 오류가 발생하므로, WebClient 에서 URL 인코딩을 하지 않도록 하기 위해 DefaultUriBuilderFactory 객체를 추가
-     * @return URL 인코딩이 되지 않는 WebClient
-     */
-    @Bean
-    public WebClient webClient() {
-        return WebClient.builder().uriBuilderFactory(defaultUriBuilderFactory()).build();
     }
 
     @Bean

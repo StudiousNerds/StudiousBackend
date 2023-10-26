@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.BankCode;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class PaymentResponseFromToss {
+
     private String version;
     private String paymentKey;
     private String type;
@@ -38,7 +40,7 @@ public class PaymentResponseFromToss {
     private int taxFreeAmount;
     private Integer taxExemptionAmount;
     @Nullable
-    private List<Cancels> cancels;
+    private List<Cancel> cancels;
     private boolean isPartialCancelable;
     @Nullable
     private Card card;
@@ -83,11 +85,10 @@ public class PaymentResponseFromToss {
                 .paymentKey(paymentKey)
                 .orderId(orderId)
                 .price(totalAmount)
-                .completeTime(LocalDateTime.parse(approvedAt, DateTimeFormatter.ofPattern(DATE_FORMAT)))
                 .method(method)
                 .status(PaymentStatus.valueOf(status))
                 .dueDate(LocalDateTime.parse(virtualAccount.getDueDate(), DateTimeFormatter.ofPattern(DATE_FORMAT)))
-                .bankCode(virtualAccount.getBankCode())
+                .bankCode(BankCode.from(virtualAccount.getBankCode()))
                 .virtualAccount(virtualAccount.getAccountNumber())
                 .secret(secret)
                 .build();

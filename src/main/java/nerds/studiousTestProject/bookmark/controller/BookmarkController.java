@@ -4,39 +4,42 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
+import nerds.studiousTestProject.common.util.LoggedInMember;
+import nerds.studiousTestProject.common.util.PageRequestConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/studious/mypage/bookmarks")
+@RequestMapping("/api/v1/mypage/bookmarks")
 public class BookmarkController {
     private final BookmarkService bookmarkService;
+    private static final int STUDYCAFE_SEARCH_SIZE = 8;
 
     @PostMapping("/{studycafeId}")
-    public ResponseEntity<?> registerBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId){
-        bookmarkService.registerBookmark(accessToken, studycafeId);
-        return ResponseEntity.status(HttpStatus.OK).body("북마크 등록에 성공했습니다.");
+    public ResponseEntity<Void> registerBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
+        bookmarkService.registerBookmark(memberId, studycafeId);
+        return ResponseEntity.created(URI.create("/api/v1/mypage/bookmarks")).build();
     }
 
     @GetMapping
-    public FindBookmarkResponse findBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, Pageable pageable){
-        return bookmarkService.findBookmark(accessToken, pageable);
+    public FindBookmarkResponse findBookmark(@LoggedInMember Long memberId, @RequestParam(required = false) Integer page){
+        return bookmarkService.findBookmark(memberId, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @DeleteMapping("/{studycafeId}")
-    public ResponseEntity<?> deleteBookmark(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @PathVariable Long studycafeId){
-        bookmarkService.deleteBookmark(accessToken, studycafeId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("북마크 삭제에 성공했습니다.");
+    public ResponseEntity<Void> deleteBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
+        bookmarkService.deleteBookmark(memberId, studycafeId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

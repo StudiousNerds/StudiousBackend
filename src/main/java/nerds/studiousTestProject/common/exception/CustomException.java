@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.common.exception;
 
 import lombok.Getter;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 
 @Getter
 public class CustomException extends RuntimeException {

@@ -3,23 +3,28 @@ package nerds.studiousTestProject.reservation.dto.detail.response;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.dto.PaymentInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.reservation.dto.ReservationInfo;
+import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
 @Builder
 public class ReservationDetailResponse {
 
-    private PlaceInfo placeInfo;
-    private PaymentInfo paymentInfo;
-    private ReserveUserInfo reserveUserInfo;
+    private PlaceInfo place;
+    private ReservationInfo reservation;
+    private PaymentInfo payment;
+    private ReserveUserInfo user;
 
-    public static ReservationDetailResponse of(ReservationRecord reservationRecord, Studycafe studycafe, Room room, Payment payment) {
+    public static ReservationDetailResponse of(ReservationRecord reservationRecord) {
+        Payment payment = reservationRecord.getPayment();
         return ReservationDetailResponse.builder()
-                .placeInfo(PlaceInfo.of(studycafe, room, reservationRecord))
-                .paymentInfo(PaymentInfo.from(payment))
-                .reserveUserInfo(ReserveUserInfo.from(reservationRecord))
+                .place(PlaceInfo.from(reservationRecord))
+                .reservation(ReservationInfo.from(reservationRecord))
+                .payment(PaymentInfo.from(payment))
+                .user(ReserveUserInfo.from(reservationRecord))
                 .build();
     }
 }

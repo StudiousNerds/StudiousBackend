@@ -21,9 +21,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,7 +71,15 @@ public class Review {
     }
 
     public void updateDetail(String detail) {
-        this.detail = detail;
+        if (detail != null) {
+            this.detail = detail;
+        }
+    }
+
+    public void updateIsRecommended(Boolean isRecommended) {
+        if (isRecommended != null) {
+            this.isRecommended = isRecommended;
+        }
     }
 
     public void updateComment(String comment) {

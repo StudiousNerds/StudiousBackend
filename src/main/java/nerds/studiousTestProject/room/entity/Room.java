@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,7 +81,7 @@ public class Room {
     }
 
     @Builder
-    public Room(Long id, Studycafe studycafe, String name, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, String photo, PriceType type) {
+    public Room(Long id, Studycafe studycafe, String name, Integer minHeadCount, Integer maxHeadCount, Integer price, Integer minUsingTime, PriceType type) {
         this.id = id;
         this.studycafe = studycafe;
         this.name = name;

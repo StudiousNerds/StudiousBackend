@@ -4,9 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,15 +17,17 @@ import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
+import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.PAYMENT_NOT_CANCELED;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.PAYMENT_NOT_CANCELED;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.*;
 
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
@@ -30,22 +35,22 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_id", nullable = false, updatable = false)
+    @Column(name = "order_id", nullable = false)
     private String orderId;
 
-    @Column(name = "payment_key", nullable = false, updatable = false)
+    @Column(name = "payment_key")
     private String paymentKey;
 
-    @Column(name = "method", nullable = false)
+    @Column(name = "method")
     private String method;
 
-    @Column(name = "complete_time", nullable = false)
+    @Column(name = "complete_time")
     private LocalDateTime completeTime;
 
     @Column(name = "price", nullable = false)
     private Integer price;
 
-    @Column(name = "payment_status")
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -56,7 +61,8 @@ public class Payment {
     private String virtualAccount;
 
     @Column(name = "bank_code")
-    private String bankCode;
+    @Enumerated(EnumType.STRING)
+    private BankCode bankCode;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
@@ -65,10 +71,12 @@ public class Payment {
     private String secret;
 
     @Column(name = "canceler")
+    @Enumerated(EnumType.STRING)
     private MemberRole canceler;
 
+
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, String bankCode, LocalDateTime dueDate, String secret) {
+    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, BankCode bankCode, LocalDateTime dueDate, String secret, MemberRole canceler) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -81,18 +89,22 @@ public class Payment {
         this.bankCode = bankCode;
         this.dueDate = dueDate;
         this.secret = secret;
+        this.canceler = canceler;
     }
 
-    public void canceled(PaymentResponseFromToss responseFromToss) {
-        String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
+
+
+    public void cancel(final PaymentResponseFromToss responseFromToss, final MemberRole canceler) {
+        final String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
         if (cancelReason != null) this.cancelReason = cancelReason;
-        if (!status.equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
+        if (!responseFromToss.getStatus().equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
         this.status = CANCELED;
+        if (canceler != null) this.canceler = MemberRole.USER;
     }
 
-    public void updateStatus(String paymentStatus) {
+    public void updateStatus(PaymentStatus paymentStatus) {
         if (paymentStatus != null) {
-            this.status = PaymentStatus.valueOf(paymentStatus);
+            this.status = paymentStatus;
         }
     }
 
@@ -102,5 +114,73 @@ public class Payment {
         if (completeTime != null) {
             this.completeTime = LocalDateTime.parse(completeTime, DateTimeFormatter.ofPattern(DATE_FORMAT));
         }
+    }
+
+    private void updatePaymentKey(String paymentKey) {
+        if (paymentKey != null) {
+            this.paymentKey = paymentKey;
+        }
+    }
+
+    private void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    private void updateMethod(String method) {
+        if (method != null) {
+            this.method = method;
+        }
+    }
+
+    private void updateOrderId(String orderId) {
+        if (orderId != null) {
+            this.orderId = orderId;
+        }
+    }
+
+    private void updateCompleteTime(LocalDateTime completeTime) {
+        if (completeTime != null) {
+            this.completeTime = completeTime;
+        }
+    }
+
+    private void updateDueDate(LocalDateTime dueDate) {
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        }
+    }
+
+    private void updateBankCode(BankCode bankCode) {
+        if (bankCode != null) {
+            this.bankCode = bankCode;
+        }
+    }
+
+    private void updateVirtualAccount(String virtualAccount) {
+        if (virtualAccount != null) {
+            this.virtualAccount = virtualAccount;
+        }
+    }
+
+    private void updateSecret(String secret) {
+        if (secret != null) {
+            this.secret = secret;
+        }
+    }
+
+
+    public void complete(Payment payment) {
+        updateStatus(payment.getStatus());
+        updatePaymentKey(payment.getPaymentKey());
+        updatePrice(payment.getPrice());
+        updateOrderId(payment.getOrderId());
+        updateCompleteTime(payment.getCompleteTime());
+        updateMethod(payment.getMethod());
+        updateDueDate(payment.getDueDate());
+        updateBankCode(payment.getBankCode());
+        updateSecret(payment.getSecret());
+        updateVirtualAccount(payment.getVirtualAccount());
     }
 }

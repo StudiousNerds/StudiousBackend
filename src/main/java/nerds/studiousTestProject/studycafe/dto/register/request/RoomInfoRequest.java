@@ -8,12 +8,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import nerds.studiousTestProject.room.entity.PriceType;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.validator.register.RegisterRoomCheck;
 
 import java.util.List;
 
 @Data
-@RegisterRoomCheck
 public class RoomInfoRequest {
     @NotBlank(message = "스터디룸 이름은 필수입니다.")
     private String name;    // 스터디룸 이름
@@ -39,14 +37,9 @@ public class RoomInfoRequest {
     @Valid
     private List<ConvenienceInfoRequest> convenienceInfos; // 룸 편의시설
 
-    @NotNull(message = "스터디룸 사진을 1개 이상 선택해주세요.")
-    @Size(min = 1, message = "스터디룸 사진을 1개 이상 선택해주세요.")
-    private List<String> photos;    // 룸 사진
-
-    public Room toEntity(String roomMainPhoto) {
+    public Room toEntity() {
         return Room.builder()
                 .name(name)
-                .photo(roomMainPhoto)
                 .minHeadCount(minHeadCount)
                 .maxHeadCount(maxHeadCount)
                 .minUsingTime(minUsingTime)
