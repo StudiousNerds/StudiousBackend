@@ -12,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +23,9 @@ import nerds.studiousTestProject.member.entity.member.Member;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "reservation_record")
 public class ReservationRecord {
     @Id
@@ -66,26 +64,38 @@ public class ReservationRecord {
     @Column(name = "request")
     private String request;
 
-    @Column(name = "order_id")
-    private String orderId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = true)
+    @JoinColumn(name = "review_id")
     private Review review;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    public void completePay(Payment payment) {
+    @Builder
+    public ReservationRecord(Long id, Member member, String userName, String userPhoneNumber, LocalDate date, LocalTime startTime, LocalTime endTime, Integer usingTime, Integer headCount, ReservationStatus status, String request, Room room, Review review, Payment payment) {
+        this.id = id;
+        this.member = member;
+        this.userName = userName;
+        this.userPhoneNumber = userPhoneNumber;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.usingTime = usingTime;
+        this.headCount = headCount;
+        this.status = status;
+        this.request = request;
+        this.room = room;
+        this.review = review;
+        this.payment = payment;
+    }
+
+    public void completePay() {
         this.status = ReservationStatus.CONFIRMED;
-        if(payment != null){
-            this.payment = payment;
-        }
     }
 
     public void completeDeposit(){
@@ -96,7 +106,7 @@ public class ReservationRecord {
         this.status = ReservationStatus.CANCELED;
     }
 
-   public void depositError() {
+    public void depositError() {
         this.status = ReservationStatus.INPROGRESS;
     }
 
@@ -113,6 +123,18 @@ public class ReservationRecord {
     public void setRoom(Room room) {
         if (room != null) {
             this.room = room;
+        }
+    }
+
+    public void updateHeadCount(final Integer headCount) {
+        if (headCount != null) {
+            this.headCount = headCount;
+        }
+    }
+
+    public void updatePayment(Payment payment) {
+        if (payment != null) {
+            this.payment = payment;
         }
     }
 }

@@ -8,18 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-@AllArgsConstructor
-@Builder
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +29,13 @@ public class Bookmark {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Builder
+    public Bookmark(Long id, Studycafe studycafe, Member member) {
+        this.id = id;
+        this.studycafe = studycafe;
+        this.member = member;
+    }
 
     public void setStudycafe(Studycafe studycafe) {
         if (studycafe != null) {

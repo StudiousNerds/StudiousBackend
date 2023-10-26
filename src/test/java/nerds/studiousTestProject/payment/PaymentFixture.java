@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.payment;
 
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
-import nerds.studiousTestProject.payment.util.fromtoss.Cancels;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class PaymentFixture {
 
 
     public static PaymentResponseFromToss createMockCancelResponse() {
-        Cancels cancel = Cancels.builder()
+        Cancel cancel = Cancel.builder()
                 .canceledAt(canceledAt)
                 .taxFreeAmount(taxFreeAmount)
                 .cancelAmount(amount)
@@ -35,7 +35,7 @@ public class PaymentFixture {
                 .refundableAmount(refundableAmount)
                 .taxExemptionAmount(taxExemptionAmount)
                 .build();
-        List<Cancels> cancels = List.of(cancel);
+        List<Cancel> cancels = List.of(cancel);
         return PaymentResponseFromToss.builder()
                 .cancels(cancels)
                 .build();

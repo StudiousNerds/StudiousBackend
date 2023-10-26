@@ -3,7 +3,7 @@ package nerds.studiousTestProject.member.entity.member;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.INVALID_MEMBER_TYPE;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_MEMBER_TYPE;
 
 public enum MemberType {
    DEFAULT, NAVER, KAKAO, GOOGLE;

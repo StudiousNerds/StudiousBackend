@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.member.entity.token.RefreshToken;
 import nerds.studiousTestProject.member.repository.token.RefreshTokenRepository;
 import nerds.studiousTestProject.member.util.JwtTokenConst;
-import nerds.studiousTestProject.common.exception.ErrorCode;
+import nerds.studiousTestProject.common.exception.errorcode.ErrorCode;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 

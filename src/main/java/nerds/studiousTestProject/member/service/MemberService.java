@@ -4,17 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.common.service.StorageService;
-import nerds.studiousTestProject.common.service.TokenService;
-import nerds.studiousTestProject.member.dto.find.FindEmailRequest;
-import nerds.studiousTestProject.member.dto.find.FindEmailResponse;
-import nerds.studiousTestProject.member.dto.find.FindPasswordRequest;
-import nerds.studiousTestProject.member.dto.find.FindPasswordResponse;
-import nerds.studiousTestProject.member.dto.inquire.response.MemberInfoResponse;
+import nerds.studiousTestProject.common.service.StorageProvider;
+import nerds.studiousTestProject.member.dto.find.request.FindEmailRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindEmailResponse;
+import nerds.studiousTestProject.member.dto.find.request.FindPasswordRequest;
+import nerds.studiousTestProject.member.dto.find.response.FindPasswordResponse;
+import nerds.studiousTestProject.member.dto.enquiry.response.ProfileResponse;
+import nerds.studiousTestProject.member.dto.enquiry.response.MenuBarProfileResponse;
+import nerds.studiousTestProject.member.dto.login.response.LoginResponse;
 import nerds.studiousTestProject.member.dto.logout.LogoutResponse;
-import nerds.studiousTestProject.member.dto.patch.PatchNicknameRequest;
-import nerds.studiousTestProject.member.dto.patch.PatchPasswordRequest;
-import nerds.studiousTestProject.member.dto.patch.PatchPhoneNumberRequest;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyNicknameRequest;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyPasswordRequest;
+import nerds.studiousTestProject.member.dto.modify.request.ModifyPhoneNumberRequest;
+import nerds.studiousTestProject.member.dto.modify.response.ModifyNicknameResponse;
+import nerds.studiousTestProject.member.dto.modify.response.ModifyPhotoResponse;
 import nerds.studiousTestProject.member.dto.signup.SignUpRequest;
 import nerds.studiousTestProject.member.dto.token.JwtTokenResponse;
 import nerds.studiousTestProject.member.dto.withdraw.WithdrawRequest;
@@ -26,6 +29,8 @@ import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.member.service.token.LogoutAccessTokenService;
 import nerds.studiousTestProject.member.service.token.RefreshTokenService;
 import nerds.studiousTestProject.member.util.JwtTokenProvider;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,17 +39,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.ALREADY_EXIST_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
-import static nerds.studiousTestProject.common.exception.ErrorCode.EXPIRE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_EMAIL;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PASSWORD;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_PHONE_NUMBER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.MISMATCH_TOKEN;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_DEFAULT_TYPE_USER;
-import static nerds.studiousTestProject.common.exception.ErrorCode.NOT_FOUND_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_TOKEN_VALID_TIME;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_EMAIL;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PASSWORD;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PHONE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_TOKEN;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_DEFAULT_TYPE_USER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_USER;
 
 @Slf4j
 @Service
@@ -56,8 +61,7 @@ public class MemberService {
     private final LogoutAccessTokenService logoutAccessTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
-    private final StorageService storageService;
+    private final StorageProvider storageProvider;
 
     /**
      * 사용자가 입력한 정보를 가지고 MemberRepository에 저장하는 메소드
@@ -83,7 +87,7 @@ public class MemberService {
      * @return 발급한 토큰 정보
      */
     @Transactional
-    public JwtTokenResponse issueToken(String email, String password) {
+    public LoginResponse issueToken(String email, String password) {
         List<Member> members = memberRepository.findByEmail(email);
         if (members.isEmpty()) {
             throw new NotFoundException(MISMATCH_EMAIL);
@@ -98,7 +102,8 @@ public class MemberService {
             throw new NotFoundException(EXPIRE_USER);
         }
 
-        return jwtTokenProvider.generateToken(member);
+        JwtTokenResponse tokenInfo = jwtTokenProvider.generateToken(member);
+        return LoginResponse.from(tokenInfo, member);
     }
 
     /**
@@ -121,20 +126,13 @@ public class MemberService {
                 .build();
     }
 
-    public MemberInfoResponse findMemberInfoFromAccessToken(String accessToken) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        return MemberInfoResponse.of(member);
+    public ProfileResponse getProfile(Long memberId) {
+        Member member = findMemberById(memberId);
+        return ProfileResponse.of(member);
     }
 
     @Transactional
-    public void addPhoto(String accessToken, MultipartFile file) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        String photoUrl = storageService.uploadFile(file);
-        member.updatePhoto(photoUrl);
-    }
-
-    @Transactional
-    public FindEmailResponse findEmailFromPhoneNumber(FindEmailRequest findEmailRequest) {
+    public FindEmailResponse enquiryEmail(FindEmailRequest findEmailRequest) {
         String phoneNumber = findEmailRequest.getPhoneNumber();
 
         Member member = memberRepository.findByPhoneNumber(phoneNumber).
@@ -179,20 +177,32 @@ public class MemberService {
                 .build();
     }
 
+    @CacheEvict(value = "memberCacheStore", key = "#memberId")
     @Transactional
-    public void replacePhoneNumber(String accessToken, PatchPhoneNumberRequest patchPhoneNumberRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        String newPhoneNumber = patchPhoneNumberRequest.getNewPhoneNumber();
+    public ModifyPhotoResponse modifyPhoto(Long memberId, MultipartFile file) {
+        Member member = findMemberById(memberId);
+        String photoUrl = storageProvider.uploadFile(file);
+        member.updatePhoto(photoUrl);
+
+        return ModifyPhotoResponse.builder()
+                .modifiedPhoto(photoUrl)
+                .build();
+    }
+
+    @Transactional
+    public void modifyPhoneNumber(Long memberId, ModifyPhoneNumberRequest modifyPhoneNumberRequest) {
+        Member member = findMemberById(memberId);
+        String newPhoneNumber = modifyPhoneNumberRequest.getNewPhoneNumber();
 
         member.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional
-    public void replacePassword(String accessToken, PatchPasswordRequest patchPasswordRequest) {
-        String oldPassword = patchPasswordRequest.getOldPassword();
-        String newPassword = patchPasswordRequest.getNewPassword();
+    public void modifyPassword(Long memberId, ModifyPasswordRequest modifyPasswordRequest) {
+        String oldPassword = modifyPasswordRequest.getOldPassword();
+        String newPassword = modifyPasswordRequest.getNewPassword();
 
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+        Member member = findMemberById(memberId);
         if (!passwordEncoder.matches(oldPassword, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
@@ -202,50 +212,52 @@ public class MemberService {
         member.updatePassword(encode);
     }
 
+    @CacheEvict(value = "memberCacheStore", key = "#memberId")
     @Transactional
-    public void replaceNickname(String accessToken, PatchNicknameRequest patchNicknameRequest) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
-        String newNickname = patchNicknameRequest.getNewNickname();
+    public ModifyNicknameResponse modifyNickname(Long memberId, ModifyNicknameRequest modifyNicknameRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
+        String newNickname = modifyNicknameRequest.getNewNickname();
 
         if (memberRepository.existsByPhoneNumber(newNickname)) {
             throw new BadRequestException(ALREADY_EXIST_NICKNAME);
         }
-
         member.updateNickname(newNickname);
+
+        return ModifyNicknameResponse.builder()
+                .modifiedNickname(newNickname)
+                .build();
     }
 
     @Transactional
-    public void deactivate(String accessToken, WithdrawRequest withdrawRequest) {
+    public void deactivate(Long memberId, WithdrawRequest withdrawRequest) {
+        Member member = findMemberById(memberId);
         String password = withdrawRequest.getPassword();
 
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new BadRequestException(MISMATCH_PASSWORD);
         }
 
         member.withdraw();
-        expireToken(accessToken);
     }
 
     /**
      * 사용자가 만료된 accessToken 과 만료되지 않은 refreshToken을 넘길 때 새로운 accessToken을 만들어 주는 메소드
      * RefreshToken의 유효기간을 확인 후, 토큰을 재발급해주는 메소드
      *
-     * @param accessToken
+     * @param memberId 사용자 pk
      * @param refreshToken 사용자로부터 넘겨 받은 refreshToken
      * @return 새로운 accessToken 이 담긴 JwtTokenResponse 객체
      */
     @Transactional
-    public JwtTokenResponse reissueToken(String accessToken, String refreshToken) {
-        Member member = tokenService.getMemberFromAccessToken(accessToken);
+    public LoginResponse reissueToken(Long memberId, String refreshToken) {
+        Member member = findMemberById(memberId);
         RefreshToken redisRefreshToken = refreshTokenService.findByMemberId(member.getId());
         if (redisRefreshToken == null) {
             throw new NotFoundException(EXPIRED_TOKEN_VALID_TIME);
         }
 
         if (!refreshToken.equals(redisRefreshToken.getToken())) {
-            log.info("refreshToken = {}", refreshToken);
-            log.info("redisRefreshToken = {}", redisRefreshToken.getToken());
             throw new NotFoundException(MISMATCH_TOKEN);
         }
 
@@ -255,7 +267,18 @@ public class MemberService {
 //        Member member = memberRepository.findById(currentEmail).get();
 //        String password = passwordEncoder.encode(member.getPassword());
 
-        return jwtTokenProvider.generateToken(member);
+        JwtTokenResponse tokenInfo = jwtTokenProvider.generateToken(member);
+        return LoginResponse.from(tokenInfo, member);
+    }
+
+    @Cacheable(value = "menuProfileCacheStore", key = "#memberId")
+    public MenuBarProfileResponse getMenuBarProfile(Long memberId) {
+        Member member = findMemberById(memberId);
+        return MenuBarProfileResponse.from(member);
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
     private void validate(SignUpRequest signUpRequest) {

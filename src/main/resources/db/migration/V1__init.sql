@@ -101,19 +101,20 @@ CREATE TABLE IF NOT EXISTS `operation_info` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `payment` (
-    `id`              bigint       NOT NULL AUTO_INCREMENT,
-    `order_id`        varchar(255) NOT NULL,
-    `payment_key`     varchar(255) NOT NULL,
-    `method`          varchar(255) NOT NULL,
-    `complete_time`   TIMESTAMP    NOT NULL,
-    `price`           int          NOT NULL,
-    `payment_status`  varchar(255) NOT NULL,
-    `cancel_reason`   varchar(255),
-    `canceler`        varchar(255),
-    `virtual_account` varchar(255),
-    `bank_code`       varchar(255),
-    `due_date`        TIMESTAMP,
-    `secret`          varchar(255),
+    `id`                    bigint       NOT NULL AUTO_INCREMENT,
+    `order_id`              varchar(255) NOT NULL,
+    `payment_key`           varchar(255),
+    `method`                varchar(255),
+    `complete_time`         TIMESTAMP,
+    `price`                 int          NOT NULL,
+    `status`        varchar(255) NOT NULL,
+    `cancel_reason`         varchar(255),
+    `canceler`              varchar(255),
+    `virtual_account`       varchar(255),
+    `bank_code`             varchar(255),
+    `due_date`              TIMESTAMP,
+    `secret`                varchar(255),
+    `reservation_record_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -145,7 +146,6 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
     `request`           varchar(255),
     `status`            varchar(255) NOT NULL,
     `member_id`         bigint       NOT NULL,
-    `payment_id`        bigint,
     `room_id`           bigint       NOT NULL,
     `review_id`         bigint,
     PRIMARY KEY (`id`)
@@ -250,7 +250,5 @@ CREATE TABLE IF NOT EXISTS `sub_photo` (
   COLLATE = utf8mb4_0900_ai_ci;
 
 alter table review add constraint grade_review_unique_key unique (grade_id);
-
-alter table reservation_record add constraint reservation_record_payment_unique_key unique (payment_id);
 
 alter table reservation_record add constraint review_reservation_record_unique_key unique (review_id);

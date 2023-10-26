@@ -1,15 +1,11 @@
 package nerds.studiousTestProject.review.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,13 +40,33 @@ public class Grade {
     }
 
     public void updateTotal(Double total) {
-        this.total = total;
+        if (total != null) {
+            this.total = total;
+        }
     }
 
-    public void updateGrade(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total){
-        this.cleanliness = cleanliness;
-        this.deafening = deafening;
-        this.fixturesStatus = fixturesStatus;
-        this.total = total;
+    private void updateCleanliness(Integer cleanliness) {
+        if (cleanliness != null) {
+            this.cleanliness = cleanliness;
+        }
+    }
+
+    private void updateDeafening(Integer deafening) {
+        if (deafening != null) {
+            this.deafening = deafening;
+        }
+    }
+
+    private void updateFixtureStatus(Integer fixturesStatus) {
+        if (fixturesStatus != null) {
+            this.fixturesStatus = fixturesStatus;
+        }
+    }
+
+    public void update(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total){
+        updateCleanliness(cleanliness);
+        updateDeafening(deafening);
+        updateFixtureStatus(fixturesStatus);
+        updateTotal(total);
     }
 }
