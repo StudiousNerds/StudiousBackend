@@ -135,9 +135,9 @@ public class PaymentService {
 
     @Transactional
     public void adminCancel(final AdminCancelRequest adminCancelRequest, final Long reservationId) {
-        ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
-        Payment payment = reservationRecord.getPayment();
-        CancelRequest cancelRequest = CancelRequest.builder()
+        final ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
+        final Payment payment = reservationRecord.getPayment();
+        final CancelRequest cancelRequest = CancelRequest.builder()
                 .cancelAmount(payment.getPrice())
                 .cancelReason(adminCancelRequest.getCancelReason())
                 .build();
