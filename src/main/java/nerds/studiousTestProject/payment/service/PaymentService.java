@@ -127,8 +127,9 @@ public class PaymentService {
         reservationRecord.getRoom().getStudycafe().cancelReservation();
     }
 
-    private void validMatchCancelAmount(Payment payment, PaymentResponseFromToss responseFromToss) {
-        if (responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum() != payment.getPrice()){
+    private void validMatchCancelAmount(final Payment payment, final PaymentResponseFromToss responseFromToss) {
+        final int responseTotalCancelAmount = responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum();
+        if (responseTotalCancelAmount != payment.getPrice()){
             throw new BadRequestException(MISMATCH_CANCEL_PRICE);
         }
     }
