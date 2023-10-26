@@ -22,6 +22,8 @@ import java.net.URI;
 @Slf4j
 public class PaymentController {
 
+    private static final String REDIRECT_URI_TO_RESERVATION = "/api/v1/mypage/reservations/";
+
     private final PaymentService paymentService;
 
     @PostMapping("/success")
@@ -29,7 +31,7 @@ public class PaymentController {
                                                        @RequestParam String paymentKey,
                                                        @RequestParam Integer amount) {
         Long reservationRecordId = paymentService.confirmSuccess(orderId, paymentKey, amount);
-        return ResponseEntity.created(URI.create("/api/v1/mypage/reservations/" + reservationRecordId)).build();
+        return ResponseEntity.created(URI.create(REDIRECT_URI_TO_RESERVATION + reservationRecordId)).build();
     }
 
     @PostMapping("/fail")
