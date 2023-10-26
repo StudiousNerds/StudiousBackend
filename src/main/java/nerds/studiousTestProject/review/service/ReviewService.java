@@ -329,7 +329,7 @@ public class ReviewService {
         return  reservationRecordList.stream()
                 .filter(reservationRecord -> reservationRecord.getReview() == null &&
                         !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewInfo.of(reservationRecord))
+                .map(reservationRecord -> AvailableReviewInfo.from(reservationRecord))
                 .sorted(Comparator.comparing(AvailableReviewInfo::getDate).reversed())
                 .collect(Collectors.toList());
     }

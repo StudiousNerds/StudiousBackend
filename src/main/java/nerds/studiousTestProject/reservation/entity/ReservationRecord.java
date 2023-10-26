@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.member.entity.member.Member;
@@ -71,8 +72,12 @@ public class ReservationRecord {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Builder
-    public ReservationRecord(Long id, Member member, String userName, String userPhoneNumber, LocalDate date, LocalTime startTime, LocalTime endTime, Integer usingTime, Integer headCount, ReservationStatus status, String request, Room room, Review review) {
+    public ReservationRecord(Long id, Member member, String userName, String userPhoneNumber, LocalDate date, LocalTime startTime, LocalTime endTime, Integer usingTime, Integer headCount, ReservationStatus status, String request, Room room, Review review, Payment payment) {
         this.id = id;
         this.member = member;
         this.userName = userName;
@@ -86,6 +91,7 @@ public class ReservationRecord {
         this.request = request;
         this.room = room;
         this.review = review;
+        this.payment = payment;
     }
 
     public void completePay() {
@@ -117,6 +123,18 @@ public class ReservationRecord {
     public void setRoom(Room room) {
         if (room != null) {
             this.room = room;
+        }
+    }
+
+    public void updateHeadCount(final Integer headCount) {
+        if (headCount != null) {
+            this.headCount = headCount;
+        }
+    }
+
+    public void updatePayment(Payment payment) {
+        if (payment != null) {
+            this.payment = payment;
         }
     }
 }

@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.convenience.entity.ConvenienceRecord;
 import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
+import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
+import nerds.studiousTestProject.payment.util.totoss.AdminCancelRequest;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.payment.util.totoss.CancelRequest;
@@ -16,17 +18,14 @@ import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailRespons
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
-import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_ORDER_ID;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_CONVENIENCE_RECORD;
 import static nerds.studiousTestProject.payment.entity.PaymentMethod.VIRTUAL_ACCOUNT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAYMENT_SECRET;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PAYMENT_METHOD;
@@ -35,6 +34,9 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.CANCELED;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.DONE;
 import static nerds.studiousTestProject.payment.entity.PaymentStatus.WAITING_FOR_DEPOSIT;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CONFIRM;
+import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.INQUIRY;
 
 
 @RequiredArgsConstructor
@@ -48,92 +50,116 @@ public class PaymentService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final ConvenienceRecordRepository convenienceRecordRepository;
 
-    private static final String CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String CANCEL_URI = "https://api.tosspayments.com/v1/payments/%s/cancel";
-
-
     @Transactional
-    public ReservationDetailResponse confirmSuccess(String orderId, String paymentKey, Integer amount) {
+    public Long confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), new ConfirmSuccessRequest(orderId, paymentKey, amount));
         payment.complete(responseFromToss.toPayment());
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationRecordByPaymentIdWithPlace(payment.getId());
         reservationRecord.completePay();
-        return createReservationDetailResponse(payment, reservationRecord);
+        reservationRecord.getRoom().getStudycafe().updateAccumReserveCount();
+        return reservationRecord.getId();
     }
 
-    private void validConfirmRequest(String orderId, Integer amount, Payment payment){
+    private ReservationRecord findReservationRecordByPaymentIdWithPlace(Long paymentId) {
+        return reservationRecordRepository.findByPaymentWithPlace(paymentId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
+    }
+
+    private void validConfirmRequest(final String orderId, final Integer amount, final Payment payment){
         if(!amount.equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
         if(!orderId.equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
     }
 
-    private ReservationDetailResponse createReservationDetailResponse(Payment payment, ReservationRecord reservationRecord) {
-        Room room = reservationRecord.getRoom();
-        Studycafe studycafe = room.getStudycafe();
-        return ReservationDetailResponse.of(reservationRecord, studycafe, room, payment);
-    }
-
     @Transactional
-    public VirtualAccountInfoResponse virtualAccount(String orderId, String paymentKey, Integer amount) {
+    public VirtualAccountInfoResponse virtualAccount(final String orderId, final String paymentKey, final Integer amount) {
         Payment payment = findByOrderId(orderId);
         validConfirmRequest(orderId, amount, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(new ConfirmSuccessRequest(orderId, paymentKey, amount), CONFIRM_URI);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(INQUIRY.getUriFormat(paymentKey));
         validPaymentMethod(responseFromToss);
-        payment.complete(responseFromToss.toVitualAccountPayment());
+        payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
         return VirtualAccountInfoResponse.from(payment);
     }
 
-    private void validPaymentMethod(PaymentResponseFromToss responseFromToss) {
+    private void validPaymentMethod(final PaymentResponseFromToss responseFromToss) {
         if (!responseFromToss.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             throw new BadRequestException(MISMATCH_PAYMENT_METHOD);
         }
     }
 
+    /**
+     * 지금은 결제 실패시 무조건 예약 내역, 결제 삭제
+     * 예약 변경 중 실패한다면 롤백할 필요가 있어보임
+     * 변경 기록 중 reservation Id 가 동일한게 있다면 -> 최근 변경 기록 전으로 롤백하는 기능추가가 필요해 보임
+     * @param message
+     * @param orderId
+     * @return
+     */
     @Transactional
-    public ConfirmFailResponse confirmFail(String message, String orderId){
-        Payment payment = findByOrderId(orderId);
-        ReservationRecord reservationRecord = payment.getReservationRecord();
-        ConvenienceRecord convenienceRecord = findConvenienceRecordByReservationRecord(reservationRecord);
-        convenienceRecordRepository.delete(convenienceRecord);
-        reservationRecordRepository.delete(reservationRecord);
+    public ConfirmFailResponse confirmFail(final String message, final String orderId){
+        final Payment payment = findByOrderId(orderId);
+        reservationRecordRepository.delete(findReservationRecordByPayment(payment));
+        //convenienceRecordRepository.findAllByPayment(payment).stream().forEach(convenience -> convenienceRecordRepository.delete(convenience));
         paymentRepository.delete(payment);
         return ConfirmFailResponse.of(message);
     }
 
-    private ConvenienceRecord findConvenienceRecordByReservationRecord(ReservationRecord reservationRecord) {
-        return convenienceRecordRepository.findByReservationRecord(reservationRecord).orElseThrow(()-> new NotFoundException(NOT_FOUND_CONVENIENCE_RECORD));
+    private ReservationRecord findReservationRecordByPayment(Payment payment) {
+        return reservationRecordRepository.findByPayment(payment).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
     @Transactional
-    public void cancel(CancelRequest cancelRequest, Long reservationId){
-        ReservationRecord reservationRecord = findReservationById(reservationId);
-        Payment payment = findByReservationRecord(reservationRecord);
-        validPaymentMethod(cancelRequest, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(cancelRequest, String.format(CANCEL_URI, payment.getPaymentKey()));
-        payment.cancel(responseFromToss);
-        reservationRecord.canceled(); //결제 취소 상태로 변경
+    public void userCancel(final CancelRequest cancelRequest, final Long reservationId){
+        ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
+        Payment payment = reservationRecord.getPayment();
+        //취소 금액 validation 해야 하는데, validate 하는 메서드가 reservationService에 있음 설계 엉망..
+        cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
     }
 
-    private void validPaymentMethod(CancelRequest cancelRequest, Payment payment) {
+    private void cancel(final CancelRequest cancelRequest, final MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
+        validPaymentMethod(cancelRequest, payment);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
+        validMatchCancelAmount(payment, responseFromToss);
+        payment.cancel(responseFromToss, canceler);
+        reservationRecord.canceled();
+        reservationRecord.getRoom().getStudycafe().cancelReservation();
+    }
+
+    private void validMatchCancelAmount(final Payment payment, final PaymentResponseFromToss responseFromToss) {
+        final int responseTotalCancelAmount = responseFromToss.getCancels().stream().mapToInt(Cancel::getCancelAmount).sum();
+        if (responseTotalCancelAmount != payment.getPrice()){
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
+        }
+    }
+
+    @Transactional
+    public void adminCancel(final AdminCancelRequest adminCancelRequest, final Long reservationId) {
+        final ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
+        final Payment payment = reservationRecord.getPayment();
+        final CancelRequest cancelRequest = CancelRequest.builder()
+                .cancelAmount(payment.getPrice())
+                .cancelReason(adminCancelRequest.getCancelReason())
+                .build();
+        cancel(cancelRequest, MemberRole.ADMIN, reservationRecord, payment);
+    }
+
+    private ReservationRecord findReservationRecordByIdWithPayment(Long reservationId) {
+        return reservationRecordRepository.findByIdWithPayment(reservationId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
+    private void validPaymentMethod(final CancelRequest cancelRequest, final Payment payment) {
         if (payment.getMethod().equals(VIRTUAL_ACCOUNT.getValue())) {
             cancelRequest.getRefundReceiveAccount().validRefundVirtualAccountPay();
         }
     }
 
-    private Payment findByReservationRecord(ReservationRecord reservationRecord) {
-        return paymentRepository.findByReservationRecord(reservationRecord).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
-    }
-
-    private ReservationRecord findReservationById(Long reservationId) {
-        return reservationRecordRepository.findById(reservationId).orElseThrow(()-> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
-    public void processDepositByStatus(DepositCallbackRequest depositCallbackRequest) {
+    public void processDepositByStatus(final DepositCallbackRequest depositCallbackRequest) {
         Payment payment = findByOrderId(depositCallbackRequest.getOrderId());
-        String status = depositCallbackRequest.getStatus();
-        ReservationRecord reservationRecord = payment.getReservationRecord();
+        ReservationRecord reservationRecord = findReservationRecordByPayment(payment);
+        final String status = depositCallbackRequest.getStatus();
         if(isDepositError(payment, status)){ // 입금 오류
             //입금 오류에 관한 알림 전송
             reservationRecord.depositError();
@@ -149,18 +175,17 @@ public class PaymentService {
         payment.updateStatus(PaymentStatus.valueOf(status));
     }
 
-    private boolean isDepositError(Payment payment, String status) {
+    private boolean isDepositError(final Payment payment, final String status) {
         return status.equals(WAITING_FOR_DEPOSIT.name()) && payment.getStatus().equals(DONE);
     }
 
-    private void validPaymentSecret(DepositCallbackRequest depositCallbackRequest, Payment payment) {
+    private void validPaymentSecret(final DepositCallbackRequest depositCallbackRequest, final Payment payment) {
         if (!payment.getSecret().equals(depositCallbackRequest.getSecret())) {
             throw new BadRequestException(INVALID_PAYMENT_SECRET);
         }
     }
 
-    private Payment findByOrderId(String orderId) {
+    private Payment findByOrderId(final String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
-
 }

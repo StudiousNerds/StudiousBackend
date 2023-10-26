@@ -9,7 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +18,7 @@ import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.util.fromtoss.PaymentResponseFromToss;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -60,7 +61,8 @@ public class Payment {
     private String virtualAccount;
 
     @Column(name = "bank_code")
-    private String bankCode;
+    @Enumerated(EnumType.STRING)
+    private BankCode bankCode;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
@@ -69,14 +71,12 @@ public class Payment {
     private String secret;
 
     @Column(name = "canceler")
+    @Enumerated(EnumType.STRING)
     private MemberRole canceler;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_record_id", nullable = false)
-    private ReservationRecord reservationRecord;
 
     @Builder
-    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, String bankCode, LocalDateTime dueDate, String secret, MemberRole canceler, ReservationRecord reservationRecord) {
+    public Payment(Long id, String orderId, String paymentKey, String method, LocalDateTime completeTime, Integer price, PaymentStatus status, String cancelReason, String virtualAccount, BankCode bankCode, LocalDateTime dueDate, String secret, MemberRole canceler) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -90,15 +90,16 @@ public class Payment {
         this.dueDate = dueDate;
         this.secret = secret;
         this.canceler = canceler;
-        this.reservationRecord = reservationRecord;
     }
 
 
-    public void cancel(PaymentResponseFromToss responseFromToss) {
-        String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
+
+    public void cancel(final PaymentResponseFromToss responseFromToss, final MemberRole canceler) {
+        final String cancelReason = responseFromToss.getCancels().get(0).getCancelReason();
         if (cancelReason != null) this.cancelReason = cancelReason;
-        if (!status.equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
+        if (!responseFromToss.getStatus().equals(CANCELED.name())) throw new BadRequestException(PAYMENT_NOT_CANCELED);
         this.status = CANCELED;
+        if (canceler != null) this.canceler = MemberRole.USER;
     }
 
     public void updateStatus(PaymentStatus paymentStatus) {
@@ -151,7 +152,7 @@ public class Payment {
         }
     }
 
-    private void updateBankCode(String bankCode) {
+    private void updateBankCode(BankCode bankCode) {
         if (bankCode != null) {
             this.bankCode = bankCode;
         }

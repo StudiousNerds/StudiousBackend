@@ -1,5 +1,11 @@
 package nerds.studiousTestProject.payment.entity;
 
+import nerds.studiousTestProject.common.exception.BadRequestException;
+
+import java.util.Arrays;
+
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_BANK_CODE;
+
 public enum BankCode {
 
     경남은행("39"),
@@ -35,7 +41,14 @@ public enum BankCode {
         this.bankCode = bankCode;
     }
 
-    public static String getBankName(String bankCode){
-        return BankCode.valueOf(bankCode).name();
+    public static BankCode from(String bankCode){
+        return Arrays.stream(BankCode.values())
+                .filter(code -> code.getBankCode().equals(bankCode))
+                .findAny()
+                .orElseThrow(() -> new BadRequestException(INVALID_BANK_CODE));
+    }
+
+    public String getBankCode() {
+        return bankCode;
     }
 }
