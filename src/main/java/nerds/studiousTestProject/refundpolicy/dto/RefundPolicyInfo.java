@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto;
+package nerds.studiousTestProject.refundpolicy.dto;
 
 import lombok.Builder;
 import lombok.Getter;

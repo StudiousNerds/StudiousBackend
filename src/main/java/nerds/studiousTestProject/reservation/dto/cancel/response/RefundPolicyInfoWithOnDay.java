@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 @Builder
 public class RefundPolicyInfoWithOnDay {
 
-    private List<RefundPolicyInfo> refundPolicy;
-    private RefundPolicyInfo refundPolicyOnDay;
+    private List<RefundPolicyInfo> refundPolicies;
+    private RefundPolicyInfo onDay;
 
     public static RefundPolicyInfoWithOnDay of(List<RefundPolicy> refundPolicies, RefundPolicy refundPolicyOnDay) {
         return RefundPolicyInfoWithOnDay.builder()
-                .refundPolicy(refundPolicies.stream().map(RefundPolicyInfo::from).collect(Collectors.toList()))
-                .refundPolicyOnDay(RefundPolicyInfo.from(refundPolicyOnDay))
+                .refundPolicies(refundPolicies.stream().map(RefundPolicyInfo::from).collect(Collectors.toList()))
+                .onDay(RefundPolicyInfo.from(refundPolicyOnDay))
                 .build();
     }
 }
