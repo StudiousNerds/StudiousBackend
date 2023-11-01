@@ -107,15 +107,17 @@ public class ReviewService {
     public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
         Review review = findReviewById(reviewId);
         Studycafe studycafe = findStudycafeById(modifyReviewRequest);
+        Double modifiedTotal = getTotal(modifyReviewRequest.getCleanliness(), modifyReviewRequest.getDeafening(), modifyReviewRequest.getFixtureStatus());
 
         Grade grade = review.getGrade();
         grade.update(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-                getTotal(modifyReviewRequest.getCleanliness(), modifyReviewRequest.getDeafening(), modifyReviewRequest.getFixtureStatus()));
+                modifiedTotal);
+        studycafe.updateGrade(modifiedTotal);
 
+        deleteHashtagRecords(reviewId, studycafe);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
-//        deleteAllHashtagRecord(reviewId);
         updateHashtagRecord(modifyReviewRequest.getHashtags(), review, studycafe);
 
         deleteAllPhotos(reviewId);
@@ -141,16 +143,16 @@ public class ReviewService {
         Review review = findReviewById(reviewId);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
-        List<AccumHashtagHistory> studycafeAccumHashtag = accumHashtagHistoryRepository.findAllByStudycafe(studycafe);
-
+        deleteHashtagRecords(reviewId, studycafe);
         deleteGradeRecord(studycafe, review.getGrade().getTotal());
-        deleteAllHashtagRecord(reviewId, studycafeAccumHashtag);
+
         deleteAllPhotos(reviewId);
         reservationRecord.deleteReview();
         reviewRepository.deleteById(reviewId);
 
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
+
 
 
     /**
@@ -379,6 +381,11 @@ public class ReviewService {
         studycafe.deleteGrade(gradeTotal);
     }
 
+    private void deleteHashtagRecords(Long reviewId, Studycafe studycafe) {
+        List<AccumHashtagHistory> studycafeAccumHashtag = accumHashtagHistoryRepository.findAllByStudycafe(studycafe);
+        deleteAllHashtagRecord(reviewId, studycafeAccumHashtag);
+    }
+
     private Member getMember(Review review) {
         return findReservationRecordByReviewId(review.getId()).getMember();
     }
@@ -485,14 +492,14 @@ public class ReviewService {
                     .build();
             review.addHashtagRecord(hashtagRecord);
 
-            validateExistedAccumHashtag(userHashtag);
+            validateExistedAccumHashtag(studycafe, userHashtag);
             AccumHashtagHistory hashtagHistory = AccumHashtagHistory.builder().count(1).name(HashtagName.valueOf(userHashtag)).build();
             studycafe.addAccumHashtagHistory(hashtagHistory);
         }
     }
 
-    private void validateExistedAccumHashtag(String userHashtag) {
-        if (accumHashtagHistoryRepository.existsByHashtagName(HashtagName.valueOf(userHashtag))) {
+    private void validateExistedAccumHashtag(Studycafe studycafe, String userHashtag) {
+        if (accumHashtagHistoryRepository.existsByStudycafeAndHashtagName(studycafe,HashtagName.valueOf(userHashtag))) {
             AccumHashtagHistory hashtagHistory = findAccumHashtagHistoryByName(userHashtag);
             hashtagHistory.updateCount();
         }
