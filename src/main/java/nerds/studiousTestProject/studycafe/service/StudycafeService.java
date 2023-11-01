@@ -13,6 +13,7 @@ import nerds.studiousTestProject.hashtag.repository.HashtagRecordRepository;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.member.repository.MemberRepository;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
@@ -103,11 +104,20 @@ public class StudycafeService {
      * 해당 메소드에서 추가적으로 잘못 입력된 값에 대한 예외처리를 진행
      * @return 검색 결과
      */
-    public List<SearchResponse> enquiry(String keyword, LocalDate date, LocalTime startTime, LocalTime endTime, Integer headCount, Integer minGrade, List<HashtagName> hashtags, List<ConvenienceName> conveniences, SearchSortType sortType, Pageable pageable) {
-        List<LocalDate> holidays = holidayProvider.getHolidays();
-        Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
+    public List<SearchResponse> enquiry(final String keyword,
+                                        final LocalDate date,
+                                        final LocalTime startTime,
+                                        final LocalTime endTime,
+                                        final Integer headCount,
+                                        final Integer minGrade,
+                                        final List<HashtagName> hashtags,
+                                        final List<ConvenienceName> conveniences,
+                                        final SearchSortType sortType,
+                                        final Pageable pageable) {
+        final List<LocalDate> holidays = holidayProvider.getHolidays();
+        final Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
 
-        SearchRequest searchRequest = SearchRequest.builder()
+        final SearchRequest searchRequest = SearchRequest.builder()
                 .keyword(keyword)
                 .date(date)
                 .week(week)
@@ -120,12 +130,12 @@ public class StudycafeService {
                 .sortType(sortType)
                 .build();
 
-        List<SearchResponseInfo> searchResponseInfos = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
+        final List<SearchResponseInfo> searchResponseInfos = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
         return searchResponseInfos.stream().map(s -> SearchResponse.from(s, getAllHashtagNames(s), getAccumRevCnt(s), getGrade(s))).toList();
     }
 
-    public FindStudycafeResponse findByDate(Long studycafeId, LocalDate date){
-        Studycafe studycafe = findStudycafeById(studycafeId);
+    public FindStudycafeResponse findByDate(final Long studycafeId, final LocalDate date){
+        final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return FindStudycafeResponse.builder()
                 .studycafeId(studycafe.getId())
@@ -142,22 +152,22 @@ public class StudycafeService {
                 .build();
     }
 
-    public List<RefundPolicyInfo> findRefundPolicy(Long studycafeId) {
+    public List<RefundPolicyInfo> findRefundPolicy(final Long studycafeId) {
         return getRefundPolicy(studycafeId);
     }
 
-    public List<String> findNotice(Long studycafeId) {
+    public List<String> findNotice(final Long studycafeId) {
         return getNotice(studycafeId);
     }
 
     public MainPageResponse getMainPage() {
-        List<RecommendCafeInfo> recommendStduycafes = getRecommendStudycafes();
-        List<EventCafeInfo> eventStudycafes = getEventStudycafes();
-        return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
+        final List<RecommendCafeInfo> recommendStudycafes = getRecommendStudycafes();
+        final List<EventCafeInfo> eventStudycafes = getEventStudycafes();
+        return MainPageResponse.builder().recommend(recommendStudycafes).event(eventStudycafes).build();
     }
 
     public List<RecommendCafeInfo> getRecommendStudycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
+        final List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
 
         return topTenCafeList.stream()
                 .map(studycafe -> RecommendCafeInfo.builder()
@@ -174,7 +184,7 @@ public class StudycafeService {
     }
 
     public List<EventCafeInfo> getEventStudycafes(){
-        List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
+        final List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
 
         return topTenCafeList.stream()
                 .map(studycafe -> EventCafeInfo.builder()
@@ -190,14 +200,14 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getNotice(Long studycafeId) {
-        Studycafe studycafe = findStudycafeById(studycafeId);
+    public List<String> getNotice(final Long studycafeId) {
+        final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getNotices().stream().map(Notice::getDetail).toList();
     }
 
-    public List<String> getConveniences(Long studycafeId) {
-        Studycafe studycafe = findStudycafeById(studycafeId);
+    public List<String> getConveniences(final Long studycafeId) {
+        final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getConveniences().stream()
                 .map(Convenience::getName)
@@ -205,42 +215,42 @@ public class StudycafeService {
                 .toList();
     }
 
-    public List<RefundPolicyInfo> getRefundPolicy(Long studycafeId) {
-        Studycafe studycafe = findStudycafeById(studycafeId);
+    public List<RefundPolicyInfo> getRefundPolicy(final Long studycafeId) {
+        final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getRefundPolicies().stream()
                 .map(RefundPolicyInfo::from)
                 .collect(Collectors.toList());
     }
 
-    public List<AnnouncementInResponse> getAnnouncement(Long studycafeId) {
-        Studycafe studycafe = findStudycafeById(studycafeId);
+    public List<AnnouncementInResponse> getAnnouncement(final Long studycafeId) {
+        final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getAnnouncements().stream()
                 .map(AnnouncementInResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private List<String> findHashtagById(Long studycafeId) {
-        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+    private List<String> findHashtagById(final Long studycafeId) {
+        final List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
 
-        int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
+        final int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<String> hashtagNameList = new ArrayList<>();
+        final List<String> hashtagNameList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             hashtagNameList.add(hashtagNames.get(i).name());
         }
         return hashtagNameList;
     }
 
-    private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
+    private int getAccumRevCnt(final SearchResponseInfo searchResponseInfo) {
         int total = 0;
-        Integer reflectedAccumRevCnt = searchResponseInfo.getReflectedAccumRevCnt();
+        final Integer reflectedAccumRevCnt = searchResponseInfo.getReflectedAccumRevCnt();
         if (reflectedAccumRevCnt != null) {
             total += reflectedAccumRevCnt;
         }
 
-        Integer accumRevCnt = searchResponseInfo.getAccumRevCnt();
+        final Integer accumRevCnt = searchResponseInfo.getAccumRevCnt();
         if (accumRevCnt != null) {
             total += accumRevCnt;
         }
@@ -248,22 +258,20 @@ public class StudycafeService {
         return total;
     }
 
-    private double getGrade(SearchResponseInfo searchResponseInfo) {
-        Double reflectedGradeSum = searchResponseInfo.getReflectedGradeSum();
-        Double gradeSum = searchResponseInfo.getGradeSum();
-        double sum = (reflectedGradeSum != null ? reflectedGradeSum : 0.) + (gradeSum != null ? gradeSum : 0.);
+    private double getGrade(final SearchResponseInfo searchResponseInfo) {
+        final Double reflectedGradeSum = searchResponseInfo.getReflectedGradeSum();
+        final Double gradeSum = searchResponseInfo.getGradeSum();
+        final double sum = (reflectedGradeSum != null ? reflectedGradeSum : 0.) + (gradeSum != null ? gradeSum : 0.);
 
-        Integer reflectedGradeCount = searchResponseInfo.getReflectedGradeCount();
-        Integer gradeCount = searchResponseInfo.getGradeCount();
-        int count = (reflectedGradeCount != null ? reflectedGradeCount : 0) + (gradeCount != null ? gradeCount : 0);
+        final Integer reflectedGradeCount = searchResponseInfo.getReflectedGradeCount();
+        final Integer gradeCount = searchResponseInfo.getGradeCount();
+        final int count = (reflectedGradeCount != null ? reflectedGradeCount : 0) + (gradeCount != null ? gradeCount : 0);
 
-        count = Math.max(count, 1); // count 값이 0인 경우 NaN이 발생하는 오류 핸들링
-
-        return sum / count;
+        return sum / Math.max(count, 1); // count 값이 0인 경우 NaN이 발생하는 오류 핸들링
     }
 
-    private List<HashtagName> getAllHashtagNames(SearchResponseInfo searchResponseInfo) {
-        List<HashtagName> hashtagNames = new ArrayList<>();
+    private List<HashtagName> getAllHashtagNames(final SearchResponseInfo searchResponseInfo) {
+        final List<HashtagName> hashtagNames = new ArrayList<>();
 
         if (searchResponseInfo.getAccumHashtags() != null) {
             hashtagNames.addAll(Arrays.stream(searchResponseInfo.getAccumHashtags().split(",")).map(HashtagName::valueOf).toList());
@@ -276,41 +284,43 @@ public class StudycafeService {
         return hashtagNames;
     }
 
-    private Integer getAccumRevCnt(Long studycafeId) {
+    private Integer getAccumRevCnt(final Long studycafeId) {
         return findAllReservationRecordByStudycafeId(studycafeId).size();
     }
 
-    private List<ReservationRecord> findAllReservationRecordByStudycafeId(Long studycafeId) {
+    private List<ReservationRecord> findAllReservationRecordByStudycafeId(final Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 
-    private Double getTotalGrade(Long studycafeId) {
+    private Double getTotalGrade(final Long studycafeId) {
         return reviewService.getAvgGrade(studycafeId);
     }
 
-    private Studycafe findStudycafeById(Long studycafeId) {
+    private Studycafe findStudycafeById(final Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    public ValidResponse validateAccountInfo(AccountInfoRequest accountInfoRequest) {
+    public ValidResponse validateAccountInfo(final AccountInfoRequest accountInfoRequest) {
         return cafeRegistrationValidator.getAccountInfoValidResponse(accountInfoRequest);
     }
 
-    public ValidResponse validateBusinessInfo(BusinessInfoRequest businessInfoRequest) {
+    public ValidResponse validateBusinessInfo(final BusinessInfoRequest businessInfoRequest) {
         return cafeRegistrationValidator.getBusinessInfoValidResponse(businessInfoRequest);
     }
 
     @Transactional
-    public RegisterResponse register(Long memberId, RegisterRequest registerRequest, MultiValueMap<String, MultipartFile> multipartFileMap) {
-        CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
-        List<RoomInfoRequest> roomInfos = registerRequest.getRoomInfos();
+    public RegisterResponse register(final Long memberId,
+                                     final RegisterRequest registerRequest,
+                                     final MultiValueMap<String, MultipartFile> multipartFileMap) {
+        final CafeInfoRequest cafeInfo = registerRequest.getCafeInfo();
+        final List<RoomInfoRequest> roomInfos = registerRequest.getRoomInfos();
         validatePhotos(multipartFileMap, roomInfos);    // 사진에 대한 검증
 
-        Member member = findMemberById(memberId);     // 현재 로그인된 유저 정보를 가져온다.
+        final Member member = findMemberById(memberId);     // 현재 로그인된 유저 정보를 가져온다.
 
         // 위도, 경도 정보를 통해 역 정보를 가져온다.
-        NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
-        Studycafe studycafe = cafeInfo.toStudycafe(member, nearestStationInfoResponse);
+        final NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
+        final Studycafe studycafe = cafeInfo.toStudycafe(member, nearestStationInfoResponse);
         addStudycafeInfos(multipartFileMap, cafeInfo, studycafe);   // 스터디카페 관련 정보들을 등록
 
         addRoomInfos(roomInfos, multipartFileMap, studycafe);   // 룸 정보 등록
@@ -322,28 +332,30 @@ public class StudycafeService {
                 .build();
     }
 
-    private void validatePhotos(MultiValueMap<String, MultipartFile> multipartFileMap, List<RoomInfoRequest> roomInfoRequests) {
+    private void validatePhotos(final MultiValueMap<String, MultipartFile> multipartFileMap, final List<RoomInfoRequest> roomInfoRequests) {
         // 카페 대표 사진이 없는 경우
         if (!multipartFileMap.containsKey(CAFE_MAIN_PHOTO_KEY) || multipartFileMap.get(CAFE_MAIN_PHOTO_KEY).size() != 1) {
             throw new BadRequestException(INVALID_CAFE_MAIN_PHOTO_SIZE);
         }
 
         // 룸 사진 개수가 DTO의 룸 개수와 다른 경우
-        int size = roomInfoRequests.size();
-        long count = multipartFileMap.keySet().stream().filter(f -> f.contains(ROOM_PHOTOS_KEY)).count();
+        final int size = roomInfoRequests.size();
+        final long count = multipartFileMap.keySet().stream().filter(f -> f.contains(ROOM_PHOTOS_KEY)).count();
         if (size != count) {
             throw new BadRequestException(INVALID_ROOM_PHOTOS);
         }
 
         for (int i = 0; i < size; i++) {
-            List<MultipartFile> multipartFiles = multipartFileMap.get(ROOM_PHOTOS_KEY + i);
+            final List<MultipartFile> multipartFiles = multipartFileMap.get(ROOM_PHOTOS_KEY + i);
             if (multipartFiles == null || multipartFiles.isEmpty()) {
                 throw new BadRequestException(INVALID_ROOM_PHOTOS);
             }
         }
     }
 
-    private void addStudycafeInfos(MultiValueMap<String, MultipartFile> multipartFileMap, CafeInfoRequest cafeInfo, Studycafe studycafe) {
+    private void addStudycafeInfos(final MultiValueMap<String, MultipartFile> multipartFileMap,
+                                   final CafeInfoRequest cafeInfo,
+                                   final Studycafe studycafe) {
         addCafeMainPhoto(multipartFileMap, studycafe);  // 카페 메인 사진 등록
         addCafeSubPhotos(multipartFileMap, studycafe);  // 카페 서브 사진 등록
         addNotices(cafeInfo, studycafe);                // 유의 사항 등록
@@ -352,86 +364,89 @@ public class StudycafeService {
         addCafeConveniences(cafeInfo, studycafe);       // 카페 편의시설 정보 등록
     }
 
-    private void addCafeMainPhoto(MultiValueMap<String, MultipartFile> multipartFileMap, Studycafe studycafe) {
-        String cafeMainPhoto = storageProvider.uploadFile(multipartFileMap.getFirst(CAFE_MAIN_PHOTO_KEY));
+    private void addCafeMainPhoto(final MultiValueMap<String, MultipartFile> multipartFileMap, final Studycafe studycafe) {
+        final String cafeMainPhoto = storageProvider.uploadFile(multipartFileMap.getFirst(CAFE_MAIN_PHOTO_KEY));
         studycafe.updatePhoto(cafeMainPhoto);   // 카페 메인 사진 등록
     }
 
-    private NearestStationInfoResponse getNearestStationInfoResponse(CafeInfoRequest cafeInfo) {
-        String latitude = cafeInfo.getAddressInfo().getLatitude();
-        String longitude = cafeInfo.getAddressInfo().getLongitude();
+    private NearestStationInfoResponse getNearestStationInfoResponse(final CafeInfoRequest cafeInfo) {
+        final String latitude = cafeInfo.getAddressInfo().getLatitude();
+        final String longitude = cafeInfo.getAddressInfo().getLongitude();
         return nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
     }
 
-    private void addCafeSubPhotos(MultiValueMap<String, MultipartFile> multipartFileMap, Studycafe studycafe) {
-        List<MultipartFile> cafeSubPhotos = multipartFileMap.get(CAFE_SUB_PHOTOS_KEY);
+    private void addCafeSubPhotos(final MultiValueMap<String, MultipartFile> multipartFileMap, final Studycafe studycafe) {
+        final List<MultipartFile> cafeSubPhotos = multipartFileMap.get(CAFE_SUB_PHOTOS_KEY);
         for (MultipartFile cafeSubPhoto : cafeSubPhotos) {
-            String photoUrl = storageProvider.uploadFile(cafeSubPhoto);
+            final String photoUrl = storageProvider.uploadFile(cafeSubPhoto);
             studycafe.addSubPhoto(SubPhoto.builder().path(photoUrl).type(STUDYCAFE).build());
         }
     }
 
-    private void addRoomInfos(List<RoomInfoRequest> roomInfoRequests, MultiValueMap<String, MultipartFile> multipartFileMap, Studycafe studycafe) {
+    private void addRoomInfos(final List<RoomInfoRequest> roomInfoRequests,
+                              final MultiValueMap<String, MultipartFile> multipartFileMap,
+                              final Studycafe studycafe) {
         for (int i = 0; i < roomInfoRequests.size(); i++) {
-            RoomInfoRequest roomInfoRequest = roomInfoRequests.get(i);
-            Room room = roomInfoRequest.toEntity();
+            final RoomInfoRequest roomInfoRequest = roomInfoRequests.get(i);
+            final Room room = roomInfoRequest.toEntity();
+            final List<ConvenienceInfoRequest> convenienceInfos = roomInfoRequest.getConvenienceInfos();
 
             addRoomSubPhotos(multipartFileMap, ROOM_PHOTOS_KEY + i, room);  // 룸 사진 등록
-            addRoomConveniences(roomInfoRequest, room); // 룸 편의시설 정보 등록
+            addRoomConveniences(convenienceInfos, room); // 룸 편의시설 정보 등록
             studycafe.addRoom(room);
         }
     }
 
-    private void addRoomConveniences(RoomInfoRequest roomInfoRequest, Room room) {
-        List<ConvenienceInfoRequest> roomConveniences = roomInfoRequest.getConvenienceInfos();
-        for (ConvenienceInfoRequest convenienceInfoRequest : roomConveniences) {
+    private void addRoomConveniences(final List<ConvenienceInfoRequest> convenienceInfoRequests, final Room room) {
+        for (ConvenienceInfoRequest convenienceInfoRequest : convenienceInfoRequests) {
             room.addConvenience(convenienceInfoRequest.toEntity());
         }
     }
 
-    private void addRoomSubPhotos(MultiValueMap<String, MultipartFile> multipartFileMap, String key, Room room) {
-        List<MultipartFile> roomSubPhotos = multipartFileMap.get(key);
+    private void addRoomSubPhotos(final MultiValueMap<String, MultipartFile> multipartFileMap,
+                                  final String key,
+                                  final Room room) {
+        final List<MultipartFile> roomSubPhotos = multipartFileMap.get(key);
         for (MultipartFile roomSubPhoto : roomSubPhotos) {
-            String roomSubPhotoUrl = storageProvider.uploadFile(roomSubPhoto);
+            final String roomSubPhotoUrl = storageProvider.uploadFile(roomSubPhoto);
             room.addSubPhoto(SubPhoto.builder().path(roomSubPhotoUrl).type(ROOM).build());
         }
     }
 
-    private void addCafeConveniences(CafeInfoRequest cafeInfo, Studycafe studycafe) {
-        List<ConvenienceInfoRequest> cafeConveniences = cafeInfo.getConvenienceInfos();
+    private void addCafeConveniences(final CafeInfoRequest cafeInfo, final Studycafe studycafe) {
+        final List<ConvenienceInfoRequest> cafeConveniences = cafeInfo.getConvenienceInfos();
         for (ConvenienceInfoRequest convenienceInfoRequest : cafeConveniences) {
             studycafe.addConvenience(convenienceInfoRequest.toEntity());
         }
     }
 
-    private void addOperationInfos(CafeInfoRequest cafeInfo, Studycafe studycafe) {
-        List<OperationInfoRequest> operationInfoRequests = cafeInfo.getOperationInfos();
+    private void addOperationInfos(final CafeInfoRequest cafeInfo, final Studycafe studycafe) {
+        final List<OperationInfoRequest> operationInfoRequests = cafeInfo.getOperationInfos();
         for (OperationInfoRequest operationInfoRequest : operationInfoRequests) {
             studycafe.addOperationInfo(operationInfoRequest.toEntity());
         }
     }
 
-    private void addRefundPolices(CafeInfoRequest cafeInfo, Studycafe studycafe) {
-        List<RefundPolicyRequest> refundPolicies = cafeInfo.getRefundPolicies();
+    private void addRefundPolices(final CafeInfoRequest cafeInfo, final Studycafe studycafe) {
+        final List<RefundPolicyRequest> refundPolicies = cafeInfo.getRefundPolicies();
         for (RefundPolicyRequest refundPolicyRequest : refundPolicies) {
             studycafe.addRefundPolicy(refundPolicyRequest.toEntity());
         }
     }
 
-    private void addNotices(CafeInfoRequest cafeInfo, Studycafe studycafe) {
-        List<String> details = cafeInfo.getNotices();
-        for (String detail : details) {
+    private void addNotices(final CafeInfoRequest cafeInfo, final Studycafe studycafe) {
+        final List<String> noticeDetails = cafeInfo.getNotices();
+        for (String noticeDetail : noticeDetails) {
             studycafe.addNotice(Notice.builder()
-                    .detail(detail)
+                    .detail(noticeDetail)
                     .studycafe(studycafe)
                     .build()
             );
         }
     }
 
-    public List<CafeBasicInfoResponse> enquiryManagedEntryStudycafes(Long memberId, Pageable pageable) {
-        Member member = findMemberById(memberId);
-
+    public List<CafeBasicInfoResponse> enquiryManagedEntryStudycafes(final Long memberId, final Pageable pageable) {
+        final Member member = findMemberById(memberId);
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
                 .stream().map(CafeBasicInfoResponse::from).toList();
     }
@@ -442,16 +457,15 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 pk
      * @return 등록된 모든 스터디카페 정보
      */
-    public CafeDetailsResponse enquiryManagedStudycafe(Long memberId, Long studycafeId) {
-        Member member = findMemberById(memberId);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-
-        AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
-        List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(OperationInfoResponse::from).toList();
-        List<ConvenienceInfoResponse> convenienceInfoResponses = studycafe.getConveniences().stream().map(ConvenienceInfoResponse::from).toList();
-        List<String> noticeResponses = studycafe.getNotices().stream().map(Notice::getDetail).toList();
-        List<String> photos = getPhotos(studycafe); // 사진 : 메인 사진(단일) + 서브 사진(리스트)
-        List<RefundPolicyResponse> refundPolicyResponses = studycafe.getRefundPolicies().stream().map(RefundPolicyResponse::from).toList();
+    public CafeDetailsResponse enquiryManagedStudycafe(final Long memberId, final Long studycafeId) {
+        final Member member = findMemberById(memberId);
+        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+        final AddressInfoResponse addressInfoResponse = AddressInfoResponse.from(studycafe.getAddress());
+        final List<OperationInfoResponse> operationInfoResponses = studycafe.getOperationInfos().stream().map(OperationInfoResponse::from).toList();
+        final List<ConvenienceInfoResponse> convenienceInfoResponses = studycafe.getConveniences().stream().map(ConvenienceInfoResponse::from).toList();
+        final List<String> noticeResponses = studycafe.getNotices().stream().map(Notice::getDetail).toList();
+        final List<String> photos = getPhotos(studycafe); // 사진 : 메인 사진(단일) + 서브 사진(리스트)
+        final List<RefundPolicyResponse> refundPolicyResponses = studycafe.getRefundPolicies().stream().map(RefundPolicyResponse::from).toList();
 
         return CafeDetailsResponse.builder()
                 .name(studycafe.getName())
@@ -465,11 +479,13 @@ public class StudycafeService {
                 .build();
     }
 
-    private List<String> getPhotos(Studycafe studycafe) {
-        List<String> photos = new ArrayList<>();
+    private List<String> getPhotos(final Studycafe studycafe) {
+        final List<String> photos = new ArrayList<>();
         photos.add(studycafe.getPhoto());
-        List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getPath).toList();
+
+        final List<String> subPhotos = studycafe.getSubPhotos().stream().map(SubPhoto::getPath).toList();
         photos.addAll(subPhotos);
+
         return photos;
     }
 
@@ -480,43 +496,52 @@ public class StudycafeService {
      * @param cafeInfoEditRequest 수정된 데이터
      */
     @Transactional
-    public void modify(Long memberId, Long studycafeId, CafeInfoEditRequest cafeInfoEditRequest) {
-        Member member = findMemberById(memberId);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
+    public void modify(final Long memberId,
+                       final Long studycafeId,
+                       final CafeInfoEditRequest cafeInfoEditRequest) {
+        final Member member = findMemberById(memberId);
+        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
-        String introduction = cafeInfoEditRequest.getIntroduction();
+        final String introduction = cafeInfoEditRequest.getIntroduction();
         if (introduction != null) {
             studycafe.updateIntroduction(introduction);
         }
 
-        List<OperationInfoEditRequest> operationInfoEditRequests = cafeInfoEditRequest.getOperationInfos();
+        final List<OperationInfoEditRequest> operationInfoEditRequests = cafeInfoEditRequest.getOperationInfos();
         if (operationInfoEditRequests != null) {
-            List<OperationInfo> operationInfos = operationInfoEditRequests.stream().map(OperationInfoEditRequest::toEntity).toList();
+            final List<OperationInfo> operationInfos = operationInfoEditRequests.stream()
+                    .map(OperationInfoEditRequest::toEntity)
+                    .toList();
             studycafe.updateOperationInfos(operationInfos);
         }
 
-        List<ConvenienceInfoEditRequest> convenienceInfoEditRequests = cafeInfoEditRequest.getConvenienceInfos();
+        final List<ConvenienceInfoEditRequest> convenienceInfoEditRequests = cafeInfoEditRequest.getConvenienceInfos();
         if (convenienceInfoEditRequests != null) {
-            List<Convenience> conveniences = convenienceInfoEditRequests.stream().map(ConvenienceInfoEditRequest::toEntity).toList();
+            final List<Convenience> conveniences = convenienceInfoEditRequests.stream()
+                    .map(ConvenienceInfoEditRequest::toEntity)
+                    .toList();
             studycafe.updateConveniences(conveniences);
         }
 
         // 사진은 추후
 
-        List<String> notices = cafeInfoEditRequest.getNotices();
-        if (notices != null) {
-            studycafe.updateNotices(notices.stream().map(
-                    n -> Notice.builder()
+        final List<String> noticeRequests = cafeInfoEditRequest.getNotices();
+        if (noticeRequests != null) {
+            List<Notice> notices = noticeRequests.stream()
+                    .map(n -> Notice.builder()
                             .detail(n)
                             .build()
-                    ).toList()
-            );
+                    ).toList();
+            studycafe.updateNotices(notices);
         }
 
-        List<RefundPolicyEditRequest> refundPolicies = cafeInfoEditRequest.getRefundPolicies();
-        if (refundPolicies != null) {
-            studycafe.updateRefundPolices(refundPolicies.stream().map(RefundPolicyEditRequest::toEntity).toList());
+        final List<RefundPolicyEditRequest> refundPolicyRequests = cafeInfoEditRequest.getRefundPolicies();
+        if (refundPolicyRequests != null) {
+            List<RefundPolicy> refundPolicies = refundPolicyRequests.stream()
+                    .map(RefundPolicyEditRequest::toEntity)
+                    .toList();
+            studycafe.updateRefundPolices(refundPolicies);
         }
 
     }
@@ -527,9 +552,9 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      * @return 스터디카페의 모든 공지사항
      */
-    public List<AnnouncementResponse> enquiryAnnouncements(Long memberId, Long studycafeId) {
-        Member member = findMemberById(memberId);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    public List<AnnouncementResponse> enquiryAnnouncements(final Long memberId, final Long studycafeId) {
+        final Member member = findMemberById(memberId);
+        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
     }
@@ -541,9 +566,11 @@ public class StudycafeService {
      * @param announcementRequest 공지사항 요청 값
      */
     @Transactional
-    public void registerAnnouncements(Long memberId, Long studycafeId, AnnouncementRequest announcementRequest) {
-        Member member = findMemberById(memberId);
-        Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
+    public void registerAnnouncements(final Long memberId,
+                                      final Long studycafeId,
+                                      final AnnouncementRequest announcementRequest) {
+        final Member member = findMemberById(memberId);
+        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
 
         studycafe.addAnnouncement(announcementRequest.toEntity());
@@ -555,13 +582,13 @@ public class StudycafeService {
      * @param studycafeId 스터디카페 PK
      */
     @Transactional
-    public void delete(Long memberId, Long studycafeId) {
-        Member member = findMemberById(memberId);
+    public void delete(final Long memberId, final Long studycafeId) {
+        final Member member = findMemberById(memberId);
         studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private Member findMemberById(Long memberId) {
+    private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 }

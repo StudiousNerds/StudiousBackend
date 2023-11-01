@@ -37,33 +37,34 @@ public class StudycafeController {
     private static final String TIME_DEFAULT_VALUE = "#{T(java.time.LocalDateTime).now()}";
 
     @GetMapping("/search")
-    public List<SearchResponse> search(@RequestParam(required = false) Integer page,
-                                       @RequestParam(required = false) String keyword,
-                                       @RequestParam(required = false) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") LocalDate date,
-                                       @RequestParam(required = false) LocalTime startTime,
-                                       @RequestParam(required = false) LocalTime endTime,
-                                       @RequestParam(required = false) @Positive(message = "인원 수는 최소 1명 이상이여야 합니다.") Integer headCount,
-                                       @RequestParam(required = false) @Range(min = 0, max = 5, message = "최소 평점은 0이상 5이하여야 합니다.") Integer minGrade,
-                                       @RequestParam(required = false) List<HashtagName> hashtags,
-                                       @RequestParam(required = false) List<ConvenienceName> conveniences,
-                                       @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) SearchSortType sortType) {
-        return studycafeService.enquiry(keyword, date, startTime, endTime, headCount, minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
+    public List<SearchResponse> search(@RequestParam(required = false) final Integer page,
+                                       @RequestParam(required = false) final String keyword,
+                                       @RequestParam(required = false) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date,
+                                       @RequestParam(required = false) final LocalTime startTime,
+                                       @RequestParam(required = false) final LocalTime endTime,
+                                       @RequestParam(required = false) @Positive(message = "인원 수는 최소 1명 이상이여야 합니다.") final Integer headCount,
+                                       @RequestParam(required = false) @Range(min = 0, max = 5, message = "최소 평점은 0이상 5이하여야 합니다.") final Integer minGrade,
+                                       @RequestParam(required = false) final List<HashtagName> hashtags,
+                                       @RequestParam(required = false) final List<ConvenienceName> conveniences,
+                                       @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) final SearchSortType sortType) {
+        return studycafeService.enquiry(keyword, date, startTime, endTime, headCount,
+                minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}")
     public FindStudycafeResponse findStudycafeInfo(
-            @PathVariable("studycafeId") Long studycafeId,
-            @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") LocalDate date) {
+            @PathVariable("studycafeId") final Long studycafeId,
+            @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date) {
         return studycafeService.findByDate(studycafeId, date);
     }
 
     @GetMapping("/studycafes/{studycafeId}/refundPolicy")
-    public List<RefundPolicyInfo> findStudycafeRefundPolicy(@PathVariable("studycafeId") Long studycafeId) {
+    public List<RefundPolicyInfo> findStudycafeRefundPolicy(@PathVariable("studycafeId") final Long studycafeId) {
         return studycafeService.findRefundPolicy(studycafeId);
     }
 
     @GetMapping("/studycafes/{studycafeId}/notice")
-    public List<String> findStudycafeNotice(@PathVariable("studycafeId") Long studycafeId) {
+    public List<String> findStudycafeNotice(@PathVariable("studycafeId") final Long studycafeId) {
         return studycafeService.findNotice(studycafeId);
     }
 

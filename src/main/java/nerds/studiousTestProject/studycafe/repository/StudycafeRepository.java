@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StudycafeRepository extends JpaRepository<Studycafe, Long>, StudycafeRepositoryCustom {
-    boolean existsByIdAndMember(Long id, Member member);
-    Optional<Studycafe> findById(Long id);
+    boolean existsByIdAndMember(final Long id, final Member member);
+    Optional<Studycafe> findById(final Long id);
 
     @Query(value = "select s from Studycafe s " +
             "join fetch Room r on r.studycafe.id = s.id " +
@@ -32,7 +32,7 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long>, Stu
             "limit 10")
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
     List<Studycafe> findTop10ByOrderByCreatedDateDesc();
-    Page<Studycafe> findByMemberOrderByCreatedDateAsc(Member member, Pageable pageable);
-    Optional<Studycafe> findByIdAndMember(Long id, Member member);
-    Optional<Studycafe> deleteByIdAndMember(Long id, Member member);
+    Page<Studycafe> findByMemberOrderByCreatedDateAsc(final Member member, final Pageable pageable);
+    Optional<Studycafe> findByIdAndMember(final Long id, final Member member);
+    Optional<Studycafe> deleteByIdAndMember(final Long id, final Member member);
 }

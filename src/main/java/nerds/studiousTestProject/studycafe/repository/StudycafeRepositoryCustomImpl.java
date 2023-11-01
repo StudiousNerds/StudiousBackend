@@ -48,13 +48,13 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     private static final String CONCAT_REPLACE_STR = "";
 
     @Override
-    public Page<SearchResponseInfo> getSearchResult(SearchRequest searchRequest, Pageable pageable) {
-        JPAQuery<Long> countQuery = queryFactory
+    public Page<SearchResponseInfo> getSearchResult(final SearchRequest searchRequest, final Pageable pageable) {
+        final JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
 
         // 페이징 처리를 위해선 개수를 직접 쿼리를 날려 확인해야 한다! (QueryDSL의 count는 믿을게 못됨)
-        JPAQuery<Long> count = getJoinedQuery(countQuery, searchRequest)
+        final JPAQuery<Long> count = getJoinedQuery(countQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
@@ -72,7 +72,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             return Page.empty();
         }
 
-        JPAQuery<SearchResponseInfo> contentQuery = queryFactory
+        final JPAQuery<SearchResponseInfo> contentQuery = queryFactory
                 .select(
                         Projections.constructor(SearchResponseInfo.class,
                                 studycafe.id,
@@ -93,7 +93,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 .from(studycafe);
 
 
-        List<SearchResponseInfo> content = getJoinedQuery(contentQuery, searchRequest)
+        final List<SearchResponseInfo> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
@@ -118,7 +118,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
      * @return Join 문이 작성된 JpaQuery 객체
      * @param <T> Count Query 인 경우 Long, 나머지는 응답 객체 또는 Entity
      */
-    private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, SearchRequest searchRequest) {
+    private <T> JPAQuery<T> getJoinedQuery(JPAQuery<T> query, final SearchRequest searchRequest) {
         query = query
                 .leftJoin(studycafe.accumHashtagHistories, accumHashtagHistory)
                 .leftJoin(studycafe.rooms, room)
@@ -144,29 +144,29 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return query;
     }
 
-    private BooleanExpression headCountBetween(Integer headCount) {
-        BooleanExpression minHeadCountLoe = minHeadCountLoe(headCount);
+    private BooleanExpression headCountBetween(final Integer headCount) {
+        final BooleanExpression minHeadCountLoe = minHeadCountLoe(headCount);
         return minHeadCountLoe == null ? null : minHeadCountLoe.and(maxHeadCountGoe(headCount));
     }
 
-    private BooleanExpression minHeadCountLoe(Integer headCount) {
+    private BooleanExpression minHeadCountLoe(final Integer headCount) {
         return headCount != null ? room.minHeadCount.loe(headCount) : null;
     }
 
-    private BooleanExpression maxHeadCountGoe(Integer headCount) {
+    private BooleanExpression maxHeadCountGoe(final Integer headCount) {
         return headCount != null ? room.maxHeadCount.goe(headCount) : null;
     }
 
-    private BooleanExpression dateAndTimeCanReserve(LocalDate date, LocalTime startTime, LocalTime endTime) {
+    private BooleanExpression dateAndTimeCanReserve(final LocalDate date, final LocalTime startTime, final LocalTime endTime) {
         if (date == null) {
             return null;
         }
 
-        BooleanExpression inOperation = inOperation(startTime, endTime);
+        final BooleanExpression inOperation = inOperation(startTime, endTime);
         return inOperation != null ? inOperation.and(dateAndTimeNotReserved(date, startTime, endTime)) : dateAndTimeNotReserved(date, startTime, endTime);
     }
 
-    private BooleanExpression inOperation(LocalTime startTime, LocalTime endTime) {
+    private BooleanExpression inOperation(final LocalTime startTime, final LocalTime endTime) {
         return isAllDay().or(NotClosedAndBetweenOperationTime(startTime, endTime));
     }
 
@@ -174,14 +174,14 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return operationInfo.isAllDay;
     }
 
-    private BooleanExpression NotClosedAndBetweenOperationTime(LocalTime startTime, LocalTime endTime) {
-        BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
-        BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
+    private BooleanExpression NotClosedAndBetweenOperationTime(final LocalTime startTime, final LocalTime endTime) {
+        final BooleanExpression startTimeLoe = cafeStartTimeLoe(startTime);
+        final BooleanExpression endTimeGoe = cafeEndTimeGoe(endTime);
 
         return operationInfo.closed.isFalse().and(startTimeLoe != null ? startTimeLoe.and(endTimeGoe) : endTimeGoe);
     }
 
-    private BooleanExpression cafeStartTimeLoe(LocalTime startTime) {
+    private BooleanExpression cafeStartTimeLoe(final LocalTime startTime) {
         if (startTime == null) {
             return null;
         }
@@ -189,7 +189,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return operationInfo.startTime.loe(startTime);
     }
 
-    private BooleanExpression cafeEndTimeGoe(LocalTime endTime) {
+    private BooleanExpression cafeEndTimeGoe(final LocalTime endTime) {
         if (endTime == null) {
             return null;
         }
@@ -197,10 +197,10 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         return operationInfo.endTime.goe(endTime);
     }
 
-    private BooleanExpression dateAndTimeNotReserved(LocalDate date, LocalTime startTime, LocalTime endTime) {
-        BooleanExpression dateEq = dateEq(date);
-        BooleanExpression startTimeLoe = startTimeLoe(startTime);
-        BooleanExpression endTimeGoe = endTimeGoe(endTime);
+    private BooleanExpression dateAndTimeNotReserved(final LocalDate date, final LocalTime startTime, final LocalTime endTime) {
+        final BooleanExpression dateEq = dateEq(date);
+        final BooleanExpression startTimeLoe = startTimeLoe(startTime);
+        final BooleanExpression endTimeGoe = endTimeGoe(endTime);
 
         // 날짜가 선택 안 된 경우는 가능 시간 조회 불가능
         // 예약이 없는 경우를 대비하여 reservationRecord.isNull() 조건 추가
@@ -214,71 +214,71 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 ) : null;
     }
 
-    private BooleanExpression dateEq(LocalDate date) {
+    private BooleanExpression dateEq(final LocalDate date) {
         return date != null ? reservationRecord.date.eq(date) : null;
     }
 
-    private BooleanExpression startTimeLoe(LocalTime startTime) {
+    private BooleanExpression startTimeLoe(final LocalTime startTime) {
         if (startTime == null) {
-            startTime = LocalTime.MIN;   // 시간 설정이 안되있는 경우 00:00:00 으로 설정
+            return reservationRecord.startTime.loe(LocalTime.MIN);
         }
 
         return reservationRecord.startTime.loe(startTime);
     }
 
-    private BooleanExpression endTimeGoe(LocalTime endTime) {
+    private BooleanExpression endTimeGoe(final LocalTime endTime) {
         if (endTime == null) {
-            endTime = LocalTime.MAX;     // 시간 설정이 안되있는 경우 23:59:59 으로 설정
+            return reservationRecord.endTime.goe(LocalTime.MAX);
         }
 
         return reservationRecord.endTime.goe(endTime);
     }
 
-    private BooleanExpression keywordContains(String keyword) {
+    private BooleanExpression keywordContains(final String keyword) {
         return hasText(keyword) ? studycafe.name.contains(keyword).or(studycafe.address.addressBasic.contains(keyword)).or(studycafe.address.addressDetail.contains(keyword)) : null;
     }
 
-    private BooleanExpression totalGradeGoe(Integer minGrade) {
+    private BooleanExpression totalGradeGoe(final Integer minGrade) {
         return minGrade != null ? studycafe.gradeSum.divide(studycafe.gradeCount).goe(minGrade) : null;
     }
 
-    private BooleanExpression convenienceContains(List<ConvenienceName> conveniences) {
+    private BooleanExpression convenienceContains(final List<ConvenienceName> conveniences) {
         if (conveniences == null || conveniences.isEmpty()) {
             return null;
         }
 
         // Room, Studycafe Convenience 두 개를 Join 해야 하므로 별도의 Q클래스 객체를 만들어 조인을 해야 한다.
-        QConvenience cConveniences = new QConvenience(CAFE_CONVENIENCE_NAME);
-        QConvenience rConveniences = new QConvenience(ROOM_CONVENIENCE_NAME);
+        final QConvenience cConveniences = new QConvenience(CAFE_CONVENIENCE_NAME);
+        final QConvenience rConveniences = new QConvenience(ROOM_CONVENIENCE_NAME);
 
-        StringExpression cafeConvenienceNames = cConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
-        StringExpression roomConvenienceNames = rConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
-        StringExpression concat = cafeConvenienceNames.concat(roomConvenienceNames);
+        final StringExpression cafeConvenienceNames = cConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
+        final StringExpression roomConvenienceNames = rConveniences.name.stringValue().coalesce(CONCAT_REPLACE_STR);
+        final StringExpression concat = cafeConvenienceNames.concat(roomConvenienceNames);
 
         return getBooleanExpression(conveniences, concat);
     }
 
-    private BooleanExpression hashtagContains(List<HashtagName> hashtags) {
+    private BooleanExpression hashtagContains(final List<HashtagName> hashtags) {
         if (hashtags == null || hashtags.isEmpty()) {
             return null;
         }
 
-        StringTemplate reflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name.stringValue().coalesce(CONCAT_REPLACE_STR));
-        StringTemplate NotReflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name.stringValue().coalesce(CONCAT_REPLACE_STR));
-        StringExpression concat = reflectedHashtagNames.concat(NotReflectedHashtagNames);
+        final StringTemplate reflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name.stringValue().coalesce(CONCAT_REPLACE_STR));
+        final StringTemplate NotReflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name.stringValue().coalesce(CONCAT_REPLACE_STR));
+        final StringExpression concat = reflectedHashtagNames.concat(NotReflectedHashtagNames);
 
         return getBooleanExpression(hashtags, concat);
     }
 
-    private <T extends Enum<?>> BooleanExpression getBooleanExpression(List<T> list, StringExpression concat) {
+    private <T extends Enum<?>> BooleanExpression getBooleanExpression(final List<T> list, final StringExpression concat) {
         return Expressions.allOf(list.stream().map(e -> nameContainedWithinConcat(e.name(), concat)).toArray(BooleanExpression[]::new));
     }
 
-    private BooleanExpression nameContainedWithinConcat(String name, StringExpression concat) {
+    private BooleanExpression nameContainedWithinConcat(final String name, final StringExpression concat) {
         return concat.contains(name);
     }
 
-    private OrderSpecifier[] createOrderSpecifier(SearchSortType sortType) {
+    private OrderSpecifier[] createOrderSpecifier(final SearchSortType sortType) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
         switch (sortType != null ? sortType : GRADE_DESC) {

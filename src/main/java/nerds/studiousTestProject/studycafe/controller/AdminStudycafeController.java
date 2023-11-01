@@ -40,49 +40,54 @@ public class AdminStudycafeController {
     private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
 
     @PostMapping("/accountInfos")
-    public ValidResponse checkAccountInfo(@RequestBody AccountInfoRequest accountInfoRequest) {
+    public ValidResponse checkAccountInfo(@RequestBody final AccountInfoRequest accountInfoRequest) {
         return studycafeService.validateAccountInfo(accountInfoRequest);
     }
 
     @PostMapping("/businessInfos")
-    public ValidResponse checkBusinessInfo(@RequestBody BusinessInfoRequest businessInfoRequest) {
+    public ValidResponse checkBusinessInfo(@RequestBody final BusinessInfoRequest businessInfoRequest) {
         return studycafeService.validateBusinessInfo(businessInfoRequest);
     }
 
     @PostMapping
-    public RegisterResponse register(@LoggedInMember Long memberId,
-                                     @RequestPart @Valid RegisterRequest registerRequest,
-                                     MultipartHttpServletRequest request) {
+    public RegisterResponse register(@LoggedInMember final Long memberId,
+                                     @RequestPart @Valid final RegisterRequest registerRequest,
+                                     final MultipartHttpServletRequest request) {
         return studycafeService.register(memberId, registerRequest, request.getMultiFileMap());
     }
 
     @GetMapping
-    public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember Long memberId, @RequestParam Integer page) {
+    public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember final Long memberId, @RequestParam final Integer page) {
         return studycafeService.enquiryManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
     }
 
     @GetMapping("/{studycafeId}")
-    public CafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
+    public CafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
         return studycafeService.enquiryManagedStudycafe(memberId, studycafeId);
     }
 
     @PatchMapping("/{studycafeId}")
-    public void modifyManagedStudycafe(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody CafeInfoEditRequest cafeInfoEditRequest) {
+    public void modifyManagedStudycafe(@LoggedInMember final Long memberId,
+                                       @PathVariable final Long studycafeId,
+                                       @RequestBody final CafeInfoEditRequest cafeInfoEditRequest) {
         studycafeService.modify(memberId, studycafeId, cafeInfoEditRequest);
     }
 
     @GetMapping("/{studycafeId}/notificationInfos")
-    public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
+    public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
         return studycafeService.enquiryAnnouncements(memberId, studycafeId);
     }
 
     @PostMapping("/{studycafeId}/notificationInfos")
-    public void addNotificationInfo(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @RequestBody @Valid AnnouncementRequest announcementRequest) {
+    public void addNotificationInfo(@LoggedInMember final Long memberId,
+                                    @PathVariable final Long studycafeId,
+                                    @RequestBody @Valid final AnnouncementRequest announcementRequest) {
         studycafeService.registerAnnouncements(memberId, studycafeId, announcementRequest);
     }
 
     @DeleteMapping("/{studycafeId}")
-    public void delete(@LoggedInMember Long memberId, @PathVariable Long studycafeId) {
+    public void delete(@LoggedInMember final Long memberId,
+                       @PathVariable final Long studycafeId) {
         studycafeService.delete(memberId, studycafeId);
     }
 }

@@ -11,5 +11,5 @@ public interface OperationInfoRepository extends JpaRepository<OperationInfo, Lo
 
     @Query("select o from OperationInfo o " +
             "where o.studycafe.id = :studycafeId and o.week = :week")
-    Optional<OperationInfo> findByStudycafeAndWeek(Long studycafeId, Week week);
+    Optional<OperationInfo> findByStudycafeAndWeek(final Long studycafeId, final Week week);
 }
