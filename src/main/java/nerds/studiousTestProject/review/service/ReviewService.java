@@ -75,50 +75,50 @@ public class ReviewService {
     public final Double GRADE_COUNT = 3.0;
 
     @Transactional
-    public RegisterReviewResponse register(RegisterReviewRequest registerReviewRequest, List<MultipartFile> files){
-        ReservationRecord reservationRecord = findReservationRecordById(registerReviewRequest.getReservationId());
-        validateReservationStatus(reservationRecord);
-        validateAvailableReviewTime(reservationRecord);
-        Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
+    public RegisterReviewResponse register(RegisterReviewRequest registerRequest, List<MultipartFile> files){
+        ReservationRecord reservation = findReservationRecordById(registerRequest.getReservationId());
+        validateReservationStatus(reservation);
+        validateAvailableReviewTime(reservation);
+        Studycafe studycafe = reservation.getRoom().getStudycafe();
 
-        Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
+        Grade grade = RegisterReviewRequest.toGrade(registerRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
         studycafe.registerGrade(getGradeSum(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
                 .createdDate(LocalDate.now())
-                .detail(registerReviewRequest.getDetail())
-                .isRecommended(registerReviewRequest.getIsRecommend())
+                .detail(registerRequest.getDetail())
+                .isRecommended(registerRequest.getIsRecommend())
                 .grade(grade)
                 .build();
         reviewRepository.save(review);
-        updateHashtagRecord(registerReviewRequest.getHashtags(), review, studycafe);
+        updateHashtagRecord(registerRequest.getHashtags(), review, studycafe);
 
         if (!files.isEmpty()) {
             saveSubPhotos(review, files);
         }
 
-        reservationRecord.addReview(review);
+        reservation.addReview(review);
 
         return RegisterReviewResponse.builder().reviewId(review.getId()).createdAt(LocalDate.now()).build();
     }
 
     @Transactional
-    public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyReviewRequest, List<MultipartFile> files) {
+    public ModifyReviewResponse modifyReview(Long reviewId, ModifyReviewRequest modifyRequest, List<MultipartFile> files) {
         Review review = findReviewById(reviewId);
-        Studycafe studycafe = findStudycafeById(modifyReviewRequest);
-        Double modifiedTotal = getTotal(modifyReviewRequest.getCleanliness(), modifyReviewRequest.getDeafening(), modifyReviewRequest.getFixtureStatus());
+        Studycafe studycafe = findStudycafeById(modifyRequest.getCafeId());
+        Double modifiedTotal = getTotal(modifyRequest.getCleanliness(), modifyRequest.getDeafening(), modifyRequest.getFixtureStatus());
 
         Grade grade = review.getGrade();
-        grade.update(modifyReviewRequest.getCleanliness(),
-                modifyReviewRequest.getDeafening(),
-                modifyReviewRequest.getFixtureStatus(),
+        grade.update(modifyRequest.getCleanliness(),
+                modifyRequest.getDeafening(),
+                modifyRequest.getFixtureStatus(),
                 modifiedTotal);
         studycafe.updateGrade(modifiedTotal);
 
         deleteHashtagRecords(reviewId, studycafe);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
-        updateHashtagRecord(modifyReviewRequest.getHashtags(), review, studycafe);
+        updateHashtagRecord(modifyRequest.getHashtags(), review, studycafe);
 
         deleteAllPhotos(reviewId);
 
@@ -126,8 +126,8 @@ public class ReviewService {
             saveSubPhotos(review, files);
         }
 
-        review.updateDetail(modifyReviewRequest.getDetail());
-        review.updateIsRecommended(modifyReviewRequest.getIsRecommend());
+        review.updateDetail(modifyRequest.getDetail());
+        review.updateIsRecommended(modifyRequest.getIsRecommend());
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
@@ -153,13 +153,6 @@ public class ReviewService {
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
 
-
-
-    /**
-     * 모든 리뷰를 보여줄 메소드(정렬까지 포함)
-     * pageable를 통해서 sort까지 지정할 수 있습니다! (쿼리 파라미터를 통해 입력하면 알아서 처리해줌)
-     * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
-     */
     public FindReviewSortedResponse findAllReviews(Long studycafeId, Pageable pageable) {
         Page<Review> reviews = getAllReviewsSorted(studycafeId, pageable);
         return FindReviewSortedResponse.builder()
@@ -170,11 +163,6 @@ public class ReviewService {
                 .build();
     }
 
-    /**
-     * 룸 별, 리뷰를 보여줄 메소드(정렬까지 포함)
-     * pageable를 통해서 sort까지 지정할 수 있습니다! (쿼리 파라미터를 통해 입력하면 알아서 처리해줌)
-     * 그래서 기본 정렬, 평점 높은/낮은 순도 들어오는 대로 하면 되다 보니 다 합쳤습니다!
-     */
     public FindReviewSortedResponse findRoomReviews(Long studycafeId, Long roomId, Pageable pageable) {
         Page<Review> reviews = getRoomReviewsSorted(studycafeId, roomId, pageable);
         return FindReviewSortedResponse.builder()
@@ -186,22 +174,20 @@ public class ReviewService {
     }
 
     public AvailableReviewResponse findAvailableReviews(Long memberId, Pageable pageable) {
-        Page<ReservationRecord> reservationRecords = getReservationRecords(memberId, pageable);
-
+        Page<ReservationRecord> reservations = getReservationRecords(memberId, pageable);
         return AvailableReviewResponse.builder()
-                .totalPage(reservationRecords.getTotalPages())
-                .currentPage(reservationRecords.getNumber() + 1)
-                .availableReviewInfo(getAvailableReviews(reservationRecords))
+                .totalPage(reservations.getTotalPages())
+                .currentPage(reservations.getNumber() + 1)
+                .availableReviewInfo(getAvailableReviews(reservations))
                 .build();
     }
 
     public WrittenReviewResponse findWrittenReviews(Long memberId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        Page<ReservationRecord> reservationRecords = getReservationRecords(memberId, pageable);
-
+        Page<ReservationRecord> reservations = getReservationRecords(memberId, pageable);
         return WrittenReviewResponse.builder()
-                .totalPage(reservationRecords.getTotalPages())
-                .currentPage(reservationRecords.getNumber() + 1)
-                .writtenReviewInfos(getWrittenReviews(reservationRecords, startDate, endDate))
+                .totalPage(reservations.getTotalPages())
+                .currentPage(reservations.getNumber() + 1)
+                .writtenReviewInfos(getWrittenReviews(reservations, startDate, endDate))
                 .build();
     }
 
@@ -216,14 +202,14 @@ public class ReviewService {
     }
 
     public Integer getAvgCleanliness(Long studycafeId){
-        List<Review> reviewList = getAllReviews(studycafeId);
+        List<Review> reviews = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
-        if (reviewList.isEmpty()) {
+        if (reviews.isEmpty()) {
             return 0;
         }
 
-        for (Review review : reviewList){
+        for (Review review : reviews){
             sum += review.getGrade().getCleanliness();
             count++;
         }
@@ -232,14 +218,14 @@ public class ReviewService {
     }
 
     public Integer getAvgDeafening(Long studycafeId) {
-        List<Review> reviewList = getAllReviews(studycafeId);
+        List<Review> reviews = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
-        if (reviewList.isEmpty()) {
+        if (reviews.isEmpty()) {
             return 0;
         }
 
-        for (Review review : reviewList){
+        for (Review review : reviews){
             sum += review.getGrade().getDeafening();
             count++;
         }
@@ -248,14 +234,14 @@ public class ReviewService {
     }
 
     public Integer getAvgFixturesStatus(Long studycafeId) {
-        List<Review> reviewList = getAllReviews(studycafeId);
+        List<Review> reviews = getAllReviews(studycafeId);
         Integer count = 0, sum = 0;
 
-        if (reviewList.isEmpty()) {
+        if (reviews.isEmpty()) {
             return 0;
         }
 
-        for (Review review : reviewList){
+        for (Review review : reviews){
             sum += review.getGrade().getFixturesStatus();
             count++;
         }
@@ -264,14 +250,14 @@ public class ReviewService {
     }
 
     public Integer getAvgRecommendation(Long studycafeId) {
-        List<Review> reviewList = getAllReviews(studycafeId);
+        List<Review> reviews = getAllReviews(studycafeId);
         Integer recommend = 0, count = 0;
 
-        if (reviewList.isEmpty()) {
+        if (reviews.isEmpty()) {
             return 0;
         }
 
-        for (Review review : reviewList){
+        for (Review review : reviews){
             if(review.getIsRecommended()){
                 recommend++;
             }
@@ -289,18 +275,9 @@ public class ReviewService {
     }
 
     public Double getAvgGrade(Long studycafeId) {
-        List<Review> reviewList = getAllReviews(studycafeId);
-        Integer count = 0;
-        Double sum = 0.0;
-
-        if (reviewList.isEmpty()) {
-            return 0.0;
-        }
-
-        for (Review review : reviewList){
-            sum += review.getGrade().getTotal();
-            count++;
-        }
+        Studycafe studycafe = findStudycafeById(studycafeId);
+        Double sum = studycafe.getGradeSum();
+        Integer count = studycafe.getGradeCount();
         return Double.isNaN(sum/ count) ? 0.0 : sum/ count;
     }
 
@@ -406,8 +383,8 @@ public class ReviewService {
         return findAllByRoomId(roomId, pageable);
     }
 
-    private Studycafe findStudycafeById(ModifyReviewRequest modifyReviewRequest) {
-        return studycafeRepository.findById(modifyReviewRequest.getCafeId()).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    private Studycafe findStudycafeById(Long studycafeId) {
+        return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
     private Review findReviewById(Long reviewId) {
