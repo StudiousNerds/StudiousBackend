@@ -81,8 +81,7 @@ public class RoomService {
     }
 
     public FindAllRoomResponse getAllRooms(Long memberId, Long studycafeId, Long roomId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_USER));
+        Member member = findMemberById(memberId);
 
         if (!matchStudycafeAndMember(studycafeId, member)) {
             throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
@@ -104,7 +103,7 @@ public class RoomService {
                 .paidConveniences(getPaidConveniences(room.getId()))
                 .build();
     }
-
+    
     @Transactional
     public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRequest, List<MultipartFile> photos) {
         Studycafe studycafe = getStudycafeById(studycafeId);
@@ -186,6 +185,11 @@ public class RoomService {
     public Room findRoomById(Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(
+                () -> new NotFoundException(NOT_FOUND_USER));
     }
 
     public OperationInfo findOperationInfoByStudycafeIdAndWeek(Long studycafeId, Week week) {
