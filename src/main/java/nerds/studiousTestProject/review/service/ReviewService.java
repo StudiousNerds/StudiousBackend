@@ -493,7 +493,8 @@ public class ReviewService {
             review.addHashtagRecord(hashtagRecord);
 
             validateExistedAccumHashtag(studycafe, userHashtag);
-            AccumHashtagHistory hashtagHistory = AccumHashtagHistory.builder().count(1).name(HashtagName.valueOf(userHashtag)).build();
+            AccumHashtagHistory hashtagHistory = AccumHashtagHistory.builder().name(HashtagName.valueOf(userHashtag)).studycafe(studycafe).build();
+            hashtagHistory.updateCount();
             studycafe.addAccumHashtagHistory(hashtagHistory);
         }
     }
