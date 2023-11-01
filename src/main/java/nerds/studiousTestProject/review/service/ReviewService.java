@@ -47,7 +47,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.EXPIRED_VALID_DATE;
@@ -84,7 +83,7 @@ public class ReviewService {
 
         Grade grade = RegisterReviewRequest.toGrade(registerReviewRequest);
         grade.updateTotal(getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-        studycafe.updateGrade(getGradeSum(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
+        studycafe.registerGrade(getGradeSum(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
 
         Review review = Review.builder()
                 .createdDate(LocalDate.now())
@@ -113,15 +112,17 @@ public class ReviewService {
         grade.update(modifyReviewRequest.getCleanliness(),
                 modifyReviewRequest.getDeafening(),
                 modifyReviewRequest.getFixtureStatus(),
-                getTotal(grade.getCleanliness(), grade.getDeafening(), grade.getFixturesStatus()));
-        
+                getTotal(modifyReviewRequest.getCleanliness(), modifyReviewRequest.getDeafening(), modifyReviewRequest.getFixtureStatus()));
 
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
-        deleteAllHashtagRecordByReviewId(reviewId);
+//        deleteAllHashtagRecord(reviewId);
         updateHashtagRecord(modifyReviewRequest.getHashtags(), review, studycafe);
 
         deleteAllPhotos(reviewId);
-        saveSubPhotos(review, files);
+
+        if (!files.isEmpty()) {
+            saveSubPhotos(review, files);
+        }
 
         review.updateDetail(modifyReviewRequest.getDetail());
         review.updateIsRecommended(modifyReviewRequest.getIsRecommend());
@@ -139,14 +140,18 @@ public class ReviewService {
 
         Review review = findReviewById(reviewId);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
+        Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
+        List<AccumHashtagHistory> studycafeAccumHashtag = accumHashtagHistoryRepository.findAllByStudycafe(studycafe);
 
-        deleteAllHashtagRecordByReviewId(reviewId);
+        deleteGradeRecord(studycafe, review.getGrade().getTotal());
+        deleteAllHashtagRecord(reviewId, studycafeAccumHashtag);
         deleteAllPhotos(reviewId);
         reservationRecord.deleteReview();
         reviewRepository.deleteById(reviewId);
 
         return DeleteReviewResponse.builder().reviewId(reviewId).deletedAt(LocalDate.now()).build();
     }
+
 
     /**
      * 모든 리뷰를 보여줄 메소드(정렬까지 포함)
@@ -370,6 +375,10 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    private void deleteGradeRecord(Studycafe studycafe, Double gradeTotal) {
+        studycafe.deleteGrade(gradeTotal);
+    }
+
     private Member getMember(Review review) {
         return findReservationRecordByReviewId(review.getId()).getMember();
     }
@@ -424,7 +433,17 @@ public class ReviewService {
         return reservationRecordRepository.findAllByMember(pageable, member);
     }
 
-    private void deleteAllHashtagRecordByReviewId(Long reviewId) {
+    private void deleteAllHashtagRecord(Long reviewId, List<AccumHashtagHistory> studycafeAccumHashtag) {
+        List<HashtagName> hashtagNames = hashtagRecordRepository.findAllByReviewId(reviewId);
+
+        for (HashtagName hashtag : hashtagNames) {
+            for (AccumHashtagHistory accumHashtagHistory : studycafeAccumHashtag) {
+                if (hashtag.equals(accumHashtagHistory.getName())) {
+                    accumHashtagHistory.subtractCount();
+                }
+            }
+        }
+
         hashtagRecordRepository.deleteAllByReviewId(reviewId);
     }
 
@@ -448,7 +467,7 @@ public class ReviewService {
     }
 
     private void validateAvailableReviewTime(ReservationRecord reservationRecord) {
-        if (LocalDate.now().isBefore(reservationRecord.getDate()) || LocalTime.now().isBefore(reservationRecord.getEndTime())) {
+        if (LocalDate.now().isBefore(reservationRecord.getDate()) && LocalTime.now().isBefore(reservationRecord.getEndTime())) {
             throw new BadRequestException(INVALID_WRITE_REVIEW_TIME);
         }
     }
