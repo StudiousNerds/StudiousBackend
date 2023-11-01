@@ -106,14 +106,14 @@ public class RoomService {
     }
 
     @Transactional
-    public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRoomRequest, List<MultipartFile> photos) {
+    public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRequest, List<MultipartFile> photos) {
         Studycafe studycafe = getStudycafeById(studycafeId);
         Room room = findRoomById(roomId);
-        Room updatedRoom = ModifyRoomRequest.toRoom(studycafe, roomId, modifyRoomRequest);
+        Room updatedRoom = ModifyRoomRequest.toRoom(studycafe, roomId, modifyRequest);
 
         room.update(updatedRoom);
         updateRoomPhotos(room, photos);
-        updateConveniences(room, modifyRoomRequest.getConveniences());
+        updateConveniences(room, modifyRequest.getConveniences());
 
         return ModifyRoomResponse.builder().roomId(roomId).modifiedAt(LocalDate.now()).build();
     }
@@ -157,7 +157,6 @@ public class RoomService {
         Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
 
         for (int i = today; i <= oneMonth; i++) {
-            log.info("반복문 확인", i);
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
             reservationList.put(date.toString(), canReserveTime);
             date = date.plusDays(1);

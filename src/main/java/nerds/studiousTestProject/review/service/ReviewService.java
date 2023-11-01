@@ -119,7 +119,6 @@ public class ReviewService {
         deleteHashtagRecords(reviewId, studycafe);
         review.getHashtagRecords().removeAll(review.getHashtagRecords());
         updateHashtagRecord(modifyRequest.getHashtags(), review, studycafe);
-
         deleteAllPhotos(reviewId);
 
         if (!files.isEmpty()) {
@@ -131,7 +130,6 @@ public class ReviewService {
 
         return ModifyReviewResponse.builder().reviewId(reviewId).modifiedAt(LocalDate.now()).build();
     }
-
 
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
@@ -145,7 +143,6 @@ public class ReviewService {
         Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
         deleteHashtagRecords(reviewId, studycafe);
         deleteGradeRecord(studycafe, review.getGrade().getTotal());
-
         deleteAllPhotos(reviewId);
         reservationRecord.deleteReview();
         reviewRepository.deleteById(reviewId);
@@ -282,52 +279,45 @@ public class ReviewService {
     }
 
     private void saveSubPhotos(Review review, List<MultipartFile> files) {
-        List<SubPhoto> photoList = new ArrayList<>();
-
+        List<SubPhoto> photos = new ArrayList<>();
         String representPhoto = storageProvider.uploadFile(files.get(0));
         review.addPhoto(representPhoto);
 
         for (int i = 2; i < files.size(); i++) {
             String uploadFile = storageProvider.uploadFile(files.get(i));
-            photoList.add(SubPhoto.builder().review(review).type(SubPhotoType.REVIEW).path(uploadFile).build());
+            photos.add(SubPhoto.builder().review(review).type(SubPhotoType.REVIEW).path(uploadFile).build());
         }
-        saveAllPhotos(photoList);
+
+        saveAllPhotos(photos);
     }
 
     private void deleteAllPhotos(Long reviewId) {
         List<String> reviewPhotos = findAllReviewPhotos(reviewId);
-
         for (String photoUrl : reviewPhotos) {
             storageProvider.deleteFile(photoUrl);
         }
         removeAllReviewPhotos(reviewId);
     }
 
-    /**
-     * 리뷰 작성 가능한 내역을 조회하는 메소드
-     */
-    private List<AvailableReviewInfo> getAvailableReviews(Page<ReservationRecord> reservationRecords) {
-        List<ReservationRecord> reservationRecordList = reservationRecords.getContent();
+    private List<AvailableReviewInfo> getAvailableReviews(Page<ReservationRecord> reservations) {
+        List<ReservationRecord> reservationList = reservations.getContent();
 
-        return  reservationRecordList.stream()
-                .filter(reservationRecord -> reservationRecord.getReview() == null &&
-                        !reservationRecord.getDate().plusDays(7).isBefore(LocalDate.now()))
-                .map(reservationRecord -> AvailableReviewInfo.from(reservationRecord))
+        return  reservationList.stream()
+                .filter(reservation -> reservation.getReview() == null &&
+                        !reservation.getDate().plusDays(7).isBefore(LocalDate.now()))
+                .map(reservation -> AvailableReviewInfo.from(reservation))
                 .sorted(Comparator.comparing(AvailableReviewInfo::getDate).reversed())
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 리뷰 작성한 내역을 조회하는 메소드
-     */
-    private List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservationRecords, LocalDate startDate, LocalDate endDate) {
-        List<ReservationRecord> reservationRecordList = reservationRecords.getContent();
+    private List<WrittenReviewInfo> getWrittenReviews(Page<ReservationRecord> reservations, LocalDate startDate, LocalDate endDate) {
+        List<ReservationRecord> reservationList = reservations.getContent();
 
-        return reservationRecordList.stream()
-                .filter(reservationRecord -> reservationRecord.getReview() != null &&
-                        reservationRecord.getReview().getCreatedDate().isAfter(startDate) &&
-                        reservationRecord.getReview().getCreatedDate().isBefore(endDate))
-                .map(reservationRecord -> WrittenReviewInfo.of(reservationRecord))
+        return reservationList.stream()
+                .filter(reservation -> reservation.getReview() != null &&
+                        reservation.getReview().getCreatedDate().isAfter(startDate) &&
+                        reservation.getReview().getCreatedDate().isBefore(endDate))
+                .map(reservation -> WrittenReviewInfo.of(reservation))
                 .collect(Collectors.toList());
     }
 
@@ -359,8 +349,8 @@ public class ReviewService {
     }
 
     private void deleteHashtagRecords(Long reviewId, Studycafe studycafe) {
-        List<AccumHashtagHistory> studycafeAccumHashtag = accumHashtagHistoryRepository.findAllByStudycafe(studycafe);
-        deleteAllHashtagRecord(reviewId, studycafeAccumHashtag);
+        List<AccumHashtagHistory> AccumHashtags = accumHashtagHistoryRepository.findAllByStudycafe(studycafe);
+        deleteAllHashtagRecord(reviewId, AccumHashtags);
     }
 
     private Member getMember(Review review) {
@@ -441,23 +431,23 @@ public class ReviewService {
 
     private List<String> findAllReviewPhotos(Long reviewId){
         Review review = findReviewById(reviewId);
-        List<SubPhoto> photoList = subPhotoRepository.findAllByReviewId(reviewId);
+        List<SubPhoto> photos = subPhotoRepository.findAllByReviewId(reviewId);
         List<String> reviewPhotos = new ArrayList<>();
         reviewPhotos.add(review.getPhoto());
-        List<String> reviewSubPhoto = photoList.stream().map(SubPhoto::getPath).collect(Collectors.toList());
+        List<String> reviewSubPhoto = photos.stream().map(SubPhoto::getPath).collect(Collectors.toList());
         reviewPhotos.addAll(reviewSubPhoto);
 
         return reviewPhotos;
     }
 
-    private void validateAvailableReviewTime(ReservationRecord reservationRecord) {
-        if (LocalDate.now().isBefore(reservationRecord.getDate()) && LocalTime.now().isBefore(reservationRecord.getEndTime())) {
+    private void validateAvailableReviewTime(ReservationRecord reservation) {
+        if (LocalDate.now().isBefore(reservation.getDate()) && LocalTime.now().isBefore(reservation.getEndTime())) {
             throw new BadRequestException(INVALID_WRITE_REVIEW_TIME);
         }
     }
 
-    private void validateReservationStatus(ReservationRecord reservationRecord) {
-        if (reservationRecord.getStatus() != ReservationStatus.CONFIRMED) {
+    private void validateReservationStatus(ReservationRecord reservation) {
+        if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
             throw new BadRequestException(INVALID_RESERVATION_STATUS);
         }
     }
