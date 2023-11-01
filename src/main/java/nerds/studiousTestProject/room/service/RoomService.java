@@ -59,9 +59,9 @@ public class RoomService {
     private final SubPhotoRepository subPhotoRepository;
     private final HolidayProvider holidayProvider;
 
-    public List<FindRoomResponse> getRooms(LocalDate date, Long studycafeId) {
+    public List<FindRoomResponse> getRooms(final LocalDate date, final Long studycafeId) {
 
-        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+        final List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
 
         return roomList.stream()
                 .map(room -> FindRoomResponse.builder()
@@ -80,15 +80,15 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
-    public FindAllRoomResponse getAllRooms(Long memberId, Long studycafeId, Long roomId) {
-        Member member = findMemberById(memberId);
+    public FindAllRoomResponse getAllRooms(final Long memberId, final Long studycafeId, final Long roomId) {
+        final Member member = findMemberById(memberId);
 
         if (!matchStudycafeAndMember(studycafeId, member)) {
             throw new NotFoundException(MISMATCH_MEMBER_AND_STUDYCAFE);
         }
 
-        List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
-        Room room = findRoomById(roomId);
+        final List<Room> roomList = roomRepository.findAllByStudycafeId(studycafeId);
+        final Room room = findRoomById(roomId);
 
         return FindAllRoomResponse.builder()
                 .roomInfos(getBasicInfo(roomList))
@@ -105,10 +105,10 @@ public class RoomService {
     }
 
     @Transactional
-    public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRequest, List<MultipartFile> photos) {
-        Studycafe studycafe = getStudycafeById(studycafeId);
-        Room room = findRoomById(roomId);
-        Room updatedRoom = ModifyRoomRequest.toRoom(studycafe, roomId, modifyRequest);
+    public ModifyRoomResponse modifyRoom(final Long studycafeId, final Long roomId, final ModifyRoomRequest modifyRequest, final List<MultipartFile> photos) {
+        final Studycafe studycafe = getStudycafeById(studycafeId);
+        final Room room = findRoomById(roomId);
+        final Room updatedRoom = ModifyRoomRequest.toRoom(studycafe, roomId, modifyRequest);
 
         room.update(updatedRoom);
         updateRoomPhotos(room, photos);
@@ -118,28 +118,27 @@ public class RoomService {
     }
 
     @Transactional
-    public void deleteRoom(Long roomId) {
-        Room room = findRoomById(roomId);
+    public void deleteRoom(final Long roomId) {
+        final Room room = findRoomById(roomId);
         deletePhotos(room);
         deleteConveniences(room);
         roomRepository.deleteById(roomId);
     }
 
-    public Integer[] getCanReserveTime(LocalDate date, Long studycafeId, Long roomId) {
+    private Integer[] getCanReserveTime(final LocalDate date, final Long studycafeId, final Long roomId) {
         getStudycafeById(studycafeId);
-        Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
+        final Map<Integer, Boolean> reservationTimes = reservationRecordService.getReservationTimes(date, studycafeId, roomId);
 
-        boolean isHoliday = holidayProvider.getHolidays().contains(date);
-        Week week = date != null ? (isHoliday ? Week.HOLIDAY : Week.of(date)) : null;
-        OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, week);
-        int start = operationInfo.getStartTime() != null ? operationInfo.getStartTime().getHour() : LocalTime.MIN.getHour();
-        int end = operationInfo.getEndTime() != null ? operationInfo.getEndTime().getHour() : LocalTime.MAX.getHour();
+        final boolean isHoliday = holidayProvider.getHolidays().contains(date);
+        final Week week = date != null ? (isHoliday ? Week.HOLIDAY : Week.of(date)) : null;
+        final OperationInfo operationInfo = findOperationInfoByStudycafeIdAndWeek(studycafeId, week);
+        final int start = operationInfo.getStartTime() != null ? operationInfo.getStartTime().getHour() : LocalTime.MIN.getHour();
+        final int end = operationInfo.getEndTime() != null ? operationInfo.getEndTime().getHour() : LocalTime.MAX.getHour();
+        final int size = end - start;
+        final Integer timeList[] = new Integer[size + 1];
 
-        int size = end - start;
-        Integer timeList[] = new Integer[size + 1];
-
-        List<Boolean> values = reservationTimes.values().stream().toList();
-        List<Integer> timeZone = reservationTimes.keySet().stream().toList();
+        final List<Boolean> values = reservationTimes.values().stream().toList();
+        final List<Integer> timeZone = reservationTimes.keySet().stream().toList();
 
         for (int i = 0; i < values.size(); i++) {
             if (values.get(i) == true) {
@@ -150,10 +149,10 @@ public class RoomService {
         return timeList;
     }
 
-    public Map<String, Integer[]> getCanReserveDatetime(LocalDate date, Long studycafeId, Long roomId) {
-        Integer oneMonth = date.lengthOfMonth();
-        int today = date.getDayOfMonth();
-        Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
+    private Map<String, Integer[]> getCanReserveDatetime(LocalDate date, final Long studycafeId, final Long roomId) {
+        final Integer oneMonth = date.lengthOfMonth();
+        final int today = date.getDayOfMonth();
+        final Map<String, Integer[]> reservationList = new ConcurrentHashMap<>();
 
         for (int i = today; i <= oneMonth; i++) {
             Integer[] canReserveTime = getCanReserveTime(date, studycafeId, roomId);
@@ -164,17 +163,17 @@ public class RoomService {
         return reservationList;
     }
 
-    public List<String> getConveniences(Long roomId) {
-        Room room = findRoomById(roomId);
+    private List<String> getConveniences(final Long roomId) {
+        final Room room = findRoomById(roomId);
 
         return room.getConveniences().stream()
                 .map(Convenience -> Convenience.getName().name())
                 .toList();
     }
 
-    public List<PaidConvenience> getPaidConveniences(Long roomId) {
-        Room room = findRoomById(roomId);
-        List<Convenience> conveniences = room.getConveniences();
+    private List<PaidConvenience> getPaidConveniences(final Long roomId) {
+        final Room room = findRoomById(roomId);
+        final List<Convenience> conveniences = room.getConveniences();
 
         return conveniences.stream()
                 .filter(convenience -> !convenience.isFree())
@@ -182,31 +181,31 @@ public class RoomService {
                 .toList();
     }
 
-    public Room findRoomById(Long roomId) {
+    private Room findRoomById(final Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
     }
 
-    private Member findMemberById(Long memberId) {
+    private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    public OperationInfo findOperationInfoByStudycafeIdAndWeek(Long studycafeId, Week week) {
+    private OperationInfo findOperationInfoByStudycafeIdAndWeek(final Long studycafeId, final Week week) {
         return operationInfoRepository.findByStudycafeAndWeek(studycafeId, week).orElseThrow(
                 () -> new NotFoundException(NOT_FOUND_OPERATION_INFO)
         );
     }
 
-    private List<String> getPhotos(Room room) {
+    private List<String> getPhotos(final Room room) {
         return room.getSubPhotos().stream().map(SubPhoto::getPath).collect(Collectors.toList());
     }
 
-    private Studycafe getStudycafeById(Long studycafeId) {
+    private Studycafe getStudycafeById(final Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private void updateRoomPhotos(Room room, List<MultipartFile> photos) {
+    private void updateRoomPhotos(final Room room, final List<MultipartFile> photos) {
         if (photos != null) {
             deletePhotos(room);
             for (MultipartFile file : photos) {
@@ -216,7 +215,7 @@ public class RoomService {
         }
     }
 
-    private void updateConveniences(Room room, List<ModifyConvenienceRequest> conveniences) {
+    private void updateConveniences(final Room room, final List<ModifyConvenienceRequest> conveniences) {
         if (conveniences != null) {
             deleteConveniences(room);
             for (ModifyConvenienceRequest convenienceInfo : conveniences) {
@@ -225,7 +224,7 @@ public class RoomService {
         }
     }
 
-    private void deletePhotos(Room room) {
+    private void deletePhotos(final Room room) {
         for (SubPhoto photo : room.getSubPhotos()) {
             storageProvider.deleteFile(photo.getPath());
             room.getSubPhotos().remove(photo.getPath());
@@ -233,26 +232,26 @@ public class RoomService {
         removeAllRoomPhotos(room.getId());
     }
 
-    private void deleteConveniences(Room room) {
+    private void deleteConveniences(final Room room) {
         room.deleteConveniences();
         deleteRoomConveniences(room.getId());
     }
 
-    private List<BasicRoomInfo> getBasicInfo(List<Room> roomList) {
+    private List<BasicRoomInfo> getBasicInfo(final List<Room> roomList) {
         return roomList.stream()
                 .map(room -> BasicRoomInfo.of(room))
                 .collect(Collectors.toList());
     }
 
-    private boolean matchStudycafeAndMember(Long studycafeId, Member member) {
+    private boolean matchStudycafeAndMember(final Long studycafeId, final Member member) {
         return studycafeRepository.existsByIdAndMember(studycafeId, member);
     }
 
-    private void deleteRoomConveniences(Long roomId) {
+    private void deleteRoomConveniences(final Long roomId) {
         convenienceRepository.deleteAllByRoomId(roomId);
     }
 
-    private void removeAllRoomPhotos(Long roomId) {
+    private void removeAllRoomPhotos(final Long roomId) {
         subPhotoRepository.deleteAllByRoomId(roomId);
     }
 }

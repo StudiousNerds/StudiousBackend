@@ -43,15 +43,15 @@ public class BookmarkService {
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
 
     @Transactional
-    public void registerBookmark(Long memberId, Long studycafeId){
+    public void registerBookmark(final Long memberId, final Long studycafeId){
         validateExistence(studycafeId);
-        Member member = findMemberById(memberId);
-        Studycafe studyCafe = findStudycafeById(studycafeId);
+        final Member member = findMemberById(memberId);
+        final Studycafe studyCafe = findStudycafeById(studycafeId);
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
     }
 
-    public FindBookmarkResponse findBookmark(Long memberId, Pageable pageable){
-        Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
+    public FindBookmarkResponse findBookmark(final Long memberId, final Pageable pageable){
+        final Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
             return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
@@ -77,37 +77,37 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(Long memberId, Long studycafeId){
-        Member member = findMemberById(memberId);
-        Bookmark bookmark = bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
+    public void deleteBookmark(final Long memberId, final Long studycafeId){
+        final Member member = findMemberById(memberId);
+        final Bookmark bookmark = bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
         member.deleteBookmark(bookmark);
         bookmarkRepository.deleteById(bookmark.getId());
     }
 
-    private List<ReservationRecord> findReservationRecordsByStudycafeId(Long studycafeId) {
+    private List<ReservationRecord> findReservationRecordsByStudycafeId(final Long studycafeId) {
         return reservationRecordRepository.findAllByStudycafeId(studycafeId);
     }
 
-    private Member findMemberById(Long memberId) {
+    private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
     }
 
-    private Studycafe findStudycafeById(Long studycafeId) {
+    private Studycafe findStudycafeById(final Long studycafeId) {
         return studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
     }
 
-    private List<String> findHashtagById(Long studycafeId) {
-        List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
-        int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
+    private List<String> findHashtagById(final Long studycafeId) {
+        final List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
+        final int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
         return hashtagNames.stream().map(tag -> tag.name()).limit(size).toList();
     }
 
-    private Double findGradeByStudycafe(Studycafe studycafe) {
+    private Double findGradeByStudycafe(final Studycafe studycafe) {
         return studycafe.getGradeSum() / studycafe.getGradeCount();
     }
 
-    private void validateExistence(Long studycafeId) {
+    private void validateExistence(final Long studycafeId) {
         if(bookmarkRepository.existsByStudycafeId(studycafeId)) {
             throw new BadRequestException(ALREADY_EXIST_BOOKMARK);
         }
