@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccumHashtagHistoryRepository extends JpaRepository<AccumHashtagHistory, Long> {
-    Boolean existsByHashtagName(HashtagName hashtagName);
+    Boolean existsByStudycafeAndHashtagName(Studycafe studycafe, HashtagName hashtagName);
     Optional<AccumHashtagHistory> findByHashtagName(HashtagName hashtagName);
     List<AccumHashtagHistory> findAllByStudycafe(Studycafe studycafe);
 }
