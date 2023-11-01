@@ -173,11 +173,18 @@ public class Studycafe {
         }
     }
 
-    public void updateGrade(Double gradeSum) {
+    public void registerGrade(Double gradeSum) {
         if (gradeSum != null) {
             this.gradeSum = gradeSum;
         }
         gradeCount++;
+    }
+
+    public void deleteGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum -= gradeSum;
+        }
+        gradeCount--;
     }
 
     @Builder
