@@ -76,7 +76,7 @@ public class ReviewService {
 
     @Transactional
     public RegisterReviewResponse register(RegisterReviewRequest registerRequest, List<MultipartFile> files){
-        ReservationRecord reservation = findReservationRecordById(registerRequest.getReservationId());
+        ReservationRecord reservation = findReservationById(registerRequest.getReservationId());
         validateReservationStatus(reservation);
         validateAvailableReviewTime(reservation);
         Studycafe studycafe = reservation.getRoom().getStudycafe();
@@ -133,7 +133,7 @@ public class ReviewService {
 
     @Transactional
     public DeleteReviewResponse deleteReview(Long reviewId) {
-        ReservationRecord reservationRecord = findReservationRecordByReviewId(reviewId);
+        ReservationRecord reservationRecord = findReservationByReviewId(reviewId);
         if (LocalDate.now().isBefore(reservationRecord.getDate().plusDays(7))) {
             throw new BadRequestException(EXPIRED_VALID_DATE);
         }
@@ -354,11 +354,11 @@ public class ReviewService {
     }
 
     private Member getMember(Review review) {
-        return findReservationRecordByReviewId(review.getId()).getMember();
+        return findReservationByReviewId(review.getId()).getMember();
     }
 
     private Room getRoom(Review review) {
-        return findReservationRecordByReviewId(review.getId()).getRoom();
+        return findReservationByReviewId(review.getId()).getRoom();
     }
 
     private List<Review> getAllReviews(Long studycafeId) {
@@ -389,18 +389,19 @@ public class ReviewService {
         return reviewRepository.findAllByRoomId(roomId, pageable);
     }
 
-    private ReservationRecord findReservationRecordByReviewId(Long reviewId) {
+    private ReservationRecord findReservationByReviewId(Long reviewId) {
         return reservationRecordRepository.findByReviewId(reviewId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    private ReservationRecord findReservationRecordById(Long reservationRecordId) {
+    private ReservationRecord findReservationById(Long reservationRecordId) {
         return reservationRecordRepository.findById(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
     }
 
-    private AccumHashtagHistory findAccumHashtagHistoryByName(String userHashtag) {
-        return accumHashtagHistoryRepository.findByHashtagName(HashtagName.valueOf(userHashtag)).orElseThrow(() -> new NotFoundException(NOT_FOUND_HASHTAG));
+    private AccumHashtagHistory findAccumHashtagHistoryByName(Studycafe studycafe, String userHashtag) {
+        return accumHashtagHistoryRepository.findByStudycafeAndHashtagName(studycafe, HashtagName.valueOf(userHashtag))
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_HASHTAG));
     }
 
     private Page<ReservationRecord> findAllReservationRecordByMember(Member member, Pageable pageable) {
@@ -468,7 +469,7 @@ public class ReviewService {
 
     private void validateExistedAccumHashtag(Studycafe studycafe, String userHashtag) {
         if (accumHashtagHistoryRepository.existsByStudycafeAndHashtagName(studycafe,HashtagName.valueOf(userHashtag))) {
-            AccumHashtagHistory hashtagHistory = findAccumHashtagHistoryByName(userHashtag);
+            AccumHashtagHistory hashtagHistory = findAccumHashtagHistoryByName(studycafe, userHashtag);
             hashtagHistory.updateCount();
         }
     }
