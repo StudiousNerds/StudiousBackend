@@ -103,7 +103,7 @@ public class RoomService {
                 .paidConveniences(getPaidConveniences(room.getId()))
                 .build();
     }
-    
+
     @Transactional
     public ModifyRoomResponse modifyRoom(Long studycafeId, Long roomId, ModifyRoomRequest modifyRequest, List<MultipartFile> photos) {
         Studycafe studycafe = getStudycafeById(studycafeId);
