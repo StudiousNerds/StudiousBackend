@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewType;
 import nerds.studiousTestProject.review.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

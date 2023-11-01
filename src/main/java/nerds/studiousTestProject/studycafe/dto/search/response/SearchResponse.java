@@ -18,7 +18,7 @@ public class SearchResponse {
     private List<HashtagName> hashtags;
     private Double grade;
 
-    public static SearchResponse from(SearchResponseInfo searchResponseInfo, List<HashtagName> hashtagNames, Integer accumRevCnt, Double grade) {
+    public static SearchResponse from(SearchResponseInfo searchResponseInfo, List<HashtagName> hashtags, Integer accumRevCnt, Double grade) {
         return SearchResponse.builder()
                 .id(searchResponseInfo.getId())
                 .id(searchResponseInfo.getId())
@@ -27,7 +27,7 @@ public class SearchResponse {
                 .accumResCnt(accumRevCnt)
                 .walkingTime(searchResponseInfo.getWalkingTime())
                 .nearestStation(searchResponseInfo.getNearestStation())
-                .hashtags(hashtagNames)
+                .hashtags(hashtags)
                 .grade(grade)
                 .build();
     }

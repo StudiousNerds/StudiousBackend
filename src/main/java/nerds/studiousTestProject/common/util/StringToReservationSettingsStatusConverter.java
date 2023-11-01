@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.common.util;
 
 import nerds.studiousTestProject.common.exception.BadRequestException;
-import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import org.springframework.core.convert.converter.Converter;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.CANT_CONVERT_TO_RESERVATION_SETTING_STATUS;

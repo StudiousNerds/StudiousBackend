@@ -1,7 +1,7 @@
 package nerds.studiousTestProject.review.repository;
 
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.review.dto.manage.inquire.request.AdminReviewType;
+import nerds.studiousTestProject.review.dto.enquiry.request.AdminReviewType;
 import nerds.studiousTestProject.review.entity.Review;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;

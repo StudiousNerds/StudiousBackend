@@ -97,6 +97,14 @@ public class Studycafe {
     @OneToMany(mappedBy = "studycafe", cascade = CascadeType.ALL)
     private List<SubPhoto> subPhotos = new ArrayList<>();
 
+    public void updateAccumReserveCount(){
+        accumReserveCount++;
+    }
+
+    public void cancelReservation() {
+        accumReserveCount--;
+    }
+
     public void addRoom(Room room) {
         rooms.add(room);
         room.setStudycafe(this);
@@ -190,6 +198,22 @@ public class Studycafe {
     public void updateGrade(Double gradeSum) {
         if (gradeSum != null) {
             this.gradeSum += gradeSum;
+        }
+    }
+
+    public void updateAccumReserveCount(Integer accumReserveCount) {
+        if (accumReserveCount != null) {
+            this.accumReserveCount += accumReserveCount;
+        }
+    }
+
+    public void updateGradeData(Double gradeSum, Integer gradeCount) {
+        if (gradeSum != null) {
+            this.gradeSum += gradeSum;
+        }
+
+        if (gradeCount != null) {
+            this.gradeCount += gradeCount;
         }
     }
 

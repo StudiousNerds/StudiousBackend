@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
@@ -47,7 +47,7 @@ public class StudycafeController {
                                        @RequestParam(required = false) List<HashtagName> hashtags,
                                        @RequestParam(required = false) List<ConvenienceName> conveniences,
                                        @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) SearchSortType sortType) {
-        return studycafeService.inquire(keyword, date, startTime, endTime, headCount, minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
+        return studycafeService.enquiry(keyword, date, startTime, endTime, headCount, minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
     @GetMapping("/studycafes/{studycafeId}")
