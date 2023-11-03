@@ -48,10 +48,7 @@ import nerds.studiousTestProject.studycafe.dto.register.response.RegisterRespons
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
-import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponseInfo;
-import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchInResponse;
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -89,12 +86,11 @@ public class StudycafeService {
     private final ReservationRecordRepository reservationRecordRepository;
     private final StudycafeRepository studycafeRepository;
 
-    /**
-     * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
-     * 해당 메소드에서 추가적으로 잘못 입력된 값에 대한 예외처리를 진행
-     * @return 검색 결과
-     */
-    public List<SearchResponse> enquiry(final String keyword,
+    private static final String SHOW_STUDYCAFE_HASHTAGS_SEPARATOR = ",";
+    private static final double INITIAL_GRADE = 0.;
+    private static final int MAX_HOUR = 24;
+
+    public List<SearchResponse> enquire(final String keyword,
                                         final LocalDate date,
                                         final LocalTime startTime,
                                         final LocalTime endTime,
@@ -103,11 +99,12 @@ public class StudycafeService {
                                         final List<HashtagName> hashtags,
                                         final List<ConvenienceName> conveniences,
                                         final SearchSortType sortType,
-                                        final Pageable pageable) {
-        final List<LocalDate> holidays = holidayProvider.getHolidays();
-        final Week week = date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
+                                        final Pageable pageable,
+                                        final Long memberId) {
+        final Week week = createWeekByDateConsiderHoliday(date);
 
         final SearchRequest searchRequest = SearchRequest.builder()
+                .memberId(memberId)
                 .keyword(keyword)
                 .date(date)
                 .week(week)
@@ -120,8 +117,10 @@ public class StudycafeService {
                 .sortType(sortType)
                 .build();
 
-        final List<SearchResponseInfo> searchResponseInfos = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
-        return searchResponseInfos.stream().map(s -> SearchResponse.from(s, getAllHashtagNames(s), getAccumRevCnt(s), getGrade(s))).toList();
+        final List<SearchInResponse> searchInResponses = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
+        return searchInResponses.stream().map(s -> SearchResponse.from(
+                s, parseStringToHashtagNames(s.getAccumHashtags()), getGradeFromSumAndCount(s.getGradeSum(), s.getGradeCount()))
+        ).toList();
     }
 
     public FindStudycafeResponse findByDate(final Long studycafeId, final LocalDate date){
