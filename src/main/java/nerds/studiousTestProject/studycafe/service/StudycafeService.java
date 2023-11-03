@@ -160,47 +160,7 @@ public class StudycafeService {
         return getNotice(studycafeId);
     }
 
-    public MainPageResponse getMainPage() {
-        final List<RecommendCafeInfo> recommendStudycafes = getRecommendStudycafes();
-        final List<EventCafeInfo> eventStudycafes = getEventStudycafes();
-        return MainPageResponse.builder().recommend(recommendStudycafes).event(eventStudycafes).build();
-    }
-
-    public List<RecommendCafeInfo> getRecommendStudycafes(){
-        final List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> RecommendCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    public List<EventCafeInfo> getEventStudycafes(){
-        final List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> EventCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getNotice(final Long studycafeId) {
+    public ShowDetailsResponse findStudycafeByDate(final Long studycafeId, final LocalDate today) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getNotices().stream().map(Notice::getDetail).toList();
@@ -215,7 +175,7 @@ public class StudycafeService {
                 .toList();
     }
 
-    public List<RefundPolicyInfo> getRefundPolicy(final Long studycafeId) {
+    public List<RefundPolicyInfo> findRefundPolicies(final Long studycafeId) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getRefundPolicies().stream()
@@ -223,7 +183,7 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    public List<AnnouncementInResponse> getAnnouncement(final Long studycafeId) {
+    public List<String> findNotices(final Long studycafeId) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getAnnouncements().stream()
