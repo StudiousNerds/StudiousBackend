@@ -15,7 +15,7 @@ import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
-import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponseInfo;
+import nerds.studiousTestProject.studycafe.dto.search.response.SearchInResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -48,7 +48,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
     private static final String CONCAT_REPLACE_STR = "";
 
     @Override
-    public Page<SearchResponseInfo> getSearchResult(final SearchRequest searchRequest, final Pageable pageable) {
+    public Page<SearchInResponse> getSearchResult(final SearchRequest searchRequest, final Pageable pageable) {
         final JPAQuery<Long> countQuery = queryFactory
                 .select(studycafe.count())
                 .from(studycafe);
@@ -72,9 +72,9 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             return Page.empty();
         }
 
-        final JPAQuery<SearchResponseInfo> contentQuery = queryFactory
+        final JPAQuery<SearchInResponse> contentQuery = queryFactory
                 .select(
-                        Projections.constructor(SearchResponseInfo.class,
+                        Projections.constructor(SearchInResponse.class,
                                 studycafe.id,
                                 studycafe.name,
                                 studycafe.photo,
@@ -92,8 +92,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 )
                 .from(studycafe);
 
-
-        final List<SearchResponseInfo> content = getJoinedQuery(contentQuery, searchRequest)
+        final List<SearchInResponse> content = getJoinedQuery(contentQuery, searchRequest)
                 .where(
                         dateAndTimeCanReserve(searchRequest.getDate(), searchRequest.getStartTime(), searchRequest.getEndTime()),
                         headCountBetween(searchRequest.getHeadCount()),
