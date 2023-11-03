@@ -1,4 +1,4 @@
-package nerds.studiousTestProject.reservation.dto.detail.response;
+package nerds.studiousTestProject.studycafe.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,29 +6,31 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 @Getter
 @Builder
 public class PlaceInfo {
 
     private String studycafeName;
+    private String studycafePhoto;
     private String roomName;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
     private String address;
 
-    public static PlaceInfo of(Studycafe studycafe, Room room, ReservationRecord reservationRecord) {
+    public static PlaceInfo from(ReservationRecord reservationRecord) {
+        Room room = reservationRecord.getRoom();
+        Studycafe studycafe = room.getStudycafe();
+        return createPlaceInfo(studycafe, room);
+    }
+
+    public static PlaceInfo of(Studycafe studycafe, Room room) {
+        return createPlaceInfo(studycafe, room);
+    }
+
+    private static PlaceInfo createPlaceInfo(Studycafe studycafe, Room room) {
         return PlaceInfo.builder()
                 .studycafeName(studycafe.getName())
+                .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())
-                .date(reservationRecord.getDate())
-                .startTime(reservationRecord.getStartTime())
-                .endTime(reservationRecord.getEndTime())
                 .address(studycafe.getAddress().getEntryAddress())
                 .build();
     }
-
 }

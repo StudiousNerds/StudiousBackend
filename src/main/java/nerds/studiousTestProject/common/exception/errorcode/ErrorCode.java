@@ -63,11 +63,15 @@ public enum ErrorCode {
     MISMATCH_PRICE("결제 금액이 일치 하지 않는 결제입니다."),
     INVALID_REQUEST_PARAM("파라미터가 잘못되었습니다."),
     NOT_FOUND_PAGE("페이지가 없습니다."),
+    MISMATCH_CANCEL_PRICE("총 취소 금액이 맞지않습니다."),
+    INVALID_CHANGE_REQUEST("변경 사항이 없습니다."),
     EXPIRED_VALID_DATE("유효 기간이 만료되었습니다"),
     INVALID_RESERVATION_STATUS("예약이 완료되지 않았습니다."),
     INVALID_WRITE_REVIEW_TIME("리뷰 작성 가능 시간이 아닙니다."),
     INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
-    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다.");
+    INVALID_ROOM_PHOTOS("룸 사진은 필수입니다."),
+    DATE_ONLY_ONE_NULL("시작일과 끝나는 일자는 둘 중 하나만 없을 수 없습니다."),
+    INVALID_BANK_CODE("유효하지 않은 bank code입니다.");
 
     private final String message;
     ErrorCode(String message) {

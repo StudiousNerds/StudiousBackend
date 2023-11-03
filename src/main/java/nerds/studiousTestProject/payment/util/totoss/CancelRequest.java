@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nerds.studiousTestProject.reservation.dto.change.request.ChangeReservationRequest;
+
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -17,4 +20,7 @@ public class CancelRequest extends RequestToToss {
     private Integer cancelAmount;
     private RefundReceiveAccount refundReceiveAccount;
 
+    public static CancelRequest from(String cancelReason, ChangeReservationRequest request) {
+        return new CancelRequest(cancelReason, null, request.getReceiveAccount());
+    }
 }

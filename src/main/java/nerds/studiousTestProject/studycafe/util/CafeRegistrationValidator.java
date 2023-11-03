@@ -1,16 +1,12 @@
 package nerds.studiousTestProject.studycafe.util;
 
 import io.netty.handler.codec.http.HttpScheme;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
-import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
+import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateBusinessmanRequest;
+import nerds.studiousTestProject.studycafe.dto.validate.response.ValidResponse;
 import nerds.studiousTestProject.studycafe.util.odcloud.response.BusinessInfoResponse;
 import nerds.studiousTestProject.studycafe.util.openbank.request.OpenBankTokenRequest;
 import nerds.studiousTestProject.studycafe.util.openbank.response.AccountInfoResponse;
@@ -24,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -48,10 +43,10 @@ public class CafeRegistrationValidator {
 
     /**
      * 사용자가 입력한 계좌 정보가 유효한지 검증하는 메소드
-     * @param accountInfoRequest 사용자가 입력한
+     * @param validateAccountRequest 사용자가 입력한
      * @return
      */
-    public ValidResponse getAccountInfoValidResponse(AccountInfoRequest accountInfoRequest) {
+    public ValidResponse getAccountInfoValidResponse(ValidateAccountRequest validateAccountRequest) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 OpenBankTokenRequest.builder()
                         .client_id(OPEN_BANK_CLIENT_ID)
@@ -61,7 +56,7 @@ public class CafeRegistrationValidator {
                         .build()
         );
 
-        accountInfoRequest.setAccount_holder_info_type("");
+        validateAccountRequest.setAccount_holder_info_type("");
         OpenBankTokenResponse openBankTokenResponse = webClient.post()
                 .uri(
                         UriComponentsBuilder.newInstance()
@@ -80,7 +75,7 @@ public class CafeRegistrationValidator {
 
         log.info("openBankTokenResponse = {}", openBankTokenResponse);
 
-        accountInfoRequest.setTran_dtime(
+        validateAccountRequest.setTran_dtime(
                 getNowTimeString()
         );
         AccountInfoResponse accountInfoResponse = webClient.post()
@@ -100,7 +95,7 @@ public class CafeRegistrationValidator {
                             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                         }
                 )
-                .body(BodyInserters.fromValue(accountInfoRequest))
+                .body(BodyInserters.fromValue(validateAccountRequest))
                 .retrieve()
                 .bodyToMono(AccountInfoResponse.class)
                 .block();
@@ -123,10 +118,10 @@ public class CafeRegistrationValidator {
 
     /**
      * 사용자가 입력한 사업자 번호가 유효한지 검증하는 메소드
-     * @param businessInfoRequest 사업자 등록 번호
+     * @param validateBusinessmanRequest 사업자 등록 번호
      * @return 사업자 등록 번호 유효성
      */
-    public ValidResponse getBusinessInfoValidResponse(BusinessInfoRequest businessInfoRequest) {
+    public ValidResponse getBusinessInfoValidResponse(ValidateBusinessmanRequest validateBusinessmanRequest) {
         BusinessInfoResponse businessInfoResponse = webClient
                 .post()
                 .uri(
@@ -140,7 +135,7 @@ public class CafeRegistrationValidator {
                 )
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(businessInfoRequest)
+                .bodyValue(validateBusinessmanRequest)
                 .retrieve()
                 .bodyToMono(BusinessInfoResponse.class)
                 .block();

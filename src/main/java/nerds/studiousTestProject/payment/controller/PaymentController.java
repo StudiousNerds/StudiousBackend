@@ -6,27 +6,35 @@ import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackReq
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
-import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
-import nerds.studiousTestProject.reservation.dto.detail.response.ReservationDetailResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RestController
-@RequestMapping("/studious/payments")
+@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentController {
 
+    private static final String REDIRECT_URI_TO_RESERVATION = "/api/v1/mypage/reservations/";
+
     private final PaymentService paymentService;
 
-    @GetMapping("/success")
-    public ReservationDetailResponse payConfirmSuccess(@RequestParam String orderId,
+    @PostMapping("/success")
+    public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
                                                        @RequestParam String paymentKey,
                                                        @RequestParam Integer amount) {
-        return paymentService.confirmSuccess(orderId, paymentKey, amount);
+        Long reservationRecordId = paymentService.confirmSuccess(orderId, paymentKey, amount);
+        return ResponseEntity.created(URI.create(REDIRECT_URI_TO_RESERVATION + reservationRecordId)).build();
     }
 
-    @GetMapping("/fail")
+    @PostMapping("/fail")
     public ConfirmFailResponse payConfirmFail(@RequestParam String code,
                                               @RequestParam String message,
                                               @RequestParam String orderId) {

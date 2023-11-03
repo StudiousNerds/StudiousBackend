@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Cancels {
-    private int cancelAmount;
+public class Cancel {
+
+    private Integer cancelAmount;
     private String cancelReason;
-    private int taxFreeAmount;
+    private Integer taxFreeAmount;
     private Integer taxExemptionAmount;
-    private int refundableAmount;
-    private int easyPayDiscountAmount;
+    private Integer refundableAmount;
+    private Integer easyPayDiscountAmount;
     private String canceledAt;
     private String transactionKey;
     private String receiptKey;

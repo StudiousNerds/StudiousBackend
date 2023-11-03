@@ -3,13 +3,13 @@ package nerds.studiousTestProject.reservation.dto.show.response;
 import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
-import nerds.studiousTestProject.convenience.entity.ConvenienceType;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
 import nerds.studiousTestProject.room.entity.Room;
+import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,25 +18,19 @@ import java.util.stream.Collectors;
 @Getter
 public class ReserveResponse {
 
-    private String cafeName;
-    private String studycafePhoto;
-    private String roomName;
+    private PlaceInfo place;
     private List<String> conveniences;
     private List<PaidConvenience> paidConveniences;
-    private String username;
-    private String userPhoneNumber;
-    private List<RefundPolicyInfo> refundPolicy;
+    private ReserveUserInfo user;
+    private List<RefundPolicyInfo> refundPolicies;
 
     public static ReserveResponse of(Member member, Room room, Studycafe studycafe, List<Convenience> conveniences, List<RefundPolicy> refundPolicyList) {
         return ReserveResponse.builder()
                 .conveniences(getRoomConvenienceList(conveniences))
                 .paidConveniences(getPaidConvenienceList(conveniences))
-                .cafeName(studycafe.getName())
-                .roomName(room.getName())
-                .studycafePhoto(studycafe.getPhoto())
-                .username(member.getName())
-                .userPhoneNumber(member.getPhoneNumber())
-                .refundPolicy(getRefundPolicyInfo(refundPolicyList))
+                .place(PlaceInfo.of(studycafe, room))
+                .user(ReserveUserInfo.from(member))
+                .refundPolicies(getRefundPolicyInfo(refundPolicyList))
                 .build();
     }
 

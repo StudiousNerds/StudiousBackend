@@ -5,26 +5,25 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nerds.studiousTestProject.member.entity.member.Member;
-import nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus;
+import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.AFTER_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.ALL;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.BEFORE_USING;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.CANCELED;
-import static nerds.studiousTestProject.reservation.dto.mypage.response.ReservationSettingsStatus.USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.AFTER_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.ALL;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.BEFORE_USING;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.CANCELED;
+import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.USING;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 
 
-@Component
 @RequiredArgsConstructor
 public class ReservationRecordRepositoryCustomImpl implements ReservationRecordRepositoryCustom {
 
@@ -54,15 +53,15 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
         return query.innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
                 .innerJoin(reservationRecord.room.studycafe, studycafe)
                 .where(
-                        equalToStudycafeName(studycafeName),
+                        searchByStudycafeName(studycafeName),
                         handleTab(tab),
                         afterReservationStartDate(startDate),
                         beforeReservationEndDate(endDate)
                 );
     }
 
-    private BooleanExpression equalToStudycafeName(String studycafeName) {
-        return studycafeName == null ? null : studycafe.name.eq(studycafeName);
+    private BooleanExpression searchByStudycafeName(String studycafeName) {
+        return studycafeName == null ? null : studycafe.name.contains(studycafeName);
     }
 
     private BooleanExpression afterReservationStartDate(LocalDate startDate) {

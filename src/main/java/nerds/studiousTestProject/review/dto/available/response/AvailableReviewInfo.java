@@ -2,7 +2,6 @@ package nerds.studiousTestProject.review.dto.available.response;
 
 import lombok.Builder;
 import lombok.Data;
-import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 import java.time.LocalDate;
@@ -22,7 +21,7 @@ public class AvailableReviewInfo {
     private Integer usingTime;
     private LocalDate validDate;
 
-    public static AvailableReviewInfo of(ReservationRecord reservationRecord) {
+    public static AvailableReviewInfo from(ReservationRecord reservationRecord) {
         return AvailableReviewInfo.builder()
                 .reservationId(reservationRecord.getId())
                 .studycafeId(reservationRecord.getRoom().getStudycafe().getId())
