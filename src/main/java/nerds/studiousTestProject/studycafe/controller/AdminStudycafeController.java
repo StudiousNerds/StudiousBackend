@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.List;
@@ -88,6 +89,30 @@ public class AdminStudycafeController {
     @DeleteMapping("/{studycafeId}")
     public void delete(@LoggedInMember final Long memberId,
                        @PathVariable final Long studycafeId) {
-        studycafeService.delete(memberId, studycafeId);
+        adminStudycafeService.delete(memberId, studycafeId);
+    }
+
+    @GetMapping("/{studycafeId}/rooms")
+    public List<ShowRoomBasicResponse> inquireRooms(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
+        return adminStudycafeService.enquireRooms(memberId, studycafeId);
+    }
+
+    @GetMapping("/{studycafeId}/rooms/{roomId}")
+    public ShowRoomDetailsResponse inquireRoom(@LoggedInMember Long memberId, @PathVariable Long studycafeId, @PathVariable Long roomId) {
+        return adminStudycafeService.enquireRoom(memberId, studycafeId, roomId);
+    }
+
+    @PatchMapping("/{studycafeId}/rooms/{roomId}")
+    public ResponseEntity<Void> modifyRoom(@PathVariable Long studycafeId, @PathVariable Long roomId,
+                                         @RequestPart("modifyRoomReuqest") @Valid ModifyRoomRequest modifyRoomRequest,
+                                         @RequestPart(value = "file", required = false) List<MultipartFile> roomPhotos) {
+        adminStudycafeService.modifyRoom(roomId, modifyRoomRequest, roomPhotos);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{studycafeId}/rooms/{roomId}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long studycafeId, @PathVariable Long roomId) {
+        adminStudycafeService.deleteRoom(roomId);
+        return ResponseEntity.noContent().build();
     }
 }
