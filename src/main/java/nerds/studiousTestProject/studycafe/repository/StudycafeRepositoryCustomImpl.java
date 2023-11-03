@@ -26,6 +26,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nerds.studiousTestProject.bookmark.entity.QBookmark.bookmark;
 import static nerds.studiousTestProject.hashtag.entity.QAccumHashtagHistory.accumHashtagHistory;
 import static nerds.studiousTestProject.hashtag.entity.QHashtagRecord.hashtagRecord;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
@@ -86,8 +87,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                                 Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name),
                                 studycafe.gradeSum,
                                 studycafe.gradeCount,
-                                grade.total.sum(),
-                                grade.count().intValue()
+                                bookmarked(searchRequest.getMemberId())
                         )
                 )
                 .from(studycafe);
@@ -126,6 +126,11 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                 .leftJoin(review.grade, grade)
                 .leftJoin(review.hashtagRecords, hashtagRecord);
 
+        if (searchRequest.getMemberId() != null) {
+            query = query
+                    .leftJoin(bookmark).on(bookmark.member.id.eq(searchRequest.getMemberId()));
+        }
+
         if (searchRequest.getDate() != null && searchRequest.getWeek() != null) {
             query = query
                     .leftJoin(studycafe.operationInfos, operationInfo).on(operationInfo.week.eq(searchRequest.getWeek()));
@@ -141,6 +146,14 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
         }
 
         return query;
+    }
+
+    private BooleanExpression bookmarked(final Long memberId) {
+        if (memberId == null) {
+            return Expressions.asBoolean(false);
+        }
+
+        return bookmark.studycafe.id.count().gt(0L).and(Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, bookmark.studycafe.id).contains(studycafe.id.stringValue()));
     }
 
     private BooleanExpression headCountBetween(final Integer headCount) {
