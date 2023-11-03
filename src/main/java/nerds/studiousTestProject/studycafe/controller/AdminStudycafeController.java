@@ -5,17 +5,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
-import nerds.studiousTestProject.studycafe.dto.modify.request.AnnouncementRequest;
-import nerds.studiousTestProject.studycafe.dto.modify.request.CafeInfoEditRequest;
-import nerds.studiousTestProject.studycafe.dto.modify.response.AnnouncementResponse;
-import nerds.studiousTestProject.studycafe.dto.modify.response.CafeBasicInfoResponse;
-import nerds.studiousTestProject.studycafe.dto.modify.response.CafeDetailsResponse;
+import nerds.studiousTestProject.room.dto.show.ShowRoomDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedDetailsResponse;
+import nerds.studiousTestProject.room.dto.show.ShowRoomBasicResponse;
+import nerds.studiousTestProject.room.dto.modify.ModifyRoomRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyAnnouncementRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyAnnouncementResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedBasicResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
-import nerds.studiousTestProject.studycafe.dto.valid.request.AccountInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.request.BusinessInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.valid.response.ValidResponse;
-import nerds.studiousTestProject.studycafe.service.StudycafeService;
+import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
+import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateBusinessmanRequest;
+import nerds.studiousTestProject.studycafe.dto.validate.response.ValidateResponse;
+import nerds.studiousTestProject.studycafe.service.AdminStudycafeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,54 +40,56 @@ import java.util.List;
 @RequestMapping("/api/v1/admin/studycafes")
 @Slf4j
 public class AdminStudycafeController {
-    private final StudycafeService studycafeService;
+    private final AdminStudycafeService adminStudycafeService;
 
-    private static final int MANAGED_ENTRY_STUDYCAFE_SIZE = 4;
+    private static final String BASIC_STUDYCAFES_SIZE = "4";
 
-    @PostMapping("/accountInfos")
-    public ValidResponse checkAccountInfo(@RequestBody final AccountInfoRequest accountInfoRequest) {
-        return studycafeService.validateAccountInfo(accountInfoRequest);
+    @PostMapping("/accounts")
+    public ValidateResponse checkAccountInfo(@RequestBody final ValidateAccountRequest validateAccountRequest) {
+        return adminStudycafeService.validateAccountInfo(validateAccountRequest);
     }
 
-    @PostMapping("/businessInfos")
-    public ValidResponse checkBusinessInfo(@RequestBody final BusinessInfoRequest businessInfoRequest) {
-        return studycafeService.validateBusinessInfo(businessInfoRequest);
+    @PostMapping("/businessmen")
+    public ValidateResponse checkBusinessInfo(@RequestBody final ValidateBusinessmanRequest validateBusinessmanRequest) {
+        return adminStudycafeService.validateBusinessInfo(validateBusinessmanRequest);
     }
 
     @PostMapping
     public RegisterResponse register(@LoggedInMember final Long memberId,
                                      @RequestPart @Valid final RegisterRequest registerRequest,
                                      final MultipartHttpServletRequest request) {
-        return studycafeService.register(memberId, registerRequest, request.getMultiFileMap());
+        return adminStudycafeService.register(memberId, registerRequest, request.getMultiFileMap());
     }
 
     @GetMapping
-    public List<CafeBasicInfoResponse> findManagedEntryStudycafes(@LoggedInMember final Long memberId, @RequestParam final Integer page) {
-        return studycafeService.enquiryManagedEntryStudycafes(memberId, PageRequestConverter.of(page, MANAGED_ENTRY_STUDYCAFE_SIZE));
+    public List<ShowManagedBasicResponse> findManagedEntryStudycafes(@LoggedInMember final Long memberId,
+                                                                     @RequestParam(required = false) final Integer page,
+                                                                     @RequestParam(defaultValue = BASIC_STUDYCAFES_SIZE) final Integer size) {
+        return adminStudycafeService.enquireStudycafes(memberId, PageRequestConverter.of(page, size));
     }
 
     @GetMapping("/{studycafeId}")
-    public CafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
-        return studycafeService.enquiryManagedStudycafe(memberId, studycafeId);
+    public ShowManagedDetailsResponse findManagedDetailStudycafe(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
+        return adminStudycafeService.enquireStudycafe(memberId, studycafeId);
     }
 
     @PatchMapping("/{studycafeId}")
     public void modifyManagedStudycafe(@LoggedInMember final Long memberId,
                                        @PathVariable final Long studycafeId,
-                                       @RequestBody final CafeInfoEditRequest cafeInfoEditRequest) {
-        studycafeService.modify(memberId, studycafeId, cafeInfoEditRequest);
+                                       @RequestBody final ModifyRequest modifyRequest) {
+        adminStudycafeService.modify(memberId, studycafeId, modifyRequest);
     }
 
-    @GetMapping("/{studycafeId}/notificationInfos")
-    public List<AnnouncementResponse> findNotificationInfos(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
-        return studycafeService.enquiryAnnouncements(memberId, studycafeId);
+    @GetMapping("/{studycafeId}/notifications")
+    public List<ModifyAnnouncementResponse> findNotificationInfos(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
+        return adminStudycafeService.enquiryAnnouncements(memberId, studycafeId);
     }
 
-    @PostMapping("/{studycafeId}/notificationInfos")
+    @PostMapping("/{studycafeId}/notifications")
     public void addNotificationInfo(@LoggedInMember final Long memberId,
                                     @PathVariable final Long studycafeId,
-                                    @RequestBody @Valid final AnnouncementRequest announcementRequest) {
-        studycafeService.registerAnnouncements(memberId, studycafeId, announcementRequest);
+                                    @RequestBody @Valid final ModifyAnnouncementRequest modifyAnnouncementRequest) {
+        adminStudycafeService.registerAnnouncements(memberId, studycafeId, modifyAnnouncementRequest);
     }
 
     @DeleteMapping("/{studycafeId}")
