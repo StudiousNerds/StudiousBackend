@@ -31,7 +31,6 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long>, Stu
             "order by (cast(s.gradeSum + sum(g.total) as double)) / (s.gradeCount + count(g)) desc " +
             "limit 10")
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
-    List<Studycafe> findTop10ByOrderByCreatedDateDesc();
     Page<Studycafe> findByMemberOrderByCreatedDateAsc(final Member member, final Pageable pageable);
     Optional<Studycafe> findByIdAndMember(final Long id, final Member member);
     Optional<Studycafe> deleteByIdAndMember(final Long id, final Member member);
