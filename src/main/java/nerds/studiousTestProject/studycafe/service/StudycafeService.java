@@ -84,20 +84,10 @@ import static nerds.studiousTestProject.photo.entity.SubPhotoType.STUDYCAFE;
 @Service
 @Transactional(readOnly = true)
 public class StudycafeService {
-    private final MemberRepository memberRepository;
-    private final CafeRegistrationValidator cafeRegistrationValidator;
-    private final HashtagRecordRepository hashtagRecordRepository;
     private final HolidayProvider holidayProvider;
-    private final NearestStationInfoCalculator nearestStationInfoCalculator;
-    private final StorageProvider storageProvider;
-    private final StudycafeRepository studycafeRepository;
-    private final ReviewService reviewService;
-    private final RoomService roomService;
+    private final OperationInfoRepository operationInfoRepository;
     private final ReservationRecordRepository reservationRecordRepository;
-    private final Integer TOTAL_HASHTAGS_COUNT = 5;
-    private static final String CAFE_MAIN_PHOTO_KEY = "cafeMainPhoto";
-    private static final String CAFE_SUB_PHOTOS_KEY = "cafeSubPhotos";
-    private static final String ROOM_PHOTOS_KEY = "roomPhotos";
+    private final StudycafeRepository studycafeRepository;
 
     /**
      * 사용자가 정한 필터 및 정렬 조건을 반영하여 알맞는 카페 정보들을 반환하는 메소드
