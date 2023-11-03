@@ -32,6 +32,10 @@ public interface StudycafeRepository extends JpaRepository<Studycafe, Long>, Stu
             "limit 10")
     List<Studycafe> findTop10ByOrderByTotalGradeDesc();
     Page<Studycafe> findByMemberOrderByCreatedDateAsc(final Member member, final Pageable pageable);
-    Optional<Studycafe> findByIdAndMember(final Long id, final Member member);
-    Optional<Studycafe> deleteByIdAndMember(final Long id, final Member member);
+
+    @Query(value = "select s from Studycafe s where s.id = :id and s.member.id = :memberId")
+    Optional<Studycafe> findByIdAndMemberId(final Long id, final Long memberId);
+
+    @Query(value = "delete from Studycafe s where s.id = :id and s.member.id = :memberId")
+    Optional<Studycafe> deleteByIdAndMemberId(final Long id, final Long memberId);
 }
