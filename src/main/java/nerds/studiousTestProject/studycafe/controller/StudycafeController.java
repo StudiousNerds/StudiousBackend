@@ -27,7 +27,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/studycafes")
 @Slf4j
 @Validated
 public class StudycafeController {
@@ -51,19 +51,19 @@ public class StudycafeController {
                 minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
     }
 
-    @GetMapping("/studycafes/{studycafeId}")
-    public FindStudycafeResponse findStudycafeInfo(
+    @GetMapping("/{studycafeId}")
+    public ShowDetailsResponse findStudycafe(
             @PathVariable("studycafeId") final Long studycafeId,
             @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date) {
         return studycafeService.findByDate(studycafeId, date);
     }
 
-    @GetMapping("/studycafes/{studycafeId}/refundPolicy")
+    @GetMapping("/{studycafeId}/refundPolicies")
     public List<RefundPolicyInfo> findStudycafeRefundPolicy(@PathVariable("studycafeId") final Long studycafeId) {
         return studycafeService.findRefundPolicy(studycafeId);
     }
 
-    @GetMapping("/studycafes/{studycafeId}/notice")
+    @GetMapping("/{studycafeId}/notices")
     public List<String> findStudycafeNotice(@PathVariable("studycafeId") final Long studycafeId) {
         return studycafeService.findNotice(studycafeId);
     }
