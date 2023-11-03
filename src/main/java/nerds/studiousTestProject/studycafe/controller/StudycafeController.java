@@ -33,22 +33,24 @@ import java.util.List;
 public class StudycafeController {
     private final StudycafeService studycafeService;
 
-    private static final int STUDYCAFE_SEARCH_SIZE = 8;
+    private static final String STUDYCAFE_SEARCH_SIZE = "8";
     private static final String TIME_DEFAULT_VALUE = "#{T(java.time.LocalDateTime).now()}";
 
-    @GetMapping("/search")
-    public List<SearchResponse> search(@RequestParam(required = false) final Integer page,
-                                       @RequestParam(required = false) final String keyword,
-                                       @RequestParam(required = false) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date,
-                                       @RequestParam(required = false) final LocalTime startTime,
-                                       @RequestParam(required = false) final LocalTime endTime,
-                                       @RequestParam(required = false) @Positive(message = "인원 수는 최소 1명 이상이여야 합니다.") final Integer headCount,
-                                       @RequestParam(required = false) @Range(min = 0, max = 5, message = "최소 평점은 0이상 5이하여야 합니다.") final Integer minGrade,
-                                       @RequestParam(required = false) final List<HashtagName> hashtags,
-                                       @RequestParam(required = false) final List<ConvenienceName> conveniences,
-                                       @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) final SearchSortType sortType) {
-        return studycafeService.enquiry(keyword, date, startTime, endTime, headCount,
-                minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
+    @GetMapping
+    public List<SearchResponse> findStudycafes(@RequestParam(required = false) final Integer page,
+                                               @RequestParam(defaultValue = STUDYCAFE_SEARCH_SIZE) final Integer size,
+                                               @RequestParam(required = false) final String keyword,
+                                               @RequestParam(required = false) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date,
+                                               @RequestParam(required = false) final LocalTime startTime,
+                                               @RequestParam(required = false) final LocalTime endTime,
+                                               @RequestParam(required = false) @Positive(message = "인원 수는 최소 1명 이상이여야 합니다.") final Integer headCount,
+                                               @RequestParam(required = false) @Range(min = 0, max = 5, message = "최소 평점은 0이상 5이하여야 합니다.") final Integer minGrade,
+                                               @RequestParam(required = false) final List<HashtagName> hashtags,
+                                               @RequestParam(required = false) final List<ConvenienceName> conveniences,
+                                               @RequestParam(defaultValue = SearchSortType.Names.GRADE_DESC) final SearchSortType sortType,
+                                               @LoggedInMember @Nullable Long memberId) {
+        return studycafeService.enquire(keyword, date, startTime, endTime, headCount,
+                minGrade, hashtags, conveniences, sortType, PageRequestConverter.of(page, size), memberId);
     }
 
     @GetMapping("/{studycafeId}")
