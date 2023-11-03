@@ -134,16 +134,23 @@ public class Room {
         }
     }
 
+    private void updateConveniences(List<Convenience> conveniences) {
+        if (conveniences != null) {
+            this.conveniences = conveniences;
+        }
+    }
+
     public void deleteConveniences() {
         conveniences.removeAll(conveniences);
     }
 
-    public void update(Room room) {
-        updateRoomName(room.getName());
-        updateMinHeadCount(room.getMinHeadCount());
-        updateMaxHeadCount(room.getMaxHeadCount());
-        updatePrice(room.getPrice());
-        updateType(room.getPriceType());
-        updateMinUsingTime(room.getMinUsingTime());
+    public void update(String name, Integer minHeadCount, Integer maxHeadCount, Integer price, PriceType type, Integer minUsingTime, List<Convenience> conveniences) {
+        updateRoomName(name);
+        updateMinHeadCount(minHeadCount);
+        updateMaxHeadCount(maxHeadCount);
+        updatePrice(price);
+        updateType(type);
+        updateMinUsingTime(minUsingTime);
+        updateConveniences(conveniences);
     }
 }
