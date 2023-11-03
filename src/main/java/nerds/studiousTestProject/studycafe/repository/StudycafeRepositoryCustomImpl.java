@@ -5,7 +5,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
-import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -61,9 +60,9 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
                         convenienceContains(searchRequest.getConveniences()),
-                        totalGradeGoe(searchRequest.getMinGrade()))
-                .having(
-                        hashtagContains(searchRequest.getHashtags()))
+                        totalGradeGoe(searchRequest.getMinGrade()),
+                        hashtagContains(searchRequest.getHashtags())
+                )
                 .groupBy(studycafe.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -80,11 +79,9 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                                 studycafe.name,
                                 studycafe.photo,
                                 studycafe.accumReserveCount,
-                                reservationRecord.count().intValue(),
                                 studycafe.walkingTime,
                                 studycafe.nearestStation,
                                 Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name),
-                                Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name),
                                 studycafe.gradeSum,
                                 studycafe.gradeCount,
                                 bookmarked(searchRequest.getMemberId())
@@ -98,9 +95,9 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
                         headCountBetween(searchRequest.getHeadCount()),
                         keywordContains(searchRequest.getKeyword()),
                         convenienceContains(searchRequest.getConveniences()),
-                        totalGradeGoe(searchRequest.getMinGrade()))
-                .having(
-                        hashtagContains(searchRequest.getHashtags()))
+                        totalGradeGoe(searchRequest.getMinGrade()),
+                        hashtagContains(searchRequest.getHashtags())
+                )
                 .groupBy(studycafe.id)
                 .orderBy(createOrderSpecifier(searchRequest.getSortType()))
                 .offset(pageable.getOffset())
@@ -275,11 +272,7 @@ public class StudycafeRepositoryCustomImpl implements StudycafeRepositoryCustom 
             return null;
         }
 
-        final StringTemplate reflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, accumHashtagHistory.name.stringValue().coalesce(CONCAT_REPLACE_STR));
-        final StringTemplate NotReflectedHashtagNames = Expressions.stringTemplate(GROUP_CONCAT_TEMPLATE, hashtagRecord.name.stringValue().coalesce(CONCAT_REPLACE_STR));
-        final StringExpression concat = reflectedHashtagNames.concat(NotReflectedHashtagNames);
-
-        return getBooleanExpression(hashtags, concat);
+        return accumHashtagHistory.name.in(hashtags);
     }
 
     private <T extends Enum<?>> BooleanExpression getBooleanExpression(final List<T> list, final StringExpression concat) {
