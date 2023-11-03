@@ -8,7 +8,7 @@ import lombok.Data;
 import nerds.studiousTestProject.convenience.dto.register.RegisterConvenienceRequest;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.dto.register.RegisterRefundPolicyRequest;
-import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 import java.util.List;
@@ -43,14 +43,14 @@ public class RegisterStudycafeRequest {
     @Valid
     private List<RegisterRefundPolicyRequest> refundPolicies;  // 환불 정책
 
-    public Studycafe toEntity(Member member, NearestStationResponse nearestStationResponse) {
+    public Studycafe toEntity(Member member, NearestStationInfoResponse nearestStationInfoResponse) {
         return Studycafe.builder()
                 .name(name)
                 .member(member)
                 .address(addressInfo.of())
                 .tel(tel)
-                .walkingTime(nearestStationResponse.getWalkingTime())
-                .nearestStation(nearestStationResponse.getNearestStation())
+                .walkingTime(nearestStationInfoResponse.getWalkingTime())
+                .nearestStation(nearestStationInfoResponse.getNearestStation())
                 .introduction(introduction)
                 .build();
     }

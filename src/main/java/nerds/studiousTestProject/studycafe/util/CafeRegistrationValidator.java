@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateBusinessmanRequest;
-import nerds.studiousTestProject.studycafe.dto.validate.response.ValidResponse;
+import nerds.studiousTestProject.studycafe.dto.validate.response.ValidateResponse;
 import nerds.studiousTestProject.studycafe.util.odcloud.response.BusinessInfoResponse;
 import nerds.studiousTestProject.studycafe.util.openbank.request.OpenBankTokenRequest;
 import nerds.studiousTestProject.studycafe.util.openbank.response.AccountInfoResponse;
@@ -46,7 +46,7 @@ public class CafeRegistrationValidator {
      * @param validateAccountRequest 사용자가 입력한
      * @return
      */
-    public ValidResponse getAccountInfoValidResponse(ValidateAccountRequest validateAccountRequest) {
+    public ValidateResponse getAccountInfoValidResponse(ValidateAccountRequest validateAccountRequest) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 OpenBankTokenRequest.builder()
                         .client_id(OPEN_BANK_CLIENT_ID)
@@ -102,7 +102,7 @@ public class CafeRegistrationValidator {
 
         log.info("response = {}", accountInfoResponse);
 
-        return ValidResponse.builder()
+        return ValidateResponse.builder()
                 .available(true)
                 .build();
     }
@@ -121,7 +121,7 @@ public class CafeRegistrationValidator {
      * @param validateBusinessmanRequest 사업자 등록 번호
      * @return 사업자 등록 번호 유효성
      */
-    public ValidResponse getBusinessInfoValidResponse(ValidateBusinessmanRequest validateBusinessmanRequest) {
+    public ValidateResponse getBusinessInfoValidResponse(ValidateBusinessmanRequest validateBusinessmanRequest) {
         BusinessInfoResponse businessInfoResponse = webClient
                 .post()
                 .uri(
@@ -140,7 +140,7 @@ public class CafeRegistrationValidator {
                 .bodyToMono(BusinessInfoResponse.class)
                 .block();
 
-        return ValidResponse.builder()
+        return ValidateResponse.builder()
                 .available(businessInfoResponse.getMatch_cnt() != null)
                 .build();
     }
