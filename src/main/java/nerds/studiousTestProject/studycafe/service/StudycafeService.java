@@ -7,11 +7,10 @@ import nerds.studiousTestProject.common.service.HolidayProvider;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.reservation.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.reservation.dto.ReservedTimeInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowOperationInfoInResponse;
 import nerds.studiousTestProject.room.dto.show.ShowRoomResponse;
@@ -24,6 +23,7 @@ import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.OperationInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.entity.Week;
+import nerds.studiousTestProject.studycafe.repository.OperationInfoRepository;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,8 +33,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
 
@@ -139,106 +143,120 @@ public class StudycafeService {
         return photos;
     }
 
-    /**
-     * 등록된 스터디카페 수정 메소드
-     * @param memberId 사용자 pk
-     * @param studycafeId 스터디카페 PK
-     * @param cafeInfoEditRequest 수정된 데이터
-     */
-    @Transactional
-    public void modify(final Long memberId,
-                       final Long studycafeId,
-                       final CafeInfoEditRequest cafeInfoEditRequest) {
-        final Member member = findMemberById(memberId);
-        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    private Map<LocalDate, List<Integer>> getCanReserveDateTime(final LocalDate today,
+                                                                final int minUsingTime,
+                                                                final Long roomId,
+                                                                final Long studycafeId) {
+        final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate = getReservedTimesGroupingByDate(roomId, today);
+        final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek = getOperationInfosGroupingByWeek(studycafeId);
+        return getCanReserveTimesGroupingByDate(today, minUsingTime, operationInfoGroupingByWeek, reservedTimesGroupingByDate);
+    }
 
-        final String introduction = cafeInfoEditRequest.getIntroduction();
-        if (introduction != null) {
-            studycafe.updateIntroduction(introduction);
+    private Map<LocalDate, List<ReservedTimeInfo>> getReservedTimesGroupingByDate(final Long roomId, final LocalDate today) {
+        final List<ReservationRecord> reservationRecords = reservationRecordRepository.findAllByFutureReservedTimeGroupingByDate(today, roomId);
+        return reservationRecords.stream()
+                .collect(Collectors.groupingBy(ReservationRecord::getDate, Collectors.mapping(ReservedTimeInfo::of, Collectors.toList())));
+    }
+
+    private Map<Week, ShowOperationInfoInResponse> getOperationInfosGroupingByWeek(final Long studycafeId) {
+        final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek = new ConcurrentHashMap<>();
+        final List<OperationInfo> operationInfos = operationInfoRepository.findAllByStudycafeId(studycafeId);
+        operationInfos.forEach(o -> operationInfoGroupingByWeek.put(o.getWeek(), ShowOperationInfoInResponse.of(o)));
+        return operationInfoGroupingByWeek;
+    }
+
+    private Map<LocalDate, List<Integer>> getCanReserveTimesGroupingByDate(final LocalDate today,
+                                                                           final int minUsingTime,
+                                                                           final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek,
+                                                                           final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate) {
+        final Map<LocalDate, List<Integer>> canReserveTimesGroupingByDate = new ConcurrentHashMap<>();
+        final int todayDate = today.getDayOfMonth();
+        final int currentMonthLastDay = today.getMonth().maxLength();
+        for (int i = todayDate; i <= currentMonthLastDay; i++) {
+            final LocalDate currentDate = today.plusDays(i - todayDate);
+            final ShowOperationInfoInResponse currentOperationInfo = operationInfoGroupingByWeek.get(createWeekByDateConsiderHoliday(currentDate));
+            final List<Integer> canReserveTimes = getCanReserveTimes(currentDate, currentOperationInfo, minUsingTime, reservedTimesGroupingByDate);
+            canReserveTimesGroupingByDate.put(currentDate, canReserveTimes);
+        }
+        return canReserveTimesGroupingByDate;
+    }
+
+    private List<Integer> getCanReserveTimes(final LocalDate currentDate,
+                                             final ShowOperationInfoInResponse currentOperationInfo,
+                                             final int minUsingTime,
+                                             final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate) {
+        if (currentOperationInfo.isClosed()) {
+            return Collections.emptyList();
         }
 
-        final List<OperationInfoEditRequest> operationInfoEditRequests = cafeInfoEditRequest.getOperationInfos();
-        if (operationInfoEditRequests != null) {
-            final List<OperationInfo> operationInfos = operationInfoEditRequests.stream()
-                    .map(OperationInfoEditRequest::toEntity)
-                    .toList();
-            studycafe.updateOperationInfos(operationInfos);
+        final LocalTime openingTime = currentOperationInfo.isAllDay() ? LocalTime.MIN : currentOperationInfo.getStartTime();
+        final LocalTime closingTime = currentOperationInfo.isAllDay() ? LocalTime.MAX : currentOperationInfo.getEndTime();
+
+        if (!reservedTimesGroupingByDate.containsKey(currentDate)) {
+            return IntStream.range(openingTime.getHour(), getHourFromClosingTime(closingTime)).boxed().toList();
         }
 
-        final List<ConvenienceInfoEditRequest> convenienceInfoEditRequests = cafeInfoEditRequest.getConvenienceInfos();
-        if (convenienceInfoEditRequests != null) {
-            final List<Convenience> conveniences = convenienceInfoEditRequests.stream()
-                    .map(ConvenienceInfoEditRequest::toEntity)
-                    .toList();
-            studycafe.updateConveniences(conveniences);
+        final List<ReservedTimeInfo> reservedTimes = reservedTimesGroupingByDate.get(currentDate);
+        final Map<Integer, Boolean> canReservePerHour = getCanReservePerHour(minUsingTime, reservedTimes, openingTime, closingTime);
+        return canReservePerHour.keySet().stream().filter(canReservePerHour::get).toList();
+    }
+
+    private Map<Integer, Boolean> getCanReservePerHour(final int minUsingTime,
+                                                       final List<ReservedTimeInfo> reservedTimes,
+                                                       final LocalTime openingTime,
+                                                       final LocalTime closingTime) {
+        final Map<Integer, Boolean> canReservePerHour = initCanReservePerHour(openingTime, closingTime);
+        final List<Integer> reservationStartTimes = getReservationStartTimes(closingTime, reservedTimes);
+        final List<Integer> reservationEndTimes = getReservationEndTimes(openingTime, reservedTimes);
+
+        for (int i = 0; i <= reservedTimes.size(); i++) {
+            int canReserveTimeRange = reservationStartTimes.get(i) - reservationEndTimes.get(i);
+            if (canReserveTimeRange >= minUsingTime) {
+                IntStream.range(reservationEndTimes.get(i), reservationStartTimes.get(i)).forEach(e -> canReservePerHour.replace(e, true));
+            }
         }
+        return canReservePerHour;
+    }
 
-        // 사진은 추후
-
-        final List<String> noticeRequests = cafeInfoEditRequest.getNotices();
-        if (noticeRequests != null) {
-            List<Notice> notices = noticeRequests.stream()
-                    .map(n -> Notice.builder()
-                            .detail(n)
-                            .build()
-                    ).toList();
-            studycafe.updateNotices(notices);
+    private Map<Integer, Boolean> initCanReservePerHour(final LocalTime openingTime, final LocalTime closingTime) {
+        final Map<Integer, Boolean> canReservePerHour = new ConcurrentHashMap<>();
+        for (int i = openingTime.getHour(); i < getHourFromClosingTime(closingTime); i++) {
+            canReservePerHour.put(i, false);
         }
+        return canReservePerHour;
+    }
 
-        final List<RefundPolicyEditRequest> refundPolicyRequests = cafeInfoEditRequest.getRefundPolicies();
-        if (refundPolicyRequests != null) {
-            List<RefundPolicy> refundPolicies = refundPolicyRequests.stream()
-                    .map(RefundPolicyEditRequest::toEntity)
-                    .toList();
-            studycafe.updateRefundPolices(refundPolicies);
-        }
+    private List<Integer> getReservationStartTimes(final LocalTime closingTime, final List<ReservedTimeInfo> reservedTimes) {
+        final List<Integer> reservationStartTimes = new ArrayList<>(reservedTimes.stream().map(r -> r.getStartTime().getHour()).toList());
+        reservationStartTimes.add(reservationStartTimes.size(), getHourFromClosingTime(closingTime));
+        return reservationStartTimes;
+    }
 
+    private List<Integer> getReservationEndTimes(final LocalTime openingTime, final List<ReservedTimeInfo> reservedTimes) {
+        final List<Integer> reservationEndTimes = new ArrayList<>(reservedTimes.stream().map(r -> r.getEndTime().getHour()).toList());
+        reservationEndTimes.add(0, openingTime.getHour());
+        return reservationEndTimes;
+    }
+
+    private Week createWeekByDateConsiderHoliday(final LocalDate date) {
+        final List<LocalDate> holidays = holidayProvider.getHolidays();
+        return date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
     }
 
     /**
-     * 공지사항 조회 로직
-     * @param memberId 사용자 PK
-     * @param studycafeId 스터디카페 PK
-     * @return 스터디카페의 모든 공지사항
+     * 24시간 운영 스터디카페의 예약 가능시간대 조사시 0 ~ 23 리스트를 반환해야한다.
+     * 이 때, 마감시간을 LocalTime.MAX 를 사용하는데, 이 경우 closingTime.getHour() = 23 이므로 0 ~ 22 리스트가 반환된다
+     * (e.g. 09:00 ~ 21:00 이면 예약 가능시간 : 9 ~ 20 => (마감 시간) - 1 까지 만들어줘야 함. 그러나, 24시간 운영인 경우 마감 시간(getHour())이 23 이므로 공식 적용 불가)
+     * 이러한 상황을 대비하기 위해 24시간 운영인 경우 마감 시간을 파싱해주는 메소드를 추가함
+     * 굳이 이렇게 메소드를 사용하지 않아도 될 것 같긴하다.
+     * @param closingTime 운영 마감 시간
+     * @return 24시간인 경우 : 24, 그 외 : 마감 시간
      */
-    public List<AnnouncementResponse> enquiryAnnouncements(final Long memberId, final Long studycafeId) {
-        final Member member = findMemberById(memberId);
-        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+    private int getHourFromClosingTime(LocalTime closingTime) {
+        if (closingTime.equals(LocalTime.MAX)) {
+            return MAX_HOUR;
+        }
 
-        return studycafe.getAnnouncements().stream().map(AnnouncementResponse::from).toList();
-    }
-
-    /**
-     * 공지사항 추가 로직
-     * @param memberId 사용자 PK
-     * @param studycafeId 스터디카페 PK
-     * @param announcementRequest 공지사항 요청 값
-     */
-    @Transactional
-    public void registerAnnouncements(final Long memberId,
-                                      final Long studycafeId,
-                                      final AnnouncementRequest announcementRequest) {
-        final Member member = findMemberById(memberId);
-        final Studycafe studycafe = studycafeRepository.findByIdAndMember(studycafeId, member).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-
-        studycafe.addAnnouncement(announcementRequest.toEntity());
-    }
-
-    /**
-     * 스터디카페 삭제 메소드, 실제로 DB에서 삭제
-     * @param memberId 사용자 PK
-     * @param studycafeId 스터디카페 PK
-     */
-    @Transactional
-    public void delete(final Long memberId, final Long studycafeId) {
-        final Member member = findMemberById(memberId);
-        studycafeRepository.deleteByIdAndMember(studycafeId, member).orElseThrow(
-                () -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-    }
-
-    private Member findMemberById(final Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER));
+        return closingTime.getHour();
     }
 }
