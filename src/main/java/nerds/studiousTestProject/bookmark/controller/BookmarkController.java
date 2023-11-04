@@ -21,7 +21,7 @@ import java.net.URI;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/mypage/bookmarks")
+@RequestMapping("/api/v1/bookmarks")
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
