@@ -2,7 +2,7 @@ package nerds.studiousTestProject.bookmark.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
+import nerds.studiousTestProject.bookmark.dto.response.ShowBookmarkResponse;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
@@ -33,7 +33,7 @@ public class BookmarkController {
     }
 
     @GetMapping
-    public FindBookmarkResponse findBookmark(@LoggedInMember Long memberId,
+    public ShowBookmarkResponse findBookmark(@LoggedInMember Long memberId,
                                              @RequestParam(required = false) Integer page,
                                              @RequestParam(defaultValue = STUDYCAFE_SEARCH_SIZE) Integer size){
         return bookmarkService.findBookmark(memberId, PageRequestConverter.of(page, size));

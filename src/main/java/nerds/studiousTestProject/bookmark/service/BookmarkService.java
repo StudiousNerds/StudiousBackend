@@ -3,7 +3,7 @@ package nerds.studiousTestProject.bookmark.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
-import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
+import nerds.studiousTestProject.bookmark.dto.response.ShowBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.exception.BadRequestException;
@@ -50,11 +50,11 @@ public class BookmarkService {
         member.addBookmark(Bookmark.builder().studycafe(studyCafe).build());
     }
 
-    public FindBookmarkResponse findBookmark(final Long memberId, final Pageable pageable){
+    public ShowBookmarkResponse findBookmark(final Long memberId, final Pageable pageable){
         final Page<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
 
         if (bookmarks == null || !bookmarks.hasContent()) {
-            return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
+            return ShowBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
                     .bookmarkInfo(Collections.emptyList()).build();
         }
 
@@ -72,7 +72,7 @@ public class BookmarkService {
                         .build())
                 .collect(Collectors.toList());
 
-        return FindBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
+        return ShowBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
                 .bookmarkInfo(bookmarkInfos).build();
     }
 
