@@ -43,6 +43,8 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
     private final AdminReviewService adminReviewService;
+    private static final String STUDYCAFE_PAGE_REVIEW_SIZE = "8";
+    private static final String REVIEW_INQUIRE_SIZE = "5";
     private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
     @PostMapping("/mypage/reviews")
@@ -63,7 +65,9 @@ public class ReviewController {
     }
 
     @GetMapping("/mypage/reviews/available")
-    public AvailableReviewResponse InquireAvailableReview(@LoggedInMember Long memberId, @RequestParam Integer page, @RequestParam Integer size) {
+    public AvailableReviewResponse InquireAvailableReview(@LoggedInMember Long memberId,
+                                                          @RequestParam Integer page,
+                                                          @RequestParam(defaultValue = REVIEW_INQUIRE_SIZE) Integer size) {
         return reviewService.findAvailableReviews(memberId, PageRequestConverter.of(page, size));
     }
 
@@ -73,14 +77,14 @@ public class ReviewController {
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate,
             @RequestParam Integer page,
-            @RequestParam Integer size) {
+            @RequestParam(defaultValue = REVIEW_INQUIRE_SIZE) Integer size) {
         return reviewService.findWrittenReviews(memberId, startDate, endDate, PageRequestConverter.of(page, size));
     }
 
     @GetMapping("/studycafes/{studycafeId}/reviews")
     public FindReviewSortedResponse findAllReviews(@PathVariable("studycafeId") Long studycafeId,
                                                    @RequestParam Integer page,
-                                                   @RequestParam Integer size,
+                                                   @RequestParam(defaultValue = STUDYCAFE_PAGE_REVIEW_SIZE) Integer size,
                                                    @RequestParam(required = false, defaultValue = UserReviewSortType.Names.CREATED_DATE_DESC) UserReviewSortType sortType) {
         return reviewService.findAllReviews(studycafeId, PageRequestConverter.of(page, size, sortType.getSort()));
     }
@@ -89,7 +93,7 @@ public class ReviewController {
     public FindReviewSortedResponse findRoomReviews(@PathVariable("studycafeId") Long studycafeId,
                                                     @PathVariable("roomId") Long roomId,
                                                     @RequestParam Integer page,
-                                                    @RequestParam Integer size,
+                                                    @RequestParam(defaultValue = STUDYCAFE_PAGE_REVIEW_SIZE) Integer size,
                                                     @RequestParam(required = false, defaultValue = UserReviewSortType.Names.CREATED_DATE_DESC) UserReviewSortType sortType) {
         return reviewService.findRoomReviews(studycafeId, roomId, PageRequestConverter.of(page, size, sortType.getSort()));
     }

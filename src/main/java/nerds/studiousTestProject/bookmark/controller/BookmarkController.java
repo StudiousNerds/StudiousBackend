@@ -24,15 +24,18 @@ import java.net.URI;
 @RequestMapping("/api/v1/bookmarks")
 public class BookmarkController {
     private final BookmarkService bookmarkService;
+    private static final String STUDYCAFE_SEARCH_SIZE = "8";
 
     @PostMapping("/{studycafeId}")
     public ResponseEntity<Void> registerBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
         bookmarkService.registerBookmark(memberId, studycafeId);
-        return ResponseEntity.created(URI.create("/api/v1/mypage/bookmarks")).build();
+        return ResponseEntity.created(URI.create("/api/v1/bookmarks")).build();
     }
 
     @GetMapping
-    public FindBookmarkResponse findBookmark(@LoggedInMember Long memberId, @RequestParam(required = false) Integer page, @RequestParam Integer size){
+    public FindBookmarkResponse findBookmark(@LoggedInMember Long memberId,
+                                             @RequestParam(required = false) Integer page,
+                                             @RequestParam(defaultValue = STUDYCAFE_SEARCH_SIZE) Integer size){
         return bookmarkService.findBookmark(memberId, PageRequestConverter.of(page, size));
     }
 
