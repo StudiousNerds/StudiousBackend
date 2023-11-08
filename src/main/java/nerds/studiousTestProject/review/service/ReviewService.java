@@ -110,10 +110,7 @@ public class ReviewService {
         final Double modifiedTotal = getTotal(modifyRequest.getCleanliness(), modifyRequest.getDeafening(), modifyRequest.getFixtureStatus());
 
         final Grade grade = review.getGrade();
-        grade.update(modifyRequest.getCleanliness(),
-                modifyRequest.getDeafening(),
-                modifyRequest.getFixtureStatus(),
-                modifiedTotal);
+        grade.update(modifyRequest.toGrade(grade.getId(), modifiedTotal));
         studycafe.updateGrade(modifiedTotal);
 
         deleteHashtagRecords(reviewId, studycafe);
