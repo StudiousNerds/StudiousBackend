@@ -18,7 +18,7 @@ public class ModifyReviewRequest {
     private List<String> hashtags;
     private String detail;
 
-    public Grade toGrade(Long Id, Double totalGrade) {
-        return new Grade(Id, cleanliness, deafening, fixtureStatus, totalGrade);
+    public Grade toGrade(Long Id, ModifyReviewRequest modifyRequest, Double totalGrade) {
+        return new Grade(Id, modifyRequest.getCleanliness(), modifyRequest.getDeafening(), modifyRequest.getFixtureStatus(), totalGrade);
     }
 }
