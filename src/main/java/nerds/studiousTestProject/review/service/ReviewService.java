@@ -463,7 +463,7 @@ public class ReviewService {
 
             validateExistedAccumHashtag(studycafe, userHashtag);
             AccumHashtagHistory hashtagHistory = AccumHashtagHistory.builder().name(HashtagName.valueOf(userHashtag)).studycafe(studycafe).build();
-            hashtagHistory.updateCount();
+            hashtagHistory.addCount();
             studycafe.addAccumHashtagHistory(hashtagHistory);
         }
     }
@@ -471,7 +471,7 @@ public class ReviewService {
     private void validateExistedAccumHashtag(final Studycafe studycafe, final String userHashtag) {
         if (accumHashtagHistoryRepository.existsByStudycafeAndHashtagName(studycafe,HashtagName.valueOf(userHashtag))) {
             final AccumHashtagHistory hashtagHistory = findAccumHashtagByCafeAndName(studycafe, userHashtag);
-            hashtagHistory.updateCount();
+            hashtagHistory.addCount();
         }
     }
 }

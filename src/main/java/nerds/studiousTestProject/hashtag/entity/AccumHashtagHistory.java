@@ -48,7 +48,7 @@ public class AccumHashtagHistory {
         }
     }
 
-    public void updateCount() {
+    public void addCount() {
         count++;
     }
 
