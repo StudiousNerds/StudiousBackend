@@ -79,9 +79,13 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(final Long memberId, final Long studycafeId){
         final Member member = findMemberById(memberId);
-        final Bookmark bookmark = bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
+        final Bookmark bookmark = findBookmarkById(studycafeId);
         member.deleteBookmark(bookmark);
         bookmarkRepository.deleteById(bookmark.getId());
+    }
+
+    private Bookmark findBookmarkById(Long studycafeId) {
+        return bookmarkRepository.findByStudycafeId(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKMARK));
     }
 
     private List<ReservationRecord> findReservationRecordsByStudycafeId(final Long studycafeId) {
