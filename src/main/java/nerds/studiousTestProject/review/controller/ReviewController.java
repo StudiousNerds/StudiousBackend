@@ -47,31 +47,31 @@ public class ReviewController {
     private static final String REVIEW_INQUIRE_SIZE = "5";
     private static final int ADMIN_REVIEW_INQUIRE_SIZE = 3;
 
-    @PostMapping("/mypage/reviews")
+    @PostMapping("/reviews")
     public RegisterReviewResponse register(@RequestPart("registerReviewRequest") @Valid RegisterReviewRequest registerReviewRequest,
                                            @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         return reviewService.register(registerReviewRequest, files);
     }
 
-    @PatchMapping("/mypage/reviews/{reviewId}")
+    @PatchMapping("/reviews/{reviewId}")
     public ModifyReviewResponse modifyReview(@PathVariable("reviewId") Long reviewId, @RequestPart("modifyReviewRequest") @Valid ModifyReviewRequest modifyReviewRequest,
                                              @RequestPart(value = "file", required = false) List<MultipartFile> files) {
         return reviewService.modifyReview(reviewId, modifyReviewRequest, files);
     }
 
-    @DeleteMapping("/mypage/reviews/{reviewId}")
+    @DeleteMapping("/reviews/{reviewId}")
     public DeleteReviewResponse deleteReview(@PathVariable("reviewId") Long reviewId) {
         return reviewService.deleteReview(reviewId);
     }
 
-    @GetMapping("/mypage/reviews/available")
+    @GetMapping("/reviews/available")
     public AvailableReviewResponse InquireAvailableReview(@LoggedInMember Long memberId,
                                                           @RequestParam Integer page,
                                                           @RequestParam(defaultValue = REVIEW_INQUIRE_SIZE) Integer size) {
         return reviewService.findAvailableReviews(memberId, PageRequestConverter.of(page, size));
     }
 
-    @GetMapping("/mypage/reviews")
+    @GetMapping("/reviews")
     public WrittenReviewResponse InquireWrittenReview(
             @LoggedInMember Long memberId,
             @RequestParam("startDate") LocalDate startDate,
