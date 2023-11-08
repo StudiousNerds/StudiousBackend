@@ -103,7 +103,7 @@ public class BookmarkService {
         return hashtagNames.stream().map(tag -> tag.name()).limit(size).toList();
     }
 
-    private Double findGradeByStudycafe(final Studycafe studycafe) {
+    private double findGradeByStudycafe(final Studycafe studycafe) {
         return studycafe.getGradeSum() / studycafe.getGradeCount();
     }
 

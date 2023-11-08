@@ -72,7 +72,7 @@ public class ReviewService {
     private final StorageProvider storageProvider;
     private final SubPhotoRepository subPhotoRepository;
     private final StudycafeRepository studycafeRepository;
-    public final Double GRADE_COUNT = 3.0;
+    public static final int GRADE_COUNT = 3;
 
     @Transactional
     public RegisterReviewResponse register(final RegisterReviewRequest registerRequest, final List<MultipartFile> files){
@@ -264,8 +264,8 @@ public class ReviewService {
         return recommend / studycafe.getGradeCount() * 100;
     }
 
-    private Double getTotal(final Integer cleanliness, final Integer deafening, final Integer fixtureStatus) {
-        return (cleanliness + deafening + fixtureStatus) / GRADE_COUNT;
+    private double getTotal(final Integer cleanliness, final Integer deafening, final Integer fixtureStatus) {
+        return (double) (cleanliness + deafening + fixtureStatus) / GRADE_COUNT;
     }
 
     private Double getGradeSum(final Integer cleanliness, final Integer deafening, final Integer fixtureStatus) {
