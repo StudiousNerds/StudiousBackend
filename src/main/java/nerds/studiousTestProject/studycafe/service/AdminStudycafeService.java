@@ -275,7 +275,7 @@ public class AdminStudycafeService {
         final Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
         studycafe.update(
                 modifyRequest.getIntroduction(),
-                modifyRequest.getConvenienceInfos().stream().map(ModifyConvenienceRequest::toEntity).toList(),
+                modifyRequest.getConvenienceInfos().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
                 modifyRequest.getNotices().stream().map(s -> Notice.builder().detail(s).build()).toList(),
                 modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toEntity).toList(),
                 modifyRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
@@ -300,7 +300,7 @@ public class AdminStudycafeService {
                 modifyRoomRequest.getPrice(),
                 PriceType.valueOf(modifyRoomRequest.getType()),
                 modifyRoomRequest.getMinUsingTime(),
-                modifyRoomRequest.getConveniences().stream().map(ModifyConvenienceRequest::toEntity).toList()
+                modifyRoomRequest.getConveniences().stream().map(ModifyConvenienceRequest::toConvenience).toList()
         );
 
         modifyRoomPhotos(room, roomPhotos);

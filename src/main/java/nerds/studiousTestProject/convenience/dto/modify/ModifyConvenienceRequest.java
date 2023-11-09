@@ -14,7 +14,7 @@ public class ModifyConvenienceRequest {
     @Min(value = 0, message = "가격은 0 이상입니다.")
     private Integer price;
 
-    public Convenience toEntity() {
+    public Convenience toConvenience() {
         return Convenience.builder()
                 .name(name)
                 .price(price)
