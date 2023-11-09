@@ -14,10 +14,10 @@ import java.util.List;
 @Data
 public class ShowManagedStudycafeDetailsResponse {
     private String name;
-    private ModifyAddressResponse addressInfo;
+    private ModifyAddressResponse address;
     private String introduction;
     private List<ModifyOperationInfoResponse> operationInfos;
-    private List<ModifyConvenienceResponse> convenienceInfos;
+    private List<ModifyConvenienceResponse> conveniences;
     private List<String> photos;
     private List<String> notices;
     private List<ModifyRefundPolicyResponse> refundPolicies;
@@ -31,10 +31,10 @@ public class ShowManagedStudycafeDetailsResponse {
                                                            final List<String> notices) {
         return ShowManagedStudycafeDetailsResponse.builder()
                 .name(studycafe.getName())
-                .addressInfo(modifyAddressResponse)
+                .address(modifyAddressResponse)
                 .introduction(studycafe.getIntroduction())
                 .operationInfos(modifyOperationInfoResponses)
-                .convenienceInfos(modifyConvenienceResponses)
+                .conveniences(modifyConvenienceResponses)
                 .photos(photos)
                 .notices(notices)
                 .refundPolicies(modifyRefundPolicyResponses)
