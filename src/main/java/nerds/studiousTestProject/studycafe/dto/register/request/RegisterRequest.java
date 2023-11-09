@@ -14,14 +14,14 @@ import java.util.List;
 public class RegisterRequest {
     @NotNull(message = "사업자 정보는 필수입니다.")
     @Valid
-    private RegisterBusinessmanRequest businessInfo;
+    private RegisterBusinessmanRequest businessman;
 
     @NotNull(message = "스터디카페 정보는 필수입니다.")
     @Valid
-    private RegisterStudycafeRequest cafeInfo;
+    private RegisterStudycafeRequest studycafe;
 
     @NotNull(message = "스터디룸 정보는 필수입니다.")
     @Size(min = 1, message = "스터디룸 정보는 필수입니다.")
     @Valid
-    private List<RegisterRoomRequest> roomInfos;
+    private List<RegisterRoomRequest> rooms;
 }

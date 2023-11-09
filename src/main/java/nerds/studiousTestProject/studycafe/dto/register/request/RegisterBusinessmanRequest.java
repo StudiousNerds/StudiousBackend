@@ -16,7 +16,7 @@ public class RegisterBusinessmanRequest {
 
     @NotNull(message = "계좌 정보는 필수입니다.")
     @Valid
-    private RegisterAccountRequest accountInfo;    // 계좌 정보
+    private RegisterAccountRequest account;    // 계좌 정보
 
     @NotBlank(message = "사업자 등록증은 필수입니다.")
     private String registration;    // 사업자 등록증
