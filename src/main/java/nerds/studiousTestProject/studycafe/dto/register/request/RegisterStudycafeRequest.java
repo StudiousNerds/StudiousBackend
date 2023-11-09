@@ -43,11 +43,11 @@ public class RegisterStudycafeRequest {
     @Valid
     private List<RegisterRefundPolicyRequest> refundPolicies;
 
-    public Studycafe toEntity(Member member, NearestStationResponse nearestStationResponse) {
+    public Studycafe toStudycafe(Member member, NearestStationResponse nearestStationResponse) {
         return Studycafe.builder()
                 .name(name)
                 .member(member)
-                .address(address.of())
+                .address(address.toAddress())
                 .tel(tel)
                 .walkingTime(nearestStationResponse.getWalkingTime())
                 .nearestStation(nearestStationResponse.getNearestStation())

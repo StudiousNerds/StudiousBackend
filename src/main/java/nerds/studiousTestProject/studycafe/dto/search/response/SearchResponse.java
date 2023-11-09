@@ -19,7 +19,7 @@ public class SearchResponse {
     private Double grade;
     private Boolean bookmarked;
 
-    public static SearchResponse from(SearchInResponse searchInResponse, List<HashtagName> hashtags, Double grade) {
+    public static SearchResponse of(SearchInResponse searchInResponse, List<HashtagName> hashtags, Double grade) {
         return SearchResponse.builder()
                 .id(searchInResponse.getId())
                 .id(searchInResponse.getId())

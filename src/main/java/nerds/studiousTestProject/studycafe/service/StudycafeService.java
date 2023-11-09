@@ -84,7 +84,7 @@ public class StudycafeService {
                 .build();
 
         final List<SearchInResponse> searchInResponses = studycafeRepository.getSearchResult(searchRequest, pageable).getContent();
-        return searchInResponses.stream().map(s -> SearchResponse.from(
+        return searchInResponses.stream().map(s -> SearchResponse.of(
                 s, parseStringToHashtagNames(s.getAccumHashtags()), getGradeFromSumAndCount(s.getGradeSum(), s.getGradeCount()))
         ).toList();
     }
@@ -161,7 +161,7 @@ public class StudycafeService {
     private Map<Week, ShowOperationInfoInResponse> getOperationInfosGroupingByWeek(final Long studycafeId) {
         final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek = new ConcurrentHashMap<>();
         final List<OperationInfo> operationInfos = operationInfoRepository.findAllByStudycafeId(studycafeId);
-        operationInfos.forEach(o -> operationInfoGroupingByWeek.put(o.getWeek(), ShowOperationInfoInResponse.of(o)));
+        operationInfos.forEach(o -> operationInfoGroupingByWeek.put(o.getWeek(), ShowOperationInfoInResponse.from(o)));
         return operationInfoGroupingByWeek;
     }
 

@@ -22,7 +22,7 @@ public class ShowRoomDetailsResponse {
     private List<String> conveniences;
     private List<PaidConvenience> paidConveniences;
 
-    public static ShowRoomDetailsResponse of(Room room) {
+    public static ShowRoomDetailsResponse from(Room room) {
         return ShowRoomDetailsResponse.builder()
                 .name(room.getName())
                 .minHeadCount(room.getMinHeadCount())

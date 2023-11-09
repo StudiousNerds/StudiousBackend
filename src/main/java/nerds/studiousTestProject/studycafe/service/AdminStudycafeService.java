@@ -94,7 +94,7 @@ public class AdminStudycafeService {
 
         final Member member = findMemberById(memberId);
         final NearestStationResponse nearestStationResponse = getNearestStationResponse(registerStudycafeRequest);
-        final Studycafe studycafe = registerStudycafeRequest.toEntity(member, nearestStationResponse);
+        final Studycafe studycafe = registerStudycafeRequest.toStudycafe(member, nearestStationResponse);
 
         registerStudycafe(multipartFileMap, registerStudycafeRequest, studycafe);
         registerRooms(registerRoomRequests, multipartFileMap, studycafe);
@@ -160,7 +160,7 @@ public class AdminStudycafeService {
                                final Studycafe studycafe) {
         for (int i = 0; i < registerRoomRequests.size(); i++) {
             final RegisterRoomRequest registerRoomRequest = registerRoomRequests.get(i);
-            final Room room = registerRoomRequest.toEntity();
+            final Room room = registerRoomRequest.toRoom();
             final List<RegisterConvenienceRequest> conveniences = registerRoomRequest.getConveniences();
 
             registerRoomPhotos(multipartFileMap, ROOM_PHOTOS_KEY + i, room);
@@ -188,7 +188,7 @@ public class AdminStudycafeService {
     private void registerOperationInfos(final RegisterStudycafeRequest registerStudycafeRequest, final Studycafe studycafe) {
         final List<RegisterOperationInfoRequest> registerOperationInfoRequests = registerStudycafeRequest.getOperationInfos();
         for (RegisterOperationInfoRequest registerOperationInfoRequest : registerOperationInfoRequests) {
-            studycafe.addOperationInfo(registerOperationInfoRequest.toEntity());
+            studycafe.addOperationInfo(registerOperationInfoRequest.toOperationInfo());
         }
     }
 
@@ -215,7 +215,7 @@ public class AdminStudycafeService {
                                       final Long studycafeId,
                                       final ModifyAnnouncementRequest modifyAnnouncementRequest) {
         final Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
-        studycafe.addAnnouncement(modifyAnnouncementRequest.toEntity());
+        studycafe.addAnnouncement(modifyAnnouncementRequest.toAnnouncement());
     }
 
     private NearestStationResponse getNearestStationResponse(final RegisterStudycafeRequest registerStudycafeRequest) {
@@ -239,7 +239,7 @@ public class AdminStudycafeService {
         final List<String> photos = getPhotos(studycafe);
         final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses = studycafe.getRefundPolicies().stream().map(ModifyRefundPolicyResponse::from).toList();
 
-        return ShowManagedStudycafeDetailsResponse.from(studycafe, modifyAddressResponse, modifyConvenienceResponses, modifyOperationInfoResponses, modifyRefundPolicyResponses, photos, notices);
+        return ShowManagedStudycafeDetailsResponse.of(studycafe, modifyAddressResponse, modifyConvenienceResponses, modifyOperationInfoResponses, modifyRefundPolicyResponses, photos, notices);
     }
 
     public List<ShowRoomBasicResponse> enquireRooms(final Long memberId,
@@ -253,7 +253,7 @@ public class AdminStudycafeService {
                                                final Long roomId) {
         // memberId, studycafeId 를 통한 검증로직 있으면 좋을 것 같음 (이번 스프린트때 진행할 내용. 구현되는데로 주석 삭제할 예정)
         Room room = findRoomById(roomId);
-        return ShowRoomDetailsResponse.of(room);
+        return ShowRoomDetailsResponse.from(room);
     }
 
     private List<String> getPhotos(final Studycafe studycafe) {
@@ -275,7 +275,7 @@ public class AdminStudycafeService {
                 modifyRequest.getIntroduction(),
                 modifyRequest.getConveniences().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
                 modifyRequest.getNotices().stream().map(s -> Notice.builder().detail(s).build()).toList(),
-                modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toEntity).toList(),
+                modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toOperationInfo).toList(),
                 modifyRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
         );
         // 사진은 추후 (이번 스프린트때 진행. 구현하는대로 주석 삭제)

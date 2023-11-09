@@ -3,9 +3,6 @@ package nerds.studiousTestProject.room.dto.modify;
 import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.convenience.dto.modify.ModifyConvenienceRequest;
-import nerds.studiousTestProject.room.entity.PriceType;
-import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 import java.util.List;
 
@@ -19,17 +16,4 @@ public class ModifyRoomRequest {
     private String type;
     private Integer minUsingTime;
     private List<ModifyConvenienceRequest> conveniences;
-
-    public static Room toRoom(Studycafe studycafe, Long roomId, ModifyRoomRequest modifyRoomRequest) {
-        return Room.builder()
-                .id(roomId)
-                .name(modifyRoomRequest.getName())
-                .minHeadCount(modifyRoomRequest.getMinHeadCount())
-                .maxHeadCount(modifyRoomRequest.getMaxHeadCount())
-                .price(modifyRoomRequest.getPrice())
-                .type(PriceType.valueOf(modifyRoomRequest.getType()))
-                .minUsingTime(modifyRoomRequest.getMinUsingTime())
-                .studycafe(studycafe)
-                .build();
-    }
 }

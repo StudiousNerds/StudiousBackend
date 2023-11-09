@@ -45,7 +45,7 @@ public class RegisterRoomRequest {
     @Valid
     private List<RegisterConvenienceRequest> conveniences;
 
-    public Room toEntity() {
+    public Room toRoom() {
         return Room.builder()
                 .name(name)
                 .minHeadCount(minHeadCount)

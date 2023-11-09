@@ -21,7 +21,7 @@ public class ModifyAddressRequest {
     @NotBlank(message = "상세 주소는 필수입니다.")
     private String detail;  // 상세 주소
 
-    public Address of() {
+    public Address toAddress() {
         return Address.builder()
                 .addressBasic(basic)
                 .addressDetail(detail)

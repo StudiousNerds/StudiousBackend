@@ -22,13 +22,13 @@ public class ShowManagedStudycafeDetailsResponse {
     private List<String> notices;
     private List<ModifyRefundPolicyResponse> refundPolicies;
 
-    public static ShowManagedStudycafeDetailsResponse from(final Studycafe studycafe,
-                                                           final ModifyAddressResponse modifyAddressResponse,
-                                                           final List<ModifyConvenienceResponse> modifyConvenienceResponses,
-                                                           final List<ModifyOperationInfoResponse> modifyOperationInfoResponses,
-                                                           final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses,
-                                                           final List<String> photos,
-                                                           final List<String> notices) {
+    public static ShowManagedStudycafeDetailsResponse of(final Studycafe studycafe,
+                                                         final ModifyAddressResponse modifyAddressResponse,
+                                                         final List<ModifyConvenienceResponse> modifyConvenienceResponses,
+                                                         final List<ModifyOperationInfoResponse> modifyOperationInfoResponses,
+                                                         final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses,
+                                                         final List<String> photos,
+                                                         final List<String> notices) {
         return ShowManagedStudycafeDetailsResponse.builder()
                 .name(studycafe.getName())
                 .address(modifyAddressResponse)

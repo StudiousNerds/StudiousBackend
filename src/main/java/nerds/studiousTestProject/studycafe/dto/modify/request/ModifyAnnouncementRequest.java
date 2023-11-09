@@ -24,7 +24,7 @@ public class ModifyAnnouncementRequest {
 //    @Pattern(regexp = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$", message = "시작 날짜 형식이 잘못되었습니다.")
     private LocalDate endDate;
 
-    public Announcement toEntity() {
+    public Announcement toAnnouncement() {
         return Announcement.builder()
                 .detail(detail)
                 .startDate(startDate)

@@ -16,7 +16,7 @@ public class ShowOperationInfoInResponse {
     private final boolean closed;
     private final boolean isAllDay;
 
-    public static ShowOperationInfoInResponse of(OperationInfo operationInfo) {
+    public static ShowOperationInfoInResponse from(OperationInfo operationInfo) {
         return ShowOperationInfoInResponse.builder()
                 .isAllDay(operationInfo.getIsAllDay())
                 .closed(operationInfo.getClosed())
