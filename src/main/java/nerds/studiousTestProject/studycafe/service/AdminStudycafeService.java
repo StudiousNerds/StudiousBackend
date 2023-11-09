@@ -22,7 +22,7 @@ import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyAnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyOperationInfoRequest;
-import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyAddressResponse;
 import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyAnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyConvenienceResponse;
@@ -269,14 +269,14 @@ public class AdminStudycafeService {
     @Transactional
     public void modify(final Long memberId,
                        final Long studycafeId,
-                       final ModifyRequest modifyRequest) {
+                       final ModifyStudycafeRequest modifyStudycafeRequest) {
         final Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
         studycafe.update(
-                modifyRequest.getIntroduction(),
-                modifyRequest.getConveniences().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
-                modifyRequest.getNotices().stream().map(s -> Notice.builder().detail(s).build()).toList(),
-                modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toOperationInfo).toList(),
-                modifyRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
+                modifyStudycafeRequest.getIntroduction(),
+                modifyStudycafeRequest.getConveniences().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
+                modifyStudycafeRequest.getNotices().stream().map(s -> Notice.builder().detail(s).build()).toList(),
+                modifyStudycafeRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toOperationInfo).toList(),
+                modifyStudycafeRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
         );
         // 사진은 추후 (이번 스프린트때 진행. 구현하는대로 주석 삭제)
     }

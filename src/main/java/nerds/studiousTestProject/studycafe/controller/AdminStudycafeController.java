@@ -10,7 +10,7 @@ import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycaf
 import nerds.studiousTestProject.room.dto.show.ShowRoomBasicResponse;
 import nerds.studiousTestProject.room.dto.modify.ModifyRoomRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyAnnouncementRequest;
-import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyRequest;
+import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyAnnouncementResponse;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeBasicResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
@@ -76,8 +76,8 @@ public class AdminStudycafeController {
     @PatchMapping("/{studycafeId}")
     public void modifyManagedStudycafe(@LoggedInMember final Long memberId,
                                        @PathVariable final Long studycafeId,
-                                       @RequestBody final ModifyRequest modifyRequest) {
-        adminStudycafeService.modify(memberId, studycafeId, modifyRequest);
+                                       @RequestBody final ModifyStudycafeRequest modifyStudycafeRequest) {
+        adminStudycafeService.modify(memberId, studycafeId, modifyStudycafeRequest);
     }
 
     @GetMapping("/{studycafeId}/notifications")

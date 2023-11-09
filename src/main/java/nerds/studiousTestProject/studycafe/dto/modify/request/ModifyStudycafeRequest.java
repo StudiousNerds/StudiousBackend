@@ -13,7 +13,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class ModifyRequest {
+public class ModifyStudycafeRequest {
     @NotBlank(message = "스터디카페 이름은 필수입니다.")
     private String name;    // 스터디카페 이름
 
