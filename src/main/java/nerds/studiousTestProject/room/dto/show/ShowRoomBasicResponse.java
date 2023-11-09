@@ -16,7 +16,6 @@ public class ShowRoomBasicResponse {
     private String priceType;
     private Integer minUsingTime;
     private String photo;
-//    private Map<String, Integer[]> canReserveDatetime;
 
     public static ShowRoomBasicResponse of(Room room) {
         return ShowRoomBasicResponse.builder()
