@@ -181,6 +181,26 @@ public class Studycafe {
         }
     }
 
+    public void registerGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum = gradeSum;
+        }
+        gradeCount++;
+    }
+
+    public void deleteGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum -= gradeSum;
+        }
+        gradeCount--;
+    }
+
+    public void updateGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum += gradeSum;
+        }
+    }
+
     public void updateAccumReserveCount(Integer accumReserveCount) {
         if (accumReserveCount != null) {
             this.accumReserveCount += accumReserveCount;

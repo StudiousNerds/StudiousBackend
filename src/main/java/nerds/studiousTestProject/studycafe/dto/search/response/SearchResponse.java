@@ -12,7 +12,7 @@ public class SearchResponse {
     private Long id;
     private String name;
     private String photo;
-    private Integer accumRevCnt;
+    private Integer accumResCnt;
     private Integer walkingTime;
     private String nearestStation;
     private List<HashtagName> hashtags;
@@ -24,7 +24,7 @@ public class SearchResponse {
                 .id(searchResponseInfo.getId())
                 .name(searchResponseInfo.getName())
                 .photo(searchResponseInfo.getPhoto())
-                .accumRevCnt(accumRevCnt)
+                .accumResCnt(accumRevCnt)
                 .walkingTime(searchResponseInfo.getWalkingTime())
                 .nearestStation(searchResponseInfo.getNearestStation())
                 .hashtags(hashtags)
