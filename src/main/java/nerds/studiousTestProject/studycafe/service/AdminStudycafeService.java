@@ -90,28 +90,26 @@ public class AdminStudycafeService {
                                      final MultiValueMap<String, MultipartFile> multipartFileMap) {
         final RegisterStudycafeRequest cafeInfo = registerRequest.getCafeInfo();
         final List<RegisterRoomRequest> roomInfos = registerRequest.getRoomInfos();
-        validatePhotos(multipartFileMap, roomInfos);    // 사진에 대한 검증
+        validatePhotos(multipartFileMap, roomInfos);
 
-        final Member member = findMemberById(memberId);     // 현재 로그인된 유저 정보를 가져온다.
+        final Member member = findMemberById(memberId);
         final NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
         final Studycafe studycafe = cafeInfo.toEntity(member, nearestStationInfoResponse);
 
-        registerStudycafe(multipartFileMap, cafeInfo, studycafe);   // 스터디카페 관련 정보들을 등록
-        registerRooms(roomInfos, multipartFileMap, studycafe);   // 룸 정보 등록
+        registerStudycafe(multipartFileMap, cafeInfo, studycafe);
+        registerRooms(roomInfos, multipartFileMap, studycafe);
 
-        studycafeRepository.save(studycafe);    // 스터디카페 저장
+        studycafeRepository.save(studycafe);
         return RegisterResponse.builder()
                 .cafeName(cafeInfo.getName())
                 .build();
     }
 
     private void validatePhotos(final MultiValueMap<String, MultipartFile> multipartFileMap, final List<RegisterRoomRequest> registerRoomRequests) {
-        // 카페 대표 사진이 없는 경우
         if (!multipartFileMap.containsKey(STUDYCAFE_MAIN_PHOTO_KEY) || multipartFileMap.get(STUDYCAFE_MAIN_PHOTO_KEY).size() != 1) {
             throw new BadRequestException(INVALID_CAFE_MAIN_PHOTO_SIZE);
         }
 
-        // 룸 사진 개수가 DTO의 룸 개수와 다른 경우
         final int size = registerRoomRequests.size();
         final long count = multipartFileMap.keySet().stream().filter(f -> f.contains(ROOM_PHOTOS_KEY)).count();
         if (size != count) {
@@ -129,17 +127,17 @@ public class AdminStudycafeService {
     private void registerStudycafe(final MultiValueMap<String, MultipartFile> multipartFileMap,
                                    final RegisterStudycafeRequest cafeInfo,
                                    final Studycafe studycafe) {
-        registerStudycafeMainPhoto(multipartFileMap, studycafe);  // 카페 메인 사진 등록
-        registerStudycafeSubPhotos(multipartFileMap, studycafe);  // 카페 서브 사진 등록
-        registerNotices(cafeInfo, studycafe);                // 유의 사항 등록
-        registerRefundPolices(cafeInfo, studycafe);          // 환불 정책 등록
-        registerOperationInfos(cafeInfo, studycafe);         // 운영 시간 정보 등록
-        registerStudycafeConveniences(cafeInfo, studycafe);       // 카페 편의시설 정보 등록
+        registerStudycafeMainPhoto(multipartFileMap, studycafe);
+        registerStudycafeSubPhotos(multipartFileMap, studycafe);
+        registerNotices(cafeInfo, studycafe);
+        registerRefundPolices(cafeInfo, studycafe);
+        registerOperationInfos(cafeInfo, studycafe);
+        registerStudycafeConveniences(cafeInfo, studycafe);
     }
 
     private void registerStudycafeMainPhoto(final MultiValueMap<String, MultipartFile> multipartFileMap, final Studycafe studycafe) {
         final String cafeMainPhoto = storageProvider.uploadFile(multipartFileMap.getFirst(STUDYCAFE_MAIN_PHOTO_KEY));
-        studycafe.updatePhoto(cafeMainPhoto);   // 카페 메인 사진 등록
+        studycafe.updatePhoto(cafeMainPhoto);
     }
 
     private void registerStudycafeSubPhotos(final MultiValueMap<String, MultipartFile> multipartFileMap, final Studycafe studycafe) {
@@ -165,8 +163,8 @@ public class AdminStudycafeService {
             final Room room = registerRoomRequest.toEntity();
             final List<RegisterConvenienceRequest> convenienceInfos = registerRoomRequest.getConvenienceInfos();
 
-            registerRoomPhotos(multipartFileMap, ROOM_PHOTOS_KEY + i, room);  // 룸 사진 등록
-            registerRoomConveniences(convenienceInfos, room); // 룸 편의시설 정보 등록
+            registerRoomPhotos(multipartFileMap, ROOM_PHOTOS_KEY + i, room);
+            registerRoomConveniences(convenienceInfos, room);
             studycafe.addRoom(room);
         }
     }
@@ -238,7 +236,7 @@ public class AdminStudycafeService {
         final List<ModifyConvenienceResponse> modifyConvenienceResponses = studycafe.getConveniences().stream().map(ModifyConvenienceResponse::from).toList();
         final List<ModifyOperationInfoResponse> modifyOperationInfoResponses = studycafe.getOperationInfos().stream().map(ModifyOperationInfoResponse::from).toList();
         final List<String> notices = studycafe.getNotices().stream().map(Notice::getDetail).toList();
-        final List<String> photos = getPhotos(studycafe); // 사진 : 메인 사진(단일) + 서브 사진(리스트)
+        final List<String> photos = getPhotos(studycafe);
         final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses = studycafe.getRefundPolicies().stream().map(ModifyRefundPolicyResponse::from).toList();
 
         return ShowManagedStudycafeDetailsResponse.from(studycafe, modifyAddressResponse, modifyConvenienceResponses, modifyOperationInfoResponses, modifyRefundPolicyResponses, photos, notices);
@@ -253,7 +251,7 @@ public class AdminStudycafeService {
     public ShowRoomDetailsResponse enquireRoom(final Long memberId,
                                                final Long studycafeId,
                                                final Long roomId) {
-        // memberId, studycafeId 를 통한 검증로직 있으면 좋을 것 같음
+        // memberId, studycafeId 를 통한 검증로직 있으면 좋을 것 같음 (이번 스프린트때 진행할 내용. 구현되는데로 주석 삭제할 예정)
         Room room = findRoomById(roomId);
         return ShowRoomDetailsResponse.of(room);
     }
@@ -280,7 +278,7 @@ public class AdminStudycafeService {
                 modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toEntity).toList(),
                 modifyRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
         );
-        // 사진은 추후
+        // 사진은 추후 (이번 스프린트때 진행. 구현하는대로 주석 삭제)
     }
 
     public List<ModifyAnnouncementResponse> enquiryAnnouncements(final Long memberId, final Long studycafeId) {
