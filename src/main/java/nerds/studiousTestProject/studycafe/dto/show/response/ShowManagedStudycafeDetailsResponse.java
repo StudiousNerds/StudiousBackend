@@ -12,7 +12,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class ShowManagedDetailsResponse {
+public class ShowManagedStudycafeDetailsResponse {
     private String name;
     private ModifyAddressResponse addressInfo;
     private String introduction;
@@ -22,14 +22,14 @@ public class ShowManagedDetailsResponse {
     private List<String> notices;
     private List<ModifyRefundPolicyResponse> refundPolicies;
 
-    public static ShowManagedDetailsResponse from(final Studycafe studycafe,
-                                                  final ModifyAddressResponse modifyAddressResponse,
-                                                  final List<ModifyConvenienceResponse> modifyConvenienceResponses,
-                                                  final List<ModifyOperationInfoResponse> modifyOperationInfoResponses,
-                                                  final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses,
-                                                  final List<String> photos,
-                                                  final List<String> notices) {
-        return ShowManagedDetailsResponse.builder()
+    public static ShowManagedStudycafeDetailsResponse from(final Studycafe studycafe,
+                                                           final ModifyAddressResponse modifyAddressResponse,
+                                                           final List<ModifyConvenienceResponse> modifyConvenienceResponses,
+                                                           final List<ModifyOperationInfoResponse> modifyOperationInfoResponses,
+                                                           final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses,
+                                                           final List<String> photos,
+                                                           final List<String> notices) {
+        return ShowManagedStudycafeDetailsResponse.builder()
                 .name(studycafe.getName())
                 .addressInfo(modifyAddressResponse)
                 .introduction(studycafe.getIntroduction())

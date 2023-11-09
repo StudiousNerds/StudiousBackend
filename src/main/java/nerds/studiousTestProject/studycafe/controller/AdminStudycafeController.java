@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.room.dto.show.ShowRoomDetailsResponse;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeDetailsResponse;
 import nerds.studiousTestProject.room.dto.show.ShowRoomBasicResponse;
 import nerds.studiousTestProject.room.dto.modify.ModifyRoomRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyAnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ModifyRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyAnnouncementResponse;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedBasicResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeBasicResponse;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
@@ -62,14 +62,14 @@ public class AdminStudycafeController {
     }
 
     @GetMapping
-    public List<ShowManagedBasicResponse> findManagedEntryStudycafes(@LoggedInMember final Long memberId,
-                                                                     @RequestParam(required = false) final Integer page,
-                                                                     @RequestParam(defaultValue = BASIC_STUDYCAFES_SIZE) final Integer size) {
+    public List<ShowManagedStudycafeBasicResponse> findManagedEntryStudycafes(@LoggedInMember final Long memberId,
+                                                                              @RequestParam(required = false) final Integer page,
+                                                                              @RequestParam(defaultValue = BASIC_STUDYCAFES_SIZE) final Integer size) {
         return adminStudycafeService.enquireStudycafes(memberId, PageRequestConverter.of(page, size));
     }
 
     @GetMapping("/{studycafeId}")
-    public ShowManagedDetailsResponse findManagedDetailStudycafe(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
+    public ShowManagedStudycafeDetailsResponse findManagedDetailStudycafe(@LoggedInMember final Long memberId, @PathVariable final Long studycafeId) {
         return adminStudycafeService.enquireStudycafe(memberId, studycafeId);
     }
 

@@ -33,8 +33,8 @@ import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterStudycafeRequest;
 import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedBasicResponse;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeBasicResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateBusinessmanRequest;
 import nerds.studiousTestProject.studycafe.dto.validate.response.ValidateResponse;
@@ -226,13 +226,13 @@ public class AdminStudycafeService {
         return nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
     }
 
-    public List<ShowManagedBasicResponse> enquireStudycafes(final Long memberId, final Pageable pageable) {
+    public List<ShowManagedStudycafeBasicResponse> enquireStudycafes(final Long memberId, final Pageable pageable) {
         final Member member = findMemberById(memberId);
         return studycafeRepository.findByMemberOrderByCreatedDateAsc(member, pageable).getContent()
-                .stream().map(ShowManagedBasicResponse::from).toList();
+                .stream().map(ShowManagedStudycafeBasicResponse::from).toList();
     }
 
-    public ShowManagedDetailsResponse enquireStudycafe(final Long memberId, final Long studycafeId) {
+    public ShowManagedStudycafeDetailsResponse enquireStudycafe(final Long memberId, final Long studycafeId) {
         final Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
         final ModifyAddressResponse modifyAddressResponse = ModifyAddressResponse.from(studycafe.getAddress());
         final List<ModifyConvenienceResponse> modifyConvenienceResponses = studycafe.getConveniences().stream().map(ModifyConvenienceResponse::from).toList();
@@ -241,7 +241,7 @@ public class AdminStudycafeService {
         final List<String> photos = getPhotos(studycafe); // 사진 : 메인 사진(단일) + 서브 사진(리스트)
         final List<ModifyRefundPolicyResponse> modifyRefundPolicyResponses = studycafe.getRefundPolicies().stream().map(ModifyRefundPolicyResponse::from).toList();
 
-        return ShowManagedDetailsResponse.from(studycafe, modifyAddressResponse, modifyConvenienceResponses, modifyOperationInfoResponses, modifyRefundPolicyResponses, photos, notices);
+        return ShowManagedStudycafeDetailsResponse.from(studycafe, modifyAddressResponse, modifyConvenienceResponses, modifyOperationInfoResponses, modifyRefundPolicyResponses, photos, notices);
     }
 
     public List<ShowRoomBasicResponse> enquireRooms(final Long memberId,

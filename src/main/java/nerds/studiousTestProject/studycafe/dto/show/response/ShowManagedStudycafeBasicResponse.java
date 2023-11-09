@@ -6,14 +6,14 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Builder
 @Data
-public class ShowManagedBasicResponse {
+public class ShowManagedStudycafeBasicResponse {
     private Long id;
     private String name;
     private String address;
     private String photo;
 
-    public static ShowManagedBasicResponse from(Studycafe studycafe) {
-        return ShowManagedBasicResponse.builder()
+    public static ShowManagedStudycafeBasicResponse from(Studycafe studycafe) {
+        return ShowManagedStudycafeBasicResponse.builder()
                 .id(studycafe.getId())
                 .name(studycafe.getName())
                 .address(studycafe.getAddress().getEntryAddress())
