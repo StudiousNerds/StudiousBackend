@@ -19,26 +19,26 @@ public class ModifyRequest {
 
     @NotNull(message = "스터디카페 주소는 필수입니다.")
     @Valid
-    private ModifyAddressRequest addressInfo;    // 주소 정보
+    private ModifyAddressRequest address;
 
     @Size(min = 20, max = 100, message = "공간 소개 글은 최소 20자에서 최대 100자 사이여야 합니다.")
-    private String introduction;    // 공간 소개
+    private String introduction;
 
     @Size(min = 8, max = 8, message = "운영 시간은 필수입니다.")
     @Valid
-    private List<ModifyOperationInfoRequest> operationInfos;   // 운영 시간
+    private List<ModifyOperationInfoRequest> operationInfos;
 
     @Size(min = 1, message = "공통 편의시설을 1개 이상 선택해주세요.")
     @Valid
-    private List<ModifyConvenienceRequest> convenienceInfos; // 카페 편의 시설
+    private List<ModifyConvenienceRequest> conveniences;
 
     @Size(min = 1, message = "스터디카페 사진을 1개 이상 등록해주세요.")
-    private List<String> photos;    // 카페 사진
+    private List<String> photos;
 
     @Size(min = 1, message = "유의 사항을 1개 이상 등록해주세요.")
-    private List<String> notices;   // 유의 사항
+    private List<String> notices;
 
     @Size(min = 9, max = 9, message = "환불 정책을 입력해주세요.")
     @Valid
-    private List<ModifyRefundPolicyRequest> refundPolicies;  // 환불 정책
+    private List<ModifyRefundPolicyRequest> refundPolicies;
 }

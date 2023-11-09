@@ -43,7 +43,7 @@ public class RegisterRoomRequest {
     @NotNull(message = "룸 편의시설을 1개 이상 선택해주세요.")
     @Size(min = 1, message = "룸 편의시설을 1개 이상 선택해주세요.")
     @Valid
-    private List<RegisterConvenienceRequest> convenienceInfos; // 룸 편의시설
+    private List<RegisterConvenienceRequest> conveniences;
 
     public Room toEntity() {
         return Room.builder()

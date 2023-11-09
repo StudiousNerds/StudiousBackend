@@ -46,12 +46,12 @@ public class AdminStudycafeController {
 
     @PostMapping("/accounts")
     public ValidateResponse checkAccountInfo(@RequestBody final ValidateAccountRequest validateAccountRequest) {
-        return adminStudycafeService.validateAccountInfo(validateAccountRequest);
+        return adminStudycafeService.validateAccount(validateAccountRequest);
     }
 
     @PostMapping("/businessmen")
     public ValidateResponse checkBusinessInfo(@RequestBody final ValidateBusinessmanRequest validateBusinessmanRequest) {
-        return adminStudycafeService.validateBusinessInfo(validateBusinessmanRequest);
+        return adminStudycafeService.validateBusinessman(validateBusinessmanRequest);
     }
 
     @PostMapping

@@ -76,11 +76,11 @@ public class AdminStudycafeService {
     private static final String STUDYCAFE_SUB_PHOTOS_KEY = "studycafeSubPhotos";
     private static final String ROOM_PHOTOS_KEY = "roomPhotos";
 
-    public ValidateResponse validateAccountInfo(final ValidateAccountRequest validateAccountRequest) {
+    public ValidateResponse validateAccount(final ValidateAccountRequest validateAccountRequest) {
         return cafeRegistrationValidator.getAccountInfoValidResponse(validateAccountRequest);
     }
 
-    public ValidateResponse validateBusinessInfo(final ValidateBusinessmanRequest validateBusinessmanRequest) {
+    public ValidateResponse validateBusinessman(final ValidateBusinessmanRequest validateBusinessmanRequest) {
         return cafeRegistrationValidator.getBusinessInfoValidResponse(validateBusinessmanRequest);
     }
 
@@ -88,20 +88,20 @@ public class AdminStudycafeService {
     public RegisterResponse register(final Long memberId,
                                      final RegisterRequest registerRequest,
                                      final MultiValueMap<String, MultipartFile> multipartFileMap) {
-        final RegisterStudycafeRequest cafeInfo = registerRequest.getCafeInfo();
-        final List<RegisterRoomRequest> roomInfos = registerRequest.getRoomInfos();
-        validatePhotos(multipartFileMap, roomInfos);
+        final RegisterStudycafeRequest registerStudycafeRequest = registerRequest.getStudycafe();
+        final List<RegisterRoomRequest> registerRoomRequests = registerRequest.getRooms();
+        validatePhotos(multipartFileMap, registerRoomRequests);
 
         final Member member = findMemberById(memberId);
         final NearestStationResponse nearestStationResponse = getNearestStationResponse(registerStudycafeRequest);
-        final Studycafe studycafe = cafeInfo.toEntity(member, nearestStationResponse);
+        final Studycafe studycafe = registerStudycafeRequest.toEntity(member, nearestStationResponse);
 
-        registerStudycafe(multipartFileMap, cafeInfo, studycafe);
-        registerRooms(roomInfos, multipartFileMap, studycafe);
+        registerStudycafe(multipartFileMap, registerStudycafeRequest, studycafe);
+        registerRooms(registerRoomRequests, multipartFileMap, studycafe);
 
         studycafeRepository.save(studycafe);
         return RegisterResponse.builder()
-                .cafeName(cafeInfo.getName())
+                .cafeName(registerStudycafeRequest.getName())
                 .build();
     }
 
@@ -125,14 +125,14 @@ public class AdminStudycafeService {
     }
 
     private void registerStudycafe(final MultiValueMap<String, MultipartFile> multipartFileMap,
-                                   final RegisterStudycafeRequest cafeInfo,
+                                   final RegisterStudycafeRequest registerStudycafeRequest,
                                    final Studycafe studycafe) {
         registerStudycafeMainPhoto(multipartFileMap, studycafe);
         registerStudycafeSubPhotos(multipartFileMap, studycafe);
-        registerNotices(cafeInfo, studycafe);
-        registerRefundPolices(cafeInfo, studycafe);
-        registerOperationInfos(cafeInfo, studycafe);
-        registerStudycafeConveniences(cafeInfo, studycafe);
+        registerNotices(registerStudycafeRequest, studycafe);
+        registerRefundPolices(registerStudycafeRequest, studycafe);
+        registerOperationInfos(registerStudycafeRequest, studycafe);
+        registerStudycafeConveniences(registerStudycafeRequest, studycafe);
     }
 
     private void registerStudycafeMainPhoto(final MultiValueMap<String, MultipartFile> multipartFileMap, final Studycafe studycafe) {
@@ -148,8 +148,8 @@ public class AdminStudycafeService {
         }
     }
 
-    private void registerStudycafeConveniences(final RegisterStudycafeRequest cafeInfo, final Studycafe studycafe) {
-        final List<RegisterConvenienceRequest> cafeConveniences = cafeInfo.getConvenienceInfos();
+    private void registerStudycafeConveniences(final RegisterStudycafeRequest registerStudycafeRequest, final Studycafe studycafe) {
+        final List<RegisterConvenienceRequest> cafeConveniences = registerStudycafeRequest.getConveniences();
         for (RegisterConvenienceRequest registerConvenienceRequest : cafeConveniences) {
             studycafe.addConvenience(registerConvenienceRequest.toEntity());
         }
@@ -161,10 +161,10 @@ public class AdminStudycafeService {
         for (int i = 0; i < registerRoomRequests.size(); i++) {
             final RegisterRoomRequest registerRoomRequest = registerRoomRequests.get(i);
             final Room room = registerRoomRequest.toEntity();
-            final List<RegisterConvenienceRequest> convenienceInfos = registerRoomRequest.getConvenienceInfos();
+            final List<RegisterConvenienceRequest> conveniences = registerRoomRequest.getConveniences();
 
             registerRoomPhotos(multipartFileMap, ROOM_PHOTOS_KEY + i, room);
-            registerRoomConveniences(convenienceInfos, room);
+            registerRoomConveniences(conveniences, room);
             studycafe.addRoom(room);
         }
     }
@@ -185,22 +185,22 @@ public class AdminStudycafeService {
         }
     }
 
-    private void registerOperationInfos(final RegisterStudycafeRequest cafeInfo, final Studycafe studycafe) {
-        final List<RegisterOperationInfoRequest> registerOperationInfoRequests = cafeInfo.getOperationInfos();
+    private void registerOperationInfos(final RegisterStudycafeRequest registerStudycafeRequest, final Studycafe studycafe) {
+        final List<RegisterOperationInfoRequest> registerOperationInfoRequests = registerStudycafeRequest.getOperationInfos();
         for (RegisterOperationInfoRequest registerOperationInfoRequest : registerOperationInfoRequests) {
             studycafe.addOperationInfo(registerOperationInfoRequest.toEntity());
         }
     }
 
-    private void registerRefundPolices(final RegisterStudycafeRequest cafeInfo, final Studycafe studycafe) {
-        final List<RegisterRefundPolicyRequest> refundPolicies = cafeInfo.getRefundPolicies();
+    private void registerRefundPolices(final RegisterStudycafeRequest registerStudycafeRequest, final Studycafe studycafe) {
+        final List<RegisterRefundPolicyRequest> refundPolicies = registerStudycafeRequest.getRefundPolicies();
         for (RegisterRefundPolicyRequest registerRefundPolicyRequest : refundPolicies) {
             studycafe.addRefundPolicy(registerRefundPolicyRequest.toEntity());
         }
     }
 
-    private void registerNotices(final RegisterStudycafeRequest cafeInfo, final Studycafe studycafe) {
-        final List<String> noticeDetails = cafeInfo.getNotices();
+    private void registerNotices(final RegisterStudycafeRequest registerStudycafeRequest, final Studycafe studycafe) {
+        final List<String> noticeDetails = registerStudycafeRequest.getNotices();
         for (String noticeDetail : noticeDetails) {
             studycafe.addNotice(Notice.builder()
                     .detail(noticeDetail)
@@ -273,7 +273,7 @@ public class AdminStudycafeService {
         final Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
         studycafe.update(
                 modifyRequest.getIntroduction(),
-                modifyRequest.getConvenienceInfos().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
+                modifyRequest.getConveniences().stream().map(ModifyConvenienceRequest::toConvenience).toList(),
                 modifyRequest.getNotices().stream().map(s -> Notice.builder().detail(s).build()).toList(),
                 modifyRequest.getOperationInfos().stream().map(ModifyOperationInfoRequest::toEntity).toList(),
                 modifyRequest.getRefundPolicies().stream().map(ModifyRefundPolicyRequest::toEntity).toList()
