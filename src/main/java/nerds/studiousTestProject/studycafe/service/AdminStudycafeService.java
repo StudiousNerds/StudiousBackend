@@ -247,7 +247,7 @@ public class AdminStudycafeService {
     public List<ShowRoomBasicResponse> enquireRooms(final Long memberId,
                                                     final Long studycafeId) {
         Studycafe studycafe = findStudycafeByIdAndMember(studycafeId, memberId);
-        return studycafe.getRooms().stream().map(ShowRoomBasicResponse::of).toList();
+        return studycafe.getRooms().stream().map(ShowRoomBasicResponse::from).toList();
     }
 
     public ShowRoomDetailsResponse enquireRoom(final Long memberId,

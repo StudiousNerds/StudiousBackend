@@ -17,7 +17,7 @@ public class ShowRoomBasicResponse {
     private Integer minUsingTime;
     private String photo;
 
-    public static ShowRoomBasicResponse of(Room room) {
+    public static ShowRoomBasicResponse from(Room room) {
         return ShowRoomBasicResponse.builder()
                 .id(room.getId())
                 .name(room.getName())
