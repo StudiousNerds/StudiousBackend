@@ -6,7 +6,7 @@ import nerds.studiousTestProject.studycafe.entity.NearestStationInfo;
 
 @Builder
 @Data
-public class NearestStationInfoResponse {
+public class NearestStationResponse {
     private Integer walkingTime;   // 분단위
     private String nearestStation;
 

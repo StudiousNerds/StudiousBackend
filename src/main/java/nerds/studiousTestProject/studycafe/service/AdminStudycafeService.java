@@ -31,7 +31,7 @@ import nerds.studiousTestProject.studycafe.dto.modify.response.ModifyRefundPolic
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterOperationInfoRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterRequest;
 import nerds.studiousTestProject.studycafe.dto.register.request.RegisterStudycafeRequest;
-import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationResponse;
 import nerds.studiousTestProject.studycafe.dto.register.response.RegisterResponse;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeBasicResponse;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowManagedStudycafeDetailsResponse;
@@ -93,8 +93,8 @@ public class AdminStudycafeService {
         validatePhotos(multipartFileMap, roomInfos);
 
         final Member member = findMemberById(memberId);
-        final NearestStationInfoResponse nearestStationInfoResponse = getNearestStationInfoResponse(cafeInfo);
-        final Studycafe studycafe = cafeInfo.toEntity(member, nearestStationInfoResponse);
+        final NearestStationResponse nearestStationResponse = getNearestStationResponse(registerStudycafeRequest);
+        final Studycafe studycafe = cafeInfo.toEntity(member, nearestStationResponse);
 
         registerStudycafe(multipartFileMap, cafeInfo, studycafe);
         registerRooms(roomInfos, multipartFileMap, studycafe);
@@ -218,9 +218,9 @@ public class AdminStudycafeService {
         studycafe.addAnnouncement(modifyAnnouncementRequest.toEntity());
     }
 
-    private NearestStationInfoResponse getNearestStationInfoResponse(final RegisterStudycafeRequest registerStudycafeRequest) {
-        final String latitude = registerStudycafeRequest.getAddressInfo().getLatitude();
-        final String longitude = registerStudycafeRequest.getAddressInfo().getLongitude();
+    private NearestStationResponse getNearestStationResponse(final RegisterStudycafeRequest registerStudycafeRequest) {
+        final String latitude = registerStudycafeRequest.getAddress().getLatitude();
+        final String longitude = registerStudycafeRequest.getAddress().getLongitude();
         return nearestStationInfoCalculator.getPlaceResponse(latitude, longitude);
     }
 
