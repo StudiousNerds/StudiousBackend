@@ -7,7 +7,7 @@ import nerds.studiousTestProject.common.util.MultiValueMapConverter;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateAccountRequest;
 import nerds.studiousTestProject.studycafe.dto.validate.request.ValidateBusinessmanRequest;
 import nerds.studiousTestProject.studycafe.dto.validate.response.ValidateResponse;
-import nerds.studiousTestProject.studycafe.util.odcloud.response.BusinessInfoResponse;
+import nerds.studiousTestProject.studycafe.util.odcloud.response.BusinessmanResponse;
 import nerds.studiousTestProject.studycafe.util.openbank.request.OpenBankTokenRequest;
 import nerds.studiousTestProject.studycafe.util.openbank.response.AccountInfoResponse;
 import nerds.studiousTestProject.studycafe.util.openbank.response.OpenBankTokenResponse;
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CafeRegistrationValidator {
+public class RegistrationValidator {
     private static final String OPEN_BANK_CLIENT_ID = "7338b43b-eb71-40e9-9414-749b772e4907";
     private static final String OPEN_BANK_CLIENT_SECRET = "3cfae1dc-b541-45a9-8528-a5707aaf36c4";
     private static final String OPEN_BANK_SCOPE = "oob";
@@ -46,7 +46,7 @@ public class CafeRegistrationValidator {
      * @param validateAccountRequest 사용자가 입력한
      * @return
      */
-    public ValidateResponse getAccountInfoValidResponse(ValidateAccountRequest validateAccountRequest) {
+    public ValidateResponse getValidateAccountRequest(ValidateAccountRequest validateAccountRequest) {
         MultiValueMap<String, String> params = MultiValueMapConverter.convert(
                 OpenBankTokenRequest.builder()
                         .client_id(OPEN_BANK_CLIENT_ID)
@@ -121,8 +121,8 @@ public class CafeRegistrationValidator {
      * @param validateBusinessmanRequest 사업자 등록 번호
      * @return 사업자 등록 번호 유효성
      */
-    public ValidateResponse getBusinessInfoValidResponse(ValidateBusinessmanRequest validateBusinessmanRequest) {
-        BusinessInfoResponse businessInfoResponse = webClient
+    public ValidateResponse getValidateBusinessmanRequest(ValidateBusinessmanRequest validateBusinessmanRequest) {
+        BusinessmanResponse businessmanResponse = webClient
                 .post()
                 .uri(
                         UriComponentsBuilder.newInstance()
@@ -137,11 +137,11 @@ public class CafeRegistrationValidator {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(validateBusinessmanRequest)
                 .retrieve()
-                .bodyToMono(BusinessInfoResponse.class)
+                .bodyToMono(BusinessmanResponse.class)
                 .block();
 
         return ValidateResponse.builder()
-                .available(businessInfoResponse.getMatch_cnt() != null)
+                .available(businessmanResponse.getMatch_cnt() != null)
                 .build();
     }
 }

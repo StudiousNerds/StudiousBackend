@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class BusinessInfoResponse {
+public class BusinessmanResponse {
     private String status_code;     // 상태 코드
     private Integer match_cnt;      // 조회 결과 개수
     private Integer request_cnt;    // 조회 요청 개수

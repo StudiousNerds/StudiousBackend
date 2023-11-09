@@ -41,7 +41,7 @@ import nerds.studiousTestProject.studycafe.dto.validate.response.ValidateRespons
 import nerds.studiousTestProject.studycafe.entity.Notice;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import nerds.studiousTestProject.studycafe.repository.StudycafeRepository;
-import nerds.studiousTestProject.studycafe.util.CafeRegistrationValidator;
+import nerds.studiousTestProject.studycafe.util.RegistrationValidator;
 import nerds.studiousTestProject.studycafe.util.NearestStationInfoCalculator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -64,7 +64,7 @@ import static nerds.studiousTestProject.photo.entity.SubPhotoType.STUDYCAFE;
 @Service
 @Transactional(readOnly = true)
 public class AdminStudycafeService {
-    private final CafeRegistrationValidator cafeRegistrationValidator;
+    private final RegistrationValidator registrationValidator;
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
@@ -77,11 +77,11 @@ public class AdminStudycafeService {
     private static final String ROOM_PHOTOS_KEY = "roomPhotos";
 
     public ValidateResponse validateAccount(final ValidateAccountRequest validateAccountRequest) {
-        return cafeRegistrationValidator.getAccountInfoValidResponse(validateAccountRequest);
+        return registrationValidator.getValidateAccountRequest(validateAccountRequest);
     }
 
     public ValidateResponse validateBusinessman(final ValidateBusinessmanRequest validateBusinessmanRequest) {
-        return cafeRegistrationValidator.getBusinessInfoValidResponse(validateBusinessmanRequest);
+        return registrationValidator.getValidateBusinessmanRequest(validateBusinessmanRequest);
     }
 
     @Transactional
