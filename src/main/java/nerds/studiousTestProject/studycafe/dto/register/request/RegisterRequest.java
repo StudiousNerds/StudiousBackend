@@ -14,7 +14,7 @@ import java.util.List;
 public class RegisterRequest {
     @NotNull(message = "사업자 정보는 필수입니다.")
     @Valid
-    private RequestBusinessmanRequest businessInfo;
+    private RegisterBusinessmanRequest businessInfo;
 
     @NotNull(message = "스터디카페 정보는 필수입니다.")
     @Valid

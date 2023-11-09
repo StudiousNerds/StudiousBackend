@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RequestBusinessmanRequest {
+public class RegisterBusinessmanRequest {
     @Size(min = 10, max = 10, message = "사업자 등록번호는 하이픈(-)을 포함하지 않는 10자리 숫자입니다.")
     private String number; // 사업자 등록 번호
 
