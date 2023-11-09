@@ -14,7 +14,7 @@ import nerds.studiousTestProject.reservation.repository.ReservationRecordReposit
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowOperationInfoInResponse;
 import nerds.studiousTestProject.room.dto.show.ShowRoomResponse;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowStudycafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchRequest;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
@@ -101,11 +101,11 @@ public class StudycafeService {
         return gradeSum / gradeCount;
     }
 
-    public ShowDetailsResponse findStudycafeByDate(final Long studycafeId, final LocalDate today) {
+    public ShowStudycafeDetailsResponse findStudycafeByDate(final Long studycafeId, final LocalDate today) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
         final List<Room> rooms = studycafe.getRooms();
         final List<ShowRoomResponse> showRoomResponses = parseRoomsToEnquireRoomResponses(studycafeId, today, rooms);
-        return ShowDetailsResponse.of(studycafe, getPhotos(studycafe), showRoomResponses);
+        return ShowStudycafeDetailsResponse.of(studycafe, getPhotos(studycafe), showRoomResponses);
     }
 
     private List<ShowRoomResponse> parseRoomsToEnquireRoomResponses(final Long studycafeId,

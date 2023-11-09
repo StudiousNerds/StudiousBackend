@@ -10,9 +10,9 @@ import java.util.List;
 
 @Builder
 @Data
-public class ShowDetailsResponse {
-    private Long studycafeId;
-    private String cafeName;
+public class ShowStudycafeDetailsResponse {
+    private Long id;
+    private String name;
     private List<String> photos;
     private Integer accumRevCnt;
     private Integer walkingTime;
@@ -23,12 +23,12 @@ public class ShowDetailsResponse {
     private List<AnnouncementInResponse> announcements;
     private List<ShowRoomResponse> rooms;
 
-    public static ShowDetailsResponse of(final Studycafe studycafe,
-                                         final List<String> photos,
-                                         final List<ShowRoomResponse> rooms) {
-        return ShowDetailsResponse.builder()
-                .studycafeId(studycafe.getId())
-                .cafeName(studycafe.getName())
+    public static ShowStudycafeDetailsResponse of(final Studycafe studycafe,
+                                                  final List<String> photos,
+                                                  final List<ShowRoomResponse> rooms) {
+        return ShowStudycafeDetailsResponse.builder()
+                .id(studycafe.getId())
+                .name(studycafe.getName())
                 .photos(photos)
                 .accumRevCnt(studycafe.getAccumReserveCount())
                 .walkingTime(studycafe.getWalkingTime())

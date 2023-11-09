@@ -10,7 +10,7 @@ import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
-import nerds.studiousTestProject.studycafe.dto.show.response.ShowDetailsResponse;
+import nerds.studiousTestProject.studycafe.dto.show.response.ShowStudycafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
 import nerds.studiousTestProject.studycafe.service.StudycafeService;
@@ -55,7 +55,7 @@ public class StudycafeController {
     }
 
     @GetMapping("/{studycafeId}")
-    public ShowDetailsResponse findStudycafe(
+    public ShowStudycafeDetailsResponse findStudycafe(
             @PathVariable("studycafeId") final Long studycafeId,
             @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date) {
         return studycafeService.findStudycafeByDate(studycafeId, date);
