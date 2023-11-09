@@ -243,15 +243,6 @@ public class StudycafeService {
         return date != null ? (holidays.contains(date) ? Week.HOLIDAY : Week.of(date)) : null;
     }
 
-    /**
-     * 24시간 운영 스터디카페의 예약 가능시간대 조사시 0 ~ 23 리스트를 반환해야한다.
-     * 이 때, 마감시간을 LocalTime.MAX 를 사용하는데, 이 경우 closingTime.getHour() = 23 이므로 0 ~ 22 리스트가 반환된다
-     * (e.g. 09:00 ~ 21:00 이면 예약 가능시간 : 9 ~ 20 => (마감 시간) - 1 까지 만들어줘야 함. 그러나, 24시간 운영인 경우 마감 시간(getHour())이 23 이므로 공식 적용 불가)
-     * 이러한 상황을 대비하기 위해 24시간 운영인 경우 마감 시간을 파싱해주는 메소드를 추가함
-     * 굳이 이렇게 메소드를 사용하지 않아도 될 것 같긴하다.
-     * @param closingTime 운영 마감 시간
-     * @return 24시간인 경우 : 24, 그 외 : 마감 시간
-     */
     private int getHourFromClosingTime(LocalTime closingTime) {
         if (closingTime.equals(LocalTime.MAX)) {
             return MAX_HOUR;
