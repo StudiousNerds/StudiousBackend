@@ -4,7 +4,7 @@ import io.netty.handler.codec.http.HttpScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.util.MultiValueMapConverter;
-import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationInfoResponse;
+import nerds.studiousTestProject.studycafe.dto.register.response.NearestStationResponse;
 import nerds.studiousTestProject.studycafe.util.kakao.request.KakaoDistanceSearchRequest;
 import nerds.studiousTestProject.studycafe.util.kakao.response.KakaoDistanceSearchResponse;
 import nerds.studiousTestProject.studycafe.util.tmap.request.TMapDistanceCalcRequest;
@@ -42,9 +42,9 @@ public class NearestStationInfoCalculator {
      * @param longitude 경도
      * @return 가장 가까운 역까지 도보 거리 (주변 지하철역이 없으면 null을 담은 객체 반환)
      */
-    public NearestStationInfoResponse getPlaceResponse(String latitude, String longitude) {
+    public NearestStationResponse getPlaceResponse(String latitude, String longitude) {
         KakaoDistanceSearchResponse response;
-        NearestStationInfoResponse.NearestStationInfoResponseBuilder builder = NearestStationInfoResponse.builder();
+        NearestStationResponse.NearestStationResponseBuilder builder = NearestStationResponse.builder();
         try {
             response = getKakaoDistanceSearchResponse(latitude, longitude);
         } catch (Exception e) {

@@ -12,23 +12,25 @@ public class SearchResponse {
     private Long id;
     private String name;
     private String photo;
-    private Integer accumResCnt;
+    private Integer accumRevCnt;
     private Integer walkingTime;
     private String nearestStation;
     private List<HashtagName> hashtags;
     private Double grade;
+    private Boolean bookmarked;
 
-    public static SearchResponse from(SearchResponseInfo searchResponseInfo, List<HashtagName> hashtags, Integer accumRevCnt, Double grade) {
+    public static SearchResponse of(SearchInResponse searchInResponse, List<HashtagName> hashtags, Double grade) {
         return SearchResponse.builder()
-                .id(searchResponseInfo.getId())
-                .id(searchResponseInfo.getId())
-                .name(searchResponseInfo.getName())
-                .photo(searchResponseInfo.getPhoto())
-                .accumResCnt(accumRevCnt)
-                .walkingTime(searchResponseInfo.getWalkingTime())
-                .nearestStation(searchResponseInfo.getNearestStation())
+                .id(searchInResponse.getId())
+                .id(searchInResponse.getId())
+                .name(searchInResponse.getName())
+                .photo(searchInResponse.getPhoto())
+                .accumRevCnt(searchInResponse.getAccumRevCnt())
+                .walkingTime(searchInResponse.getWalkingTime())
+                .nearestStation(searchInResponse.getNearestStation())
                 .hashtags(hashtags)
                 .grade(grade)
+                .bookmarked(searchInResponse.getBookmarked())
                 .build();
     }
 }
