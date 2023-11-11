@@ -63,10 +63,10 @@ public class Grade {
         }
     }
 
-    public void update(Integer cleanliness, Integer deafening, Integer fixturesStatus, Double total){
-        updateCleanliness(cleanliness);
-        updateDeafening(deafening);
-        updateFixtureStatus(fixturesStatus);
-        updateTotal(total);
+    public void update(Grade grade){
+        updateCleanliness(grade.getCleanliness());
+        updateDeafening(grade.getDeafening());
+        updateFixtureStatus(grade.getFixturesStatus());
+        updateTotal(grade.getTotal());
     }
 }

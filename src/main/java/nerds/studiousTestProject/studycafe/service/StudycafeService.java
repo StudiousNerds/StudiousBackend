@@ -16,13 +16,10 @@ import nerds.studiousTestProject.photo.entity.SubPhoto;
 import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
-import nerds.studiousTestProject.review.service.ReviewService;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.service.RoomService;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.EventCafeInfo;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.FindStudycafeResponse;
 import nerds.studiousTestProject.studycafe.dto.enquiry.response.MainPageResponse;
-import nerds.studiousTestProject.studycafe.dto.enquiry.response.RecommendCafeInfo;
 import nerds.studiousTestProject.studycafe.dto.modify.request.AnnouncementRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.CafeInfoEditRequest;
 import nerds.studiousTestProject.studycafe.dto.modify.request.ConvenienceInfoEditRequest;
@@ -90,7 +87,6 @@ public class StudycafeService {
     private final NearestStationInfoCalculator nearestStationInfoCalculator;
     private final StorageProvider storageProvider;
     private final StudycafeRepository studycafeRepository;
-    private final ReviewService reviewService;
     private final RoomService roomService;
     private final ReservationRecordRepository reservationRecordRepository;
     private final Integer TOTAL_HASHTAGS_COUNT = 5;
@@ -151,43 +147,19 @@ public class StudycafeService {
     }
 
     public MainPageResponse getMainPage() {
-        List<RecommendCafeInfo> recommendStduycafes = getRecommendStudycafes();
-        List<EventCafeInfo> eventStudycafes = getEventStudycafes();
+        List<SearchResponse> recommendStduycafes = getRecommendStudycafes();
+        List<SearchResponse> eventStudycafes = getEventStudycafes();
         return MainPageResponse.builder().recommend(recommendStduycafes).event(eventStudycafes).build();
     }
 
-    public List<RecommendCafeInfo> getRecommendStudycafes(){
+    public List<SearchResponse> getRecommendStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByTotalGradeDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> RecommendCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
+        return getSearchResponses(topTenCafeList);
     }
 
-    public List<EventCafeInfo> getEventStudycafes(){
+    public List<SearchResponse> getEventStudycafes(){
         List<Studycafe> topTenCafeList = studycafeRepository.findTop10ByOrderByCreatedDateDesc();
-
-        return topTenCafeList.stream()
-                .map(studycafe -> EventCafeInfo.builder()
-                        .studycafeId(studycafe.getId())
-                        .studycafeName(studycafe.getName())
-                        .photo(studycafe.getPhoto())
-                        .accumResCnt(getAccumRevCnt(studycafe.getId()))
-                        .walkingTime(studycafe.getWalkingTime())
-                        .nearestStation(studycafe.getNearestStation())
-                        .grade(getTotalGrade(studycafe.getId()))
-                        .hashtags(findHashtagById(studycafe.getId()))
-                        .build())
-                .collect(Collectors.toList());
+        return getSearchResponses(topTenCafeList);
     }
 
     public List<String> getNotice(Long studycafeId) {
@@ -196,12 +168,11 @@ public class StudycafeService {
         return studycafe.getNotices().stream().map(Notice::getDetail).toList();
     }
 
-    public List<String> getConveniences(Long studycafeId) {
+    public List<ConvenienceName> getConveniences(Long studycafeId) {
         Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getConveniences().stream()
                 .map(Convenience::getName)
-                .map(ConvenienceName::toString)
                 .toList();
     }
 
@@ -221,16 +192,28 @@ public class StudycafeService {
                 .collect(Collectors.toList());
     }
 
-    private List<String> findHashtagById(Long studycafeId) {
+    private List<HashtagName> findHashtagById(Long studycafeId) {
         List<HashtagName> hashtagNames = hashtagRecordRepository.findHashtagRecordByStudycafeId(studycafeId);
-
         int size = Math.min(hashtagNames.size(), TOTAL_HASHTAGS_COUNT);
 
-        List<String> hashtagNameList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            hashtagNameList.add(hashtagNames.get(i).name());
-        }
-        return hashtagNameList;
+        return hashtagNames.stream()
+                .limit(size)
+                .toList();
+    }
+
+    private List<SearchResponse> getSearchResponses(List<Studycafe> topTenCafeList) {
+        return topTenCafeList.stream()
+                .map(studycafe -> SearchResponse.builder()
+                        .id(studycafe.getId())
+                        .name(studycafe.getName())
+                        .photo(studycafe.getPhoto())
+                        .accumResCnt(studycafe.getAccumReserveCount())
+                        .walkingTime(studycafe.getWalkingTime())
+                        .nearestStation(studycafe.getNearestStation())
+                        .grade(getTotalGrade(studycafe.getId()))
+                        .hashtags(findHashtagById(studycafe.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private int getAccumRevCnt(SearchResponseInfo searchResponseInfo) {
@@ -285,7 +268,9 @@ public class StudycafeService {
     }
 
     private Double getTotalGrade(Long studycafeId) {
-        return reviewService.getAvgGrade(studycafeId);
+        Studycafe studycafe = findStudycafeById(studycafeId);
+
+        return Double.isNaN(studycafe.getGradeSum() / studycafe.getGradeCount()) ? 0.0 : studycafe.getGradeSum() / studycafe.getGradeCount();
     }
 
     private Studycafe findStudycafeById(Long studycafeId) {
