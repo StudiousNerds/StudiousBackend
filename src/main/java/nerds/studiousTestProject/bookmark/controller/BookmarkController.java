@@ -2,7 +2,7 @@ package nerds.studiousTestProject.bookmark.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.response.FindBookmarkResponse;
+import nerds.studiousTestProject.bookmark.dto.response.ShowBookmarkResponse;
 import nerds.studiousTestProject.bookmark.service.BookmarkService;
 import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
@@ -21,20 +21,22 @@ import java.net.URI;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/mypage/bookmarks")
+@RequestMapping("/api/v1/bookmarks")
 public class BookmarkController {
     private final BookmarkService bookmarkService;
-    private static final int STUDYCAFE_SEARCH_SIZE = 8;
+    private static final String STUDYCAFE_SEARCH_SIZE = "8";
 
     @PostMapping("/{studycafeId}")
     public ResponseEntity<Void> registerBookmark(@LoggedInMember Long memberId, @PathVariable Long studycafeId){
         bookmarkService.registerBookmark(memberId, studycafeId);
-        return ResponseEntity.created(URI.create("/api/v1/mypage/bookmarks")).build();
+        return ResponseEntity.created(URI.create("/api/v1/bookmarks")).build();
     }
 
     @GetMapping
-    public FindBookmarkResponse findBookmark(@LoggedInMember Long memberId, @RequestParam(required = false) Integer page){
-        return bookmarkService.findBookmark(memberId, PageRequestConverter.of(page, STUDYCAFE_SEARCH_SIZE));
+    public ShowBookmarkResponse findBookmark(@LoggedInMember Long memberId,
+                                             @RequestParam(required = false) Integer page,
+                                             @RequestParam(defaultValue = STUDYCAFE_SEARCH_SIZE) Integer size){
+        return bookmarkService.findBookmark(memberId, PageRequestConverter.of(page, size));
     }
 
     @DeleteMapping("/{studycafeId}")
