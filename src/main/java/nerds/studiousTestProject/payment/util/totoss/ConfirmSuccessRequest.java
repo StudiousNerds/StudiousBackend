@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.payment.util.totoss;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class ConfirmSuccessRequest extends RequestToToss {
     @NotBlank(message = "paymentKey는 필수입니다.")
     private String paymentKey;
 
-    @NotBlank(message = "amount는 필수입니다.")
+    @NotNull(message = "amount는 필수입니다.")
     private Integer amount;
 
 }
