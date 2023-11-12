@@ -58,13 +58,13 @@ import java.util.stream.Collectors;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.DATE_ONLY_ONE_NULL;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_CHANGE_REQUEST;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAGE_NUMBER;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_PAGE_SIZE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVE_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_USING_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISCALCULATED_USING_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
-import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_PAYMENT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_RESERVATION_RECORD;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_ROOM;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT_FOUND_STUDYCAFE;
@@ -270,12 +270,21 @@ public class ReservationRecordService {
         return remainDate > 8 ? 8 : remainDate;
     }
 
-    public MypageReservationResponse getAll(final ReservationSettingsStatus tab, final String studycafeName, LocalDate startDate, LocalDate endDate, int page, final Long memberId) {
-        page = validPageAndAssign(page);
+    public MypageReservationResponse getAll(final ReservationSettingsStatus tab, final String studycafeName, LocalDate startDate, LocalDate endDate, final Pageable pageable, final Long memberId) {
+        validPageable(pageable);
         final Member member = findMemberById(memberId);
-        final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, PageRequest.of(page, RESERVATION_SETTINGS_PAGE_SIZE));
+        final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, pageable);
         final List<ReservationRecordInfoWithStatus> reservationRecordInfoWithStatusList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
         return MypageReservationResponse.of(reservationRecordInfoWithStatusList, reservationRecordPage);
+    }
+
+    private void validPageable(Pageable pageable) {
+        if (pageable.getPageNumber() < 1) {
+            throw new BadRequestException(INVALID_PAGE_NUMBER);
+        }
+        if (pageable.getPageSize() < 1) {
+            throw new BadRequestException(INVALID_PAGE_SIZE);
+        }
     }
 
     private int validPageAndAssign(Integer page) {
