@@ -1,20 +1,20 @@
 package nerds.studiousTestProject.payment.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.SuccessPayResponse;
 import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
+import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -22,16 +22,11 @@ import java.net.URI;
 @Slf4j
 public class PaymentController {
 
-    private static final String REDIRECT_URI_TO_RESERVATION = "/api/v1/mypage/reservations/";
-
     private final PaymentService paymentService;
 
     @PostMapping("/success")
-    public ResponseEntity<Void> payConfirmSuccess(@RequestParam String orderId,
-                                                       @RequestParam String paymentKey,
-                                                       @RequestParam Integer amount) {
-        Long reservationRecordId = paymentService.confirmSuccess(orderId, paymentKey, amount);
-        return ResponseEntity.created(URI.create(REDIRECT_URI_TO_RESERVATION + reservationRecordId)).build();
+    public SuccessPayResponse payConfirmSuccess(@RequestBody @Valid ConfirmSuccessRequest request) {
+        return paymentService.confirmSuccess(request);
     }
 
     @PostMapping("/fail")
@@ -41,11 +36,9 @@ public class PaymentController {
         return paymentService.confirmFail(message, orderId);
     }
 
-    @GetMapping("/virtual/success")
-    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestParam String orderId,
-                                                            @RequestParam String paymentKey,
-                                                            @RequestParam Integer amount) {
-        return paymentService.virtualAccount(orderId, paymentKey, amount);
+    @PostMapping("/virtual/success")
+    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestBody @Valid ConfirmSuccessRequest request) {
+        return paymentService.virtualAccount(request);
     }
 
 
