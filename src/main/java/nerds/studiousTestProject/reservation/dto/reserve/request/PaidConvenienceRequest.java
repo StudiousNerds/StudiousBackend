@@ -12,7 +12,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 @Builder
 @Getter
 @NoArgsConstructor
-public class PaidConvenience {
+public class PaidConvenienceRequest {
 
     @NotBlank
     private String name;

@@ -10,15 +10,15 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ReservationInfo {
+public class ReservationResponse {
 
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private int usingTime;
 
-    public static ReservationInfo from(ReservationRecord reservationRecord) {
-        return ReservationInfo.builder()
+    public static ReservationResponse from(ReservationRecord reservationRecord) {
+        return ReservationResponse.builder()
                 .date(reservationRecord.getDate())
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())

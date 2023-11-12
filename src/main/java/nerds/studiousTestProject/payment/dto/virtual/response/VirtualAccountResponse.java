@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class VirtualAccountInfoResponse {
+public class VirtualAccountResponse {
 
     private LocalDateTime dueDate;
     private String bankName;
     private String virtualAccount;
 
-    public static VirtualAccountInfoResponse from(Payment payment) {
-        return VirtualAccountInfoResponse.builder()
+    public static VirtualAccountResponse from(Payment payment) {
+        return VirtualAccountResponse.builder()
                 .dueDate(payment.getDueDate())
                 .virtualAccount(payment.getVirtualAccount())
                 .bankName(payment.getBankCode().name())

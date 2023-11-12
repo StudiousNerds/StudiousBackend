@@ -16,13 +16,13 @@ import java.util.List;
 public class ReserveRequest {
 
     @NotNull
-    private ReserveUser user;
+    private ReserveUserRequest user;
 
     @NotNull
-    private ReservationInfo reservation;
+    private ReservationRequest reservation;
 
     @Nullable
-    private List<PaidConvenience> paidConveniences;
+    private List<PaidConvenienceRequest> paidConveniences;
 
     private int price;
 
