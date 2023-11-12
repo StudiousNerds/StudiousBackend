@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @Data
 public class SearchRequest {
+    private Long memberId;
     private String keyword;
     private LocalDate date;
     private LocalTime startTime;
