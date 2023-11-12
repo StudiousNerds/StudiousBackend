@@ -10,12 +10,12 @@ import java.time.LocalTime;
 @Builder
 @Data
 @ToString
-public class ReservedTimeInfo {
+public class ReservedTimeResponse {
     private final LocalTime startTime;
     private final LocalTime endTime;
 
-    public static ReservedTimeInfo of(ReservationRecord reservationRecord) {
-        return ReservedTimeInfo.builder()
+    public static ReservedTimeResponse of(ReservationRecord reservationRecord) {
+        return ReservedTimeResponse.builder()
                 .startTime(reservationRecord.getStartTime())
                 .endTime(reservationRecord.getEndTime())
                 .build();

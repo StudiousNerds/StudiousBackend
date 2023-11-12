@@ -7,7 +7,7 @@ import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.SuccessPayResponse;
-import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
 import nerds.studiousTestProject.payment.util.totoss.AdminCancelRequest;
@@ -72,14 +72,14 @@ public class PaymentService {
     }
 
     @Transactional
-    public VirtualAccountInfoResponse virtualAccount(ConfirmSuccessRequest request) {
+    public VirtualAccountResponse virtualAccount(ConfirmSuccessRequest request) {
         Payment payment = findByOrderId(request.getOrderId());
         validConfirmRequest(request, payment);
         PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(INQUIRY.getUriFormat(request.getPaymentKey()));
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
-        return VirtualAccountInfoResponse.from(payment);
+        return VirtualAccountResponse.from(payment);
     }
 
     private void validPaymentMethod(final PaymentResponseFromToss responseFromToss) {

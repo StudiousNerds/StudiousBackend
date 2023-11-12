@@ -5,8 +5,8 @@ import lombok.Getter;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
-import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
-import nerds.studiousTestProject.reservation.dto.ReserveUserInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyResponse;
+import nerds.studiousTestProject.reservation.dto.ReserveUserResponse;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
@@ -20,30 +20,30 @@ public class ReserveResponse {
 
     private PlaceInfo place;
     private List<String> conveniences;
-    private List<PaidConvenience> paidConveniences;
-    private ReserveUserInfo user;
-    private List<RefundPolicyInfo> refundPolicies;
+    private List<PaidConvenienceResponse> paidConveniences;
+    private ReserveUserResponse user;
+    private List<RefundPolicyResponse> refundPolicies;
 
     public static ReserveResponse of(Member member, Room room, Studycafe studycafe, List<Convenience> conveniences, List<RefundPolicy> refundPolicyList) {
         return ReserveResponse.builder()
                 .conveniences(getRoomConvenienceList(conveniences))
                 .paidConveniences(getPaidConvenienceList(conveniences))
                 .place(PlaceInfo.of(studycafe, room))
-                .user(ReserveUserInfo.from(member))
+                .user(ReserveUserResponse.from(member))
                 .refundPolicies(getRefundPolicyInfo(refundPolicyList))
                 .build();
     }
 
-    private static List<RefundPolicyInfo> getRefundPolicyInfo(List<RefundPolicy> refundPolicyList) {
+    private static List<RefundPolicyResponse> getRefundPolicyInfo(List<RefundPolicy> refundPolicyList) {
         return refundPolicyList.stream()
                 .sorted(Comparator.comparing((RefundPolicy refundPolicy) -> refundPolicy.getRemaining().getRemain()).reversed())
-                .map(RefundPolicyInfo::from)
+                .map(RefundPolicyResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private static List<PaidConvenience> getPaidConvenienceList(List<Convenience> conveniences) {
-        List<PaidConvenience> paidConvenienceList = conveniences.stream().filter(convenience -> !convenience.isFree()).map(PaidConvenience::from).toList();
-        return paidConvenienceList;
+    private static List<PaidConvenienceResponse> getPaidConvenienceList(List<Convenience> conveniences) {
+        List<PaidConvenienceResponse> paidConvenienceResponseList = conveniences.stream().filter(convenience -> !convenience.isFree()).map(PaidConvenienceResponse::from).toList();
+        return paidConvenienceResponseList;
     }
 
     private static List<String> getRoomConvenienceList(List<Convenience> conveniences) {

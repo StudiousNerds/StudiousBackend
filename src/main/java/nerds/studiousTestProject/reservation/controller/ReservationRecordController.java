@@ -13,7 +13,7 @@ import nerds.studiousTestProject.reservation.dto.mypage.response.MypageReservati
 import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.NAME;
 import nerds.studiousTestProject.reservation.dto.reserve.request.ReserveRequest;
-import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentInfoResponse;
+import nerds.studiousTestProject.reservation.dto.reserve.response.PaymentResponse;
 import nerds.studiousTestProject.reservation.dto.show.response.ReserveResponse;
 import nerds.studiousTestProject.reservation.service.ReservationRecordService;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +38,6 @@ public class ReservationRecordController {
     private final PaymentService paymentService;
     private final ReservationRecordService reservationRecordService;
 
-    private final static Integer DEFAULT_PAGE_NUMBER = 1;
 
     @PostMapping("/reservations/{reservationId}/cancellations")
     public ResponseEntity<Void> cancel(@PathVariable Long reservationId,
@@ -53,7 +52,7 @@ public class ReservationRecordController {
     }
 
     @PostMapping("/rooms/{roomId}")
-    public PaymentInfoResponse reserve(
+    public PaymentResponse reserve(
             @LoggedInMember Long memberId,
             @PathVariable Long roomId,
             @RequestBody @Valid ReserveRequest reserveRequest) {
@@ -72,7 +71,7 @@ public class ReservationRecordController {
             @RequestParam(required = false) String studycafeName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam @PageableDefault(page = DEFAULT_PAGE_NUMBER) Pageable pageable) {
+            @RequestParam @PageableDefault(page = 1) Pageable pageable) {
         return reservationRecordService.getAll(tab, studycafeName, startDate, endDate, pageable, memberId);
     }
 
@@ -89,7 +88,7 @@ public class ReservationRecordController {
 
     @PostMapping("/reservations/{reservationRecordId}/changing")
     public ResponseEntity<?> change(@PathVariable Long reservationRecordId, @RequestBody ChangeReservationRequest request) {
-        PaymentInfoResponse response = reservationRecordService.change(reservationRecordId, request);
+        PaymentResponse response = reservationRecordService.change(reservationRecordId, request);
         return response == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(response);
     }
 }

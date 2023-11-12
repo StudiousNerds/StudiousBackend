@@ -398,7 +398,7 @@ public class ReviewService {
     }
 
     private AccumHashtagHistory findAccumHashtagByCafeAndName(final Studycafe studycafe, final String userHashtag) {
-        return accumHashtagHistoryRepository.findByStudycafeAndHashtagName(studycafe, HashtagName.valueOf(userHashtag))
+        return accumHashtagHistoryRepository.findByStudycafeAndName(studycafe, HashtagName.valueOf(userHashtag))
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_HASHTAG));
     }
 
@@ -466,7 +466,7 @@ public class ReviewService {
     }
 
     private void validateExistedAccumHashtag(final Studycafe studycafe, final String userHashtag) {
-        if (accumHashtagHistoryRepository.existsByStudycafeAndHashtagName(studycafe,HashtagName.valueOf(userHashtag))) {
+        if (accumHashtagHistoryRepository.existsByStudycafeAndName(studycafe,HashtagName.valueOf(userHashtag))) {
             final AccumHashtagHistory hashtagHistory = findAccumHashtagByCafeAndName(studycafe, userHashtag);
             hashtagHistory.addCount();
         }

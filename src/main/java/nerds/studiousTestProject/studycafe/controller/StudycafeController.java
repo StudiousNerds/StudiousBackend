@@ -9,7 +9,7 @@ import nerds.studiousTestProject.common.util.LoggedInMember;
 import nerds.studiousTestProject.common.util.PageRequestConverter;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
-import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyResponse;
 import nerds.studiousTestProject.studycafe.dto.show.response.ShowStudycafeDetailsResponse;
 import nerds.studiousTestProject.studycafe.dto.search.request.SearchSortType;
 import nerds.studiousTestProject.studycafe.dto.search.response.SearchResponse;
@@ -62,7 +62,7 @@ public class StudycafeController {
     }
 
     @GetMapping("/{studycafeId}/refundPolicies")
-    public List<RefundPolicyInfo> findStudycafeRefundPolicy(@PathVariable("studycafeId") final Long studycafeId) {
+    public List<RefundPolicyResponse> findStudycafeRefundPolicy(@PathVariable("studycafeId") final Long studycafeId) {
         return studycafeService.findRefundPolicies(studycafeId);
     }
 

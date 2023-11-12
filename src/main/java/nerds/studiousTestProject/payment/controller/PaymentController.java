@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
 import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailResponse;
 import nerds.studiousTestProject.payment.dto.confirm.response.SuccessPayResponse;
-import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountResponse;
 import nerds.studiousTestProject.payment.service.PaymentService;
 import nerds.studiousTestProject.payment.util.totoss.ConfirmSuccessRequest;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class PaymentController {
     }
 
     @PostMapping("/virtual/success")
-    public VirtualAccountInfoResponse confirmVirtualAccount(@RequestBody @Valid ConfirmSuccessRequest request) {
+    public VirtualAccountResponse confirmVirtualAccount(@RequestBody @Valid ConfirmSuccessRequest request) {
         return paymentService.virtualAccount(request);
     }
 

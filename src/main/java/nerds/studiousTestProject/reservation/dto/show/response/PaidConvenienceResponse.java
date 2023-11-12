@@ -8,14 +8,14 @@ import nerds.studiousTestProject.convenience.entity.Convenience;
 @Builder
 @AllArgsConstructor
 @Getter
-public class PaidConvenience {
+public class PaidConvenienceResponse {
 
-    private String convenienceName;
+    private String name;
     private Integer price;
 
-    public static PaidConvenience from(Convenience convenienceList) {
-        return PaidConvenience.builder()
-                .convenienceName(convenienceList.getName().name())
+    public static PaidConvenienceResponse from(Convenience convenienceList) {
+        return PaidConvenienceResponse.builder()
+                .name(convenienceList.getName().name())
                 .price(convenienceList.getPrice())
                 .build();
     }
