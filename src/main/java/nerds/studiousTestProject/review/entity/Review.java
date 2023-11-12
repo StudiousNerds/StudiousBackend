@@ -3,6 +3,7 @@ package nerds.studiousTestProject.review.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.hashtag.entity.HashtagRecord;
 import org.springframework.data.annotation.CreatedDate;
-
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
