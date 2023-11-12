@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Builder
 @Data
 @NoArgsConstructor
-public class ReservationInfo {
+public class ReservationRequest {
 
     @NotNull(message = "예약날짜는 필수입니다.")
     private LocalDate date;

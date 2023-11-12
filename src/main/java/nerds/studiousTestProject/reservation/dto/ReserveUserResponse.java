@@ -7,20 +7,20 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @Getter
 @Builder
-public class ReserveUserInfo {
+public class ReserveUserResponse {
 
     private String name;
     private String phoneNumber;
 
-    public static ReserveUserInfo from(ReservationRecord reservationRecord) {
-        return ReserveUserInfo.builder()
+    public static ReserveUserResponse from(ReservationRecord reservationRecord) {
+        return ReserveUserResponse.builder()
                 .name(reservationRecord.getUserName())
                 .phoneNumber(reservationRecord.getUserPhoneNumber())
                 .build();
     }
 
-    public static ReserveUserInfo from(Member member) {
-        return ReserveUserInfo.builder()
+    public static ReserveUserResponse from(Member member) {
+        return ReserveUserResponse.builder()
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
                 .build();

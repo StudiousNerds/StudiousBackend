@@ -114,7 +114,6 @@ CREATE TABLE IF NOT EXISTS `payment` (
     `bank_code`             varchar(255),
     `due_date`              TIMESTAMP,
     `secret`                varchar(255),
-    `reservation_record_id` bigint       NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -148,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
     `member_id`         bigint       NOT NULL,
     `room_id`           bigint       NOT NULL,
     `review_id`         bigint,
+    `payment_id`        bigint,      NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1

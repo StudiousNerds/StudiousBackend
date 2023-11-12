@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @NoArgsConstructor
-public class ReserveUser {
+public class ReserveUserRequest {
 
     @NotBlank(message = "예약자명은 필수 입니다.")
     private String name;
