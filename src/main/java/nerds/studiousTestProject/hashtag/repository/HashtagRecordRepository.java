@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface HashtagRecordRepository extends JpaRepository<HashtagRecord, Long> {
     void deleteAllByReviewId(Long reviewId);
-
+    List<HashtagName> findAllByReviewId(Long reviewId);
     @Query(value = "select h.name from HashtagRecord as h join fetch ReservationRecord as r " +
             "where r.room.studycafe.id = :studycafeId " +
             "group by h.name " +

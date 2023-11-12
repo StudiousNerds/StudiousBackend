@@ -145,13 +145,25 @@ public class Studycafe {
         announcement.setStudycafe(this);
     }
 
-    public void updateIntroduction(String introduction) {
+    public void update(final String introduction,
+                       final List<Convenience> conveniences,
+                       final List<Notice> notices,
+                       final List<OperationInfo> operationInfos,
+                       final List<RefundPolicy> refundPolicies) {
+        updateIntroduction(introduction);
+        updateConveniences(conveniences);
+        updateNotices(notices);
+        updateOperationInfos(operationInfos);
+        updateRefundPolices(refundPolicies);
+    }
+
+    private void updateIntroduction(String introduction) {
         if (introduction != null) {
             this.introduction = introduction;
         }
     }
 
-    public void updateOperationInfos(List<OperationInfo> operationInfos) {
+    private void updateOperationInfos(List<OperationInfo> operationInfos) {
         if (operationInfos != null) {
             this.operationInfos = operationInfos;
         }
@@ -163,21 +175,41 @@ public class Studycafe {
         }
     }
 
-    public void updateConveniences(List<Convenience> conveniences) {
+    private void updateConveniences(List<Convenience> conveniences) {
         if (conveniences != null) {
             this.conveniences = conveniences;
         }
     }
 
-    public void updateNotices(List<Notice> notices) {
+    private void updateNotices(List<Notice> notices) {
         if (notices != null) {
             this.notices = notices;
         }
     }
 
-    public void updateRefundPolices(List<RefundPolicy> refundPolicies) {
+    private void updateRefundPolices(List<RefundPolicy> refundPolicies) {
         if (refundPolicies != null) {
             this.refundPolicies = refundPolicies;
+        }
+    }
+
+    public void registerGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum = gradeSum;
+        }
+        gradeCount++;
+    }
+
+    public void deleteGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum -= gradeSum;
+        }
+        gradeCount--;
+    }
+
+    public void updateGrade(Double gradeSum) {
+        if (gradeSum != null) {
+            this.gradeSum += gradeSum;
         }
     }
 

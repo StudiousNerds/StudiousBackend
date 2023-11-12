@@ -190,26 +190,26 @@ public class ReservationRecordService {
                 .forEach(paidConvenience -> convenienceRecordRepository.save(paidConvenience.toConvenienceRecord(reservationRecord)));
     }
 
-    public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {
-        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
-        LocalTime openTime = studycafe.getOperationInfos().get(0).getStartTime() != null ? studycafe.getOperationInfos().get(0).getStartTime() : LocalTime.MIN;
-        LocalTime endTime = studycafe.getOperationInfos().get(1).getEndTime() != null ? studycafe.getOperationInfos().get(1).getEndTime() : LocalTime.MAX;
-
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
-        Integer minUsingTime = room.getMinUsingTime();
-
-        for (int i = openTime.getHour(); i <= endTime.getHour(); i += minUsingTime) {
-            reservationTimes.put(i, true);
-        }
-
-        List<Object[]> allReservedTime = reservationRecordRepository.findAllReservedTime(date, roomId);
-        for (Object[] localTimes : allReservedTime) {
-            for (int i = ((LocalTime) localTimes[0]).getHour(); i < ((LocalTime) localTimes[1]).getHour(); i++) {
-                reservationTimes.put(i, false);
-            }
-        }
-        return reservationTimes;
-    }
+//    public Map<Integer, Boolean> getReservationTimes(LocalDate date, Long studycafeId, Long roomId) {
+//        Studycafe studycafe = studycafeRepository.findById(studycafeId).orElseThrow(() -> new NotFoundException(NOT_FOUND_STUDYCAFE));
+//        LocalTime openTime = studycafe.getOperationInfos().get(0).getStartTime() != null ? studycafe.getOperationInfos().get(0).getStartTime() : LocalTime.MIN;
+//        LocalTime endTime = studycafe.getOperationInfos().get(1).getEndTime() != null ? studycafe.getOperationInfos().get(1).getEndTime() : LocalTime.MAX;
+//
+//        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ROOM));
+//        Integer minUsingTime = room.getMinUsingTime();
+//
+//        for (int i = openTime.getHour(); i <= endTime.getHour(); i += minUsingTime) {
+//            reservationTimes.put(i, true);
+//        }
+//
+//        List<Object[]> allReservedTime = reservationRecordRepository.findAllReservedTime(date, roomId);
+//        for (Object[] localTimes : allReservedTime) {
+//            for (int i = ((LocalTime) localTimes[0]).getHour(); i < ((LocalTime) localTimes[1]).getHour(); i++) {
+//                reservationTimes.put(i, false);
+//            }
+//        }
+//        return reservationTimes;
+//    }
 
     public ReservationRecord findByIdWithPlace(final Long reservationRecordId) {
         return reservationRecordRepository.findByIdWithPlace(reservationRecordId)
