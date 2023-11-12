@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class BookmarkInfo {
+public class BookmarkResponse {
     private Long studycafeId;
     private String cafeName;
     private String photo;

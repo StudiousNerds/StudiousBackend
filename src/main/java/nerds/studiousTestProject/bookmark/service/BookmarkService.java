@@ -2,7 +2,7 @@ package nerds.studiousTestProject.bookmark.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nerds.studiousTestProject.bookmark.dto.response.BookmarkInfo;
+import nerds.studiousTestProject.bookmark.dto.response.BookmarkResponse;
 import nerds.studiousTestProject.bookmark.dto.response.ShowBookmarkResponse;
 import nerds.studiousTestProject.bookmark.entity.Bookmark;
 import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
@@ -55,12 +55,12 @@ public class BookmarkService {
 
         if (bookmarks == null || !bookmarks.hasContent()) {
             return ShowBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
-                    .bookmarkInfo(Collections.emptyList()).build();
+                    .bookmarkResponse(Collections.emptyList()).build();
         }
 
-        List<BookmarkInfo> bookmarkInfos = bookmarks.stream()
+        List<BookmarkResponse> bookmarkResponses = bookmarks.stream()
                 .map(Bookmark::getStudycafe)
-                .map(studycafe -> BookmarkInfo.builder()
+                .map(studycafe -> BookmarkResponse.builder()
                         .studycafeId(studycafe.getId())
                         .cafeName(studycafe.getName())
                         .photo(studycafe.getPhoto())
@@ -73,7 +73,7 @@ public class BookmarkService {
                 .collect(Collectors.toList());
 
         return ShowBookmarkResponse.builder().totalPage(bookmarks.getTotalPages()).currentPage(bookmarks.getNumber() + 1)
-                .bookmarkInfo(bookmarkInfos).build();
+                .bookmarkResponse(bookmarkResponses).build();
     }
 
     @Transactional

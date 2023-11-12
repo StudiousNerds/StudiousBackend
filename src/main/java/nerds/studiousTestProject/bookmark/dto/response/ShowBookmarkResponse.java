@@ -10,5 +10,5 @@ import java.util.List;
 public class ShowBookmarkResponse {
     private Integer totalPage;
     private Integer currentPage;
-    private List<BookmarkInfo> bookmarkInfo;
+    private List<BookmarkResponse> bookmarkResponse;
 }
