@@ -48,6 +48,14 @@ public class AccumHashtagHistory {
         }
     }
 
+    public void addCount() {
+        count++;
+    }
+
+    public void subtractCount() {
+        count--;
+    }
+    
     public void updateCount(Integer count) {
         if (count != null) {
             this.count += count;
