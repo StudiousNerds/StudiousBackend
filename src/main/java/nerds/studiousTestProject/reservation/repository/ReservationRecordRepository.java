@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservationRecordRepository extends JpaRepository<ReservationRecord, Long>, ReservationRecordRepositoryCustom {
-    @Query(value = "select r.startTime, r.endTime " +
-            "from ReservationRecord r " +
-            "where r.date = :date and r.room.id = :roomId " +
-            "and r.status = nerds.studiousTestProject.reservation.entity.ReservationStatus.CONFIRMED")
-    List<Object[]> findAllReservedTime(@Param("date")LocalDate date, @Param("roomId")Long roomId);
+    @Query(value = "select * from reservation_record " +
+            "where date >= :date and room_id = :roomId " +
+            "and status = 'CONFIRMED' " +
+            "group by id, date", nativeQuery = true)
+    List<ReservationRecord> findAllByFutureReservedTimeGroupingByDate(@Param("date")LocalDate date, @Param("roomId")Long roomId);
 
     List<ReservationRecord> findAllByRoomId(Long roomId);
 

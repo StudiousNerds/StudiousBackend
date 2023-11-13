@@ -40,6 +40,7 @@ public enum ErrorCode {
     INVALID_SORT_TYPE("정렬 기준이 잘못되었습니다."),
     NOT_PARSING_BODY("JSON 형식이 잘못되었습니다."),
     NOT_FOUND_REVIEW("리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_BOOKMARK("북마크를 찾을 수 없습니다."),
     NOT_FOUND_START_TIME("시작 시간을 찾을 수 없습니다."),
     NOT_FOUND_END_TIME("종료 시간을 찾을 수 없습니다."),
     NOT_FOUND_OPERATION_INFO("운영 정보를 찾을 수 없습니다"),
@@ -70,8 +71,10 @@ public enum ErrorCode {
     INVALID_WRITE_REVIEW_TIME("리뷰 작성 가능 시간이 아닙니다."),
     INVALID_CAFE_MAIN_PHOTO_SIZE("스터디카페 메인 사진은 1개이여야 합니다."),
     INVALID_ROOM_PHOTOS("룸 사진은 필수입니다."),
+    ALREADY_EXIST_BOOKMARK("이미 존재하는 북마크입니다."),
     DATE_ONLY_ONE_NULL("시작일과 끝나는 일자는 둘 중 하나만 없을 수 없습니다."),
-    INVALID_BANK_CODE("유효하지 않은 bank code입니다.");
+    INVALID_BANK_CODE("유효하지 않은 bank code입니다."),
+    INVALID_PAGE_SIZE("page size는 양수여야 합니다.");
 
     private final String message;
     ErrorCode(String message) {

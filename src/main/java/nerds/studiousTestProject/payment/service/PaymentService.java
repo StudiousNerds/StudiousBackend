@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nerds.studiousTestProject.common.exception.BadRequestException;
 import nerds.studiousTestProject.common.exception.NotFoundException;
-import nerds.studiousTestProject.convenience.repository.ConvenienceRecordRepository;
 import nerds.studiousTestProject.member.entity.member.MemberRole;
 import nerds.studiousTestProject.payment.dto.callback.request.DepositCallbackRequest;
-import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountInfoResponse;
+import nerds.studiousTestProject.payment.dto.confirm.response.SuccessPayResponse;
+import nerds.studiousTestProject.payment.dto.virtual.response.VirtualAccountResponse;
 import nerds.studiousTestProject.payment.entity.PaymentStatus;
 import nerds.studiousTestProject.payment.util.fromtoss.Cancel;
 import nerds.studiousTestProject.payment.util.totoss.AdminCancelRequest;
@@ -48,18 +48,17 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentGenerator paymentGenerator;
     private final ReservationRecordRepository reservationRecordRepository;
-    private final ConvenienceRecordRepository convenienceRecordRepository;
 
     @Transactional
-    public Long confirmSuccess(final String orderId, final String paymentKey, final Integer amount) {
-        Payment payment = findByOrderId(orderId);
-        validConfirmRequest(orderId, amount, payment);
-        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), new ConfirmSuccessRequest(orderId, paymentKey, amount));
+    public SuccessPayResponse confirmSuccess(ConfirmSuccessRequest request) {
+        Payment payment = findByOrderId(request.getOrderId());
+        validConfirmRequest(request, payment);
+        final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CONFIRM.getUriFormat(), request);
         payment.complete(responseFromToss.toPayment());
         ReservationRecord reservationRecord = findReservationRecordByPaymentIdWithPlace(payment.getId());
         reservationRecord.completePay();
         reservationRecord.getRoom().getStudycafe().updateAccumReserveCount();
-        return reservationRecord.getId();
+        return new SuccessPayResponse(reservationRecord.getId());
     }
 
     private ReservationRecord findReservationRecordByPaymentIdWithPlace(Long paymentId) {
@@ -67,20 +66,20 @@ public class PaymentService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
 
-    private void validConfirmRequest(final String orderId, final Integer amount, final Payment payment){
-        if(!amount.equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
-        if(!orderId.equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
+    private void validConfirmRequest(ConfirmSuccessRequest request, final Payment payment){
+        if(!request.getAmount().equals(payment.getPrice())) throw new BadRequestException(MISMATCH_PRICE);
+        if(!request.getOrderId().equals(payment.getOrderId())) throw new BadRequestException(MISMATCH_ORDER_ID);
     }
 
     @Transactional
-    public VirtualAccountInfoResponse virtualAccount(final String orderId, final String paymentKey, final Integer amount) {
-        Payment payment = findByOrderId(orderId);
-        validConfirmRequest(orderId, amount, payment);
-        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(INQUIRY.getUriFormat(paymentKey));
+    public VirtualAccountResponse virtualAccount(ConfirmSuccessRequest request) {
+        Payment payment = findByOrderId(request.getOrderId());
+        validConfirmRequest(request, payment);
+        PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(INQUIRY.getUriFormat(request.getPaymentKey()));
         validPaymentMethod(responseFromToss);
         payment.complete(responseFromToss.toVitualAccountPayment()); //complete 말고 다른 작명이 좋을 수도 있을 듯
         log.info("success payment ! payment status is {} and method is {}", responseFromToss.getStatus(), responseFromToss.getMethod());
-        return VirtualAccountInfoResponse.from(payment);
+        return VirtualAccountResponse.from(payment);
     }
 
     private void validPaymentMethod(final PaymentResponseFromToss responseFromToss) {
