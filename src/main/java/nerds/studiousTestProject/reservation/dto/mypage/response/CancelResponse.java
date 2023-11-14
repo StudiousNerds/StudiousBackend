@@ -7,13 +7,13 @@ import nerds.studiousTestProject.payment.entity.Payment;
 
 @Getter
 @Builder
-public class CancelInfo {
+public class CancelResponse {
 
     private String reason;
     private MemberRole canceler;
 
-    public static CancelInfo from(Payment payment) {
-        return CancelInfo.builder()
+    public static CancelResponse from(Payment payment) {
+        return CancelResponse.builder()
                 .reason(payment.getCancelReason())
                 .canceler(payment.getCanceler())
                 .build();

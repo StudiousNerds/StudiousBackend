@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import nerds.studiousTestProject.convenience.entity.Convenience;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenience;
+import nerds.studiousTestProject.reservation.dto.show.response.PaidConvenienceResponse;
 import nerds.studiousTestProject.room.entity.Room;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class ShowRoomDetailsResponse {
     private Integer minUsingTime;
     private List<String> photos;
     private List<String> conveniences;
-    private List<PaidConvenience> paidConveniences;
+    private List<PaidConvenienceResponse> paidConvenienceResponses;
 
     public static ShowRoomDetailsResponse from(Room room) {
         return ShowRoomDetailsResponse.builder()
@@ -32,7 +32,7 @@ public class ShowRoomDetailsResponse {
                 .minUsingTime(room.getMinUsingTime())
                 .photos(room.getSubPhotos().stream().map(SubPhoto::getPath).toList())
                 .conveniences(room.getConveniences().stream().filter(Convenience::isFree).map(c -> c.getName().name()).toList())
-                .paidConveniences(room.getConveniences().stream().filter(c -> !c.isFree()).map(c -> new PaidConvenience(c.getName().name(), c.getPrice())).toList())
+                .paidConvenienceResponses(room.getConveniences().stream().filter(c -> !c.isFree()).map(c -> new PaidConvenienceResponse(c.getName().name(), c.getPrice())).toList())
                 .build();
     }
 }

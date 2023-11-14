@@ -3,25 +3,23 @@ package nerds.studiousTestProject.reservation.dto.cancel.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import nerds.studiousTestProject.payment.dto.PaymentInfo;
+import nerds.studiousTestProject.payment.dto.PaymentResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
-
-import java.util.List;
 
 @AllArgsConstructor
 @Getter
 @Builder
-public class PaymentInfoWithRefund {
+public class PaymentWithRefundResponse {
 
     private int refundPrice;
     private int refundFee;
-    private PaymentInfo payment;
+    private PaymentResponse payment;
 
-    public static PaymentInfoWithRefund of(int refundPrice, int refundFee, Payment payment) {
-        return PaymentInfoWithRefund.builder()
+    public static PaymentWithRefundResponse of(int refundPrice, int refundFee, Payment payment) {
+        return PaymentWithRefundResponse.builder()
                 .refundPrice(refundPrice)
                 .refundFee(refundFee)
-                .payment(PaymentInfo.from(payment))
+                .payment(PaymentResponse.from(payment))
                 .build();
     }
 

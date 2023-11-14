@@ -5,13 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 
 @AllArgsConstructor
 @Builder
 @Data
 @NoArgsConstructor
-public class PaymentInfoResponse {
+public class PaymentResponse {
 
     private int amount;
 
@@ -19,8 +18,8 @@ public class PaymentInfoResponse {
 
     private String orderName;
 
-    public static PaymentInfoResponse of(Payment payment, String orderName) {
-        return PaymentInfoResponse.builder()
+    public static PaymentResponse of(Payment payment, String orderName) {
+        return PaymentResponse.builder()
                 .amount(payment.getPrice())
                 .orderId(payment.getOrderId())
                 .orderName(orderName)

@@ -7,8 +7,8 @@ import nerds.studiousTestProject.common.service.HolidayProvider;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
 import nerds.studiousTestProject.hashtag.entity.HashtagName;
 import nerds.studiousTestProject.photo.entity.SubPhoto;
-import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyInfo;
-import nerds.studiousTestProject.reservation.dto.ReservedTimeInfo;
+import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyResponse;
+import nerds.studiousTestProject.reservation.dto.ReservedTimeResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
 import nerds.studiousTestProject.room.entity.Room;
@@ -116,11 +116,11 @@ public class StudycafeService {
                 .toList();
     }
 
-    public List<RefundPolicyInfo> findRefundPolicies(final Long studycafeId) {
+    public List<RefundPolicyResponse> findRefundPolicies(final Long studycafeId) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
 
         return studycafe.getRefundPolicies().stream()
-                .map(RefundPolicyInfo::from)
+                .map(RefundPolicyResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -147,15 +147,15 @@ public class StudycafeService {
                                                                 final int minUsingTime,
                                                                 final Long roomId,
                                                                 final Long studycafeId) {
-        final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate = getReservedTimesGroupingByDate(roomId, today);
+        final Map<LocalDate, List<ReservedTimeResponse>> reservedTimesGroupingByDate = getReservedTimesGroupingByDate(roomId, today);
         final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek = getOperationInfosGroupingByWeek(studycafeId);
         return getCanReserveTimesGroupingByDate(today, minUsingTime, operationInfoGroupingByWeek, reservedTimesGroupingByDate);
     }
 
-    private Map<LocalDate, List<ReservedTimeInfo>> getReservedTimesGroupingByDate(final Long roomId, final LocalDate today) {
+    private Map<LocalDate, List<ReservedTimeResponse>> getReservedTimesGroupingByDate(final Long roomId, final LocalDate today) {
         final List<ReservationRecord> reservationRecords = reservationRecordRepository.findAllByFutureReservedTimeGroupingByDate(today, roomId);
         return reservationRecords.stream()
-                .collect(Collectors.groupingBy(ReservationRecord::getDate, Collectors.mapping(ReservedTimeInfo::of, Collectors.toList())));
+                .collect(Collectors.groupingBy(ReservationRecord::getDate, Collectors.mapping(ReservedTimeResponse::of, Collectors.toList())));
     }
 
     private Map<Week, ShowOperationInfoInResponse> getOperationInfosGroupingByWeek(final Long studycafeId) {
@@ -168,7 +168,7 @@ public class StudycafeService {
     private Map<LocalDate, List<Integer>> getCanReserveTimesGroupingByDate(final LocalDate today,
                                                                            final int minUsingTime,
                                                                            final Map<Week, ShowOperationInfoInResponse> operationInfoGroupingByWeek,
-                                                                           final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate) {
+                                                                           final Map<LocalDate, List<ReservedTimeResponse>> reservedTimesGroupingByDate) {
         final Map<LocalDate, List<Integer>> canReserveTimesGroupingByDate = new ConcurrentHashMap<>();
         final int todayDate = today.getDayOfMonth();
         final int currentMonthLastDay = today.getMonth().maxLength();
@@ -184,7 +184,7 @@ public class StudycafeService {
     private List<Integer> getCanReserveTimes(final LocalDate currentDate,
                                              final ShowOperationInfoInResponse currentOperationInfo,
                                              final int minUsingTime,
-                                             final Map<LocalDate, List<ReservedTimeInfo>> reservedTimesGroupingByDate) {
+                                             final Map<LocalDate, List<ReservedTimeResponse>> reservedTimesGroupingByDate) {
         if (currentOperationInfo.isClosed()) {
             return Collections.emptyList();
         }
@@ -196,13 +196,13 @@ public class StudycafeService {
             return IntStream.range(openingTime.getHour(), getHourFromClosingTime(closingTime)).boxed().toList();
         }
 
-        final List<ReservedTimeInfo> reservedTimes = reservedTimesGroupingByDate.get(currentDate);
+        final List<ReservedTimeResponse> reservedTimes = reservedTimesGroupingByDate.get(currentDate);
         final Map<Integer, Boolean> canReservePerHour = getCanReservePerHour(minUsingTime, reservedTimes, openingTime, closingTime);
         return canReservePerHour.keySet().stream().filter(canReservePerHour::get).toList();
     }
 
     private Map<Integer, Boolean> getCanReservePerHour(final int minUsingTime,
-                                                       final List<ReservedTimeInfo> reservedTimes,
+                                                       final List<ReservedTimeResponse> reservedTimes,
                                                        final LocalTime openingTime,
                                                        final LocalTime closingTime) {
         final Map<Integer, Boolean> canReservePerHour = initCanReservePerHour(openingTime, closingTime);
@@ -226,13 +226,13 @@ public class StudycafeService {
         return canReservePerHour;
     }
 
-    private List<Integer> getReservationStartTimes(final LocalTime closingTime, final List<ReservedTimeInfo> reservedTimes) {
+    private List<Integer> getReservationStartTimes(final LocalTime closingTime, final List<ReservedTimeResponse> reservedTimes) {
         final List<Integer> reservationStartTimes = new ArrayList<>(reservedTimes.stream().map(r -> r.getStartTime().getHour()).toList());
         reservationStartTimes.add(reservationStartTimes.size(), getHourFromClosingTime(closingTime));
         return reservationStartTimes;
     }
 
-    private List<Integer> getReservationEndTimes(final LocalTime openingTime, final List<ReservedTimeInfo> reservedTimes) {
+    private List<Integer> getReservationEndTimes(final LocalTime openingTime, final List<ReservedTimeResponse> reservedTimes) {
         final List<Integer> reservationEndTimes = new ArrayList<>(reservedTimes.stream().map(r -> r.getEndTime().getHour()).toList());
         reservationEndTimes.add(0, openingTime.getHour());
         return reservationEndTimes;

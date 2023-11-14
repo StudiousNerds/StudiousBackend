@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class PaymentInfo {
+public class PaymentResponse {
 
     private int price;
     private String method;
     private LocalDateTime completeTime;
 
-    public static PaymentInfo from(Payment payment) {
-        return PaymentInfo.builder()
+    public static PaymentResponse from(Payment payment) {
+        return PaymentResponse.builder()
                 .price(payment.getPrice())
                 .method(payment.getMethod())
                 .completeTime(payment.getCompleteTime())
