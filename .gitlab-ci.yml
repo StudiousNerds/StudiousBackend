@@ -31,8 +31,6 @@ deploy-to-ec2:
     - chmod 644 ~/.ssh/known_hosts
 
   script:
-    - ssh -o StrictHostKeyChecking=no ec2-user@"$DEPLOY_SERVER" 'rm -f ~/studious-backend/build/libs/*.jar'
-    - ssh -o StrictHostKeyChecking=no ec2-user@"$DEPLOY_SERVER" 'mkdir -p ~/studious-backend/build/libs'
     - scp build/libs/*.jar ec2-user@"$DEPLOY_SERVER":~/studious-backend/build/libs/*.jar
     - ssh -o StrictHostKeyChecking=no ec2-user@"$DEPLOY_SERVER" '~/test-cd.sh'
   only:
