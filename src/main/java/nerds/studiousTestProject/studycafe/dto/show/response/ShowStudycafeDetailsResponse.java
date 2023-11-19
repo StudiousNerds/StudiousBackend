@@ -22,10 +22,12 @@ public class ShowStudycafeDetailsResponse {
     private List<String> conveniences;
     private List<AnnouncementInResponse> announcements;
     private List<ShowRoomResponse> rooms;
+    private boolean bookmarked;
 
     public static ShowStudycafeDetailsResponse of(final Studycafe studycafe,
                                                   final List<String> photos,
-                                                  final List<ShowRoomResponse> rooms) {
+                                                  final List<ShowRoomResponse> rooms,
+                                                  final Boolean bookmarked) {
         return ShowStudycafeDetailsResponse.builder()
                 .id(studycafe.getId())
                 .name(studycafe.getName())
@@ -38,6 +40,7 @@ public class ShowStudycafeDetailsResponse {
                 .conveniences(studycafe.getConveniences().stream().map(c -> c.getName().name()).toList())
                 .announcements(studycafe.getAnnouncements().stream().map(AnnouncementInResponse::from).toList())
                 .rooms(rooms)
+                .bookmarked(bookmarked)
                 .build();
     }
 }
