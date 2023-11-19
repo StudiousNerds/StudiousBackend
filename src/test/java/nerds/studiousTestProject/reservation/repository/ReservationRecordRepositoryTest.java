@@ -1,5 +1,8 @@
 package nerds.studiousTestProject.reservation.repository;
 
+import nerds.studiousTestProject.payment.entity.Payment;
+import nerds.studiousTestProject.payment.entity.PaymentStatus;
+import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.support.RepositoryTest;
 import nerds.studiousTestProject.room.entity.Room;
 import nerds.studiousTestProject.room.repository.RoomRepository;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import static nerds.studiousTestProject.support.EntitySaveProvider.권한_저장;
 import static nerds.studiousTestProject.support.EntitySaveProvider.리뷰_저장;
@@ -48,6 +52,8 @@ class ReservationRecordRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private StudycafeRepository studycafeRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName(value = "룸 id를 통해 예약 내역을 조회할 수 있다.")
@@ -155,6 +161,26 @@ class ReservationRecordRepositoryTest {
         assertAll(
                 ()->assertThat(page.getTotalPages()).isEqualTo(1),
                 ()->assertThat(page.getContent()).containsExactly(reservation)
+        );
+    }
+
+    @Test
+    void 기존_예약과_중복되는_예약을_조회할_수_있다() {
+        Member member1 = 멤버_저장(DEFAULT_USER.생성());
+        Room room = 룸_저장(ROOM_FOUR_SIX.스터디카페_생성(스터디카페_저장(NERDS.멤버_추가_생성(member1))));
+        Payment payment = paymentRepository.save(Payment.builder().status(PaymentStatus.DONE).orderId(UUID.randomUUID().toString()).price(1000).build());
+        예약_내역_저장(CONFIRM_RESERVATION.예약_내역_결제_추가_생성(LocalDate.of(2023,11,19), LocalTime.of(19,0), LocalTime.of(21,0), member1, room, payment));
+        boolean exists1 = reservationRecordRepository.existsByRoomAndDateTime(LocalDate.of(2023, 11, 19), LocalTime.of(18, 0), LocalTime.of(20, 0), room.getId());
+        boolean exists2 = reservationRecordRepository.existsByRoomAndDateTime(LocalDate.of(2023, 11, 19), LocalTime.of(20, 0), LocalTime.of(22, 0), room.getId());
+        boolean exists3 = reservationRecordRepository.existsByRoomAndDateTime(LocalDate.of(2023, 11, 19), LocalTime.of(19, 0), LocalTime.of(21, 0), room.getId());
+        boolean exists4 = reservationRecordRepository.existsByRoomAndDateTime(LocalDate.of(2023, 11, 19), LocalTime.of(17, 0), LocalTime.of(19, 0), room.getId());
+        boolean exists5 = reservationRecordRepository.existsByRoomAndDateTime(LocalDate.of(2023, 11, 19), LocalTime.of(21, 0), LocalTime.of(23, 0), room.getId());
+        assertAll(
+                () -> assertThat(exists1).isTrue(),
+                () -> assertThat(exists2).isTrue(),
+                () -> assertThat(exists3).isTrue(),
+                () -> assertThat(exists4).isFalse(),
+                () -> assertThat(exists5).isFalse()
         );
     }
 
