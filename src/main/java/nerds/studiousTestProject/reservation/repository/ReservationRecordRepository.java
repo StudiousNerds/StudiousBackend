@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,4 +44,9 @@ public interface ReservationRecordRepository extends JpaRepository<ReservationRe
 
     @Query("select r from ReservationRecord r join fetch r.payment where r.id = :reservationRecordId")
     Optional<ReservationRecord> findByIdWithPayment(@Param("reservationRecordId") Long reservationRecordId);
+
+    @Query("select exists (select r from ReservationRecord r where r.room.id = :roomId and r.date = :date " +
+            "and ((r.startTime < :endTime and r.startTime >= :startTime) or (r.endTime > :startTime and r.endTime < :endTime))" +
+            "and r.status = 'CONFIRMED')")
+    boolean existsByRoomAndDateTime(@Param("date") LocalDate date, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime, @Param("roomId") Long roomId);
 }
