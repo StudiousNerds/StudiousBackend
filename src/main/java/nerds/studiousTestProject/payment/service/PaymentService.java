@@ -117,6 +117,15 @@ public class PaymentService {
         cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
     }
 
+    private void validCancelAmount(CancelRequest cancelRequest, ReservationRecord reservationRecord, Payment payment) {
+        Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
+        int refundRate = refundPolicyRepository.findStudycafeRefundRateOnDay(studycafe, Remaining.from(reservationRecord.getDate()));
+        double refundPrice = payment.getPrice() * refundRate * 0.01;
+        if (refundPrice != cancelRequest.getCancelAmount()) {
+            throw new BadRequestException(MISMATCH_CANCEL_PRICE);
+        }
+    }
+
     private void cancel(final CancelRequest cancelRequest, final MemberRole canceler, ReservationRecord reservationRecord, Payment payment) {
         validPaymentMethod(cancelRequest, payment);
         final PaymentResponseFromToss responseFromToss = paymentGenerator.requestToToss(CANCEL.getUriFormat(payment.getPaymentKey()), cancelRequest);
