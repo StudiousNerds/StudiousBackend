@@ -50,7 +50,7 @@ public class Payment {
     @Column(name = "price", nullable = false)
     private Integer price;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
