@@ -1,6 +1,7 @@
 package nerds.studiousTestProject.support.fixture;
 
 import nerds.studiousTestProject.member.entity.member.Member;
+import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord.ReservationRecordBuilder;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
@@ -45,6 +46,19 @@ public enum ReservationRecordFixture {
     public ReservationRecord 예약_내역_생성(LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room){
         return 예약_내역_생성(null, reserveDate, startTime, endTime, member, room);
     }
+
+    public ReservationRecord 예약_내역_결제_추가_생성(LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room, Payment payment){
+        return 기본_정보_빌더_생성(null)
+                .date(reserveDate)
+                .startTime(startTime)
+                .endTime(endTime)
+                .usingTime(endTime.getHour() - startTime.getHour())
+                .member(member)
+                .room(room)
+                .payment(payment)
+                .build();
+    }
+
 
     public ReservationRecord 예약_내역_생성(Long id, LocalDate reserveDate, LocalTime startTime, LocalTime endTime, Member member, Room room){
         return 기본_정보_빌더_생성(id)
