@@ -56,9 +56,10 @@ public class StudycafeController {
 
     @GetMapping("/{studycafeId}")
     public ShowStudycafeDetailsResponse findStudycafe(
+            @LoggedInMember @Nullable Long memberId,
             @PathVariable("studycafeId") final Long studycafeId,
             @RequestParam(defaultValue = TIME_DEFAULT_VALUE) @FutureOrPresent(message = "예약일은 오늘 이후 날짜로 설정해야 합니다.") final LocalDate date) {
-        return studycafeService.findStudycafeByDate(studycafeId, date);
+        return studycafeService.findStudycafeByDate(memberId, studycafeId, date);
     }
 
     @GetMapping("/{studycafeId}/refundPolicies")
