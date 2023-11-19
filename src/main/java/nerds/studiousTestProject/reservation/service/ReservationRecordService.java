@@ -239,39 +239,10 @@ public class ReservationRecordService {
         return ReserveResponse.of(member, room, studycafe, conveniences, refundPolicyList);
     }
 
-    public ReservationCancelResponse getCancelInfo(final Long reservationId) {
-        final ReservationRecord reservationRecord = findByIdWithPaymentAndPlace(reservationId);
-        final Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
-        final List<RefundPolicy> refundPolicies = refundPolicyRepository.findAllByStudycafe(studycafe);
-
-        final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
-        final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
-        PaymentWithRefundResponse paymentWithRefundResponse = calculateRefundMoney(reservationRecord.getPayment(), refundPolicyOnDay);
-        return ReservationCancelResponse.of(reservationRecord, paymentWithRefundResponse, refundPolicies, refundPolicyOnDay);
-    }
 
     private ReservationRecord findByIdWithPaymentAndPlace(Long reservationRecordId) {
         return reservationRecordRepository.findByIdWithPaymentAndPlace(reservationRecordId)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
-    }
-
-    private PaymentWithRefundResponse calculateRefundMoney(final Payment payment, final RefundPolicy refundPolicyOnDay) {
-        final int price = payment.getPrice();
-        final int refundPrice = price * refundPolicyOnDay.getRate() * (1 / 100);
-        final int refundFee = price - refundPrice;
-        return PaymentWithRefundResponse.of(refundPrice, refundFee, payment);
-    }
-
-    private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {
-        return refundPolicies.stream()
-                .filter(refundPolicy -> refundPolicy.getRemaining().getRemain() == remainDate)
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
-    }
-
-    private int getRemainDate(final LocalDate reservationDate, final LocalDate now) {
-        int remainDate = reservationDate.getDayOfYear() - now.getDayOfYear();
-        return remainDate > 8 ? 8 : remainDate;
     }
 
     public MypageReservationResponse getAll(final ReservationSettingsStatus tab, final String studycafeName, LocalDate startDate, LocalDate endDate, final Pageable pageable, final Long memberId) {
