@@ -8,7 +8,7 @@ import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.refundpolicy.dto.RefundPolicyResponse;
 import nerds.studiousTestProject.reservation.dto.ReserveUserResponse;
 import nerds.studiousTestProject.room.entity.Room;
-import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceResponse;
 import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Getter
 public class ReserveResponse {
 
-    private PlaceInfo place;
+    private PlaceResponse place;
     private List<String> conveniences;
     private List<PaidConvenienceResponse> paidConveniences;
     private ReserveUserResponse user;
@@ -28,7 +28,7 @@ public class ReserveResponse {
         return ReserveResponse.builder()
                 .conveniences(getRoomConvenienceList(conveniences))
                 .paidConveniences(getPaidConvenienceList(conveniences))
-                .place(PlaceInfo.of(studycafe, room))
+                .place(PlaceResponse.of(studycafe, room))
                 .user(ReserveUserResponse.from(member))
                 .refundPolicies(getRefundPolicyInfo(refundPolicyList))
                 .build();

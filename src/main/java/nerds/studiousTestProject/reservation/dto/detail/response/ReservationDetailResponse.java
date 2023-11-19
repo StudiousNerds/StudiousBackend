@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.dto.PaymentResponse;
-import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceResponse;
 import nerds.studiousTestProject.reservation.dto.ReservationResponse;
 import nerds.studiousTestProject.reservation.dto.ReserveUserResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -13,7 +13,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 @Builder
 public class ReservationDetailResponse {
 
-    private PlaceInfo place;
+    private PlaceResponse place;
     private ReservationResponse reservation;
     private PaymentResponse payment;
     private ReserveUserResponse user;
@@ -21,7 +21,7 @@ public class ReservationDetailResponse {
     public static ReservationDetailResponse of(ReservationRecord reservationRecord) {
         Payment payment = reservationRecord.getPayment();
         return ReservationDetailResponse.builder()
-                .place(PlaceInfo.from(reservationRecord))
+                .place(PlaceResponse.from(reservationRecord))
                 .reservation(ReservationResponse.from(reservationRecord))
                 .payment(PaymentResponse.from(payment))
                 .user(ReserveUserResponse.from(reservationRecord))

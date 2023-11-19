@@ -6,7 +6,7 @@ import lombok.Getter;
 import nerds.studiousTestProject.convenience.dto.PaidConvenienceResponse;
 import nerds.studiousTestProject.reservation.dto.ReservationResponse;
 import nerds.studiousTestProject.room.entity.PriceType;
-import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.room.entity.Room;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 public class ShowChangeReservationResponse {
 
-    private PlaceInfo place;
+    private PlaceResponse place;
     private ReservationResponse reservation;
     private int headCount;
     private int maxHeadCount;
@@ -28,7 +28,7 @@ public class ShowChangeReservationResponse {
     public static ShowChangeReservationResponse of(ReservationRecord reservationRecord, List<PaidConvenienceResponse> paidConvenienceList, List<PaidConvenienceResponse> notPaidConvenienceList) {
         Room room = reservationRecord.getRoom();
         return ShowChangeReservationResponse.builder()
-                .place(PlaceInfo.from(reservationRecord))
+                .place(PlaceResponse.from(reservationRecord))
                 .reservation(ReservationResponse.from(reservationRecord))
                 .headCount(reservationRecord.getHeadCount())
                 .maxHeadCount(room.getMaxHeadCount())

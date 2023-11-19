@@ -8,25 +8,25 @@ import nerds.studiousTestProject.studycafe.entity.Studycafe;
 
 @Getter
 @Builder
-public class PlaceInfo {
+public class PlaceResponse {
 
     private String studycafeName;
     private String studycafePhoto;
     private String roomName;
     private String address;
 
-    public static PlaceInfo from(ReservationRecord reservationRecord) {
+    public static PlaceResponse from(ReservationRecord reservationRecord) {
         Room room = reservationRecord.getRoom();
         Studycafe studycafe = room.getStudycafe();
         return createPlaceInfo(studycafe, room);
     }
 
-    public static PlaceInfo of(Studycafe studycafe, Room room) {
+    public static PlaceResponse of(Studycafe studycafe, Room room) {
         return createPlaceInfo(studycafe, room);
     }
 
-    private static PlaceInfo createPlaceInfo(Studycafe studycafe, Room room) {
-        return PlaceInfo.builder()
+    private static PlaceResponse createPlaceInfo(Studycafe studycafe, Room room) {
+        return PlaceResponse.builder()
                 .studycafeName(studycafe.getName())
                 .studycafePhoto(studycafe.getPhoto())
                 .roomName(room.getName())

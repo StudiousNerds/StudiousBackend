@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import nerds.studiousTestProject.payment.dto.PaymentResponse;
 import nerds.studiousTestProject.payment.entity.Payment;
-import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceResponse;
 import nerds.studiousTestProject.reservation.dto.ReservationResponse;
 import nerds.studiousTestProject.reservation.dto.ReserveUserResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
@@ -15,7 +15,7 @@ import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 @Getter
 public class ShowAdminCancelResponse {
 
-    private PlaceInfo place;
+    private PlaceResponse place;
     private ReservationResponse reservation;
     private ReserveUserResponse user;
     private PaymentResponse payment;
@@ -24,7 +24,7 @@ public class ShowAdminCancelResponse {
         Payment payment = reservationRecord.getPayment();
         return ShowAdminCancelResponse.builder()
                 .payment(PaymentResponse.from(payment))
-                .place(PlaceInfo.from(reservationRecord))
+                .place(PlaceResponse.from(reservationRecord))
                 .reservation(ReservationResponse.from(reservationRecord))
                 .user(ReserveUserResponse.from(reservationRecord))
                 .build();

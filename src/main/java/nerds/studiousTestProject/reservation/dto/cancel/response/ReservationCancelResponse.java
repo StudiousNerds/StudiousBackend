@@ -6,7 +6,7 @@ import lombok.Getter;
 import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
 import nerds.studiousTestProject.reservation.dto.ReservationResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
-import nerds.studiousTestProject.studycafe.dto.PlaceInfo;
+import nerds.studiousTestProject.studycafe.dto.PlaceResponse;
 
 import java.util.List;
 
@@ -16,14 +16,14 @@ import java.util.List;
 public class ReservationCancelResponse {
 
     private ReservationResponse reservation;
-    private PlaceInfo place;
+    private PlaceResponse place;
     private PaymentWithRefundResponse paymentWithRefund;
     private RefundPolicyWithOnDayResponse refundPolicy;
 
     public static ReservationCancelResponse of(ReservationRecord reservationRecord, PaymentWithRefundResponse paymentWithRefundResponse, List<RefundPolicy> refundPolicies, RefundPolicy refundPolicyOnDay) {
         return ReservationCancelResponse.builder()
                 .reservation(ReservationResponse.from(reservationRecord))
-                .place(PlaceInfo.from(reservationRecord))
+                .place(PlaceResponse.from(reservationRecord))
                 .paymentWithRefund(paymentWithRefundResponse)
                 .refundPolicy(RefundPolicyWithOnDayResponse.of(refundPolicies, refundPolicyOnDay))
                 .build();
