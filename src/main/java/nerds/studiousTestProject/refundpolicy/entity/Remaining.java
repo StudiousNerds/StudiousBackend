@@ -1,5 +1,8 @@
 package nerds.studiousTestProject.refundpolicy.entity;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,6 +33,14 @@ public enum Remaining {
 
     public static Remaining of(int remain) {
         return Remaining.valueOf(ENUM_MAP.get(remain));
+    }
+
+    public static Remaining from(LocalDate reservationDate) {
+        long remain = ChronoUnit.DAYS.between(LocalDate.now(), reservationDate);
+        return Arrays.stream(Remaining.values())
+                .filter(remaining -> remaining.remain == remain)
+                .findAny()
+                .orElse(BEFORE8);
     }
 
     public String getMessage() {
