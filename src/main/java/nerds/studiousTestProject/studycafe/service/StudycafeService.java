@@ -2,6 +2,7 @@ package nerds.studiousTestProject.studycafe.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nerds.studiousTestProject.bookmark.repository.BookmarkRepository;
 import nerds.studiousTestProject.common.exception.NotFoundException;
 import nerds.studiousTestProject.common.service.HolidayProvider;
 import nerds.studiousTestProject.convenience.entity.ConvenienceName;
@@ -51,6 +52,7 @@ public class StudycafeService {
     private final OperationInfoRepository operationInfoRepository;
     private final ReservationRecordRepository reservationRecordRepository;
     private final StudycafeRepository studycafeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     private static final String SHOW_STUDYCAFE_HASHTAGS_SEPARATOR = ",";
     private static final double INITIAL_GRADE = 0.;
@@ -101,11 +103,12 @@ public class StudycafeService {
         return gradeSum / gradeCount;
     }
 
-    public ShowStudycafeDetailsResponse findStudycafeByDate(final Long studycafeId, final LocalDate today) {
+    public ShowStudycafeDetailsResponse findStudycafeByDate(final Long memberId, final Long studycafeId, final LocalDate today) {
         final Studycafe studycafe = findStudycafeById(studycafeId);
         final List<Room> rooms = studycafe.getRooms();
+        final Boolean bookmarked = bookmarkRepository.existsByStudycafeIdAndMemberId(studycafeId, memberId);
         final List<ShowRoomResponse> showRoomResponses = parseRoomsToEnquireRoomResponses(studycafeId, today, rooms);
-        return ShowStudycafeDetailsResponse.of(studycafe, getPhotos(studycafe), showRoomResponses);
+        return ShowStudycafeDetailsResponse.of(studycafe, getPhotos(studycafe), showRoomResponses, bookmarked);
     }
 
     private List<ShowRoomResponse> parseRoomsToEnquireRoomResponses(final Long studycafeId,
