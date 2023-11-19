@@ -93,8 +93,6 @@ public class ReservationRecordService {
     private final PaymentGenerator paymentGenerator;
 
     private Map<Integer, Boolean> reservationTimes = new ConcurrentHashMap<>();
-    private static final int RESERVATION_SETTINGS_PAGE_SIZE = 4;
-    private static final int ADMIN_RESERVATION_SETTINGS_PAGE_SIZE = 10;
     private static final String ORDER_NAME_FORMAT = "%s 인원 %d명";
     private static final String CHANGE_CANCEL_REASON = "재결제를 위한 취소";
 
@@ -102,7 +100,7 @@ public class ReservationRecordService {
     @Transactional
     public PaymentResponse reserve(final ReserveRequest reserveRequest, final Long roomId, final Long memberId) {
         final Room room = findRoomById(roomId);
-        validReservationInfo(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
+        validReservation(reserveRequest, room); // 운영시간 검증 필요 (공휴일 구현이 끝날 경우), 이미 예약 된 시간/날짜는 아닌지 확인
         final Payment payment = paymentRepository.save(createInProgressPayment(reserveRequest.getPrice()));
         final ReservationRecord reservationRecord = reservationRecordRepository.save(reserveRequest.toReservationRecord(room, findMemberById(memberId), payment));
         final String orderName = String.format(ORDER_NAME_FORMAT, room.getName(), reserveRequest.getReservation().getHeadCount());
@@ -122,7 +120,7 @@ public class ReservationRecordService {
                 .build();
     }
 
-    private void validReservationInfo(final ReserveRequest reserveRequest, final Room room) {
+    private void validReservation(final ReserveRequest reserveRequest, final Room room) {
         ReservationRequest reservationRequest = reserveRequest.getReservation();
         validCorrectDate(reservationRequest);
         validCorrectTime(reservationRequest);
