@@ -18,11 +18,21 @@ import nerds.studiousTestProject.payment.dto.confirm.response.ConfirmFailRespons
 import nerds.studiousTestProject.payment.entity.Payment;
 import nerds.studiousTestProject.payment.repository.PaymentRepository;
 import nerds.studiousTestProject.payment.util.PaymentGenerator;
+import nerds.studiousTestProject.refundpolicy.entity.RefundPolicy;
+import nerds.studiousTestProject.refundpolicy.entity.Remaining;
+import nerds.studiousTestProject.refundpolicy.repository.RefundPolicyRepository;
+import nerds.studiousTestProject.reservation.dto.cancel.response.PaymentWithRefundResponse;
+import nerds.studiousTestProject.reservation.dto.cancel.response.ReservationCancelResponse;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.repository.ReservationRecordRepository;
+import nerds.studiousTestProject.studycafe.entity.Studycafe;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.INVALID_RESERVATION_CANCEL_DATE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_CANCEL_PRICE;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_ORDER_ID;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.MISMATCH_PRICE;
@@ -48,6 +58,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentGenerator paymentGenerator;
     private final ReservationRecordRepository reservationRecordRepository;
+    private final RefundPolicyRepository refundPolicyRepository;
 
     @Transactional
     public SuccessPayResponse confirmSuccess(ConfirmSuccessRequest request) {
@@ -110,10 +121,10 @@ public class PaymentService {
     }
 
     @Transactional
-    public void userCancel(final CancelRequest cancelRequest, final Long reservationId){
+    public void userCancel(final CancelRequest cancelRequest, final Long reservationId) {
         ReservationRecord reservationRecord = findReservationRecordByIdWithPayment(reservationId);
         Payment payment = reservationRecord.getPayment();
-        //취소 금액 validation 해야 하는데, validate 하는 메서드가 reservationService에 있음 설계 엉망..
+        validCancelAmount(cancelRequest, reservationRecord, payment);
         cancel(cancelRequest, MemberRole.USER, reservationRecord, payment);
     }
 
@@ -196,4 +207,44 @@ public class PaymentService {
     private Payment findByOrderId(final String orderId) {
         return paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException(NOT_FOUND_PAYMENT));
     }
+
+    public ReservationCancelResponse getCancel(final Long reservationId) {
+        final ReservationRecord reservationRecord = findByIdWithPaymentAndPlace(reservationId);
+        final Studycafe studycafe = reservationRecord.getRoom().getStudycafe();
+        final List<RefundPolicy> refundPolicies = refundPolicyRepository.findAllByStudycafe(studycafe);
+
+        final int remainDate = getRemainDate(reservationRecord.getDate(), LocalDate.now());
+        final RefundPolicy refundPolicyOnDay = getRefundPolicyOnDay(refundPolicies, remainDate);
+        PaymentWithRefundResponse paymentWithRefundResponse = createPaymentWithRefundResponse(reservationRecord.getPayment(), refundPolicyOnDay);
+        return ReservationCancelResponse.of(reservationRecord, paymentWithRefundResponse, refundPolicies, refundPolicyOnDay);
+    }
+
+    private ReservationRecord findByIdWithPaymentAndPlace(Long reservationRecordId) {
+        return reservationRecordRepository.findByIdWithPaymentAndPlace(reservationRecordId)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_RESERVATION_RECORD));
+    }
+
+    private PaymentWithRefundResponse createPaymentWithRefundResponse(final Payment payment, final RefundPolicy refundPolicyOnDay) {
+        final int price = payment.getPrice();
+        final int refundPrice = calculateRefundPrice(refundPolicyOnDay, price);
+        final int refundFee = price - refundPrice;
+        return PaymentWithRefundResponse.of(refundPrice, refundFee, payment);
+    }
+
+    private int calculateRefundPrice(RefundPolicy refundPolicyOnDay, int price) {
+        return price * refundPolicyOnDay.getRate() * (1 / 100);
+    }
+
+    private RefundPolicy getRefundPolicyOnDay(final List<RefundPolicy> refundPolicies, final int remainDate) {
+        return refundPolicies.stream()
+                .filter(refundPolicy -> refundPolicy.getRemaining().getRemain() == remainDate)
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(INVALID_RESERVATION_CANCEL_DATE));
+    }
+
+    private int getRemainDate(final LocalDate reservationDate, final LocalDate now) {
+        int remainDate = reservationDate.getDayOfYear() - now.getDayOfYear();
+        return remainDate > 8 ? 8 : remainDate;
+    }
+
 }
