@@ -70,6 +70,7 @@ import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.NOT
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.OVER_MAX_HEADCOUNT;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.START_TIME_AFTER_THAN_END_TIME;
 import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.USING_TIME_NOT_PER_HOUR;
+import static nerds.studiousTestProject.common.exception.errorcode.ErrorCode.ALREADY_EXIST_RESERVATION;
 import static nerds.studiousTestProject.payment.util.PaymentRequestStatus.CANCEL;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.AFTER_USING;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.BEFORE_USING;
@@ -129,6 +130,13 @@ public class ReservationRecordService {
         validMinUsingTime(reservationRequest, room);
         validOverMaxHeadCount(reservationRequest.getHeadCount(), room);
         validCalculatePrice(reserveRequest, room);
+        validAlreadyExistReservation(reservationRequest, room);
+    }
+
+    private void validAlreadyExistReservation(ReservationRequest reservationRequest, Room room) {
+        if (reservationRecordRepository.existsByRoomAndDateTime(reservationRequest.getDate(), reservationRequest.getStartTime(), reservationRequest.getEndTime(), room.getId())) {
+            throw new BadRequestException(ALREADY_EXIST_RESERVATION);
+        }
     }
 
     private void validCalculatePrice(final ReserveRequest reserveRequest, final Room room) {
