@@ -140,7 +140,6 @@ CREATE TABLE IF NOT EXISTS `reservation_record` (
     `end_time`          time         NOT NULL,
     `head_count`        int          NOT NULL,
     `user_name`         varchar(255) NOT NULL,
-    `order_id`          varchar(255),
     `user_phone_number` varchar(255) NOT NULL,
     `request`           varchar(255),
     `status`            varchar(255) NOT NULL,
