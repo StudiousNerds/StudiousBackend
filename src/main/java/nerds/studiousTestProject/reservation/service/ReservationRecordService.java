@@ -277,7 +277,7 @@ public class ReservationRecordService {
     }
 
     private void validPageable(Pageable pageable) {
-        if (pageable.getPageNumber() < 1) {
+        if (pageable.getPageNumber() < 0) {
             throw new BadRequestException(INVALID_PAGE_NUMBER);
         }
         if (pageable.getPageSize() < 1) {
