@@ -18,7 +18,7 @@ public class MypageReservationResponse {
         if(reservationRecordPage.isEmpty()) return null;
         return MypageReservationResponse.builder()
                 .reservations(reservationRecordWithStatusResponseList)
-                .pageNumber(reservationRecordPage.getNumber() + 1)
+                .pageNumber(reservationRecordPage.getNumber())
                 .totalPage(reservationRecordPage.getTotalPages())
                 .build();
     }
