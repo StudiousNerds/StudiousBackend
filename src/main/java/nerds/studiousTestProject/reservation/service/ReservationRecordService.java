@@ -270,8 +270,7 @@ public class ReservationRecordService {
 
     public MypageReservationResponse getAll(final ReservationSettingsStatus tab, final String studycafeName, LocalDate startDate, LocalDate endDate, final Pageable pageable, final Long memberId) {
         validPageable(pageable);
-        final Member member = findMemberById(memberId);
-        final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, member, pageable);
+        final Page<ReservationRecord> reservationRecordPage = reservationRecordRepository.getReservationRecordsConditions(tab, studycafeName, startDate, endDate, memberId, pageable);
         final List<ReservationRecordWithStatusResponse> reservationRecordWithStatusResponseList = reservationRecordPage.getContent().stream().map(reservationRecord -> createReservationSettingsResponse(reservationRecord)).collect(Collectors.toList());
         return MypageReservationResponse.of(reservationRecordWithStatusResponseList, reservationRecordPage);
     }

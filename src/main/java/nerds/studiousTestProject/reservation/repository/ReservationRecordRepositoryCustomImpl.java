@@ -4,23 +4,25 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import nerds.studiousTestProject.member.entity.member.Member;
 import nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus;
 import nerds.studiousTestProject.reservation.entity.ReservationRecord;
 import nerds.studiousTestProject.reservation.entity.ReservationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
+import static nerds.studiousTestProject.member.entity.member.QMember.member;
+import static nerds.studiousTestProject.payment.entity.QPayment.payment;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.AFTER_USING;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.ALL;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.BEFORE_USING;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.CANCELED;
 import static nerds.studiousTestProject.reservation.entity.ReservationSettingsStatus.USING;
 import static nerds.studiousTestProject.reservation.entity.QReservationRecord.reservationRecord;
+import static nerds.studiousTestProject.room.entity.QRoom.room;
 import static nerds.studiousTestProject.studycafe.entity.QStudycafe.studycafe;
 
 
@@ -30,29 +32,35 @@ public class ReservationRecordRepositoryCustomImpl implements ReservationRecordR
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<ReservationRecord> getReservationRecordsConditions(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member, Pageable pageable) {
+    public Page<ReservationRecord> getReservationRecordsConditions(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Long memberId, Pageable pageable) {
 
-        JPAQuery<ReservationRecord> contentQuery = jpaQueryFactory.selectFrom(reservationRecord);
+        JPAQuery<ReservationRecord> contentQuery = jpaQueryFactory.selectFrom(reservationRecord)
+                .join(reservationRecord.member, member).fetchJoin()
+                .join(reservationRecord.room, room).fetchJoin()
+                .innerJoin(room.studycafe, studycafe).fetchJoin()
+                .join(reservationRecord.payment, payment).fetchJoin();
 
         JPAQuery<Long> countQuery = jpaQueryFactory.select(reservationRecord.count())
-                .from(reservationRecord);
+                .from(reservationRecord)
+                .join(reservationRecord.member, member)
+                .join(reservationRecord.room.studycafe, studycafe);
 
-        List<ReservationRecord> content = getReservationSettings(contentQuery, tab, studycafeName, startDate, endDate, member)
+        List<ReservationRecord> content = getReservationSettings(contentQuery, tab, studycafeName, startDate, endDate, memberId)
                 .orderBy(reservationRecord.date.desc(), reservationRecord.startTime.desc(), reservationRecord.endTime.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long count = getReservationSettings(countQuery, tab, studycafeName, startDate, endDate, member)
+        Long count = getReservationSettings(countQuery, tab, studycafeName, startDate, endDate, memberId)
                 .fetchOne();
 
         return count == null ? Page.empty() : new PageImpl<>(content, pageable, count);
     }
 
-    private <T> JPAQuery<T> getReservationSettings(JPAQuery<T> query, ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member) {
-        return query.innerJoin(reservationRecord.member).on(reservationRecord.member.id.eq(member.getId()))
-                .innerJoin(reservationRecord.room.studycafe, studycafe)
+    private <T> JPAQuery<T> getReservationSettings(JPAQuery<T> query, ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Long memberId) {
+        return query
                 .where(
+                        member.id.eq(memberId),
                         searchByStudycafeName(studycafeName),
                         handleTab(tab),
                         afterReservationStartDate(startDate),

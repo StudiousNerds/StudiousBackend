@@ -9,5 +9,5 @@ import java.time.LocalDate;
 
 public interface ReservationRecordRepositoryCustom {
 
-    Page<ReservationRecord> getReservationRecordsConditions(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Member member, Pageable pageable);
+    Page<ReservationRecord> getReservationRecordsConditions(ReservationSettingsStatus tab, String studycafeName, LocalDate startDate, LocalDate endDate, Long memberId, Pageable pageable);
 }
