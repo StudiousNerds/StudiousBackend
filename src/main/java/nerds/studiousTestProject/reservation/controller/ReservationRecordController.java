@@ -71,7 +71,7 @@ public class ReservationRecordController {
             @RequestParam(required = false) String studycafeName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam @PageableDefault(page = 1) Pageable pageable) {
+            @PageableDefault Pageable pageable) {
         return reservationRecordService.getAll(tab, studycafeName, startDate, endDate, pageable, memberId);
     }
 
